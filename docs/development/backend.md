@@ -456,8 +456,30 @@ src/main/resources/db/changelog/
 - Configure PostgreSQL
 - Configure Liquibase
 - Configure Swagger
+- Add base package structure
+- Add global response model
+- Add exception package
+- Add validation dependency
 
-### Phase 2 — Authentication
+### Phase 2 - Database design
+- Create ERD
+- Create first Liquibase changelog
+- Create users table
+- Create agencies table
+- Create agents table
+- Create properties table
+- Create property_images table
+- Create favorites table
+- Create inquiries table
+- Create viewings table
+- Create subscription tables
+- Add foreign keys
+- Add indexes
+- Add enum columns
+- Add created_at / updated_at fields
+- Test database migration
+
+### Phase 3 — Authentication
 
 - User entity
 - Role enum
@@ -467,7 +489,7 @@ src/main/resources/db/changelog/
 - Refresh token
 - Security config
 
-### Phase 3 — Agency CRM
+### Phase 4 — Agency CRM
 
 - Agency entity
 - Agency CRUD
@@ -475,7 +497,7 @@ src/main/resources/db/changelog/
 - Agent CRUD
 - Agent assignment
 
-### Phase 4 — Properties
+### Phase 5 — Properties
 
 - Property entity
 - Property CRUD
@@ -484,26 +506,26 @@ src/main/resources/db/changelog/
 - Search/filter endpoints
 - Map endpoint
 
-### Phase 5 — Client Features
+### Phase 6 — Client Features
 
 - Favorites
 - Inquiries
 - Viewing requests
 
-### Phase 6 — Subscription Logic
+### Phase 7 — Subscription Logic
 
 - Plans
 - Agency subscription status
 - Listing creation restriction
 
-### Phase 7 — Dashboards
+### Phase 8 — Dashboards
 
 - Admin statistics
 - Agency statistics
 - Agent statistics
 - Client dashboard data
 
-### Phase 8 — Testing and Documentation
+### Phase 9 — Testing and Documentation
 
 - Unit tests
 - Controller tests
