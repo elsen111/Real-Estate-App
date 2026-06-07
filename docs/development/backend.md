@@ -136,6 +136,16 @@ Fields:
 - createdAt
 - updatedAt
 
+### Role
+
+Fields:
+
+- id
+- name
+- description
+- createdAt
+- updatedAt
+
 ### Agency
 
 Fields:
@@ -144,12 +154,23 @@ Fields:
 - name
 - description
 - email
-- phone
+- phone_number
 - address
 - website
 - logoUrl
 - status
 - subscriptionStatus
+- createdAt
+- updatedAt
+
+### AgencyMember
+
+Fields:
+
+- id
+- position
+- memberType
+- active
 - createdAt
 - updatedAt
 
@@ -192,23 +213,42 @@ Fields:
 - createdAt
 - updatedAt
 
-### PropertyImage
+### Category
 
 Fields:
 
 - id
-- property
-- imageUrl
-- mainImage
+- name
+- slug
+- description
+- active
 - createdAt
+- updatedAt
+
+### MediaFiles
+
+Fields:
+
+- id
+- property_id
+- agency_id
+- file_url
+- file_name
+- file_type
+- file_size
+- media_purpose
+- is_main
+- sort_order
+- createdAt
+- updatedAt
 
 ### Favorite
 
 Fields:
 
 - id
-- client
-- property
+- user_id
+- property_id
 - createdAt
 
 ### Inquiry
@@ -239,27 +279,87 @@ Fields:
 - createdAt
 - updatedAt
 
+### Appointment
+
+Fields:
+
+- id
+- property_id
+- client_id
+- agent_id
+- appointment_type
+- preferredDateTime
+- confirmedDateTime
+- status
+- note
+- response_note
+- createdAt
+- updatedAt
+
 ### SubscriptionPlan
 
 Fields:
 
 - id
 - name
+- description
 - price
-- maxListings
-- maxAgents
+- duration_days
+- max_agents
+- max_listings
+- featured_listings_allowed
 - active
+- createdAt
+- updatedAt
 
 ### AgencySubscription
 
 Fields:
 
 - id
-- agency
-- plan
-- startDate
-- endDate
+- agency_id
+- plan_id
+- start_date
+- end_date
+- active
+- createdAt
+- updatedAt
+
+### Review
+
+Fields:
+
+- id
+- reviewer_id
+- agency_id
+- property_id
+- rating
+- comment
 - status
+- createdAt
+- updatedAt
+
+### RefreshToken
+
+Fields:
+
+- id
+- user_id
+- token
+- expiry_date
+- revoked
+- createdAt
+
+### PasswordResetToken
+
+Fields:
+
+- id
+- user_id
+- token
+- expiry_date
+- used
+- createdAt
 
 ## 8. Main Enums
 
@@ -435,16 +535,22 @@ Suggested changelog order:
 ```bash
 src/main/resources/db/changelog/
 ├── db.changelog-master.yaml
-├── 001-create-users-table.yaml
-├── 002-create-agencies-table.yaml
-├── 003-create-agents-table.yaml
-├── 004-create-properties-table.yaml
-├── 005-create-property-images-table.yaml
-├── 006-create-favorites-table.yaml
-├── 007-create-inquiries-table.yaml
-├── 008-create-viewing-requests-table.yaml
-├── 009-create-subscription-plans-table.yaml
-└── 010-create-agency-subscriptions-table.yaml
+├── 1.0.0-create-users-table.sql
+├── 1.0.1-create-roles-table.sql
+├── 1.0.2-create-agencies-table.sql
+├── 1.0.3-create-categories-table.sql
+├── 1.0.4-create-subscription-plans-table.sql
+├── 1.0.5-create-user-roles-table.sql
+├── 1.0.6-create-agency-members-table.sql
+├── 1.0.7-create-agency-subscriptions-table.sql
+├── 1.0.8-create-properties-table.sql
+├── 1.0.9-create-media-files-table.sql
+├── 1.0.10-create-favorites-table.sql
+├── 1.0.11-create-inquiries-table.sql
+├── 1.0.12-create-appointments-table.sql
+├── 1.0.13-create-reviews-table.sql
+├── 1.0.14-create-refresh-tokens-table.sql
+└── 1.0.15-create-password-reset-tokens-table.sql
 ```
 
 ## 14. Backend Development Phases
