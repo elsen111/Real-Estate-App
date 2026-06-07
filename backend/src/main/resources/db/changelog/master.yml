@@ -1,6 +1,0 @@
-databaseChangeLog:
-  - changeSet:
-      id: 001-create-initial-schema
-      author: backend-team
-      comment: Empty placeholder for initialization
-      changes:
