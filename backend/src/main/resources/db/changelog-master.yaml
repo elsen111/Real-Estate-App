@@ -1,0 +1,57 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/1.0.0-create-users-table.sql
+
+  - include:
+      file: db/changelog/1.0.1-create-roles-table.sql
+
+  - include:
+      file: db/changelog/1.0.2-create-agencies-table.sql
+
+  - include:
+      file: db/changelog/1.0.3-create-categories-table.sql
+
+  - include:
+      file: db/changelog/1.0.4-create-subscription-plans-table.sql
+
+  - include:
+      file: db/changelog/1.0.5-create-user-roles-table.sql
+
+  - include:
+      file: db/changelog/1.0.6-create-agency-members-table.sql
+
+  - include:
+      file: db/changelog/1.0.7-create-agency-subscriptions-table.sql
+
+  - include:
+      file: db/changelog/1.0.8-create-properties-table.sql
+
+  - include:
+      file: db/changelog/1.0.9-create-media-files-table.sql
+
+  - include:
+      file: db/changelog/1.0.10-create-favorites-table.sql
+
+  - include:
+      file: db/changelog/1.0.11-create-inquiries-table.sql
+
+  - include:
+      file: db/changelog/1.0.12-create-appointments-table.sql
+
+  - include:
+      file: db/changelog/1.0.13-create-reviews-table.sql
+
+  - include:
+      file: db/changelog/1.0.14-create-refresh-tokens-table.sql
+
+  - include:
+      file: db/changelog/1.0.16-create-password-reset-tokens-table.sql
+
+  - include:
+      file: db/changelog/1.0.17-insert-default-categories.sql
+
+  - include:
+      file: db/changelog/1.0.18-insert-default-roles.sql
+
+  - include:
+      file: db/changelog/1.0.19-insert-default-subscription-plans.sql
