@@ -45,13 +45,13 @@ databaseChangeLog:
       file: db/changelog/1.0.14-create-refresh-tokens-table.sql
 
   - include:
-      file: db/changelog/1.0.16-create-password-reset-tokens-table.sql
+      file: db/changelog/1.0.15-create-password-reset-tokens-table.sql
 
   - include:
-      file: db/changelog/1.0.17-insert-default-categories.sql
+      file: db/changelog/1.0.16-insert-default-categories.sql
 
   - include:
-      file: db/changelog/1.0.18-insert-default-roles.sql
+      file: db/changelog/1.0.17-insert-default-roles.sql
 
   - include:
-      file: db/changelog/1.0.19-insert-default-subscription-plans.sql
+      file: db/changelog/1.0.18-insert-default-subscription-plans.sql
