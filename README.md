@@ -153,9 +153,13 @@ Main tables:
 - roles
 - user_roles
 - agencies
+- agency_members
+- appointments
+- categories
 - agents
 - properties
-- property_images
+- media_files
+- reviews
 - favorites
 - inquiries
 - viewing_requests
