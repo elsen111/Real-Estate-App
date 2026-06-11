@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/test")
 public class Test {
     @GetMapping
-    public ApiResponse<String> test(){
-        return ResponseEntity.ok(ApiResponse.success("Data fetched successfully", "This is test")).
-                getBody();
+    public ResponseEntity<ApiResponse<String>> test() {
+        ApiResponse<String> response = ApiResponse.success("Data fetched successfully", "This is test");
+        return ResponseEntity.ok(response);
     }
 }
