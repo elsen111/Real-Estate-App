@@ -1,8 +1,8 @@
 CREATE TABLE properties (
-                            id BIGSERIAL PRIMARY KEY,
-                            agency_id BIGINT NOT NULL,
-                            category_id BIGINT NOT NULL,
-                            assigned_agent_id BIGINT,
+                            id UUID PRIMARY KEY,
+                            agency_id UUID NOT NULL,
+                            category_id UUID NOT NULL,
+                            assigned_agent_id UUID,
                             title VARCHAR(200) NOT NULL,
                             description TEXT NOT NULL,
                             price DECIMAL(15,2) NOT NULL,

@@ -1,5 +1,5 @@
 CREATE TABLE agencies (
-                          id BIGSERIAL PRIMARY KEY,
+                          id UUID PRIMARY KEY,
                           name VARCHAR(150) NOT NULL,
                           description TEXT,
                           phone_number VARCHAR(30) NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE agencies (
                           logo_url VARCHAR(500),
                           city VARCHAR(100) NOT NULL,
                           address VARCHAR(255) NOT NULL,
-                          status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
+                          status VARCHAR(30) NOT NULL DEFAULT 'PENDING',
                           created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                           updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

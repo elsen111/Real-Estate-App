@@ -1,7 +1,7 @@
 CREATE TABLE favorites (
-                           id BIGSERIAL PRIMARY KEY,
-                           user_id BIGINT NOT NULL,
-                           property_id BIGINT NOT NULL,
+                           id UUID PRIMARY KEY,
+                           user_id UUID NOT NULL,
+                           property_id UUID NOT NULL,
                            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
                            CONSTRAINT fk_favorites_user_id

@@ -1,7 +1,7 @@
 CREATE TABLE agency_members (
-                                id BIGSERIAL PRIMARY KEY,
-                                agency_id BIGINT NOT NULL,
-                                user_id BIGINT NOT NULL,
+                                id UUID PRIMARY KEY,
+                                agency_id UUID NOT NULL,
+                                user_id UUID NOT NULL,
                                 position VARCHAR(100),
                                 member_type VARCHAR(30) NOT NULL,
                                 active BOOLEAN NOT NULL DEFAULT TRUE,

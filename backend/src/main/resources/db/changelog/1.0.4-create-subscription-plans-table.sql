@@ -1,5 +1,5 @@
 CREATE TABLE subscription_plans (
-                                    id BIGSERIAL PRIMARY KEY,
+                                    id UUID PRIMARY KEY,
                                     name VARCHAR(100) NOT NULL,
                                     description TEXT,
                                     price DECIMAL(10,2) NOT NULL,

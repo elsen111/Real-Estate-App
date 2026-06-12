@@ -1,5 +1,5 @@
 CREATE TABLE roles (
-                       id BIGSERIAL PRIMARY KEY,
+                       id UUID PRIMARY KEY,
                        name VARCHAR(50) NOT NULL,
                        description VARCHAR(255),
 

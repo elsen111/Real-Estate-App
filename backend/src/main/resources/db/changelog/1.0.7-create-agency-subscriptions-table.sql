@@ -1,7 +1,7 @@
 CREATE TABLE agency_subscriptions (
-                                      id BIGSERIAL PRIMARY KEY,
-                                      agency_id BIGINT NOT NULL,
-                                      plan_id BIGINT NOT NULL,
+                                      id UUID PRIMARY KEY,
+                                      agency_id UUID NOT NULL,
+                                      plan_id UUID NOT NULL,
                                       start_date DATE NOT NULL,
                                       end_date DATE NOT NULL,
                                       active BOOLEAN NOT NULL DEFAULT TRUE,
