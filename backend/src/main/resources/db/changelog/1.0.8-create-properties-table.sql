@@ -17,7 +17,7 @@ CREATE TABLE properties (
                             total_floors INT,
                             latitude DECIMAL(10,7) NOT NULL,
                             longitude DECIMAL(10,7) NOT NULL,
-                            status VARCHAR(30) NOT NULL DEFAULT 'PENDING',
+                            status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
                             featured BOOLEAN NOT NULL DEFAULT FALSE,
                             view_count BIGINT NOT NULL DEFAULT 0,
                             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
