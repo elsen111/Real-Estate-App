@@ -1,6 +1,6 @@
 package com.realestate.backend.enums;
 
-public enum ViewingStatus {
+public enum ReviewStatus {
     PENDING,
     APPROVED,
     REJECTED,
