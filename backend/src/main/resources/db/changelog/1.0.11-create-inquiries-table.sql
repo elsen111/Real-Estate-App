@@ -1,8 +1,8 @@
 CREATE TABLE inquiries (
-                           id BIGSERIAL PRIMARY KEY,
-                           property_id BIGINT NOT NULL,
-                           client_id BIGINT NOT NULL,
-                           assigned_agent_id BIGINT,
+                           id UUID PRIMARY KEY,
+                           property_id UUID NOT NULL,
+                           client_id UUID NOT NULL,
+                           assigned_agent_id UUID,
                            message TEXT NOT NULL,
                            preferred_contact_method VARCHAR(30) NOT NULL,
                            status VARCHAR(30) NOT NULL DEFAULT 'NEW',

@@ -1,10 +1,10 @@
 CREATE TABLE agency_subscriptions (
-                                      id BIGSERIAL PRIMARY KEY,
-                                      agency_id BIGINT NOT NULL,
-                                      plan_id BIGINT NOT NULL,
+                                      id UUID PRIMARY KEY,
+                                      agency_id UUID NOT NULL,
+                                      plan_id UUID NOT NULL,
                                       start_date DATE NOT NULL,
                                       end_date DATE NOT NULL,
-                                      active BOOLEAN NOT NULL DEFAULT TRUE,
+                                      status VARCHAR(30) NOT NULL DEFAULT 'INACTIVE',
                                       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                       updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -23,5 +23,5 @@ CREATE TABLE agency_subscriptions (
 
 CREATE INDEX idx_agency_subscriptions_agency_id ON agency_subscriptions(agency_id);
 CREATE INDEX idx_agency_subscriptions_plan_id ON agency_subscriptions(plan_id);
-CREATE INDEX idx_agency_subscriptions_active ON agency_subscriptions(active);
+CREATE INDEX idx_agency_subscriptions_status ON agency_subscriptions(status);
 CREATE INDEX idx_agency_subscriptions_end_date ON agency_subscriptions(end_date);

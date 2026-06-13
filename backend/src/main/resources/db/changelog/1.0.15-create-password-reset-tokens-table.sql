@@ -1,6 +1,6 @@
 CREATE TABLE password_reset_tokens (
-                                       id BIGSERIAL PRIMARY KEY,
-                                       user_id BIGINT NOT NULL,
+                                       id UUID PRIMARY KEY,
+                                       user_id UUID NOT NULL,
                                        token VARCHAR(500) NOT NULL,
                                        expiry_date TIMESTAMP NOT NULL,
                                        used BOOLEAN NOT NULL DEFAULT FALSE,

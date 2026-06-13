@@ -1,5 +1,5 @@
 CREATE TABLE categories (
-                            id BIGSERIAL PRIMARY KEY,
+                            id UUID PRIMARY KEY,
                             name VARCHAR(100) NOT NULL,
                             slug VARCHAR(100) NOT NULL,
                             description VARCHAR(255),

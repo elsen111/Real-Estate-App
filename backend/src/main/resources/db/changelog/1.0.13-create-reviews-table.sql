@@ -1,8 +1,8 @@
 CREATE TABLE reviews (
-                         id BIGSERIAL PRIMARY KEY,
-                         reviewer_id BIGINT NOT NULL,
-                         agency_id BIGINT,
-                         property_id BIGINT,
+                         id UUID PRIMARY KEY,
+                         reviewer_id UUID NOT NULL,
+                         agency_id UUID,
+                         property_id UUID,
                          rating INT NOT NULL,
                          comment TEXT,
                          status VARCHAR(30) NOT NULL DEFAULT 'PENDING',

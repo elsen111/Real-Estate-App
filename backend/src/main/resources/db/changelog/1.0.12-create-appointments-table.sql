@@ -1,8 +1,8 @@
 CREATE TABLE appointments (
-                              id BIGSERIAL PRIMARY KEY,
-                              property_id BIGINT NOT NULL,
-                              client_id BIGINT NOT NULL,
-                              agent_id BIGINT,
+                              id UUID PRIMARY KEY,
+                              property_id UUID NOT NULL,
+                              client_id UUID NOT NULL,
+                              agent_id UUID,
                               appointment_type VARCHAR(30) NOT NULL DEFAULT 'PROPERTY_VIEWING',
                               preferred_date_time TIMESTAMP NOT NULL,
                               confirmed_date_time TIMESTAMP,

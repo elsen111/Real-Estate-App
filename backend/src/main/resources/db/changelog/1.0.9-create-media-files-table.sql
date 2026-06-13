@@ -1,8 +1,8 @@
 CREATE TABLE media_files (
-                             id BIGSERIAL PRIMARY KEY,
+                             id UUID PRIMARY KEY,
 
-                             property_id BIGINT,
-                             agency_id BIGINT,
+                             property_id UUID,
+                             agency_id UUID,
 
                              file_url VARCHAR(500) NOT NULL,
                              file_name VARCHAR(255),

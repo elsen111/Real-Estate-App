@@ -1,6 +1,6 @@
 CREATE TABLE refresh_tokens (
-                                id BIGSERIAL PRIMARY KEY,
-                                user_id BIGINT NOT NULL,
+                                id UUID PRIMARY KEY,
+                                user_id UUID NOT NULL,
                                 token VARCHAR(500) NOT NULL,
                                 expiry_date TIMESTAMP NOT NULL,
                                 revoked BOOLEAN NOT NULL DEFAULT FALSE,

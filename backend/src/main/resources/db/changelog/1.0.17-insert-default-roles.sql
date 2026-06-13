@@ -1,6 +1,6 @@
-INSERT INTO roles (name, description)
+INSERT INTO roles (id, name, description)
 VALUES
-    ('SUPER_ADMIN', 'Platform administrator'),
-    ('AGENCY_ADMIN', 'Agency owner or manager'),
-    ('AGENT', 'Agency property agent'),
-    ('CLIENT', 'Buyer or renter');
+    (gen_random_uuid(), 'SUPER_ADMIN', 'Platform administrator'),
+    (gen_random_uuid(), 'AGENCY_ADMIN', 'Agency owner or manager'),
+    (gen_random_uuid(), 'AGENT', 'Agency property agent'),
+    (gen_random_uuid(), 'CLIENT', 'Buyer or renter');

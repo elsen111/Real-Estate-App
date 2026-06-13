@@ -1,4 +1,5 @@
 INSERT INTO subscription_plans (
+    id,
     name,
     description,
     price,
@@ -10,6 +11,7 @@ INSERT INTO subscription_plans (
 )
 VALUES
     (
+        gen_random_uuid(),
         'Starter',
         'Basic plan for small agencies',
         29.99,
@@ -20,6 +22,7 @@ VALUES
         TRUE
     ),
     (
+        gen_random_uuid(),
         'Professional',
         'Standard plan for growing agencies',
         79.99,
@@ -30,6 +33,7 @@ VALUES
         TRUE
     ),
     (
+        gen_random_uuid(),
         'Enterprise',
         'Advanced plan for large agencies',
         149.99,
