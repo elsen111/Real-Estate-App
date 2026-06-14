@@ -69,7 +69,7 @@ public class AppointmentEntity {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 30, nullable = false)
-    AppointmentStatus sttus = AppointmentStatus.PENDING;
+    AppointmentStatus status = AppointmentStatus.PENDING;
 
     @Column(name = "note", columnDefinition = "TEXT")
     private String note;
