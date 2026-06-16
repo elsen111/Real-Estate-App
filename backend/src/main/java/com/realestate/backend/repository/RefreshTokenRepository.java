@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,6 +19,8 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshTokenEntity
             String tokenHash,
             LocalDateTime currentDateTime
     );
+
+    List<RefreshTokenEntity> findAllByUserIdAndRevokedFalse(UUID userId);
 
     @Transactional
     void deleteByUser_Id(UUID userId);
