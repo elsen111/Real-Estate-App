@@ -18,14 +18,13 @@ import java.util.UUID;
 @Builder
 public class RoleEntity {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "name", length = 50, nullable = false)
+    @Column(name = "name", length = 50, nullable = false, unique = true)
     private Role roleName;
 
     @Column(name = "description")
