@@ -1,3 +1,7 @@
+--liquibase formatted sql
+
+--changeset Elshan:V1.0.09-create-media-files-table
+--comment Create media_files table
 CREATE TABLE media_files (
                              id UUID PRIMARY KEY,
 

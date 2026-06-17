@@ -1,3 +1,7 @@
+--liquibase formatted sql
+
+--changeset Elshan:V1.0.15-create-password-reset-tokens-table
+--comment Create password_reset_tokens table
 CREATE TABLE password_reset_tokens (
                                        id UUID PRIMARY KEY,
                                        user_id UUID NOT NULL,

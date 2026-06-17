@@ -1,3 +1,7 @@
+--liquibase formatted sql
+
+--changeset Elshan:V1.0.06-create-agency-members-table
+--comment Create agency_members table
 CREATE TABLE agency_members (
                                 id UUID PRIMARY KEY,
                                 agency_id UUID NOT NULL,

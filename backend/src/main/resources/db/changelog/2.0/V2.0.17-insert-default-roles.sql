@@ -1,3 +1,7 @@
+-- liquibase formatted sql
+
+-- changeset Elshan:V2.0.17-insert-default-roles
+-- comment: Insert default system roles.
 INSERT INTO roles (id, name, description)
 VALUES
     (gen_random_uuid(), 'SUPER_ADMIN', 'Platform administrator'),

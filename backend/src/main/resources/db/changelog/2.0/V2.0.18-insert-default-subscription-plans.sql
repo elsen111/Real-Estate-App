@@ -1,3 +1,7 @@
+-- liquibase formatted sql
+
+-- changeset Elshan:V2.0.18-insert-default-subscription-plans
+-- comment: Insert default system subscription plans.
 INSERT INTO subscription_plans (
     id,
     name,

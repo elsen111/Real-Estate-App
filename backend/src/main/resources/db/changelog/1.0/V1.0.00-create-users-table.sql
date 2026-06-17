@@ -1,3 +1,7 @@
+--liquibase formatted sql
+
+--changeset Elshan:V1.0.00-create-users-table
+--comment Create roles table
 CREATE TABLE users (
                        id UUID PRIMARY KEY,
                        full_name VARCHAR(100) NOT NULL,

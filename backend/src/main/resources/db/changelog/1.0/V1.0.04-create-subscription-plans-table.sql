@@ -1,3 +1,7 @@
+--liquibase formatted sql
+
+--changeset Elshan:V1.0.04-create-subscription-plans-table
+--comment Create subscription_plans table
 CREATE TABLE subscription_plans (
                                     id UUID PRIMARY KEY,
                                     name VARCHAR(100) NOT NULL,

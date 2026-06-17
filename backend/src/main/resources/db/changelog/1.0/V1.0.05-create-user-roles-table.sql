@@ -1,3 +1,7 @@
+--liquibase formatted sql
+
+--changeset Elshan:V1.0.05-create-user-roles-table
+--comment Create user_roles table
 CREATE TABLE user_roles (
                             user_id UUID NOT NULL,
                             role_id UUID NOT NULL,

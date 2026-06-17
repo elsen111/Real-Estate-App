@@ -1,3 +1,7 @@
+--liquibase formatted sql
+
+--changeset Elshan:V1.0.03-create-categories-table
+--comment Create categories table
 CREATE TABLE categories (
                             id UUID PRIMARY KEY,
                             name VARCHAR(100) NOT NULL,

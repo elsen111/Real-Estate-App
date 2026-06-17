@@ -1,3 +1,7 @@
+--liquibase formatted sql
+
+--changeset Elshan:V1.0.11-create-inquiries-table
+--comment Create inquiries table
 CREATE TABLE inquiries (
                            id UUID PRIMARY KEY,
                            property_id UUID NOT NULL,

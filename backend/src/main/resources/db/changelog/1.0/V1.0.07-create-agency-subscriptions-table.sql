@@ -1,3 +1,7 @@
+--liquibase formatted sql
+
+--changeset Elshan:V1.0.07-create-agency-subscriptions-table
+--comment Create agency_subscriptions table
 CREATE TABLE agency_subscriptions (
                                       id UUID PRIMARY KEY,
                                       agency_id UUID NOT NULL,

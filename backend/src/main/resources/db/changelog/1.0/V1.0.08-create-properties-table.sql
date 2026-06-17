@@ -1,3 +1,7 @@
+--liquibase formatted sql
+
+--changeset Elshan:V1.0.08-create-properties-table
+--comment Create properties table
 CREATE TABLE properties (
                             id UUID PRIMARY KEY,
                             agency_id UUID NOT NULL,

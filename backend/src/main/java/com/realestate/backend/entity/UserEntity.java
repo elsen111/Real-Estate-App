@@ -50,7 +50,8 @@ public class UserEntity {
     @Column(name = "email_verified", nullable = false)
     private boolean emailVerified = false;
 
-    @ManyToMany
+    @Builder.Default
+    @ManyToMany(fetch =  FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),

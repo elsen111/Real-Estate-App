@@ -1,3 +1,7 @@
+--liquibase formatted sql
+
+--changeset Elshan:V1.0.14-create-refresh-tokens-table
+--comment Create refresh_tokens table
 CREATE TABLE refresh_tokens (
                                 id UUID PRIMARY KEY,
                                 user_id UUID NOT NULL,

@@ -1,3 +1,7 @@
+--liquibase formatted sql
+
+--changeset Elshan:V1.0.10-create-favorites-table
+--comment Create favorites table
 CREATE TABLE favorites (
                            id UUID PRIMARY KEY,
                            user_id UUID NOT NULL,

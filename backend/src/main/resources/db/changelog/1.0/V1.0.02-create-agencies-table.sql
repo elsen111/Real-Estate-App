@@ -1,3 +1,7 @@
+--liquibase formatted sql
+
+--changeset Elshan:V1.0.02-create-agencies-table
+--comment Create agencies table
 CREATE TABLE agencies (
                           id UUID PRIMARY KEY,
                           name VARCHAR(150) NOT NULL,

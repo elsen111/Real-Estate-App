@@ -1,3 +1,7 @@
+--liquibase formatted sql
+
+--changeset Elshan:V1.0.12-create-appointments-table
+--comment Create appointments table
 CREATE TABLE appointments (
                               id UUID PRIMARY KEY,
                               property_id UUID NOT NULL,

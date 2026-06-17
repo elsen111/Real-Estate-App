@@ -1,3 +1,7 @@
+--liquibase formatted sql
+
+--changeset Elshan:V1.0.13-create-reviews-table
+--comment Create reviews table
 CREATE TABLE reviews (
                          id UUID PRIMARY KEY,
                          reviewer_id UUID NOT NULL,
