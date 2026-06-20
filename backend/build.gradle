@@ -77,16 +77,3 @@ compileJava {
 tasks.named('test') {
     useJUnitPlatform()
 }
-
-liquibase {
-    activities {
-        main {
-            changelogFile 'src/main/resources/db/changelog/changelog-master.yaml'
-            url 'jdbc:postgresql://localhost:5432/real_estate_db'
-            username 'postgres'
-            password 'Elsen4444'
-            driver 'org.postgresql.Driver'
-        }
-    }
-    runList = 'main'
-}

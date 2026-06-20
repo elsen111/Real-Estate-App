@@ -50,19 +50,29 @@ public class RefreshTokenEntity {
         private boolean revoked = false;
 
         @Column(name = "revoked_at")
-        private LocalDateTime revoked_at;
+        private LocalDateTime revokedAt;
 
         @Column(name = "replaced_by_token_hash")
-        private String replaced_by_token_hash;
+        private String replacedByTokenHash;
 
         @Column(name = "ip_address", length = 100)
-        private String ip_address;
+        private String ipAddress;
 
         @Column(name = "user_agent", columnDefinition = "TEXT")
-        private String user_agent;
+        private String userAgent;
 
         @CreationTimestamp
         @Column(name = "created_at", nullable = false, updatable = false)
         private LocalDateTime createdAt;
+
+        public void revoke(String replacedByTokenHash) {
+                this.revoked = true;
+                this.revokedAt = LocalDateTime.now();
+                this.replacedByTokenHash = replacedByTokenHash;
+        }
+        
+        public boolean isExpired() {
+                return LocalDateTime.now().isAfter(this.expiryDate);
+        }
 
 }
