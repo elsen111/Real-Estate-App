@@ -1,6 +1,7 @@
 package com.realestate.backend.service.auth;
 
-import com.realestate.backend.dto.agency.request.AgencyOwnerRegisterRequest;
+import com.realestate.backend.dto.agency.response.AgencyResponse;
+import com.realestate.backend.dto.auth.request.AgencyOwnerRegisterRequest;
 import com.realestate.backend.dto.auth.request.*;
 import com.realestate.backend.dto.auth.response.AuthResponse;
 import com.realestate.backend.dto.auth.response.RefreshTokenResponse;
@@ -60,7 +61,7 @@ public class AuthService {
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.getRoles().add(clientRole);
 
-        user = userRepository.save(user);
+        user = userRepository.saveAndFlush(user);
 
         RefreshTokenService.CreatedRefreshToken refreshToken =
                 refreshTokenService.createRefreshToken(
@@ -83,19 +84,19 @@ public class AuthService {
         ensureUserEmailIsFree(ownerEmail);
         ensureAgencyEmailIsFree(agencyEmail);
 
-        RoleEntity agencyAdminRole = getRole(Role.AGENCY_ADMIN);
+        RoleEntity agencyAdminRole = getRole(Role.AGENCY_OWNER);
 
         UserEntity owner = authMapper.toAgencyOwnerUser(request);
+        AgencyEntity agency = authMapper.toAgencyEntity(request);
+        agency.setEmail(agencyEmail);
+        agency = agencyRepository.saveAndFlush(agency);
+
         owner.setEmail(ownerEmail);
         owner.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         owner.getRoles().add(agencyAdminRole);
+        owner.setAgency(agency);
 
-        owner = userRepository.save(owner);
-
-        AgencyEntity agency = authMapper.toAgencyEntity(request);
-        agency.setEmail(agencyEmail);
-
-        agency = agencyRepository.save(agency);
+        owner = userRepository.saveAndFlush(owner);
 
         AgencyMemberEntity ownerMembership = AgencyMemberEntity.builder()
                 .agency(agency)
@@ -139,6 +140,11 @@ public class AuthService {
             throw new UnauthorizedException("User account is disabled");
         }
 
+        AgencyMemberEntity membership = agencyMemberRepository
+                .findByUserAndActiveTrue(user)
+                .orElse(null);
+        AgencyEntity agency = membership != null ? membership.getAgency() : null;
+
         RefreshTokenService.CreatedRefreshToken refreshToken =
                 refreshTokenService.createRefreshToken(
                         user,
@@ -146,7 +152,7 @@ public class AuthService {
                         servletRequest.getHeader("User-Agent")
                 );
 
-        return buildAuthResponse(user, refreshToken.rawToken(), null);
+        return buildAuthResponse(user, refreshToken.rawToken(), agency);
     }
 
     @Transactional
@@ -181,10 +187,19 @@ public class AuthService {
         UserEntity user = userRepository.findByEmail(currentUser.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        AgencyMemberEntity membership = agencyMemberRepository
+                .findByUserAndActiveTrue(user)
+                .orElse(null);
+
+        AgencyEntity agency = membership != null
+                ? membership.getAgency()
+                : null;
+
         return AuthResponse.builder()
                 .tokenType(SecurityConstants.TOKEN_PREFIX.trim())
                 .expiresInSeconds(jwtService.accessTokenExpiresInSeconds())
                 .user(userMapper.toSummary(user))
+                .agency(agencyMapper.toSummary(agency))
                 .build();
     }
 

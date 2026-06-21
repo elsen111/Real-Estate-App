@@ -1,7 +1,7 @@
 package com.realestate.backend.controller.auth;
 
 import com.realestate.backend.common.response.ApiResponse;
-import com.realestate.backend.dto.agency.request.AgencyOwnerRegisterRequest;
+import com.realestate.backend.dto.auth.request.AgencyOwnerRegisterRequest;
 import com.realestate.backend.dto.auth.request.*;
 import com.realestate.backend.dto.auth.response.AuthResponse;
 import com.realestate.backend.dto.auth.response.RefreshTokenResponse;

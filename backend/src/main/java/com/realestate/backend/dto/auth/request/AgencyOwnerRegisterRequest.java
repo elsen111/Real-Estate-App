@@ -1,4 +1,4 @@
-package com.realestate.backend.dto.agency.request;
+package com.realestate.backend.dto.auth.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

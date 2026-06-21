@@ -59,6 +59,10 @@ public class UserEntity {
     )
     private Set<RoleEntity> roles = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agency_id")
+    private AgencyEntity agency;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

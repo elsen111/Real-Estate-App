@@ -1,6 +1,6 @@
 package com.realestate.backend.mapper.auth;
 
-import com.realestate.backend.dto.agency.request.AgencyOwnerRegisterRequest;
+import com.realestate.backend.dto.auth.request.AgencyOwnerRegisterRequest;
 import com.realestate.backend.dto.auth.request.UserRegisterRequest;
 import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.UserEntity;

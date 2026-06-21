@@ -64,7 +64,7 @@ public class AgencyMemberService {
                 agencyId,
                 request,
                 Role.AGENT,
-                AgencyMemberType.AGENCY_OWNER,
+                AgencyMemberType.AGENT,
                 "Agent"
         );
     }
@@ -92,6 +92,7 @@ public class AgencyMemberService {
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + role));
 
         targetUser.getRoles().add(roleEntity);
+        targetUser.setAgency(agency);
         userRepository.save(targetUser);
 
         String position = request.getPosition() == null || request.getPosition().isBlank()

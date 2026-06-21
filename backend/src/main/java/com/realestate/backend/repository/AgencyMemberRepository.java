@@ -1,6 +1,7 @@
 package com.realestate.backend.repository;
 
 import com.realestate.backend.entity.AgencyMemberEntity;
+import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.AgencyMemberType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,5 +31,7 @@ public interface AgencyMemberRepository extends JpaRepository<AgencyMemberEntity
     Page<AgencyMemberEntity> findByAgency_Id(UUID agencyId, Pageable pageable);
 
     Page<AgencyMemberEntity> findByUser_Id(UUID userId, Pageable pageable);
+
+    Optional<AgencyMemberEntity> findByUserAndActiveTrue(UserEntity user);
 
 }
