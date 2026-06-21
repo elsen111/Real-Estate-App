@@ -1,5 +1,6 @@
 package com.realestate.backend.entity;
 
+import com.realestate.backend.enums.AgencyMemberType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -53,8 +54,9 @@ public class AgencyMemberEntity {
         @Column(name = "position", length = 100)
         private String position;
 
+        @Enumerated(EnumType.STRING)
         @Column(name = "member_type", length = 30, nullable = false)
-        private String memberType;
+        private AgencyMemberType memberType;
 
         @Builder.Default
         @Column(name = "active", nullable = false)

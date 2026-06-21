@@ -535,22 +535,22 @@ Suggested changelog order:
 ```bash
 src/main/resources/db/changelog/
 ├── db.changelog-master.yaml
-├── 1.0.0-create-users-table.sql
-├── 1.0.1-create-roles-table.sql
-├── 1.0.2-create-agencies-table.sql
-├── 1.0.3-create-categories-table.sql
-├── 1.0.4-create-subscription-plans-table.sql
-├── 1.0.5-create-user-roles-table.sql
-├── 1.0.6-create-agency-members-table.sql
-├── 1.0.7-create-agency-subscriptions-table.sql
-├── 1.0.8-create-properties-table.sql
-├── 1.0.9-create-media-files-table.sql
-├── 1.0.10-create-favorites-table.sql
-├── 1.0.11-create-inquiries-table.sql
-├── 1.0.12-create-appointments-table.sql
-├── 1.0.13-create-reviews-table.sql
-├── 1.0.14-create-refresh-tokens-table.sql
-└── 1.0.15-create-password-reset-tokens-table.sql
+├── V1.0.00-create-users-table.sql
+├── V1.0.01-create-roles-table.sql
+├── V1.0.02-create-agencies-table.sql
+├── V1.0.03-create-categories-table.sql
+├── V1.0.04-create-subscription-plans-table.sql
+├── V1.0.05-create-user-roles-table.sql
+├── V1.0.06-create-agency-members-table.sql
+├── V1.0.07-create-agency-subscriptions-table.sql
+├── V1.0.08-create-properties-table.sql
+├── V1.0.09-create-media-files-table.sql
+├── V1.0.10-create-favorites-table.sql
+├── V1.0.11-create-inquiries-table.sql
+├── V1.0.12-create-appointments-table.sql
+├── V1.0.13-create-reviews-table.sql
+├── V1.0.14-create-refresh-tokens-table.sql
+└── V1.0.15-create-password-reset-tokens-table.sql
 ```
 
 ## 14. Backend Development Phases

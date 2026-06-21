@@ -55,6 +55,7 @@ public class AgencySubscriptionEntity {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private SubscriptionStatus status = SubscriptionStatus.INACTIVE;

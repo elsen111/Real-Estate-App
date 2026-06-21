@@ -11,7 +11,7 @@ import java.util.UUID;
 @Table(
         name = "refresh_tokens",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_refresh_tokens_token", columnNames = "token")
+                @UniqueConstraint(name = "uk_refresh_tokens_token", columnNames = "token_hash")
         },
         indexes = {
                 @Index(name = "idx_refresh_tokens_user_id", columnList = "user_id"),
@@ -39,8 +39,8 @@ public class RefreshTokenEntity {
         )
         private UserEntity user;
 
-        @Column(name = "token", length = 500, nullable = false)
-        private String token;
+        @Column(name = "token_hash", length = 500, nullable = false)
+        private String tokenHash;
 
         @Column(name = "expiry_date", nullable = false)
         private LocalDateTime expiryDate;
@@ -49,8 +49,30 @@ public class RefreshTokenEntity {
         @Column(name = "revoked", nullable = false)
         private boolean revoked = false;
 
+        @Column(name = "revoked_at")
+        private LocalDateTime revokedAt;
+
+        @Column(name = "replaced_by_token_hash")
+        private String replacedByTokenHash;
+
+        @Column(name = "ip_address", length = 100)
+        private String ipAddress;
+
+        @Column(name = "user_agent", columnDefinition = "TEXT")
+        private String userAgent;
+
         @CreationTimestamp
         @Column(name = "created_at", nullable = false, updatable = false)
         private LocalDateTime createdAt;
+
+        public void revoke(String replacedByTokenHash) {
+                this.revoked = true;
+                this.revokedAt = LocalDateTime.now();
+                this.replacedByTokenHash = replacedByTokenHash;
+        }
+        
+        public boolean isExpired() {
+                return LocalDateTime.now().isAfter(this.expiryDate);
+        }
 
 }
