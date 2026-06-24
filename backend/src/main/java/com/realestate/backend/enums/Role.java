@@ -1,9 +1,20 @@
 package com.realestate.backend.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
+@AllArgsConstructor
 public enum Role {
-    SUPER_ADMIN,
-    AGENCY_ADMIN,
-    AGENCY_OWNER,
-    AGENT,
-    CLIENT
+
+    SUPER_ADMIN("Super Admin"),
+    AGENCY_OWNER("Agency Owner"),
+    AGENT("Agent"),
+    Landlord("Landlord"),
+    CLIENT("Client");
+
+    private String displayName;
+
 }

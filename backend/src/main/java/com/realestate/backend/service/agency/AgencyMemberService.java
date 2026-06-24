@@ -46,7 +46,7 @@ public class AgencyMemberService {
         return assignMember(
                 agencyId,
                 request,
-                Role.AGENCY_ADMIN,
+                Role.AGENCY_OWNER,
                 AgencyMemberType.AGENCY_OWNER,
                 "Agency Admin"
         );

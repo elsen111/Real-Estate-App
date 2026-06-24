@@ -1,6 +1,5 @@
 package com.realestate.backend.service.auth;
 
-import com.realestate.backend.dto.agency.response.AgencyResponse;
 import com.realestate.backend.dto.auth.request.AgencyOwnerRegisterRequest;
 import com.realestate.backend.dto.auth.request.*;
 import com.realestate.backend.dto.auth.response.AuthResponse;
@@ -46,15 +45,17 @@ public class AuthService {
     private final AgencyMapper agencyMapper;
 
     @Transactional
-    public AuthResponse registerClient(
+    public AuthResponse registerUser(
             UserRegisterRequest request,
+            String type,
             HttpServletRequest servletRequest
     ) {
         String email = normalizeEmail(request.getEmail());
 
         ensureUserEmailIsFree(email);
 
-        RoleEntity clientRole = getRole(Role.CLIENT);
+        Role role = "landlord".equalsIgnoreCase(type) ? Role.Landlord : Role.CLIENT;
+        RoleEntity clientRole = getRole(role);
 
         UserEntity user = authMapper.toUserEntity(request);
         user.setEmail(email);
@@ -78,17 +79,14 @@ public class AuthService {
             AgencyOwnerRegisterRequest request,
             HttpServletRequest servletRequest
     ) {
-        String ownerEmail = normalizeEmail(request.getOwnerEmail());
-        String agencyEmail = normalizeEmail(request.getAgencyEmail());
+        String ownerEmail = normalizeEmail(request.getEmail());
 
         ensureUserEmailIsFree(ownerEmail);
-        ensureAgencyEmailIsFree(agencyEmail);
 
         RoleEntity agencyAdminRole = getRole(Role.AGENCY_OWNER);
 
         UserEntity owner = authMapper.toAgencyOwnerUser(request);
         AgencyEntity agency = authMapper.toAgencyEntity(request);
-        agency.setEmail(agencyEmail);
         agency = agencyRepository.saveAndFlush(agency);
 
         owner.setEmail(ownerEmail);
@@ -196,8 +194,6 @@ public class AuthService {
                 : null;
 
         return AuthResponse.builder()
-                .tokenType(SecurityConstants.TOKEN_PREFIX.trim())
-                .expiresInSeconds(jwtService.accessTokenExpiresInSeconds())
                 .user(userMapper.toSummary(user))
                 .agency(agencyMapper.toSummary(agency))
                 .build();
