@@ -308,6 +308,9 @@ SPRING_DATASOURCE_PASSWORD=postgres
 VITE_API_BASE_URL=http://localhost:8080/api
 ```
 
+## Swagger url
+http://localhost:8080/api/swagger-ui.html
+
 Start containers:
 
 ```bash
