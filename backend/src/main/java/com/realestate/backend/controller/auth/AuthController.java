@@ -23,15 +23,16 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register/user")
-    public ResponseEntity<ApiResponse<AuthResponse>> registerClient(
+    public ResponseEntity<ApiResponse<AuthResponse>> registerUser(
             @Valid @RequestBody UserRegisterRequest request,
+            @RequestParam(required = false, name = "registrationType", defaultValue = "buyer") String type,
             HttpServletRequest servletRequest
     ) {
-        AuthResponse response = authService.registerClient(request, servletRequest);
+        AuthResponse response = authService.registerUser(request, type, servletRequest);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Client registered successfully", response));
+                .body(ApiResponse.success("User registered successfully as a " + type, response));
     }
 
     @PostMapping("/register/agency-owner")

@@ -1,11 +1,9 @@
-package com.realestate.backend.controller;
+package com.realestate.backend.controller.agency;
 
 import com.realestate.backend.common.response.ApiResponse;
-import com.realestate.backend.dto.agency.request.AgencyMemberAssignmentRequest;
 import com.realestate.backend.dto.agency.response.AgencyMemberResponse;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.agency.AgencyMemberService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,30 +20,15 @@ public class AgencyMemberController {
 
     private final AgencyMemberService agencyMemberService;
 
-    @PostMapping("/admins")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'AGENCY_ADMIN','AGENCY_OWNER')")
-    public ResponseEntity<ApiResponse<AgencyMemberResponse>> assignAgencyAdmin(
-            @PathVariable UUID agencyId,
-            @Valid @RequestBody AgencyMemberAssignmentRequest request,
-            @AuthenticationPrincipal CustomUserDetails currentUser
-    ) {
-        AgencyMemberResponse response =
-                agencyMemberService.assignAgencyAdmin(agencyId, request, currentUser);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Agency admin assigned successfully", response));
-    }
-
-    @PostMapping("/agents")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'AGENCY_ADMIN')")
+    @PostMapping("/agents/{userId}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'AGENCY_OWNER')")
     public ResponseEntity<ApiResponse<AgencyMemberResponse>> assignAgent(
             @PathVariable UUID agencyId,
-            @Valid @RequestBody AgencyMemberAssignmentRequest request,
+            @PathVariable UUID userId,
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
         AgencyMemberResponse response =
-                agencyMemberService.assignAgent(agencyId, request, currentUser);
+                agencyMemberService.assignAgent(agencyId, userId, currentUser);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

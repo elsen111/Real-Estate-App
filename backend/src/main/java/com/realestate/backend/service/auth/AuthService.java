@@ -1,12 +1,10 @@
 package com.realestate.backend.service.auth;
 
-import com.realestate.backend.dto.agency.response.AgencyResponse;
 import com.realestate.backend.dto.auth.request.AgencyOwnerRegisterRequest;
 import com.realestate.backend.dto.auth.request.*;
 import com.realestate.backend.dto.auth.response.AuthResponse;
 import com.realestate.backend.dto.auth.response.RefreshTokenResponse;
 import com.realestate.backend.entity.*;
-import com.realestate.backend.enums.AgencyMemberType;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ResourceNotFoundException;
@@ -46,15 +44,17 @@ public class AuthService {
     private final AgencyMapper agencyMapper;
 
     @Transactional
-    public AuthResponse registerClient(
+    public AuthResponse registerUser(
             UserRegisterRequest request,
+            String type,
             HttpServletRequest servletRequest
     ) {
         String email = normalizeEmail(request.getEmail());
 
         ensureUserEmailIsFree(email);
 
-        RoleEntity clientRole = getRole(Role.CLIENT);
+        Role role = "landlord".equalsIgnoreCase(type) ? Role.LANDLORD : Role.CLIENT;
+        RoleEntity clientRole = getRole(role);
 
         UserEntity user = authMapper.toUserEntity(request);
         user.setEmail(email);
@@ -78,17 +78,14 @@ public class AuthService {
             AgencyOwnerRegisterRequest request,
             HttpServletRequest servletRequest
     ) {
-        String ownerEmail = normalizeEmail(request.getOwnerEmail());
-        String agencyEmail = normalizeEmail(request.getAgencyEmail());
+        String ownerEmail = normalizeEmail(request.getEmail());
 
         ensureUserEmailIsFree(ownerEmail);
-        ensureAgencyEmailIsFree(agencyEmail);
 
         RoleEntity agencyAdminRole = getRole(Role.AGENCY_OWNER);
 
         UserEntity owner = authMapper.toAgencyOwnerUser(request);
         AgencyEntity agency = authMapper.toAgencyEntity(request);
-        agency.setEmail(agencyEmail);
         agency = agencyRepository.saveAndFlush(agency);
 
         owner.setEmail(ownerEmail);
@@ -101,8 +98,6 @@ public class AuthService {
         AgencyMemberEntity ownerMembership = AgencyMemberEntity.builder()
                 .agency(agency)
                 .user(owner)
-                .position("Owner")
-                .memberType(AgencyMemberType.AGENCY_OWNER)
                 .active(true)
                 .build();
 
@@ -196,8 +191,6 @@ public class AuthService {
                 : null;
 
         return AuthResponse.builder()
-                .tokenType(SecurityConstants.TOKEN_PREFIX.trim())
-                .expiresInSeconds(jwtService.accessTokenExpiresInSeconds())
                 .user(userMapper.toSummary(user))
                 .agency(agencyMapper.toSummary(agency))
                 .build();
