@@ -20,6 +20,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -124,7 +125,12 @@ public class AuthService {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, request.getPassword())
             );
-        } catch (BadCredentialsException ex) {
+        } catch (DisabledException e) {
+            throw new UnauthorizedException(
+                    "This user profile is not active. Please contact support or restore your account."
+            );
+        }
+        catch (BadCredentialsException ex) {
             throw new UnauthorizedException("Invalid email or password");
         }
 
