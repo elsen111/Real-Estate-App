@@ -1,6 +1,7 @@
 package com.realestate.backend.repository;
 
 import com.realestate.backend.entity.RefreshTokenEntity;
+import com.realestate.backend.entity.UserEntity;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -24,4 +25,5 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshTokenEntity
     @Transactional
     void deleteByUser_Id(UUID userId);
 
+    void deleteAllByUser(UserEntity user);
 }
