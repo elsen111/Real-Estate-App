@@ -29,4 +29,5 @@ public interface AgencyMemberRepository extends JpaRepository<AgencyMemberEntity
 
     Optional<AgencyMemberEntity> findByUserAndActiveTrue(UserEntity user);
 
+    boolean existsByUser_Id(UUID id);
 }

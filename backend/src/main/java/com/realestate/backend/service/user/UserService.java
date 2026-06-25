@@ -1,4 +1,14 @@
 package com.realestate.backend.service.user;
 
-public class UserService {
+import com.realestate.backend.dto.auth.response.UserResponse;
+import com.realestate.backend.dto.user.request.UpdateProfileRequest;
+import com.realestate.backend.security.CustomUserDetails;
+
+public interface UserService {
+
+    UserResponse updateProfile(
+            UpdateProfileRequest request,
+            CustomUserDetails currentUser
+    );
+
 }
