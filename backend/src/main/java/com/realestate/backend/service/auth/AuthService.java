@@ -5,7 +5,6 @@ import com.realestate.backend.dto.auth.request.*;
 import com.realestate.backend.dto.auth.response.AuthResponse;
 import com.realestate.backend.dto.auth.response.RefreshTokenResponse;
 import com.realestate.backend.entity.*;
-import com.realestate.backend.enums.AgencyMemberType;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ResourceNotFoundException;
@@ -54,7 +53,7 @@ public class AuthService {
 
         ensureUserEmailIsFree(email);
 
-        Role role = "landlord".equalsIgnoreCase(type) ? Role.Landlord : Role.CLIENT;
+        Role role = "landlord".equalsIgnoreCase(type) ? Role.LANDLORD : Role.CLIENT;
         RoleEntity clientRole = getRole(role);
 
         UserEntity user = authMapper.toUserEntity(request);
@@ -99,8 +98,6 @@ public class AuthService {
         AgencyMemberEntity ownerMembership = AgencyMemberEntity.builder()
                 .agency(agency)
                 .user(owner)
-                .position("Owner")
-                .memberType(AgencyMemberType.AGENCY_OWNER)
                 .active(true)
                 .build();
 

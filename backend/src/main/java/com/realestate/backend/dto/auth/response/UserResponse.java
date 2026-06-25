@@ -18,6 +18,7 @@ public class UserResponse {
     private boolean enabled;
     private boolean emailVerified;
     private Set<String> roles;
+    private String position;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

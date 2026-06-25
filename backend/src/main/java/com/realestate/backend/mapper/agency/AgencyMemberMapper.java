@@ -2,6 +2,7 @@ package com.realestate.backend.mapper.agency;
 
 import com.realestate.backend.dto.agency.response.AgencyMemberResponse;
 import com.realestate.backend.entity.AgencyMemberEntity;
+import com.realestate.backend.enums.Role;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,6 +13,14 @@ public class AgencyMemberMapper {
             return null;
         }
 
+        Role role = member.getUser()
+                .getRoles()
+                .stream()
+                .filter(r -> r.getRoleName() != Role.SUPER_ADMIN)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Role not found"))
+                .getRoleName();
+
         return AgencyMemberResponse.builder()
                 .id(member.getId())
                 .agencyId(member.getAgency().getId())
@@ -19,8 +28,7 @@ public class AgencyMemberMapper {
                 .userId(member.getUser().getId())
                 .userFullName(member.getUser().getFullName())
                 .userEmail(member.getUser().getEmail())
-                .position(member.getPosition())
-                .memberType(member.getMemberType())
+                .position(role.getLabel())
                 .active(member.isActive())
                 .build();
     }

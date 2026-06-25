@@ -12,9 +12,9 @@ public enum Role {
     SUPER_ADMIN("Super Admin"),
     AGENCY_OWNER("Agency Owner"),
     AGENT("Agent"),
-    Landlord("Landlord"),
+    LANDLORD("Landlord"),
     CLIENT("Client");
 
-    private String displayName;
+    private String label;
 
 }

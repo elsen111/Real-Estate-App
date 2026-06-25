@@ -1,6 +1,6 @@
 package com.realestate.backend.dto.agency.response;
 
-import com.realestate.backend.enums.AgencyMemberType;
+import com.realestate.backend.enums.Role;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,7 +17,6 @@ public class AgencyMemberResponse {
     private String userFullName;
     private String userEmail;
     private String position;
-    private AgencyMemberType memberType;
     private boolean active;
 
 }

@@ -1,6 +1,6 @@
 package com.realestate.backend.entity;
 
-import com.realestate.backend.enums.AgencyMemberType;
+import com.realestate.backend.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,7 +20,6 @@ import java.util.UUID;
         },
         indexes = {
                 @Index(name = "idx_agency_members_user_id", columnList = "user_id"),
-                @Index(name = "idx_agency_members_member_type", columnList = "member_type")
         }
 )
 @Getter
@@ -50,13 +49,6 @@ public class AgencyMemberEntity {
                 foreignKey = @ForeignKey(name = "fk_agency_members_user_id")
         )
         private UserEntity user;
-
-        @Column(name = "position", length = 100)
-        private String position;
-
-        @Enumerated(EnumType.STRING)
-        @Column(name = "member_type", length = 30, nullable = false)
-        private AgencyMemberType memberType;
 
         @Builder.Default
         @Column(name = "active", nullable = false)

@@ -2,6 +2,7 @@ package com.realestate.backend.dto.auth.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.realestate.backend.dto.agency.response.AgencyMemberResponse;
 import com.realestate.backend.dto.agency.response.AgencyResponse;
 import lombok.Builder;
 import lombok.Getter;

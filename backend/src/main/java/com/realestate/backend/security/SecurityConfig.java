@@ -52,7 +52,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html"
+                                "/api/swagger-ui.html"
                         ).permitAll()
 
                         .requestMatchers("/api/admin/**").hasRole("SUPER_ADMIN")

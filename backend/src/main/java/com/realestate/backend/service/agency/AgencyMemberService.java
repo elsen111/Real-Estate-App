@@ -1,12 +1,10 @@
 package com.realestate.backend.service.agency;
 
-import com.realestate.backend.dto.agency.request.AgencyMemberAssignmentRequest;
 import com.realestate.backend.dto.agency.response.AgencyMemberResponse;
 import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.AgencyMemberEntity;
 import com.realestate.backend.entity.RoleEntity;
 import com.realestate.backend.entity.UserEntity;
-import com.realestate.backend.enums.AgencyMemberType;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ForbiddenException;
@@ -36,50 +34,31 @@ public class AgencyMemberService {
     private final AgencyMemberMapper agencyMemberMapper;
 
     @Transactional
-    public AgencyMemberResponse assignAgencyAdmin(
-            UUID agencyId,
-            AgencyMemberAssignmentRequest request,
-            CustomUserDetails currentUser
-    ) {
-        ensureCanAssignAdmin(agencyId, currentUser);
-
-        return assignMember(
-                agencyId,
-                request,
-                Role.AGENCY_OWNER,
-                AgencyMemberType.AGENCY_OWNER,
-                "Agency Admin"
-        );
-    }
-
-    @Transactional
     public AgencyMemberResponse assignAgent(
             UUID agencyId,
-            AgencyMemberAssignmentRequest request,
+            UUID userId,
             CustomUserDetails currentUser
     ) {
         ensureCanAssignAgent(agencyId, currentUser);
 
         return assignMember(
                 agencyId,
-                request,
+                userId,
                 Role.AGENT,
-                AgencyMemberType.AGENT,
                 "Agent"
         );
     }
 
     private AgencyMemberResponse assignMember(
             UUID agencyId,
-            AgencyMemberAssignmentRequest request,
+            UUID userId,
             Role role,
-            AgencyMemberType memberType,
             String defaultPosition
     ) {
         AgencyEntity agency = agencyRepository.findById(agencyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Agency not found"));
 
-        UserEntity targetUser = userRepository.findByEmail(normalizeEmail(request.getEmail()))
+        UserEntity targetUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "User not found. Ask the user to register first, then assign them to the agency."
                 ));
@@ -95,36 +74,17 @@ public class AgencyMemberService {
         targetUser.setAgency(agency);
         userRepository.save(targetUser);
 
-        String position = request.getPosition() == null || request.getPosition().isBlank()
-                ? defaultPosition
-                : request.getPosition().trim();
+//        String position = request.getPosition() == null || request.getPosition().isBlank()
+//                ? defaultPosition
+//                : request.getPosition().trim();
 
         AgencyMemberEntity member = AgencyMemberEntity.builder()
                 .agency(agency)
                 .user(targetUser)
-                .position(position)
-                .memberType(memberType)
                 .active(true)
                 .build();
 
         return agencyMemberMapper.toResponse(agencyMemberRepository.save(member));
-    }
-
-    private void ensureCanAssignAdmin(UUID agencyId, CustomUserDetails currentUser) {
-        if (hasRole(currentUser)) {
-            return;
-        }
-
-        boolean isOwner = agencyMemberRepository
-                .existsByAgency_IdAndUser_IdAndMemberTypeAndActiveTrue(
-                        agencyId,
-                        currentUser.getId(),
-                        AgencyMemberType.AGENCY_OWNER
-                );
-
-        if (!isOwner) {
-            throw new ForbiddenException("Only agency owner can assign agency admins");
-        }
     }
 
     private void ensureCanAssignAgent(UUID agencyId, CustomUserDetails currentUser) {
@@ -139,13 +99,16 @@ public class AgencyMemberService {
                 )
                 .orElseThrow(() -> new ForbiddenException("You are not a member of this agency"));
 
-        Set<AgencyMemberType> allowedTypes = Set.of(
-                AgencyMemberType.AGENCY_OWNER,
-                AgencyMemberType.AGENCY_ADMIN
+        Set<Role> allowedTypes = Set.of(
+                Role.AGENCY_OWNER
         );
 
-        if (!allowedTypes.contains(member.getMemberType())) {
-            throw new ForbiddenException("Only agency owner or admin can assign agents");
+        if (!hasAnyRole(member.getUser(),
+                Set.of(Role.AGENCY_OWNER))) {
+
+            throw new ForbiddenException(
+                    "Only agency owners can assign agents"
+            );
         }
     }
 
@@ -159,7 +122,11 @@ public class AgencyMemberService {
                 );
     }
 
-    private String normalizeEmail(String email) {
-        return email == null ? null : email.trim().toLowerCase();
+    private boolean hasAnyRole(UserEntity user, Set<Role> roles) {
+        return user.getRoles()
+                .stream()
+                .map(RoleEntity::getRoleName)
+                .anyMatch(roles::contains);
     }
+
 }
