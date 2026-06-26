@@ -6,6 +6,7 @@ import com.realestate.backend.dto.admin.user.response.AdminUserResponse;
 import com.realestate.backend.dto.auth.response.UserResponse;
 import com.realestate.backend.service.admin.user.AdminUserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -53,6 +54,20 @@ public class AdminUserController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("User fetched successfully", response)
+        );
+
+    }
+
+    @Transactional
+    @PatchMapping("/{userId}/status")
+    @Operation(summary = "Toggle user status")
+    public ResponseEntity<ApiResponse<Void>> toggleUserStatus(
+            @PathVariable UUID userId
+    ) {
+        String message = adminUserService.toggleUserStatus(userId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(message, null)
         );
 
     }

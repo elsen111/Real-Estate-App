@@ -17,4 +17,6 @@ public interface AdminUserService {
 
     AdminUserResponse getUserById(UUID userId);
 
+    String toggleUserStatus(UUID userId);
+
 }
