@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -46,5 +47,27 @@ public class AdminUserServiceImpl implements AdminUserService {
         );
 
         return userMapper.toAdminResponse(user);
+    }
+
+    @Override
+    @Transactional
+    public String toggleUserStatus(UUID userId) {
+
+        UserEntity user = userRepository.findById(userId).orElseThrow(
+                () -> new ResourceNotFoundException(
+                        "User not found with id" + userId
+                )
+        );
+
+        boolean newStatus = !user.isEnabled();
+
+        user.setEnabled(newStatus);
+
+        userRepository.save(user);
+
+        return newStatus
+                ? "User has been enabled successfully"
+                : "User has been disabled successfully";
+
     }
 }
