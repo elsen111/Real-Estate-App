@@ -19,4 +19,6 @@ public interface AdminUserService {
 
     String toggleUserStatus(UUID userId);
 
+    String assignAdminRoleToUser(UUID userId);
+
 }

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 public enum Role {
 
     SUPER_ADMIN("Super Admin"),
+    ADMIN("Admin"),
     AGENCY_OWNER("Agency Owner"),
     AGENT("Agent"),
     LANDLORD("Landlord"),

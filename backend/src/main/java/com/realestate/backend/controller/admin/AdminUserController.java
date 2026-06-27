@@ -21,7 +21,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/admin/users")
-@PreAuthorize("hasRole('SUPER_ADMIN')")
 @RequiredArgsConstructor
 public class AdminUserController {
 
@@ -70,6 +69,18 @@ public class AdminUserController {
                 ApiResponse.success(message, null)
         );
 
+    }
+
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PostMapping("/{userId}/assign-admin")
+    public ResponseEntity<ApiResponse<Void>> assignAdmin(
+            @PathVariable UUID userId
+    ) {
+        String message = adminUserService.assignAdminRoleToUser(userId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(message, null)
+        );
     }
 
 }
