@@ -17,6 +17,7 @@ public class UserMapper {
 
     private static final List<Role> ROLE_PRIORITY_LIST = List.of(
             Role.SUPER_ADMIN,
+            Role.ADMIN,
             Role.AGENCY_OWNER,
             Role.AGENT,
             Role.LANDLORD,

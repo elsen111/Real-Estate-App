@@ -2,18 +2,25 @@ package com.realestate.backend.service.admin.user;
 
 import com.realestate.backend.dto.admin.user.request.AdminUserFilterRequest;
 import com.realestate.backend.dto.admin.user.response.AdminUserResponse;
+import com.realestate.backend.entity.RoleEntity;
 import com.realestate.backend.entity.UserEntity;
+import com.realestate.backend.enums.Role;
+import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.user.UserMapper;
+import com.realestate.backend.repository.RoleRepository;
 import com.realestate.backend.repository.UserRepository;
 import com.realestate.backend.repository.specification.UserSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,6 +30,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final RoleRepository roleRepository;
 
 
     @Override
@@ -70,4 +78,32 @@ public class AdminUserServiceImpl implements AdminUserService {
                 : "User has been disabled successfully";
 
     }
+
+    @Override
+    @Transactional
+    public String assignAdminRoleToUser(UUID userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(
+                () -> new ResourceNotFoundException(
+                        "User not found with id " + userId
+                )
+        );
+
+        if(!user.isEnabled()){
+            throw new BusinessException(
+                    "This user profile is not enabled. Firstly, activate this profile, then try again."
+            );
+        }
+
+        RoleEntity adminRoleEntity = roleRepository.findByRoleName(Role.ADMIN)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Role not found with name " + Role.ADMIN.name()
+                ));
+
+        user.getRoles().add(adminRoleEntity);
+        userRepository.save(user);
+
+        return "Admin role successfully assigned to user: " + userId;
+    }
+
+
 }
