@@ -346,6 +346,8 @@ Password: Client123!
 
 ## Future Improvements
 
+- Multilanguage support
+- Currencies
 - Online payment integration
 - Featured listing payment flow
 - Advanced reports
