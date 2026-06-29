@@ -2,9 +2,14 @@ package com.realestate.backend.controller.admin;
 
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.admin.agency.request.AdminAgencyFilterRequest;
+import com.realestate.backend.dto.admin.agency.request.AgencyStatusRequest;
 import com.realestate.backend.dto.admin.agency.response.AdminAgencyResponse;
+import com.realestate.backend.enums.AgencyStatus;
 import com.realestate.backend.service.admin.agency.AdminAgencyService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +53,21 @@ public class AdminAgencyController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Agency fetched successfully", response)
+        );
+
+    }
+
+    @PutMapping("/{agencyId}/status")
+    @Operation(summary = "Change agency status")
+    public ResponseEntity<ApiResponse<Void>> changeAgencyStatus(
+            @PathVariable @NotNull UUID agencyId,
+            @Valid @RequestBody AgencyStatusRequest request
+    ) {
+
+        String message = adminAgencyService.changeAgencyStatus(agencyId, request.getStatus());
+
+        return ResponseEntity.ok(
+                ApiResponse.success(message, null)
         );
 
     }

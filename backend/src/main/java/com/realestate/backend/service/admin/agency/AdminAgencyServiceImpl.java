@@ -10,6 +10,7 @@ import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.AgencyMemberEntity;
 import com.realestate.backend.entity.AgencySubscriptionEntity;
 import com.realestate.backend.entity.UserEntity;
+import com.realestate.backend.enums.AgencyStatus;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.ResourceNotFoundException;
@@ -22,6 +23,7 @@ import com.realestate.backend.repository.AgencyRepository;
 import com.realestate.backend.repository.AgencySubscriptionRepository;
 import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.specification.AgencySpecification;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -107,6 +109,23 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         response.setStatistics(statistics);
 
         return response;
+
+    }
+
+    @Transactional
+    @Override
+    public String changeAgencyStatus(UUID id, AgencyStatus status) {
+
+        AgencyEntity agency = agencyRepository.findById(id)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Agency not found with id " + id)
+                );
+
+        agency.setStatus(status);
+
+        agencyRepository.save(agency);
+
+        return agency.getName() + "'s status changed to " + status.toString();
 
     }
 }
