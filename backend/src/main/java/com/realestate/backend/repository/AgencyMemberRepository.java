@@ -6,6 +6,7 @@ import com.realestate.backend.enums.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -30,4 +31,17 @@ public interface AgencyMemberRepository extends JpaRepository<AgencyMemberEntity
     Optional<AgencyMemberEntity> findByUserAndActiveTrue(UserEntity user);
 
     boolean existsByUser_Id(UUID id);
+
+    @Query("""
+select am
+from AgencyMemberEntity am
+join am.user u
+join u.roles r
+where am.agency.id = :agencyId
+and r.roleName = 'AGENCY_OWNER'
+""")
+    Optional<AgencyMemberEntity> findOwner(UUID agencyId);
+
+    long countByAgencyIdAndActiveTrue(UUID agencyId);
+
 }
