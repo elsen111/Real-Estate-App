@@ -1,0 +1,42 @@
+package com.realestate.backend.controller.admin;
+
+import com.realestate.backend.common.response.ApiResponse;
+import com.realestate.backend.dto.admin.agency.request.AdminAgencyFilterRequest;
+import com.realestate.backend.dto.admin.agency.response.AdminAgencyResponse;
+import com.realestate.backend.service.admin.agency.AdminAgencyService;
+import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/admin/agencies")
+@RequiredArgsConstructor
+public class AdminAgencyController {
+
+    private final AdminAgencyService adminAgencyService;
+
+    @GetMapping
+    @Operation(summary = "Get all agencies")
+    public ResponseEntity<ApiResponse<Page<AdminAgencyResponse>>> getAllAgencies(
+            @ModelAttribute AdminAgencyFilterRequest filter,
+            @PageableDefault(sort = "createdAt")
+            Pageable pageable
+            ) {
+
+        Page<AdminAgencyResponse> response = adminAgencyService.getAllAgencies(filter, pageable);
+
+        ApiResponse<Page<AdminAgencyResponse>> apiResponse =
+                ApiResponse.success("Agencies fetched successfully", response);
+
+        return ResponseEntity.ok(apiResponse);
+
+    }
+
+}
