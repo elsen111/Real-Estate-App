@@ -9,9 +9,7 @@ import lombok.Setter;
 public class AdminUserFilterRequest {
 
     Role role;
-
     Boolean enabled;
-
     String query;
 
 }
