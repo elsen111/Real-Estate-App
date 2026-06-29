@@ -43,6 +43,7 @@ public class AgencyMapper {
                 .city(agency.getCity())
                 .address(agency.getAddress())
                 .status(agency.getStatus())
+                .isDeleted(agency.isDeleted())
                 .createdAt(agency.getCreatedAt())
                 .updatedAt(agency.getUpdatedAt())
                 .build();

@@ -21,4 +21,6 @@ public interface AdminAgencyService {
 
     String changeAgencyStatus(UUID id, AgencyStatus status);
 
+    String softDeleteAgency(UUID id);
+
 }

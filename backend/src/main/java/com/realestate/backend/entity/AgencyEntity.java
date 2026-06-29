@@ -3,8 +3,7 @@ package com.realestate.backend.entity;
 import com.realestate.backend.enums.AgencyStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -54,6 +53,10 @@ public class AgencyEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 100)
     private AgencyStatus status = AgencyStatus.PENDING;
+
+    @Builder.Default
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

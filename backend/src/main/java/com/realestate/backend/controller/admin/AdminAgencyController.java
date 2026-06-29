@@ -4,7 +4,9 @@ import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.admin.agency.request.AdminAgencyFilterRequest;
 import com.realestate.backend.dto.admin.agency.request.AgencyStatusRequest;
 import com.realestate.backend.dto.admin.agency.response.AdminAgencyResponse;
+import com.realestate.backend.dto.user.request.DeleteAccountRequest;
 import com.realestate.backend.enums.AgencyStatus;
+import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.admin.agency.AdminAgencyService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -70,6 +73,23 @@ public class AdminAgencyController {
                 ApiResponse.success(message, null)
         );
 
+    }
+
+
+    @Transactional
+    @DeleteMapping("/{agencyId}")
+    @Operation(summary = "Delete a specific agency")
+    public ResponseEntity<ApiResponse<Void>> deleteAccount(
+            @PathVariable @NotNull UUID agencyId
+    ) {
+
+        adminAgencyService.softDeleteAgency(agencyId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Agency successfully disabled", null
+                )
+        );
     }
 
 }

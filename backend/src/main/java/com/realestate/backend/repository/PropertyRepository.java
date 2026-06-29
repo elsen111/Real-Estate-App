@@ -35,4 +35,5 @@ public interface PropertyRepository extends JpaRepository<PropertyEntity, UUID>,
 
     List<PropertyEntity> findByAgencyId(UUID agencyId);
 
+
 }
