@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -23,5 +25,14 @@ public interface PropertyRepository extends JpaRepository<PropertyEntity, UUID>,
     Page<PropertyEntity> findByCityIgnoreCase(String city, Pageable pageable);
 
     boolean existsByIdAndAgency_Id(UUID id, UUID agencyId);
+
+    long countByAgencyId(UUID agencyId);
+
+    long countByAgencyIdAndStatus(
+            UUID agencyId,
+            PropertyStatus status
+        );
+
+    List<PropertyEntity> findByAgencyId(UUID agencyId);
 
 }

@@ -1,12 +1,17 @@
 package com.realestate.backend.dto.admin.agency.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.realestate.backend.dto.admin.property.response.AdminAgencyPropertyResponse;
+import com.realestate.backend.dto.agency.response.AgencyOwnerResponse;
+import com.realestate.backend.dto.agency.response.AgencyStatisticsResponse;
+import com.realestate.backend.dto.agency.response.AgencySubscriptionResponse;
 import com.realestate.backend.enums.AgencyStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -15,17 +20,21 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AdminAgencyResponse {
 
-    UUID id;
-    String name;
-    String description;
-    String phoneNumber;
-    String email;
-    String website;
-    String logoUrl;
-    String city;
-    String address;
-    AgencyStatus status;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+    private UUID id;
+    private String name;
+    private String description;
+    private String phoneNumber;
+    private String email;
+    private String website;
+    private String logoUrl;
+    private String city;
+    private String address;
+    private AgencyStatus status;
+    private AgencyOwnerResponse owner;
+    private AgencySubscriptionResponse subscription;
+    private List<AdminAgencyPropertyResponse> properties;
+    private AgencyStatisticsResponse statistics;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
 }

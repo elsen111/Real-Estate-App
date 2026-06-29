@@ -16,6 +16,8 @@ public interface AgencySubscriptionRepository extends JpaRepository<AgencySubscr
 
     Optional<AgencySubscriptionEntity> findFirstByAgency_IdAndStatusOrderByEndDateDesc(UUID agencyId, SubscriptionStatus status);
 
+    Optional<AgencySubscriptionEntity> findFirstByAgencyIdOrderByEndDateDesc(UUID agencyId, SubscriptionStatus status);
+
     boolean existsByAgency_IdAndStatusAndEndDateAfter(UUID agencyId, SubscriptionStatus status, LocalDate endDate);
 
     Page<AgencySubscriptionEntity> findByAgency_IdOrderByCreatedAtDesc(UUID agencyId, Pageable pageable);
