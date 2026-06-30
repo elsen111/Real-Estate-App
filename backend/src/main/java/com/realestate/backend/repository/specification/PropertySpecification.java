@@ -1,11 +1,8 @@
 package com.realestate.backend.repository.specification;
 
-import com.realestate.backend.dto.admin.agency.request.AdminAgencyFilterRequest;
-import com.realestate.backend.dto.admin.agency.request.AdminPropertyFilterRequest;
-import com.realestate.backend.dto.admin.user.request.AdminUserFilterRequest;
+import com.realestate.backend.dto.admin.property.request.AdminPropertyFilterRequest;
 import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.PropertyEntity;
-import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.PropertyStatus;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;

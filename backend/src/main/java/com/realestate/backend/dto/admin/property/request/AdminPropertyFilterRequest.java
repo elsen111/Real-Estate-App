@@ -1,4 +1,4 @@
-package com.realestate.backend.dto.admin.agency.request;
+package com.realestate.backend.dto.admin.property.request;
 
 import com.realestate.backend.enums.PropertyStatus;
 import lombok.Getter;
