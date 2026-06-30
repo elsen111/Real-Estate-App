@@ -17,7 +17,7 @@ import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.agency.AgencyMapper;
 import com.realestate.backend.mapper.agency.AgencyOwnerMapper;
 import com.realestate.backend.mapper.property.PropertyMapper;
-import com.realestate.backend.mapper.subscription.SubscriptionMapper;
+import com.realestate.backend.mapper.subscription.SubscriptionPlanMapper;
 import com.realestate.backend.repository.AgencyMemberRepository;
 import com.realestate.backend.repository.AgencyRepository;
 import com.realestate.backend.repository.AgencySubscriptionRepository;
@@ -44,7 +44,7 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
     private final AgencyOwnerMapper agencyOwnerMapper;
 
     private final AgencySubscriptionRepository agencySubscriptionRepository;
-    private final SubscriptionMapper subscriptionMapper;
+    private final SubscriptionPlanMapper subscriptionMapper;
 
     private final PropertyRepository propertyRepository;
     private final PropertyMapper propertyMapper;
