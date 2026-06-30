@@ -10,6 +10,7 @@ public class AdminAgencyFilterRequest {
     String city;
     String email;
     Boolean status;
+    Boolean isDeleted;
     String query;
 
 }

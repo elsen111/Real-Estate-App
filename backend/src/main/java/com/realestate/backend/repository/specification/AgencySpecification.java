@@ -24,6 +24,7 @@ public class AgencySpecification {
         return Specification.where(hasCity(filterRequest.getCity()))
                 .and(hasEmail(filterRequest.getEmail()))
                 .and(isEnabled(filterRequest.getStatus()))
+                .and(isDeleted(filterRequest.getIsDeleted()))
                 .and(hasQuery(filterRequest.getQuery()));
 
     }
@@ -38,6 +39,10 @@ public class AgencySpecification {
 
     private static Specification<AgencyEntity> isEnabled(Boolean status) {
         return ((root, query, criteriaBuilder) -> status == null ? null : criteriaBuilder.equal(root.get("status"), status));
+    }
+
+    private static Specification<AgencyEntity> isDeleted(Boolean isDeleted) {
+        return ((root, query, criteriaBuilder) -> isDeleted == null ? null : criteriaBuilder.equal(root.get("isDeleted"), isDeleted));
     }
 
     private static Specification<AgencyEntity> hasQuery(String keyword) {

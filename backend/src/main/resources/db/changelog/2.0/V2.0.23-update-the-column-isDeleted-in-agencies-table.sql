@@ -1,0 +1,1 @@
+UPDATE agencies SET is_deleted = FALSE WHERE is_deleted = TRUE;

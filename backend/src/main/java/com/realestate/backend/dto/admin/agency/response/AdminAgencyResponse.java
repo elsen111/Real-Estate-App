@@ -30,6 +30,7 @@ public class AdminAgencyResponse {
     private String city;
     private String address;
     private AgencyStatus status;
+    private boolean isDeleted;
     private AgencyOwnerResponse owner;
     private AgencySubscriptionResponse subscription;
     private List<AdminAgencyPropertyResponse> properties;

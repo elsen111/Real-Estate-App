@@ -128,4 +128,20 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         return agency.getName() + "'s status changed to " + status.toString();
 
     }
+
+    @Override
+    public String softDeleteAgency(UUID id) {
+
+        AgencyEntity agency = agencyRepository.findById(id)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Agency not found with id " + id)
+                );
+
+        agency.setDeleted(true);
+
+        agencyRepository.save(agency);
+
+        return agency.getName() + "has been deleted successfully";
+
+    }
 }
