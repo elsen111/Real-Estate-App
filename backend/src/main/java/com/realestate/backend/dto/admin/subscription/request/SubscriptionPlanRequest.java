@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateSubscriptionPlanRequest {
+public class SubscriptionPlanRequest {
 
     @NotNull(message = "Name is required")
     @Size(max = 100, message = "Name length should be most 200 characters")

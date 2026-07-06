@@ -1,15 +1,13 @@
 package com.realestate.backend.controller.admin;
 
 import com.realestate.backend.common.response.ApiResponse;
-import com.realestate.backend.dto.admin.agency.response.AdminAgencyResponse;
 import com.realestate.backend.dto.admin.subscription.request.AdminSubscriptionPlanFilterRequest;
-import com.realestate.backend.dto.admin.subscription.request.CreateSubscriptionPlanRequest;
+import com.realestate.backend.dto.admin.subscription.request.SubscriptionPlanRequest;
 import com.realestate.backend.dto.admin.subscription.response.AdminSubscriptionPlanResponse;
 import com.realestate.backend.service.admin.subscription.AdminSubscriptionPlanService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +25,7 @@ public class AdminSubscriptionController {
     @PostMapping
     @Operation(summary = "Create a new subscription plan")
     public ResponseEntity<ApiResponse<AdminSubscriptionPlanResponse>> createSubscriptionPlan(
-            @Valid @RequestBody CreateSubscriptionPlanRequest request
+            @Valid @RequestBody SubscriptionPlanRequest request
     ) {
 
         AdminSubscriptionPlanResponse response = adminSubscriptionPlanService.createSubscriptionPlan(request);
@@ -61,6 +59,21 @@ public class AdminSubscriptionController {
         return ResponseEntity.ok(
                 ApiResponse.success("Subscription plan fetched successfully", response)
         );
+    }
+
+    @PutMapping("/{planId}")
+    @Operation(summary = "Update subscription plan")
+    public ResponseEntity<ApiResponse<AdminSubscriptionPlanResponse>> updateSubscriptionPlan(
+            @PathVariable UUID planId,
+            @Valid @RequestBody SubscriptionPlanRequest request
+    ) {
+
+        AdminSubscriptionPlanResponse response = adminSubscriptionPlanService.updateSubscriptionPlan(planId, request);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Subscription plan updated successfully", response)
+        );
+
     }
 
 

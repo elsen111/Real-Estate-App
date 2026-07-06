@@ -1,7 +1,7 @@
 package com.realestate.backend.service.admin.subscription;
 
 import com.realestate.backend.dto.admin.subscription.request.AdminSubscriptionPlanFilterRequest;
-import com.realestate.backend.dto.admin.subscription.request.CreateSubscriptionPlanRequest;
+import com.realestate.backend.dto.admin.subscription.request.SubscriptionPlanRequest;
 import com.realestate.backend.dto.admin.subscription.response.AdminSubscriptionPlanResponse;
 import com.realestate.backend.entity.SubscriptionPlanEntity;
 import com.realestate.backend.exception.BadRequestException;
@@ -27,7 +27,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
     private final SubscriptionPlanMapper subscriptionPlanMapper;
 
     @Override
-    public AdminSubscriptionPlanResponse createSubscriptionPlan(CreateSubscriptionPlanRequest request) {
+    public AdminSubscriptionPlanResponse createSubscriptionPlan(SubscriptionPlanRequest request) {
 
         validatePlanName(request.getName());
 
@@ -58,6 +58,34 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
         return subscriptionPlanMapper.toAdminSubscriptionPlanResponse(subscriptionPlan);
     }
 
+    @Override
+    public AdminSubscriptionPlanResponse updateSubscriptionPlan(UUID id, SubscriptionPlanRequest request) {
+
+        SubscriptionPlanEntity subscriptionPlan = subscriptionPlanRepository.findById(id)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Subscription plan not found with id " + id)
+                );
+
+        validatePlanName(request.getName());
+        validatePlanUsage(id);
+
+
+
+        subscriptionPlan.setName(request.getName());
+        subscriptionPlan.setDescription(request.getDescription());
+        subscriptionPlan.setPrice(request.getPrice());
+        subscriptionPlan.setPrice(request.getPrice());
+        subscriptionPlan.setDurationDays(request.getDurationDays());
+        subscriptionPlan.setMaxListings(request.getMaxListings());
+        subscriptionPlan.setMaxAgents(request.getMaxAgents());
+        subscriptionPlan.setFeaturedListingsAllowed(request.getFeaturedListingsAllowed());
+
+        SubscriptionPlanEntity updatedSubscriptionPlan = subscriptionPlanRepository.save(subscriptionPlan);
+
+        return subscriptionPlanMapper.toAdminSubscriptionPlanResponse(updatedSubscriptionPlan);
+
+    }
+
     private void validatePlanName(String name) {
 
         if (subscriptionPlanRepository.existsByNameIgnoreCase(name.trim())) {
@@ -65,6 +93,16 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
                     "Subscription plan with this name already exists."
             );
         }
+    }
+
+    private void validatePlanUsage(UUID planId) {
+
+        boolean usedByAnyAgency = subscriptionPlanRepository.existsByIdAndActiveTrue(planId);
+
+        if(usedByAnyAgency) {
+            throw new BadRequestException("Plan already in use by agency or agencies");
+        }
+
     }
 
 }

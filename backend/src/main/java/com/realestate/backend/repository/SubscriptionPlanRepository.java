@@ -22,4 +22,6 @@ public interface SubscriptionPlanRepository extends JpaRepository<SubscriptionPl
 
     List<SubscriptionPlanEntity> findByActiveTrueOrderByPriceDesc();
 
+    boolean existsByIdAndActiveTrue(UUID id);
+
 }
