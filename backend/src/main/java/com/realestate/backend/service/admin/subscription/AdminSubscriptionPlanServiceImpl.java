@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -29,7 +31,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
     @Override
     public AdminSubscriptionPlanResponse createSubscriptionPlan(SubscriptionPlanRequest request) {
 
-        validatePlanName(request.getName());
+        validatePlanName(request.getName(), null);
 
         SubscriptionPlanEntity subscriptionPlanEntity = subscriptionPlanMapper.toSubscriptionPlanEntity(request);
 
@@ -66,7 +68,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
                         () -> new ResourceNotFoundException("Subscription plan not found with id " + id)
                 );
 
-        validatePlanName(request.getName());
+        validatePlanName(request.getName(), id);
         validatePlanUsage(id);
 
 
@@ -86,9 +88,18 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
 
     }
 
-    private void validatePlanName(String name) {
+    private void validatePlanName(String name, UUID planId) {
 
-        if (subscriptionPlanRepository.existsByNameIgnoreCase(name.trim())) {
+        String trimmedName = name.trim();
+        boolean nameExists;
+
+        if (Objects.nonNull(planId)) {
+            nameExists = subscriptionPlanRepository.existsByNameIgnoreCaseAndIdNot(trimmedName, planId);
+        } else {
+            nameExists = subscriptionPlanRepository.existsByNameIgnoreCase(trimmedName);
+        }
+
+        if (nameExists) {
             throw new BadRequestException(
                     "Subscription plan with this name already exists."
             );
