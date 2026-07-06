@@ -24,4 +24,6 @@ public interface SubscriptionPlanRepository extends JpaRepository<SubscriptionPl
 
     boolean existsByIdAndActiveTrue(UUID id);
 
+    boolean existsByNameIgnoreCaseAndIdNot(String name, UUID id);
+
 }
