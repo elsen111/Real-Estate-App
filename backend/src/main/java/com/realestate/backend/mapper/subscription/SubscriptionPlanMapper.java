@@ -1,6 +1,6 @@
 package com.realestate.backend.mapper.subscription;
 
-import com.realestate.backend.dto.admin.subscription.request.CreateSubscriptionPlanRequest;
+import com.realestate.backend.dto.admin.subscription.request.SubscriptionPlanRequest;
 import com.realestate.backend.dto.admin.subscription.response.AdminSubscriptionPlanResponse;
 import com.realestate.backend.dto.agency.response.AgencySubscriptionResponse;
 import com.realestate.backend.entity.AgencySubscriptionEntity;
@@ -27,7 +27,7 @@ public class SubscriptionPlanMapper {
 
     }
 
-    public SubscriptionPlanEntity toSubscriptionPlanEntity(CreateSubscriptionPlanRequest request){
+    public SubscriptionPlanEntity toSubscriptionPlanEntity(SubscriptionPlanRequest request){
 
         return SubscriptionPlanEntity.builder()
                 .name(request.getName())
