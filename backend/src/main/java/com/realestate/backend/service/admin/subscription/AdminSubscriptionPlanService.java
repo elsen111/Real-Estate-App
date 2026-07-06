@@ -19,4 +19,6 @@ public interface AdminSubscriptionPlanService {
 
     AdminSubscriptionPlanResponse updateSubscriptionPlan(UUID id, SubscriptionPlanRequest subscriptionPlanEntity);
 
+    String toggleSubscriptionPlanStatus(UUID id);
+
 }

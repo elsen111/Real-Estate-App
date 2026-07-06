@@ -76,5 +76,19 @@ public class AdminSubscriptionController {
 
     }
 
+    @PatchMapping("/{planId}/status")
+    @Operation(summary = "Change subscription plan status")
+    public ResponseEntity<ApiResponse<Void>> toggleSubscriptionPlanStatus(
+            @PathVariable UUID planId
+    ) {
+
+        adminSubscriptionPlanService.toggleSubscriptionPlanStatus(planId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Subscription plan updated successfully")
+        );
+
+    }
+
 
 }
