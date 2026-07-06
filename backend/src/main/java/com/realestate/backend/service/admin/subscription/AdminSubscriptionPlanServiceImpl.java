@@ -5,6 +5,7 @@ import com.realestate.backend.dto.admin.subscription.request.CreateSubscriptionP
 import com.realestate.backend.dto.admin.subscription.response.AdminSubscriptionPlanResponse;
 import com.realestate.backend.entity.SubscriptionPlanEntity;
 import com.realestate.backend.exception.BadRequestException;
+import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.subscription.SubscriptionPlanMapper;
 import com.realestate.backend.repository.SubscriptionPlanRepository;
 import com.realestate.backend.repository.specification.AdminSubscriptionPlanSpecification;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -44,6 +46,16 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
 
         return subscriptionPlanRepository.findAll(specification).stream().map(subscriptionPlanMapper::toAdminSubscriptionPlanResponse).toList();
 
+    }
+
+    @Override
+    public AdminSubscriptionPlanResponse getSubscriptionPlanById(UUID id) {
+        SubscriptionPlanEntity subscriptionPlan = subscriptionPlanRepository.findById(id)
+                .orElseThrow(() ->
+                    new ResourceNotFoundException("Subscription plan not found with id " + id)
+                );
+
+        return subscriptionPlanMapper.toAdminSubscriptionPlanResponse(subscriptionPlan);
     }
 
     private void validatePlanName(String name) {
