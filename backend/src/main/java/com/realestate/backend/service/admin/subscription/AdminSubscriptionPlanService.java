@@ -6,6 +6,7 @@ import com.realestate.backend.dto.admin.subscription.response.AdminSubscriptionP
 import com.realestate.backend.entity.SubscriptionPlanEntity;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface AdminSubscriptionPlanService {
 
@@ -14,5 +15,7 @@ public interface AdminSubscriptionPlanService {
     List<AdminSubscriptionPlanResponse> getAllSubscriptionPlans(
             AdminSubscriptionPlanFilterRequest filterRequest
     );
+
+    AdminSubscriptionPlanResponse getSubscriptionPlanById(UUID id);
 
 }

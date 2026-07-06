@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/admin/subscription-plans")
@@ -48,6 +49,18 @@ public class AdminSubscriptionController {
                 ApiResponse.success("Subscription plans fetched successfully", response);
 
         return ResponseEntity.ok(apiResponse);
+    }
+
+    @GetMapping("/{planId}")
+    @Operation(summary = "Get subscription plan by id")
+    public ResponseEntity<ApiResponse<AdminSubscriptionPlanResponse>> getSubscriptionPlanById(
+            @PathVariable UUID planId
+    ) {
+        AdminSubscriptionPlanResponse response = adminSubscriptionPlanService.getSubscriptionPlanById(planId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Subscription plan fetched successfully", response)
+        );
     }
 
 
