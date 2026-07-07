@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 
@@ -89,7 +88,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
     }
 
     @Override
-    public String toggleSubscriptionPlanStatus(UUID id) {
+    public void toggleSubscriptionPlanStatus(UUID id) {
         SubscriptionPlanEntity subscriptionPlan = subscriptionPlanRepository.findById(id)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Subscription plan not found with id " + id)
@@ -100,7 +99,23 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
         subscriptionPlan.setActive(newStatus);
         subscriptionPlanRepository.save(subscriptionPlan);
 
-        return subscriptionPlan.getName() + "'s status changed";
+    }
+
+    @Override
+    public String softDeleteSubscriptionPlan(UUID id) {
+
+        SubscriptionPlanEntity subscriptionPlan =  subscriptionPlanRepository.findById(id)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Subscription plan not found with id " + id)
+                );
+
+        validatePlanUsage(id);
+
+        subscriptionPlan.setDeleted(true);
+
+        subscriptionPlanRepository.save(subscriptionPlan);
+
+        return subscriptionPlan.getName() + " plan deleted successfully";
 
     }
 
