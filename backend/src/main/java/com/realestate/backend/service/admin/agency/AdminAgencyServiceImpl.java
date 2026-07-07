@@ -190,4 +190,24 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         return subscriptionMapper.toAdminResponse(createdAgencySubscription);
 
     }
+
+    @Override
+    public AgencySubscriptionResponse getAgencySubscription(UUID agencyId) {
+
+        AgencyEntity agency = agencyRepository.findById(agencyId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Agency not found with id " + agencyId)
+                );
+
+        AgencySubscriptionEntity agencySubscription = agencySubscriptionRepository
+                .findFirstByAgencyIdAndStatusOrderByEndDateDesc(
+                    agencyId,
+                    SubscriptionStatus.ACTIVE
+        ).orElseThrow(
+                () -> new ResourceNotFoundException("This agency does not have any active subscription currently")
+        );
+
+        return subscriptionMapper.toAdminResponse(agencySubscription);
+
+    }
 }

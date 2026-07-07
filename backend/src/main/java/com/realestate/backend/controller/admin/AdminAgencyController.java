@@ -109,4 +109,18 @@ public class AdminAgencyController {
 
     }
 
+    @GetMapping("/{agencyId}/subscription-plan")
+    @Operation(summary = "Get agency subscription")
+    public ResponseEntity<ApiResponse<AgencySubscriptionResponse>> getAgencySubscription(
+            @PathVariable UUID agencyId
+    ) {
+
+        AgencySubscriptionResponse response = adminAgencyService.getAgencySubscription(agencyId);
+
+        return ResponseEntity.ok(ApiResponse.success(
+                "Agency subscription fetched successfully", response
+        ));
+
+    }
+
 }
