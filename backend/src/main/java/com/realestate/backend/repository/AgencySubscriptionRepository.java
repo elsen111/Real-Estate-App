@@ -22,4 +22,7 @@ public interface AgencySubscriptionRepository extends JpaRepository<AgencySubscr
 
     Page<AgencySubscriptionEntity> findByAgency_IdOrderByCreatedAtDesc(UUID agencyId, Pageable pageable);
 
+    boolean existsByAgencyIdAndStatus(UUID agencyId, SubscriptionStatus status);
+
+    boolean existsByPlanIdAndStatus(UUID planId, SubscriptionStatus status);
 }

@@ -2,6 +2,7 @@ package com.realestate.backend.service.admin.agency;
 
 import com.realestate.backend.dto.admin.agency.request.AdminAgencyFilterRequest;
 import com.realestate.backend.dto.admin.agency.response.AdminAgencyResponse;
+import com.realestate.backend.dto.agency.response.AgencySubscriptionResponse;
 import com.realestate.backend.enums.AgencyStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,5 +23,7 @@ public interface AdminAgencyService {
     String changeAgencyStatus(UUID id, AgencyStatus status);
 
     String softDeleteAgency(UUID id);
+
+    AgencySubscriptionResponse createAgencySubscription(UUID agencyId, UUID subscriptionId);
 
 }

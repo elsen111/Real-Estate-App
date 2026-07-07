@@ -4,9 +4,11 @@ import com.realestate.backend.dto.admin.subscription.request.AdminSubscriptionPl
 import com.realestate.backend.dto.admin.subscription.request.SubscriptionPlanRequest;
 import com.realestate.backend.dto.admin.subscription.response.AdminSubscriptionPlanResponse;
 import com.realestate.backend.entity.SubscriptionPlanEntity;
+import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.subscription.SubscriptionPlanMapper;
+import com.realestate.backend.repository.AgencySubscriptionRepository;
 import com.realestate.backend.repository.SubscriptionPlanRepository;
 import com.realestate.backend.repository.specification.AdminSubscriptionPlanSpecification;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,8 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
 
     private final SubscriptionPlanRepository subscriptionPlanRepository;
     private final SubscriptionPlanMapper subscriptionPlanMapper;
+
+    private final AgencySubscriptionRepository  agencySubscriptionRepository;
 
     @Override
     public AdminSubscriptionPlanResponse createSubscriptionPlan(SubscriptionPlanRequest request) {
@@ -112,6 +116,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
         validatePlanUsage(id);
 
         subscriptionPlan.setDeleted(true);
+        subscriptionPlan.setActive(false);
 
         subscriptionPlanRepository.save(subscriptionPlan);
 
@@ -139,7 +144,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
 
     private void validatePlanUsage(UUID planId) {
 
-        boolean usedByAnyAgency = subscriptionPlanRepository.existsByIdAndActiveTrue(planId);
+        boolean usedByAnyAgency = agencySubscriptionRepository.existsByPlanIdAndStatus(planId, SubscriptionStatus.ACTIVE);
 
         if(usedByAnyAgency) {
             throw new BadRequestException("Plan already in use by agency or agencies");

@@ -6,22 +6,17 @@ import com.realestate.backend.dto.admin.property.response.AdminAgencyPropertyRes
 import com.realestate.backend.dto.agency.response.AgencyOwnerResponse;
 import com.realestate.backend.dto.agency.response.AgencyStatisticsResponse;
 import com.realestate.backend.dto.agency.response.AgencySubscriptionResponse;
-import com.realestate.backend.entity.AgencyEntity;
-import com.realestate.backend.entity.AgencyMemberEntity;
-import com.realestate.backend.entity.AgencySubscriptionEntity;
-import com.realestate.backend.entity.UserEntity;
+import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.AgencyStatus;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.SubscriptionStatus;
+import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.agency.AgencyMapper;
 import com.realestate.backend.mapper.agency.AgencyOwnerMapper;
 import com.realestate.backend.mapper.property.PropertyMapper;
 import com.realestate.backend.mapper.subscription.SubscriptionPlanMapper;
-import com.realestate.backend.repository.AgencyMemberRepository;
-import com.realestate.backend.repository.AgencyRepository;
-import com.realestate.backend.repository.AgencySubscriptionRepository;
-import com.realestate.backend.repository.PropertyRepository;
+import com.realestate.backend.repository.*;
 import com.realestate.backend.repository.specification.AgencySpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +25,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,6 +45,9 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
 
     private final PropertyRepository propertyRepository;
     private final PropertyMapper propertyMapper;
+
+    private final SubscriptionPlanRepository subscriptionPlanRepository;
+    private final SubscriptionPlanMapper subscriptionPlanMapper;
 
     @Override
     public Page<AdminAgencyResponse> getAllAgencies(AdminAgencyFilterRequest filter, Pageable pageable) {
@@ -142,6 +142,52 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         agencyRepository.save(agency);
 
         return agency.getName() + "has been deleted successfully";
+
+    }
+
+    @Override
+    public AgencySubscriptionResponse createAgencySubscription(UUID agencyId, UUID subscriptionId) {
+
+        AgencyEntity agency = agencyRepository.findById(agencyId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Agency not found with id " + agencyId)
+                );
+
+        SubscriptionPlanEntity subscriptionPlan = subscriptionPlanRepository.findById(subscriptionId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Subscription plan not found with id " + subscriptionId)
+                );
+
+        boolean isPlanActive = subscriptionPlanRepository.existsByIdAndActiveTrue(subscriptionPlan.getId());
+        boolean isAgencyDeleted = agency.isDeleted();
+        boolean isAgencyApproved = agency.getStatus().equals(AgencyStatus.APPROVED);
+        boolean hasActiveSubscription = agencySubscriptionRepository.existsByAgencyIdAndStatus(agencyId, SubscriptionStatus.ACTIVE);
+
+        if(!isPlanActive) {
+            throw new BadRequestException("Subscription plan is not active.");
+        } else if (isAgencyDeleted) {
+            throw new  BadRequestException("Agency has been deleted.");
+        } else if(!isAgencyApproved)  {
+            throw new  BadRequestException("Agency has not been approved.Only approved agencies are allowed to get subscriptions.");
+        } else  if(hasActiveSubscription) {
+            throw new  BadRequestException("Agency has already an active subscription.");
+        }
+
+        LocalDateTime startDate = LocalDateTime.now();
+        LocalDateTime endDate = startDate.plusDays(subscriptionPlan.getDurationDays());
+
+        AgencySubscriptionEntity agencySubscription =
+                AgencySubscriptionEntity.builder()
+                        .agency(agency)
+                        .plan(subscriptionPlan)
+                        .startDate(LocalDate.from(startDate))
+                        .endDate(LocalDate.from(endDate))
+                        .status(SubscriptionStatus.ACTIVE)
+                        .build();
+
+        AgencySubscriptionEntity createdAgencySubscription = agencySubscriptionRepository.saveAndFlush(agencySubscription);
+
+        return subscriptionMapper.toAdminResponse(createdAgencySubscription);
 
     }
 }

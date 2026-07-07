@@ -4,6 +4,7 @@ import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.admin.agency.request.AdminAgencyFilterRequest;
 import com.realestate.backend.dto.admin.agency.request.AgencyStatusRequest;
 import com.realestate.backend.dto.admin.agency.response.AdminAgencyResponse;
+import com.realestate.backend.dto.agency.response.AgencySubscriptionResponse;
 import com.realestate.backend.dto.user.request.DeleteAccountRequest;
 import com.realestate.backend.enums.AgencyStatus;
 import com.realestate.backend.security.CustomUserDetails;
@@ -90,6 +91,22 @@ public class AdminAgencyController {
                         "Agency successfully disabled", null
                 )
         );
+    }
+
+    @Transactional
+    @PostMapping("/{agencyId}/subscription-plans/{subscriptionId}")
+    @Operation(summary = "Assign subscription plan to an agency")
+    public ResponseEntity<ApiResponse<AgencySubscriptionResponse>> assignSubscriptionPlan(
+            @PathVariable UUID agencyId,
+            @PathVariable UUID subscriptionId
+    ) {
+
+        AgencySubscriptionResponse response = adminAgencyService.createAgencySubscription(agencyId, subscriptionId);
+
+        return ResponseEntity.ok(ApiResponse.success(
+                "Agency assigned successfully", response
+        ));
+
     }
 
 }
