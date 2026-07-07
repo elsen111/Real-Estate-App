@@ -88,6 +88,22 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
 
     }
 
+    @Override
+    public String toggleSubscriptionPlanStatus(UUID id) {
+        SubscriptionPlanEntity subscriptionPlan = subscriptionPlanRepository.findById(id)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Subscription plan not found with id " + id)
+                );
+
+        boolean newStatus = !subscriptionPlan.isActive();
+
+        subscriptionPlan.setActive(newStatus);
+        subscriptionPlanRepository.save(subscriptionPlan);
+
+        return subscriptionPlan.getName() + "'s status changed";
+
+    }
+
     private void validatePlanName(String name, UUID planId) {
 
         String trimmedName = name.trim();
