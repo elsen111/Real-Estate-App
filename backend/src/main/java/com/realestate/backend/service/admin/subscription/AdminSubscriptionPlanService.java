@@ -19,6 +19,8 @@ public interface AdminSubscriptionPlanService {
 
     AdminSubscriptionPlanResponse updateSubscriptionPlan(UUID id, SubscriptionPlanRequest subscriptionPlanEntity);
 
-    String toggleSubscriptionPlanStatus(UUID id);
+    void toggleSubscriptionPlanStatus(UUID id);
+
+    String softDeleteSubscriptionPlan(UUID id);
 
 }

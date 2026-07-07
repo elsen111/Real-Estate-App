@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -86,6 +87,21 @@ public class AdminSubscriptionController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Subscription plan updated successfully")
+        );
+
+    }
+
+    @Transactional
+    @DeleteMapping("/{planId}")
+    @Operation(summary = "Delete a subscription plan")
+    public ResponseEntity<ApiResponse<Void>> deleteSubscriptionPlan(
+            @PathVariable UUID planId
+    ) {
+
+        adminSubscriptionPlanService.softDeleteSubscriptionPlan(planId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Subscription plan deleted successfully")
         );
 
     }
