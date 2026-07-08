@@ -25,7 +25,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class AgencyMemberService {
+public class AgencyMemberServiceImpl {
 
     private final AgencyRepository agencyRepository;
     private final AgencyMemberRepository agencyMemberRepository;
