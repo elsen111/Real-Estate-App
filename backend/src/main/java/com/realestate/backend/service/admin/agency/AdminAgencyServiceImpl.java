@@ -137,7 +137,7 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
                         () -> new ResourceNotFoundException("Agency not found with id " + id)
                 );
 
-        agency.setDeleted(true);
+        agency.setIsDeleted(true);
 
         agencyRepository.save(agency);
 
@@ -159,7 +159,7 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
                 );
 
         boolean isPlanActive = subscriptionPlanRepository.existsByIdAndActiveTrue(subscriptionPlan.getId());
-        boolean isAgencyDeleted = agency.isDeleted();
+        boolean isAgencyDeleted = agency.getIsDeleted();
         boolean isAgencyApproved = agency.getStatus().equals(AgencyStatus.APPROVED);
         boolean hasActiveSubscription = agencySubscriptionRepository.existsByAgencyIdAndStatus(agencyId, SubscriptionStatus.ACTIVE);
 

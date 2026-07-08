@@ -48,6 +48,8 @@ public class SecurityConfig {
                                 "/auth/login",
                                 "/auth/refresh-token"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/agencies").permitAll()   // <-- add this, exact path only, no /** wildcard
+
 
                         .requestMatchers(
                                 "/v3/api-docs/**",

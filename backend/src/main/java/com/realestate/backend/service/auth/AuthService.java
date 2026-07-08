@@ -198,7 +198,7 @@ public class AuthService {
 
         return AuthResponse.builder()
                 .user(userMapper.toSummary(user))
-                .agency(agencyMapper.toSummary(agency))
+                .agency(agencyMapper.toAgencyOwnerResponse(agency))
                 .build();
     }
 
@@ -213,7 +213,7 @@ public class AuthService {
                 .tokenType(SecurityConstants.TOKEN_PREFIX.trim())
                 .expiresInSeconds(jwtService.accessTokenExpiresInSeconds())
                 .user(userMapper.toSummary(user))
-                .agency(agencyMapper.toSummary(agency))
+                .agency(agencyMapper.toAgencyOwnerResponse(agency))
                 .build();
     }
 

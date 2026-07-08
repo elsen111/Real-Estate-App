@@ -6,50 +6,19 @@ import com.realestate.backend.dto.agency.response.AgencyResponse;
 import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.UserEntity;
 import lombok.Builder;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
 
-@Component
-public class AgencyMapper {
+@Mapper(componentModel = "spring")
+public interface AgencyMapper {
 
-    public AgencyResponse toSummary(AgencyEntity agency) {
-        if(agency == null) {
-            return null;
-        }
+    AgencyResponse toAgencyOwnerResponse(AgencyEntity agency);
 
-        return AgencyResponse.builder()
-                .id(agency.getId())
-                .name(agency.getName())
-                .description(agency.getDescription())
-                .email(agency.getEmail())
-                .phoneNumber(agency.getPhoneNumber())
-                .website(agency.getWebsite())
-                .logoUrl(agency.getLogoUrl())
-                .city(agency.getCity())
-                .address(agency.getAddress())
-                .status(agency.getStatus())
-                .build();
-    }
+    @Mapping(target = "properties",  ignore = true)
+    AdminAgencyResponse toAdminResponse(AgencyEntity agency);
 
-    public AdminAgencyResponse toAdminResponse(AgencyEntity agency) {
-        if(agency == null) {
-            return null;
-        }
-
-        return AdminAgencyResponse.builder()
-                .id(agency.getId())
-                .name(agency.getName())
-                .description(agency.getDescription())
-                .phoneNumber(agency.getPhoneNumber())
-                .email(agency.getEmail())
-                .website(agency.getWebsite())
-                .logoUrl(agency.getLogoUrl())
-                .city(agency.getCity())
-                .address(agency.getAddress())
-                .status(agency.getStatus())
-                .isDeleted(agency.isDeleted())
-                .createdAt(agency.getCreatedAt())
-                .updatedAt(agency.getUpdatedAt())
-                .build();
-    }
+    @Mapping(target = "status",  ignore = true)
+    AgencyResponse toPublicAgencyResponse(AgencyEntity agency);
 
 }

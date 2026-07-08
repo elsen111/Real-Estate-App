@@ -2,14 +2,35 @@ package com.realestate.backend.repository.specification;
 
 import com.realestate.backend.dto.admin.agency.request.AdminAgencyFilterRequest;
 import com.realestate.backend.dto.admin.user.request.AdminUserFilterRequest;
+import com.realestate.backend.dto.agency.request.AgencyFilterRequest;
 import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.UserEntity;
+import com.realestate.backend.enums.AgencyStatus;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 public class AgencySpecification {
 
     public AgencySpecification() {}
+
+    public static Specification<AgencyEntity> withPublicFilter(
+            AgencyFilterRequest filterRequest
+    ) {
+
+        Specification<AgencyEntity> spec = Specification
+                .where(isNotDeleted())
+                .and(hasStatus(AgencyStatus.APPROVED));
+
+        if (filterRequest == null) {
+            return spec;
+        }
+
+        return spec
+                .and(hasCity(filterRequest.getCity()))
+                .and(hasQuery(filterRequest.getQuery()));
+    }
+
+
 
     public static Specification<AgencyEntity> withFilter(
             AdminAgencyFilterRequest filterRequest
@@ -60,6 +81,16 @@ public class AgencySpecification {
             );
 
         };
+    }
+
+    private static Specification<AgencyEntity> isNotDeleted() {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.isFalse(root.get("isDeleted"));
+    }
+
+    private static Specification<AgencyEntity> hasStatus(AgencyStatus status) {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("status"), status);
     }
 
 }

@@ -1,7 +1,10 @@
 package com.realestate.backend.service.agency;
 
+import com.realestate.backend.dto.admin.agency.request.AdminAgencyFilterRequest;
+import com.realestate.backend.dto.admin.agency.response.AdminAgencyResponse;
 import com.realestate.backend.dto.admin.property.request.AdminPropertyFilterRequest;
 import com.realestate.backend.dto.admin.property.response.AdminPropertyResponse;
+import com.realestate.backend.dto.agency.request.AgencyFilterRequest;
 import com.realestate.backend.dto.agency.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.dto.agency.request.UpdateAgencyRequest;
 import com.realestate.backend.dto.agency.response.AgencyResponse;
@@ -27,6 +30,11 @@ public interface AgencyService {
     Page<AdminPropertyResponse> getMyAgencyProperties(
             CustomUserDetails currentUser,
             AgencyPropertyFilterRequest filter,
+            Pageable pageable
+    );
+
+    Page<AgencyResponse> getAllPublicAgencies(
+            AgencyFilterRequest filter,
             Pageable pageable
     );
 

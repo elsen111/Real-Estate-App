@@ -1,5 +1,6 @@
 package com.realestate.backend.dto.agency.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.realestate.backend.enums.AgencyStatus;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import java.util.UUID;
 
 @Getter
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AgencyResponse {
 
     private UUID id;
