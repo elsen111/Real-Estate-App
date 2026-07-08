@@ -12,8 +12,11 @@ public class AgencyResponse {
 
     private UUID id;
     private String name;
+    private String description;
     private String email;
     private String phoneNumber;
+    private String website;
+    private String logoUrl;
     private String city;
     private String address;
     private AgencyStatus status;
