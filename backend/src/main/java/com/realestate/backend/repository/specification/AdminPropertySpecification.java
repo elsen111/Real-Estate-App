@@ -9,9 +9,9 @@ import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
-public class PropertySpecification {
+public class AdminPropertySpecification {
 
-    public PropertySpecification() {}
+    public AdminPropertySpecification() {}
 
     public static Specification<PropertyEntity> withFilter(
             AdminPropertyFilterRequest filterRequest

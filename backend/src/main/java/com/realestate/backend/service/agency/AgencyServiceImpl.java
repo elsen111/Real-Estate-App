@@ -1,22 +1,27 @@
 package com.realestate.backend.service.agency;
 
+import com.realestate.backend.dto.admin.property.response.AdminPropertyResponse;
+import com.realestate.backend.dto.agency.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.dto.agency.request.UpdateAgencyRequest;
 import com.realestate.backend.dto.agency.response.AgencyResponse;
 import com.realestate.backend.dto.agency.response.AgencySubscriptionResponse;
-import com.realestate.backend.entity.AgencyEntity;
-import com.realestate.backend.entity.AgencySubscriptionEntity;
-import com.realestate.backend.entity.SubscriptionPlanEntity;
-import com.realestate.backend.entity.UserEntity;
+import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.agency.AgencyMapper;
+import com.realestate.backend.mapper.property.PropertyMapper;
 import com.realestate.backend.repository.AgencyRepository;
 import com.realestate.backend.repository.AgencySubscriptionRepository;
 import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.UserRepository;
+import com.realestate.backend.repository.specification.AdminPropertySpecification;
+import com.realestate.backend.repository.specification.AgencyPropertySpecification;
 import com.realestate.backend.security.CustomUserDetails;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,6 +36,7 @@ public class AgencyServiceImpl implements AgencyService {
     private final AgencySubscriptionRepository agencySubscriptionRepository;
 
    private final PropertyRepository propertyRepository;
+   private final PropertyMapper propertyMapper;
 
     @Override
     public AgencyResponse getCurrentAgency(CustomUserDetails currentUser) {
@@ -129,6 +135,32 @@ public class AgencyServiceImpl implements AgencyService {
                         subscriptionPlan.getMaxAgents() - (int) usedAgents
                 )
                 .build();
+
+    }
+
+    @Override
+    public Page<AdminPropertyResponse> getMyAgencyProperties(CustomUserDetails currentUser, AgencyPropertyFilterRequest filter, Pageable pageable) {
+
+
+        UserEntity user = userRepository.findById(currentUser.getId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("User not found with id " + currentUser.getId())
+                );
+
+        AgencyEntity agency = agencyRepository.findById(user.getAgency().getId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Agency not found with id " + user.getAgency().getId())
+                );
+
+
+
+        Specification<PropertyEntity> specification = AgencyPropertySpecification
+                .withFilter(filter);
+
+        specification = specification.and(AgencyPropertySpecification.hasAgencyId(user.getAgency().getId()));
+
+        return propertyRepository.findAll(specification, pageable)
+                .map(propertyMapper::toAdminPropertyResponse);
 
     }
 }
