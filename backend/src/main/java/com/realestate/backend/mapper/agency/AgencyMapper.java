@@ -19,6 +19,10 @@ public interface AgencyMapper {
     AdminAgencyResponse toAdminResponse(AgencyEntity agency);
 
     @Mapping(target = "status",  ignore = true)
-    AgencyResponse toPublicAgencyResponse(AgencyEntity agency);
+    AgencyResponse toPublicAgencyListItem(AgencyEntity agency);
+
+    @Mapping(target = "totalAgents", source = "totalAgents")
+    @Mapping(target = "status",  ignore = true)
+    AgencyResponse toPublicAgencyResponse(AgencyEntity agency, long totalAgents);
 
 }

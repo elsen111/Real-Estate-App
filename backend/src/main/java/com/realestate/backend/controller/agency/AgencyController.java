@@ -23,6 +23,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/agencies")
 @RequiredArgsConstructor
@@ -94,7 +96,7 @@ public class AgencyController {
 
     }
 
-    @GetMapping
+    @GetMapping("/public")
     @Operation(summary = "Get all public agencies")
     public ResponseEntity<ApiResponse<Page<AgencyResponse>>> getAllAgencies(
             @ModelAttribute AgencyFilterRequest filter,
@@ -108,6 +110,21 @@ public class AgencyController {
                 ApiResponse.success("Agencies fetched successfully", response);
 
         return ResponseEntity.ok(apiResponse);
+
+    }
+
+
+    @GetMapping("/public/{agencyId}")
+    @Operation(summary = "Get specific agency's public information.")
+    public ResponseEntity<ApiResponse<AgencyResponse>> getAgencyPublicInfo(
+            @PathVariable UUID agencyId
+    ){
+
+        AgencyResponse response = agencyService.getPublicAgencyInfo(agencyId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Agency information fetched successfully", response)
+        );
 
     }
 
