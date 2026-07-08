@@ -1,6 +1,9 @@
 package com.realestate.backend.service.agency;
 
+import com.realestate.backend.dto.admin.agency.request.AdminAgencyFilterRequest;
+import com.realestate.backend.dto.admin.agency.response.AdminAgencyResponse;
 import com.realestate.backend.dto.admin.property.response.AdminPropertyResponse;
+import com.realestate.backend.dto.agency.request.AgencyFilterRequest;
 import com.realestate.backend.dto.agency.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.dto.agency.request.UpdateAgencyRequest;
 import com.realestate.backend.dto.agency.response.AgencyResponse;
@@ -16,6 +19,7 @@ import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.UserRepository;
 import com.realestate.backend.repository.specification.AdminPropertySpecification;
 import com.realestate.backend.repository.specification.AgencyPropertySpecification;
+import com.realestate.backend.repository.specification.AgencySpecification;
 import com.realestate.backend.security.CustomUserDetails;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +56,7 @@ public class AgencyServiceImpl implements AgencyService {
             throw new ResourceNotFoundException("No agency associated with this user id: " + currentUser.getId());
         }
 
-        return agencyMapper.toSummary(currentAgency);
+        return agencyMapper.toAgencyOwnerResponse(currentAgency);
 
     }
 
@@ -82,7 +86,7 @@ public class AgencyServiceImpl implements AgencyService {
         agency.setAddress(request.getAddress());
 
         agencyRepository.save(agency);
-        return agencyMapper.toSummary(agency);
+        return agencyMapper.toAgencyOwnerResponse(agency);
 
     }
 
@@ -162,5 +166,14 @@ public class AgencyServiceImpl implements AgencyService {
         return propertyRepository.findAll(specification, pageable)
                 .map(propertyMapper::toAdminPropertyResponse);
 
+    }
+
+    @Override
+    public Page<AgencyResponse> getAllPublicAgencies(AgencyFilterRequest filter, Pageable pageable) {
+        Specification<AgencyEntity> specification = AgencySpecification
+                .withPublicFilter(filter);
+
+        return agencyRepository.findAll(specification, pageable)
+                .map(agencyMapper::toPublicAgencyResponse);
     }
 }
