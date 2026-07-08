@@ -1,6 +1,9 @@
 package com.realestate.backend.controller.agency;
 
 import com.realestate.backend.common.response.ApiResponse;
+import com.realestate.backend.dto.admin.property.request.AdminPropertyFilterRequest;
+import com.realestate.backend.dto.admin.property.response.AdminPropertyResponse;
+import com.realestate.backend.dto.agency.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.dto.agency.request.UpdateAgencyRequest;
 import com.realestate.backend.dto.agency.response.AgencyResponse;
 import com.realestate.backend.dto.agency.response.AgencySubscriptionResponse;
@@ -9,6 +12,9 @@ import com.realestate.backend.service.agency.AgencyService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -63,6 +69,25 @@ public class AgencyController {
         return ResponseEntity.ok(
                 ApiResponse.success("Subscription information fetched successfully", response)
         );
+
+    }
+
+    @GetMapping("/me/properties")
+    @Operation(summary = "Get all properties belonging to the current agency")
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER', 'AGENT')")
+    public ResponseEntity<ApiResponse<Page<AdminPropertyResponse>>> getAllProperties(
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            @ModelAttribute AgencyPropertyFilterRequest filter,
+            @PageableDefault(sort = "createdAt")
+            Pageable pageable
+    ) {
+
+        Page<AdminPropertyResponse> response = agencyService.getMyAgencyProperties(currentUser, filter, pageable);
+
+        ApiResponse<Page<AdminPropertyResponse>> apiResponse =
+                ApiResponse.success("Properties fetched successfully", response);
+
+        return ResponseEntity.ok(apiResponse);
 
     }
 
