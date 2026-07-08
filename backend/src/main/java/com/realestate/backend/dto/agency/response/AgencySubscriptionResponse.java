@@ -15,11 +15,18 @@ import java.util.UUID;
 public class AgencySubscriptionResponse {
 
     private UUID id;
+    private UUID planId;
     private String planName;
     private BigDecimal price;
     private Integer durationDays;
     private LocalDate startDate;
     private LocalDate endDate;
     private SubscriptionStatus subscriptionStatus;
+    private Integer maxListings;
+    private Integer usedListings;
+    private Integer remainingListings;
+    private Integer maxAgents;
+    private Integer usedAgents;
+    private Integer remainingAgents;
 
 }

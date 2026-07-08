@@ -1,5 +1,6 @@
 package com.realestate.backend.repository;
 
+import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.AgencySubscriptionEntity;
 import com.realestate.backend.enums.SubscriptionStatus;
 import org.springframework.data.domain.Page;
@@ -28,6 +29,11 @@ public interface AgencySubscriptionRepository extends JpaRepository<AgencySubscr
 
     Optional<AgencySubscriptionEntity> findFirstByAgencyIdAndStatusOrderByEndDateDesc(
             UUID agencyId,
+            SubscriptionStatus status
+    );
+
+    Optional<AgencySubscriptionEntity> findByAgencyAndStatus(
+            AgencyEntity agency,
             SubscriptionStatus status
     );
 }
