@@ -28,6 +28,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class AgencyServiceImpl implements AgencyService {
@@ -174,6 +176,20 @@ public class AgencyServiceImpl implements AgencyService {
                 .withPublicFilter(filter);
 
         return agencyRepository.findAll(specification, pageable)
-                .map(agencyMapper::toPublicAgencyResponse);
+                .map(agencyMapper::toPublicAgencyListItem);
+    }
+
+    @Override
+    public AgencyResponse getPublicAgencyInfo(UUID agencyId) {
+
+        AgencyEntity agency = agencyRepository.findById(agencyId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Agency not found with id " + agencyId)
+                );
+
+        long totalAgents = userRepository.countByAgency(agency);
+
+        return agencyMapper.toPublicAgencyResponse(agency, totalAgents);
+
     }
 }

@@ -21,6 +21,7 @@ public class AgencyResponse {
     private String logoUrl;
     private String city;
     private String address;
+    private long totalAgents;
     private AgencyStatus status;
 
 }
