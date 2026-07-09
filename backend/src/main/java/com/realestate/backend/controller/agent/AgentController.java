@@ -6,6 +6,7 @@ import com.realestate.backend.dto.agency.response.AgencyResponse;
 import com.realestate.backend.dto.agent.response.AgentResponse;
 import com.realestate.backend.dto.property.request.PropertyFilterRequest;
 import com.realestate.backend.dto.property.response.PropertyResponse;
+import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.agent.AgentService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -54,6 +57,20 @@ public class AgentController {
 
         return ResponseEntity.ok(apiResponse);
 
+    }
+
+    @DeleteMapping("/{agentId}")
+    @Operation(summary = "Delete an agent from their agency")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'AGENCY_OWNER')")
+    public ResponseEntity<ApiResponse<Void>> deleteAgent(
+            @PathVariable UUID agentId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+        agentService.deleteAgentFromAgency(agentId, currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Agent removed successfully", null)
+        );
     }
 
 }

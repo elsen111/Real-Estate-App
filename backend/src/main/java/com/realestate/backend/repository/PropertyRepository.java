@@ -6,6 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -34,6 +37,10 @@ public interface PropertyRepository extends JpaRepository<PropertyEntity, UUID>,
         );
 
     List<PropertyEntity> findByAgencyId(UUID agencyId);
+
+    @Modifying
+    @Query("UPDATE PropertyEntity p SET p.assignedAgent = null WHERE p.assignedAgent.id = :agentId")
+    int unassignAgentFromAllProperties(@Param("agentId") UUID agentId);
 
 
 }

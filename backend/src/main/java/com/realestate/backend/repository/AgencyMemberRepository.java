@@ -17,7 +17,7 @@ public interface AgencyMemberRepository extends JpaRepository<AgencyMemberEntity
 
     boolean existsByAgency_IdAndUser_Id(UUID agencyId, UUID userId);
 
-    boolean existsByAgency_IdAndUser_IdAndActiveTrue(UUID agencyId, UUID userId);
+    boolean existsByUser_IdAndActiveTrue(UUID userId);
 
     Optional<AgencyMemberEntity> findByAgency_IdAndUser_Id(UUID agencyId, UUID userId);
 
@@ -43,5 +43,7 @@ and r.roleName = 'AGENCY_OWNER'
     Optional<AgencyMemberEntity> findOwner(UUID agencyId);
 
     long countByAgencyIdAndActiveTrue(UUID agencyId);
+
+    Optional<AgencyMemberEntity> findByUser_IdAndActiveTrue(UUID userId);
 
 }
