@@ -63,14 +63,12 @@ public class AgencyMemberServiceImpl {
                         "User not found. Ask the user to register first, then assign them to the agency."
                 ));
 
-//        Block if the User entity is already directly linked to ANY agency
         if (targetUser.getAgency() != null) {
             throw new ConflictException("User is already assigned to an agency ("
                     + targetUser.getAgency().getName() + ") and cannot join another.");
         }
 
-        // Safety check against the mapping table for any active membership
-        if (agencyMemberRepository.existsByUser_Id(targetUser.getId())) {
+        if (agencyMemberRepository.existsByUser_IdAndActiveTrue(targetUser.getId())) {
             throw new ConflictException("An active agency membership record already exists for this user.");
         }
 
