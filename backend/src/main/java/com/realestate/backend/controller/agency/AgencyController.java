@@ -1,6 +1,7 @@
 package com.realestate.backend.controller.agency;
 
 import com.realestate.backend.common.response.ApiResponse;
+import com.realestate.backend.dto.agency.request.AgencyAgentFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyFilterRequest;
 import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.dto.agency.request.AgencyFilterRequest;
@@ -8,6 +9,7 @@ import com.realestate.backend.dto.agency.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.dto.agency.request.UpdateAgencyRequest;
 import com.realestate.backend.dto.agency.response.AgencyResponse;
 import com.realestate.backend.dto.agency.response.AgencySubscriptionResponse;
+import com.realestate.backend.dto.user.response.UserResponse;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.agency.AgencyService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -139,6 +141,24 @@ public class AgencyController {
 
         ApiResponse<Page<PropertyResponse>> apiResponse =
                 ApiResponse.success("Properties list fetched successfully", response);
+
+        return ResponseEntity.ok(apiResponse);
+
+    }
+
+    @GetMapping("/{agencyId}/agents")
+    @Operation(summary = "Get all agents belonging to the specific agency")
+    public ResponseEntity<ApiResponse<Page<UserResponse>>> getAgencyAgents(
+            @PathVariable UUID agencyId,
+            @ModelAttribute AgencyAgentFilterRequest filter,
+            @PageableDefault(sort = "createdAt")
+            Pageable pageable
+    ) {
+
+        Page<UserResponse> response = agencyService.getAgencyAgents(agencyId, filter, pageable);
+
+        ApiResponse<Page<UserResponse>> apiResponse =
+                ApiResponse.success("Agency's agents fetched successfully", response);
 
         return ResponseEntity.ok(apiResponse);
 

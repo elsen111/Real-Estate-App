@@ -1,21 +1,20 @@
 package com.realestate.backend.service.admin.user;
 
 import com.realestate.backend.dto.admin.user.request.AdminUserFilterRequest;
-import com.realestate.backend.dto.admin.user.response.AdminUserResponse;
+import com.realestate.backend.dto.user.response.UserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public interface AdminUserService {
 
-    Page<AdminUserResponse> getAllUsers(
+    Page<UserResponse> getAllUsers(
             AdminUserFilterRequest request,
             Pageable pageable
     );
 
-    AdminUserResponse getUserById(UUID userId);
+    UserResponse getUserById(UUID userId);
 
     String toggleUserStatus(UUID userId);
 

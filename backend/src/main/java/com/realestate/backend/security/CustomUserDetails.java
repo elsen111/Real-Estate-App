@@ -52,7 +52,7 @@ public class CustomUserDetails implements UserDetails {
                 user.getFullName(),
                 user.getEmail(),
                 user.getPasswordHash(),
-                user.isEnabled(),
+                user.getEnabled(),
                 authorities
         );
     }

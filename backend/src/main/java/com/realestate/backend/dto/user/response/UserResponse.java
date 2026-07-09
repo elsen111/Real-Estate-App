@@ -1,12 +1,8 @@
-package com.realestate.backend.dto.admin.user.response;
+package com.realestate.backend.dto.user.response;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.realestate.backend.dto.agency.response.AgencyResponse;
-import com.realestate.backend.enums.Role;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -15,8 +11,10 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AdminUserResponse {
+public class UserResponse {
 
     UUID id;
     String fullName;

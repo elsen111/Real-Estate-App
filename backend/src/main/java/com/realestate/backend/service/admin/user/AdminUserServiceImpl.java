@@ -1,7 +1,7 @@
 package com.realestate.backend.service.admin.user;
 
 import com.realestate.backend.dto.admin.user.request.AdminUserFilterRequest;
-import com.realestate.backend.dto.admin.user.response.AdminUserResponse;
+import com.realestate.backend.dto.user.response.UserResponse;
 import com.realestate.backend.entity.RoleEntity;
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.Role;
@@ -15,13 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -34,7 +30,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
 
     @Override
-    public Page<AdminUserResponse> getAllUsers(
+    public Page<UserResponse> getAllUsers(
             AdminUserFilterRequest request,
             Pageable pageable
     ) {
@@ -47,7 +43,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    public AdminUserResponse getUserById(UUID userId) {
+    public UserResponse getUserById(UUID userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException(
                         "User not found with id" + userId
@@ -67,7 +63,7 @@ public class AdminUserServiceImpl implements AdminUserService {
                 )
         );
 
-        boolean newStatus = !user.isEnabled();
+        boolean newStatus = !user.getEnabled();
 
         user.setEnabled(newStatus);
 
@@ -88,7 +84,7 @@ public class AdminUserServiceImpl implements AdminUserService {
                 )
         );
 
-        if(!user.isEnabled()){
+        if(!user.getEnabled()){
             throw new BusinessException(
                     "This user profile is not enabled. Firstly, activate this profile, then try again."
             );
