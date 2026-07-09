@@ -50,6 +50,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/agencies/public/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/agencies/*/agents").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/agents/**").permitAll()
 
 
                         .requestMatchers(

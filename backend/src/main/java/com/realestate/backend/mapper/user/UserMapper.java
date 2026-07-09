@@ -1,6 +1,8 @@
 package com.realestate.backend.mapper.user;
 
+import com.realestate.backend.dto.agent.response.AgentResponse;
 import com.realestate.backend.dto.user.response.UserResponse;
+import com.realestate.backend.entity.AgencyMemberEntity;
 import com.realestate.backend.entity.RoleEntity;
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.Role;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Mapper(
@@ -45,6 +48,15 @@ public interface UserMapper {
     @Mapping(target = "roles", source = "user", qualifiedByName = "toRoleNames")
     @Mapping(target = "position", source = "user", qualifiedByName = "resolvePosition")
     UserResponse toAgentResponse(UserEntity user);
+
+    @Mapping(target = "id", source = "user.id")
+    @Mapping(target = "phoneNumber", source = "user.phoneNumber")
+    @Mapping(target = "agency", source = "agency.name")
+    @Mapping(target = "roles", source = "user", qualifiedByName = "toRoleNames")
+    @Mapping(target = "position", source = "user", qualifiedByName = "resolvePosition")
+    @Mapping(target = "agencyId", source = "agency.id")
+    @Mapping(target = "memberId", source = "id")
+    AgentResponse toAgentWithUserIdResponse(AgencyMemberEntity agencyMember);
 
     default Page<UserResponse> toAdminResponse(Page<UserEntity> users) {
         return users.map(this::toAdminResponse);
