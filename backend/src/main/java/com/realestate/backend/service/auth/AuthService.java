@@ -137,7 +137,7 @@ public class AuthService {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
 
-        if (!user.isEnabled()) {
+        if (!user.getEnabled()) {
             throw new UnauthorizedException("User account is disabled");
         }
 

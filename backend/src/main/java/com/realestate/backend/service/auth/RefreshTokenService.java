@@ -90,7 +90,7 @@ public class RefreshTokenService {
             throw new UnauthorizedException("Refresh token is expired or revoked");
         }
 
-        if (!token.getUser().isEnabled()) {
+        if (!token.getUser().getEnabled()) {
             throw new UnauthorizedException("User account is disabled");
         }
 

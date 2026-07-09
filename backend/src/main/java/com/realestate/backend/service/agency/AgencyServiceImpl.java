@@ -1,5 +1,6 @@
 package com.realestate.backend.service.agency;
 
+import com.realestate.backend.dto.agency.request.AgencyAgentFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyFilterRequest;
 import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.dto.agency.request.AgencyFilterRequest;
@@ -7,15 +8,18 @@ import com.realestate.backend.dto.agency.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.dto.agency.request.UpdateAgencyRequest;
 import com.realestate.backend.dto.agency.response.AgencyResponse;
 import com.realestate.backend.dto.agency.response.AgencySubscriptionResponse;
+import com.realestate.backend.dto.user.response.UserResponse;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.agency.AgencyMapper;
 import com.realestate.backend.mapper.property.PropertyMapper;
+import com.realestate.backend.mapper.user.UserMapper;
 import com.realestate.backend.repository.AgencyRepository;
 import com.realestate.backend.repository.AgencySubscriptionRepository;
 import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.UserRepository;
+import com.realestate.backend.repository.specification.AgencyAgentSpecification;
 import com.realestate.backend.repository.specification.AgencyPropertySpecification;
 import com.realestate.backend.repository.specification.AgencySpecification;
 import com.realestate.backend.repository.specification.PropertySpecification;
@@ -34,6 +38,7 @@ import java.util.UUID;
 public class AgencyServiceImpl implements AgencyService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     private final AgencyRepository agencyRepository;
     private final AgencyMapper agencyMapper;
@@ -203,6 +208,16 @@ public class AgencyServiceImpl implements AgencyService {
 
         return propertyRepository.findAll(specification, pageable)
                 .map(propertyMapper::toPublicAgencyPropertyResponse);
+    }
+
+    @Override
+    public Page<UserResponse> getAgencyAgents(UUID agencyId, AgencyAgentFilterRequest filterRequest, Pageable pageable) {
+        Specification<UserEntity> specification = AgencyAgentSpecification
+                .withAgencyAgentFilter(agencyId, filterRequest);
+
+        return userRepository.findAll(specification, pageable)
+                .map(userMapper::toAgentResponse);
+
     }
 
 }

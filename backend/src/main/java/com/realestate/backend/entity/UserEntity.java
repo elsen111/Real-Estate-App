@@ -43,7 +43,7 @@ public class UserEntity {
 
     @Builder.Default
     @Column(name = "enabled", nullable = false)
-    private boolean enabled = true;
+    private Boolean enabled = true;
 
     @Builder.Default
     @Column(name = "email_verified", nullable = false)

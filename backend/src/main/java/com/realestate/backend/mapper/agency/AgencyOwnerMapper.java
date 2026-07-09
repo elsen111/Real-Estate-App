@@ -15,7 +15,7 @@ public class AgencyOwnerMapper {
                 .fullName(owner.getFullName())
                 .email(owner.getEmail())
                 .phoneNumber(owner.getPhoneNumber())
-                .enabled(owner.isEnabled())
+                .enabled(owner.getEnabled())
                 .emailVerified(owner.isEmailVerified())
                 .build();
     }
