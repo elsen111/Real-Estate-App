@@ -1,20 +1,22 @@
 package com.realestate.backend.repository.specification;
 
-import com.realestate.backend.dto.admin.property.request.AdminPropertyFilterRequest;
+import com.realestate.backend.dto.agency.request.AgencyFilterRequest;
+import com.realestate.backend.dto.property.request.PropertyFilterRequest;
 import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.PropertyEntity;
+import com.realestate.backend.enums.AgencyStatus;
 import com.realestate.backend.enums.PropertyStatus;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
-public class AdminPropertySpecification {
+public class PropertySpecification {
 
-    public AdminPropertySpecification() {}
+    public PropertySpecification() {}
 
     public static Specification<PropertyEntity> withFilter(
-            AdminPropertyFilterRequest filterRequest
+            PropertyFilterRequest filterRequest
     ) {
 
         if(filterRequest == null) {
@@ -30,6 +32,24 @@ public class AdminPropertySpecification {
                 .and(isFeatured(filterRequest.getFeatured()))
                 .and(hasQuery(filterRequest.getQuery()));
 
+    }
+
+    public static Specification<PropertyEntity> withPublicFilter(
+            PropertyFilterRequest filterRequest
+    ) {
+
+        Specification<PropertyEntity> spec = Specification
+                .where(hasStatus(PropertyStatus.ACTIVE));
+
+        if (filterRequest == null) {
+            return spec;
+        }
+
+        return spec
+                .and(hasCity(filterRequest.getCity()))
+                .and(hasAgencyName(filterRequest.getAgencyName()))
+                .and(isFeatured(filterRequest.getFeatured()))
+                .and(hasQuery(filterRequest.getQuery()));
     }
 
     private static Specification<PropertyEntity> hasCity(Object city) {

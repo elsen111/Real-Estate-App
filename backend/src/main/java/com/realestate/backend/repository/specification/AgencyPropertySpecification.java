@@ -1,12 +1,8 @@
 package com.realestate.backend.repository.specification;
 
-import com.realestate.backend.dto.admin.property.request.AdminPropertyFilterRequest;
 import com.realestate.backend.dto.agency.request.AgencyPropertyFilterRequest;
-import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.enums.PropertyStatus;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 

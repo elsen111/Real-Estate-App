@@ -1,4 +1,4 @@
-package com.realestate.backend.dto.admin.property.request;
+package com.realestate.backend.dto.property.request;
 
 import com.realestate.backend.enums.PropertyStatus;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AdminPropertyFilterRequest {
+public class PropertyFilterRequest {
 
     private String query;
     private PropertyStatus status;
