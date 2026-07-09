@@ -1,10 +1,9 @@
 package com.realestate.backend.controller.admin;
 
 import com.realestate.backend.common.response.ApiResponse;
-import com.realestate.backend.dto.admin.agency.request.AgencyStatusRequest;
-import com.realestate.backend.dto.admin.property.request.AdminPropertyFilterRequest;
+import com.realestate.backend.dto.property.request.PropertyFilterRequest;
 import com.realestate.backend.dto.admin.property.request.PropertyStatusRequest;
-import com.realestate.backend.dto.admin.property.response.AdminPropertyResponse;
+import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.service.admin.property.AdminPropertyService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -27,15 +26,15 @@ public class AdminPropertyController {
 
     @GetMapping
     @Operation(summary = "Get all properties")
-    public ResponseEntity<ApiResponse<Page<AdminPropertyResponse>>> getAllProperties(
-            @ModelAttribute AdminPropertyFilterRequest filter,
+    public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getAllProperties(
+            @ModelAttribute PropertyFilterRequest filter,
             @PageableDefault(sort = "createdAt")
             Pageable pageable
             ) {
 
-        Page<AdminPropertyResponse> response = adminPropertyService.getAllProperties(filter, pageable);
+        Page<PropertyResponse> response = adminPropertyService.getAllProperties(filter, pageable);
 
-        ApiResponse<Page<AdminPropertyResponse>> apiResponse =
+        ApiResponse<Page<PropertyResponse>> apiResponse =
                 ApiResponse.success("Properties fetched successfully", response);
 
         return ResponseEntity.ok(apiResponse);

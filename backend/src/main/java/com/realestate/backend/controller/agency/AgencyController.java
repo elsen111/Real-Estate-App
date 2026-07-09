@@ -1,10 +1,8 @@
 package com.realestate.backend.controller.agency;
 
 import com.realestate.backend.common.response.ApiResponse;
-import com.realestate.backend.dto.admin.agency.request.AdminAgencyFilterRequest;
-import com.realestate.backend.dto.admin.agency.response.AdminAgencyResponse;
-import com.realestate.backend.dto.admin.property.request.AdminPropertyFilterRequest;
-import com.realestate.backend.dto.admin.property.response.AdminPropertyResponse;
+import com.realestate.backend.dto.property.request.PropertyFilterRequest;
+import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.dto.agency.request.AgencyFilterRequest;
 import com.realestate.backend.dto.agency.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.dto.agency.request.UpdateAgencyRequest;
@@ -80,16 +78,16 @@ public class AgencyController {
     @GetMapping("/me/properties")
     @Operation(summary = "Get all properties belonging to the current agency")
     @PreAuthorize("hasAnyRole('AGENCY_OWNER', 'AGENT')")
-    public ResponseEntity<ApiResponse<Page<AdminPropertyResponse>>> getAllProperties(
+    public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getAllProperties(
             @AuthenticationPrincipal CustomUserDetails currentUser,
             @ModelAttribute AgencyPropertyFilterRequest filter,
             @PageableDefault(sort = "createdAt")
             Pageable pageable
     ) {
 
-        Page<AdminPropertyResponse> response = agencyService.getMyAgencyProperties(currentUser, filter, pageable);
+        Page<PropertyResponse> response = agencyService.getMyAgencyProperties(currentUser, filter, pageable);
 
-        ApiResponse<Page<AdminPropertyResponse>> apiResponse =
+        ApiResponse<Page<PropertyResponse>> apiResponse =
                 ApiResponse.success("Properties fetched successfully", response);
 
         return ResponseEntity.ok(apiResponse);
@@ -125,6 +123,24 @@ public class AgencyController {
         return ResponseEntity.ok(
                 ApiResponse.success("Agency information fetched successfully", response)
         );
+
+    }
+
+    @GetMapping("/public/{agencyId}/properties")
+    @Operation(summary = "Get agency's public properties list")
+    public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getAllAgencies(
+            @PathVariable UUID agencyId,
+            @ModelAttribute PropertyFilterRequest filter,
+            @PageableDefault(sort = "createdAt")
+            Pageable pageable
+    ) {
+
+        Page<PropertyResponse> response = agencyService.getAgencyProperties(agencyId, filter, pageable);
+
+        ApiResponse<Page<PropertyResponse>> apiResponse =
+                ApiResponse.success("Properties list fetched successfully", response);
+
+        return ResponseEntity.ok(apiResponse);
 
     }
 

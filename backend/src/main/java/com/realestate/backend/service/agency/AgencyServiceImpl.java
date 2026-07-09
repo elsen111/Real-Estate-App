@@ -1,8 +1,7 @@
 package com.realestate.backend.service.agency;
 
-import com.realestate.backend.dto.admin.agency.request.AdminAgencyFilterRequest;
-import com.realestate.backend.dto.admin.agency.response.AdminAgencyResponse;
-import com.realestate.backend.dto.admin.property.response.AdminPropertyResponse;
+import com.realestate.backend.dto.property.request.PropertyFilterRequest;
+import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.dto.agency.request.AgencyFilterRequest;
 import com.realestate.backend.dto.agency.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.dto.agency.request.UpdateAgencyRequest;
@@ -17,9 +16,9 @@ import com.realestate.backend.repository.AgencyRepository;
 import com.realestate.backend.repository.AgencySubscriptionRepository;
 import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.UserRepository;
-import com.realestate.backend.repository.specification.AdminPropertySpecification;
 import com.realestate.backend.repository.specification.AgencyPropertySpecification;
 import com.realestate.backend.repository.specification.AgencySpecification;
+import com.realestate.backend.repository.specification.PropertySpecification;
 import com.realestate.backend.security.CustomUserDetails;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -145,7 +144,7 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
-    public Page<AdminPropertyResponse> getMyAgencyProperties(CustomUserDetails currentUser, AgencyPropertyFilterRequest filter, Pageable pageable) {
+    public Page<PropertyResponse> getMyAgencyProperties(CustomUserDetails currentUser, AgencyPropertyFilterRequest filter, Pageable pageable) {
 
 
         UserEntity user = userRepository.findById(currentUser.getId())
@@ -192,4 +191,18 @@ public class AgencyServiceImpl implements AgencyService {
         return agencyMapper.toPublicAgencyResponse(agency, totalAgents);
 
     }
+
+    @Override
+    public Page<PropertyResponse> getAgencyProperties(
+            UUID agencyId,
+            PropertyFilterRequest filter,
+            Pageable pageable
+    ) {
+        Specification<PropertyEntity> specification = PropertySpecification
+                .withPublicFilter(filter);
+
+        return propertyRepository.findAll(specification, pageable)
+                .map(propertyMapper::toPublicAgencyPropertyResponse);
+    }
+
 }

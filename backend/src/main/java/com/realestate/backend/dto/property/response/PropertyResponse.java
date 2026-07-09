@@ -1,4 +1,4 @@
-package com.realestate.backend.dto.admin.property.response;
+package com.realestate.backend.dto.property.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.realestate.backend.enums.ListingType;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @Setter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AdminPropertyResponse {
+public class PropertyResponse {
 
     private UUID id;
 

@@ -1,13 +1,13 @@
 package com.realestate.backend.service.admin.property;
 
-import com.realestate.backend.dto.admin.property.request.AdminPropertyFilterRequest;
-import com.realestate.backend.dto.admin.property.response.AdminPropertyResponse;
+import com.realestate.backend.dto.property.request.PropertyFilterRequest;
+import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.property.PropertyMapper;
 import com.realestate.backend.repository.PropertyRepository;
-import com.realestate.backend.repository.specification.AdminPropertySpecification;
+import com.realestate.backend.repository.specification.PropertySpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,9 +25,9 @@ public class AdminPropertyServiceImpl implements AdminPropertyService{
     private final PropertyMapper propertyMapper;
 
     @Override
-    public Page<AdminPropertyResponse> getAllProperties(AdminPropertyFilterRequest filter, Pageable pageable) {
+    public Page<PropertyResponse> getAllProperties(PropertyFilterRequest filter, Pageable pageable) {
 
-        Specification<PropertyEntity> specification = AdminPropertySpecification
+        Specification<PropertyEntity> specification = PropertySpecification
                 .withFilter(filter);
 
         return propertyRepository.findAll(specification, pageable)
