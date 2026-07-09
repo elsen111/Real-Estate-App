@@ -11,6 +11,8 @@ import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
+import java.util.UUID;
+
 public class PropertySpecification {
 
     public PropertySpecification() {}
@@ -90,6 +92,12 @@ public class PropertySpecification {
             );
 
         };
+    }
+
+    public static Specification<PropertyEntity> hasAssignedAgentId(UUID agentId) {
+        return (root, query, cb) -> agentId == null
+                ? null
+                : cb.equal(root.get("assignedAgent").get("id"), agentId);
     }
 
 }
