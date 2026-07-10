@@ -23,7 +23,17 @@ public class PropertyResponse {
 
     private String description;
 
+    private UUID agencyId;
+
     private String agencyName;
+
+    private UUID categoryId;
+
+    private String categoryName;
+
+    private UUID assignedAgentId;
+
+    private String assignedAgentName;
 
     private BigDecimal price;
 
@@ -52,4 +62,6 @@ public class PropertyResponse {
     private Long viewCount;
 
     private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 }
