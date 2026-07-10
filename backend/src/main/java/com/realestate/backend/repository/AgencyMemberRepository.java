@@ -46,4 +46,5 @@ and r.roleName = 'AGENCY_OWNER'
 
     Optional<AgencyMemberEntity> findByUser_IdAndActiveTrue(UUID userId);
 
+    boolean existsByAgency_IdAndUser_IdAndActiveTrue(UUID id, UUID id1);
 }

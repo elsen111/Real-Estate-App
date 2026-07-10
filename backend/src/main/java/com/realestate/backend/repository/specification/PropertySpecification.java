@@ -100,4 +100,11 @@ public class PropertySpecification {
                 : cb.equal(root.get("assignedAgent").get("id"), agentId);
     }
 
+    public static Specification<PropertyEntity> hasAgencyId(UUID agencyId) {
+        return (root, query, cb) -> agencyId == null
+                ? null
+                : cb.equal(root.get("agency").get("id"), agencyId);
+    }
+
+
 }

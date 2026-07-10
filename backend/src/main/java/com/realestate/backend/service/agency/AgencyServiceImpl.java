@@ -204,7 +204,8 @@ public class AgencyServiceImpl implements AgencyService {
             Pageable pageable
     ) {
         Specification<PropertyEntity> specification = PropertySpecification
-                .withPublicFilter(filter);
+                .withPublicFilter(filter)
+                .and(PropertySpecification.hasAgencyId(agencyId));
 
         return propertyRepository.findAll(specification, pageable)
                 .map(propertyMapper::toPublicAgencyPropertyResponse);
