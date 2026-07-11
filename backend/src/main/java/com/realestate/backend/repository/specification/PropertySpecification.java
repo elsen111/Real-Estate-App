@@ -2,15 +2,19 @@ package com.realestate.backend.repository.specification;
 
 import com.realestate.backend.dto.agency.request.AgencyFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyFilterRequest;
+import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
 import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.enums.AgencyStatus;
+import com.realestate.backend.enums.ListingType;
 import com.realestate.backend.enums.PropertyStatus;
+import com.realestate.backend.enums.PropertyType;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public class PropertySpecification {
@@ -54,6 +58,30 @@ public class PropertySpecification {
                 .and(hasQuery(filterRequest.getQuery()));
     }
 
+    public static Specification<PropertyEntity> withDetailedPublicFilter(
+            PropertyPublicFilterRequest filterRequest
+    ) {
+
+        Specification<PropertyEntity> spec = Specification
+                .where(hasStatus(PropertyStatus.ACTIVE));
+
+        if (filterRequest == null) {
+            return spec;
+        }
+
+        return spec
+                .and(hasDistrict(filterRequest.getDistrict()))
+                .and(hasCity(filterRequest.getCity()))
+                .and(hasAgencyName(filterRequest.getAgencyName()))
+                .and(hasPropertyType(filterRequest.getPropertyType()))
+                .and(hasListingType(filterRequest.getListingType()))
+                .and(priceBetween(filterRequest.getMinPrice(), filterRequest.getMaxPrice()))
+                .and(areaBetween(filterRequest.getMinArea(), filterRequest.getMaxArea()))
+                .and(hasRooms(filterRequest.getRoomCount()))
+                .and(isFeatured(filterRequest.getFeatured()))
+                .and(hasQuery(filterRequest.getQuery()));
+    }
+
     private static Specification<PropertyEntity> hasCity(Object city) {
         return ((root, query, criteriaBuilder) -> city == null ? null : criteriaBuilder.equal(root.get("city"), city));
     }
@@ -93,6 +121,62 @@ public class PropertySpecification {
 
         };
     }
+
+    private static Specification<PropertyEntity> hasDistrict(String district) {
+        return (root, query, cb) -> !StringUtils.hasText(district)
+                ? null
+                : cb.equal(root.get("district"), district);
+    }
+
+    private static Specification<PropertyEntity> hasPropertyType(PropertyType propertyType) {
+        return (root, query, cb) -> propertyType == null
+                ? null
+                : cb.equal(root.get("propertyType"), propertyType);
+    }
+
+    private static Specification<PropertyEntity> hasListingType(ListingType listingType) {
+        return (root, query, cb) -> listingType == null
+                ? null
+                : cb.equal(root.get("listingType"), listingType);
+    }
+
+    private static Specification<PropertyEntity> priceBetween(BigDecimal minPrice, BigDecimal maxPrice) {
+        return (root, query, cb) -> {
+            if (minPrice == null && maxPrice == null) {
+                return null;
+            }
+            if (minPrice != null && maxPrice != null) {
+                return cb.between(root.get("price"), minPrice, maxPrice);
+            }
+            if (minPrice != null) {
+                return cb.greaterThanOrEqualTo(root.get("price"), minPrice);
+            }
+            return cb.lessThanOrEqualTo(root.get("price"), maxPrice);
+        };
+    }
+
+    private static Specification<PropertyEntity> hasRooms(Integer rooms) {
+        return (root, query, cb) -> rooms == null
+                ? null
+                : cb.equal(root.get("rooms"), rooms);
+    }
+
+    private static Specification<PropertyEntity> areaBetween(BigDecimal minArea, BigDecimal maxArea) {
+        return (root, query, cb) -> {
+            if (minArea == null && maxArea == null) {
+                return null;
+            }
+            if (minArea != null && maxArea != null) {
+                return cb.between(root.get("area"), minArea, maxArea);
+            }
+            if (minArea != null) {
+                return cb.greaterThanOrEqualTo(root.get("area"), minArea);
+            }
+            return cb.lessThanOrEqualTo(root.get("area"), maxArea);
+        };
+    }
+
+
 
     public static Specification<PropertyEntity> hasAssignedAgentId(UUID agentId) {
         return (root, query, cb) -> agentId == null

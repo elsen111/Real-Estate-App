@@ -3,12 +3,17 @@ package com.realestate.backend.controller.property;
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.agent.response.AgentResponse;
 import com.realestate.backend.dto.property.request.CreatePropertyRequest;
+import com.realestate.backend.dto.property.request.PropertyFilterRequest;
+import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
 import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.property.PropertyService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +38,22 @@ public class PropertyController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Property created successfully", response)
+        );
+
+    }
+
+    @GetMapping
+    @Operation(summary = "Get all available public properties.")
+    public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getAllPublicProperties(
+            @ModelAttribute PropertyPublicFilterRequest filter,
+            @PageableDefault(sort = "createdAt")
+            Pageable pageable
+    ){
+
+        Page<PropertyResponse> response = propertyService.getAllPublicProperties(filter, pageable);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Properties fetched successfully", response)
         );
 
     }

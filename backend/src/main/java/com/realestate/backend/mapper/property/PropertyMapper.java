@@ -35,4 +35,13 @@ public interface PropertyMapper {
     @Mapping(target = "updatedAt", ignore = true)
     PropertyEntity toEntity(CreatePropertyRequest request);
 
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "agencyId", source = "agency.id")
+    @Mapping(target = "agencyName", source = "agency.name")
+    @Mapping(target = "categoryId", source = "category.id")
+    @Mapping(target = "categoryName", source = "category.name")
+    @Mapping(target = "assignedAgentId", source = "assignedAgent.id")
+    @Mapping(target = "assignedAgentName", source = "assignedAgent.fullName")
+    PropertyResponse toPublicClientResponse(PropertyEntity property);
+
 }

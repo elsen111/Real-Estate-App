@@ -1,6 +1,7 @@
 package com.realestate.backend.service.property;
 
 import com.realestate.backend.dto.property.request.CreatePropertyRequest;
+import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
 import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.Role;
@@ -10,10 +11,14 @@ import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.property.PropertyMapper;
 import com.realestate.backend.repository.*;
+import com.realestate.backend.repository.specification.PropertySpecification;
 import com.realestate.backend.security.CustomUserDetails;
 import liquibase.license.User;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,5 +104,14 @@ public class PropertyServiceImpl implements PropertyService {
         propertyRepository.saveAndFlush(newProperty);
 
         return propertyMapper.toDetailResponse(newProperty);
+    }
+
+    @Override
+    public Page<PropertyResponse> getAllPublicProperties(PropertyPublicFilterRequest filter, Pageable pageable) {
+        Specification<PropertyEntity> specification = PropertySpecification
+                .withDetailedPublicFilter(filter);
+
+        return propertyRepository.findAll(specification, pageable)
+                .map(propertyMapper::toPublicClientResponse);
     }
 }
