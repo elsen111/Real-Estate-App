@@ -1,12 +1,23 @@
 package com.realestate.backend.service.property;
 
 import com.realestate.backend.dto.property.request.CreatePropertyRequest;
+import com.realestate.backend.dto.property.request.PropertyFilterRequest;
+import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
 import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.security.CustomUserDetails;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.util.UUID;
 
 public interface PropertyService {
 
     PropertyResponse createProperty(CreatePropertyRequest createdProperty, CustomUserDetails currentUser);
+
+    Page<PropertyResponse> getAllPublicProperties(
+            PropertyPublicFilterRequest filter,
+            Pageable pageable
+    );
 
 }

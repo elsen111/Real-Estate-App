@@ -49,6 +49,7 @@ public class SecurityConfig {
                                 "/auth/refresh-token"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/agencies/public/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/properties/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/agencies/*/agents").permitAll()
                         .requestMatchers(HttpMethod.GET, "/agents/**").permitAll()
 

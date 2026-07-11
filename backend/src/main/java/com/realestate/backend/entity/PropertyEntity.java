@@ -113,7 +113,7 @@ public class PropertyEntity {
 
     @Builder.Default
     @Column(name = "featured", nullable = false)
-    private boolean featured = false;
+    private Boolean featured = false;
 
     @Builder.Default
     @Column(name = "view_count", nullable = false)
