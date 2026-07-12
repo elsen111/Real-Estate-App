@@ -3,6 +3,7 @@ package com.realestate.backend.controller.property;
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.property.request.PropertyRequest;
 import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
+import com.realestate.backend.dto.property.request.PropertyStatusRequest;
 import com.realestate.backend.dto.property.response.PropertyDetailResponse;
 import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.security.CustomUserDetails;
@@ -76,7 +77,7 @@ public class PropertyController {
     @PutMapping("/{propertyId}")
     @Operation(summary = "Update an existing property")
     @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT')")
-    public ResponseEntity<ApiResponse<PropertyResponse>> updatePropertyById(
+    public ResponseEntity<ApiResponse<PropertyResponse>> updateProperty(
             @Valid @RequestBody PropertyRequest request,
             @PathVariable UUID propertyId,
             @AuthenticationPrincipal CustomUserDetails currentUser
@@ -86,6 +87,23 @@ public class PropertyController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Property updated successfully", response)
+        );
+
+    }
+
+    @PatchMapping("/{propertyId}")
+    @Operation(summary = "Update the status of an existing property")
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT')")
+    public ResponseEntity<ApiResponse<Void>> updatePropertyStatus(
+            @Valid @RequestBody PropertyStatusRequest request,
+            @PathVariable UUID propertyId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ){
+
+        propertyService.updateStatus(propertyId, request, currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Property status successfully changed to " + request.getStatus(), null)
         );
 
     }
