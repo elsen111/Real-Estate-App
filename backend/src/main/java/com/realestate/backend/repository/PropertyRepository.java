@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -41,6 +42,15 @@ public interface PropertyRepository extends JpaRepository<PropertyEntity, UUID>,
     @Modifying
     @Query("UPDATE PropertyEntity p SET p.assignedAgent = null WHERE p.assignedAgent.id = :agentId")
     int unassignAgentFromAllProperties(@Param("agentId") UUID agentId);
+
+    @Query("""
+        SELECT p FROM PropertyEntity p
+        LEFT JOIN FETCH p.agency
+        LEFT JOIN FETCH p.assignedAgent
+        LEFT JOIN FETCH p.category
+        WHERE p.id = :id
+    """)
+    Optional<PropertyEntity> findByIdWithDetails(@Param("id") UUID id);
 
 
 }

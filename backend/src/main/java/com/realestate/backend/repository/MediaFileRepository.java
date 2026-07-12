@@ -1,5 +1,6 @@
 package com.realestate.backend.repository;
 
+import com.realestate.backend.dto.media.response.PropertyImageResponse;
 import com.realestate.backend.entity.MediaFileEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -46,4 +47,7 @@ public interface MediaFileRepository extends JpaRepository<MediaFileEntity, UUID
     void deleteByProperty_IdAndId(UUID propertyId, UUID mediaFileId);
 
     void deleteByAgency_IdAndId(UUID agencyId, UUID mediaFileId);
+
+    List<PropertyImageResponse> findByPropertyIdOrderBySortOrderAsc(UUID propertyId);
+
 }

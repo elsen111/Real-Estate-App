@@ -1,11 +1,17 @@
 package com.realestate.backend.mapper.property;
 
 import com.realestate.backend.dto.admin.property.response.AdminAgencyPropertyResponse;
+import com.realestate.backend.dto.agent.response.AgentResponse;
+import com.realestate.backend.dto.media.response.PropertyImageResponse;
 import com.realestate.backend.dto.property.request.CreatePropertyRequest;
+import com.realestate.backend.dto.property.response.PropertyDetailResponse;
 import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.entity.PropertyEntity;
+import com.realestate.backend.entity.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface PropertyMapper {
@@ -23,7 +29,14 @@ public interface PropertyMapper {
     @Mapping(target = "categoryName", source = "category.name")
     @Mapping(target = "assignedAgentId", source = "assignedAgent.id")
     @Mapping(target = "assignedAgentName", source = "assignedAgent.fullName")
-    PropertyResponse toDetailResponse(PropertyEntity property);
+    PropertyResponse toCreateResponse(PropertyEntity property);
+
+    @Mapping(target = "propertyType", source = "category.name")
+    @Mapping(target = "agency", source = "agency")
+    @Mapping(target = "agent", source = "assignedAgent")
+    @Mapping(target = "propertyStatus", source = "status")
+    @Mapping(target = "images", ignore = true)
+    PropertyDetailResponse toDetailResponse(PropertyEntity property);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "category", ignore = true)
@@ -44,4 +57,9 @@ public interface PropertyMapper {
     @Mapping(target = "assignedAgentName", source = "assignedAgent.fullName")
     PropertyResponse toPublicClientResponse(PropertyEntity property);
 
+    @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "agency", ignore = true)
+    AgentResponse toAgentResponse(UserEntity agent);
+
+    List<PropertyImageResponse> toImageResponseList(List<PropertyImageResponse> images);
 }

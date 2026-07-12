@@ -5,6 +5,7 @@ import com.realestate.backend.dto.agent.response.AgentResponse;
 import com.realestate.backend.dto.property.request.CreatePropertyRequest;
 import com.realestate.backend.dto.property.request.PropertyFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
+import com.realestate.backend.dto.property.response.PropertyDetailResponse;
 import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.property.PropertyService;
@@ -54,6 +55,21 @@ public class PropertyController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Properties fetched successfully", response)
+        );
+
+    }
+
+    @GetMapping("/{propertyId}")
+    @Operation(summary = "Get detailed information for the specific property.")
+    public ResponseEntity<ApiResponse<PropertyDetailResponse>> getPropertyById(
+            @PathVariable UUID propertyId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ){
+
+        PropertyDetailResponse response = propertyService.getPropertyDetailsById(propertyId, currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Property details fetched successfully", response)
         );
 
     }

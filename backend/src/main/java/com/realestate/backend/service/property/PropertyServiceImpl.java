@@ -1,9 +1,12 @@
 package com.realestate.backend.service.property;
 
+import com.realestate.backend.dto.media.response.PropertyImageResponse;
 import com.realestate.backend.dto.property.request.CreatePropertyRequest;
 import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
+import com.realestate.backend.dto.property.response.PropertyDetailResponse;
 import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.entity.*;
+import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.BadRequestException;
@@ -13,16 +16,20 @@ import com.realestate.backend.mapper.property.PropertyMapper;
 import com.realestate.backend.repository.*;
 import com.realestate.backend.repository.specification.PropertySpecification;
 import com.realestate.backend.security.CustomUserDetails;
-import liquibase.license.User;
-import lombok.AllArgsConstructor;
+import com.realestate.backend.security.SecurityConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +41,7 @@ public class PropertyServiceImpl implements PropertyService {
     private final AgencySubscriptionRepository agencySubscriptionRepository;
     private final PropertyRepository propertyRepository;
     private final PropertyMapper propertyMapper;
+    private final MediaFileRepository mediaFileRepository;
 
     @Override
     @Transactional
@@ -103,7 +111,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         propertyRepository.saveAndFlush(newProperty);
 
-        return propertyMapper.toDetailResponse(newProperty);
+        return propertyMapper.toCreateResponse(newProperty);
     }
 
     @Override
@@ -113,5 +121,61 @@ public class PropertyServiceImpl implements PropertyService {
 
         return propertyRepository.findAll(specification, pageable)
                 .map(propertyMapper::toPublicClientResponse);
+    }
+
+    @Override
+    public PropertyDetailResponse getPropertyDetailsById(UUID propertyId, CustomUserDetails currentUser) {
+
+        PropertyEntity property = propertyRepository.findById(propertyId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Property not found with id: " + propertyId)
+                );
+
+        List<PropertyImageResponse> images = mediaFileRepository.findByPropertyIdOrderBySortOrderAsc(propertyId);
+
+        if(!canView(property, currentUser)) {
+            throw new ResourceNotFoundException("Active property not found with id: " + propertyId);
+        }
+
+        return propertyMapper.toDetailResponse(property).toBuilder().images(propertyMapper.toImageResponseList(images)).build();
+
+    }
+
+    private boolean canView(PropertyEntity property, CustomUserDetails currentUser) {
+        boolean isPrivileged = currentUser != null && isOwnerAgentOrAdmin(property, currentUser);
+
+        if (isPrivileged) {
+            return true;
+        }
+
+        return !PUBLICLY_HIDDEN_STATUSES.contains(property.getStatus());
+    }
+
+    private static final Set<PropertyStatus> PUBLICLY_HIDDEN_STATUSES = EnumSet.of(
+            PropertyStatus.PENDING,
+            PropertyStatus.REJECTED,
+            PropertyStatus.DELETED,
+            PropertyStatus.CANCELED
+    );
+
+    private boolean isOwnerAgentOrAdmin(PropertyEntity property, CustomUserDetails currentUser) {
+        if (hasRole(currentUser)) {
+            return true;
+        }
+
+        boolean isOwner = property.getAgency().getEmail() != null
+                && property.getAgency().getEmail().equals(currentUser.getEmail());
+
+        boolean isAssignedAgent = property.getAssignedAgent() != null
+                && property.getAssignedAgent().getId().equals(currentUser.getId());
+
+        return isOwner || isAssignedAgent;
+    }
+
+    private boolean hasRole(CustomUserDetails user) {
+        String target = SecurityConstants.ROLE_PREFIX + "SUPER_ADMIN";
+        return user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(target::equals);
     }
 }

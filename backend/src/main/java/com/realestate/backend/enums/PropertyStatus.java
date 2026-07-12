@@ -6,5 +6,6 @@ public enum PropertyStatus {
     REJECTED,
     CANCELED,
     SOLD,
-    RENTED
+    RENTED,
+    DELETED
 }
