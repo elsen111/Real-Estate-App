@@ -3,13 +3,14 @@ package com.realestate.backend.mapper.property;
 import com.realestate.backend.dto.admin.property.response.AdminAgencyPropertyResponse;
 import com.realestate.backend.dto.agent.response.AgentResponse;
 import com.realestate.backend.dto.media.response.PropertyImageResponse;
-import com.realestate.backend.dto.property.request.CreatePropertyRequest;
+import com.realestate.backend.dto.property.request.PropertyRequest;
 import com.realestate.backend.dto.property.response.PropertyDetailResponse;
 import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.entity.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -46,7 +47,7 @@ public interface PropertyMapper {
     @Mapping(target = "viewCount", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    PropertyEntity toEntity(CreatePropertyRequest request);
+    PropertyEntity toEntity(PropertyRequest request);
 
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "agencyId", source = "agency.id")
@@ -56,6 +57,15 @@ public interface PropertyMapper {
     @Mapping(target = "assignedAgentId", source = "assignedAgent.id")
     @Mapping(target = "assignedAgentName", source = "assignedAgent.fullName")
     PropertyResponse toPublicClientResponse(PropertyEntity property);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "agency", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "assignedAgent", ignore = true)
+    @Mapping(target = "viewCount", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    void updateEntityFromDto(PropertyRequest request, @MappingTarget PropertyEntity property);
 
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "agency", ignore = true)

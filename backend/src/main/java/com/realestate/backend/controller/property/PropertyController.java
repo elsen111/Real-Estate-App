@@ -1,9 +1,7 @@
 package com.realestate.backend.controller.property;
 
 import com.realestate.backend.common.response.ApiResponse;
-import com.realestate.backend.dto.agent.response.AgentResponse;
-import com.realestate.backend.dto.property.request.CreatePropertyRequest;
-import com.realestate.backend.dto.property.request.PropertyFilterRequest;
+import com.realestate.backend.dto.property.request.PropertyRequest;
 import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
 import com.realestate.backend.dto.property.response.PropertyDetailResponse;
 import com.realestate.backend.dto.property.response.PropertyResponse;
@@ -16,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +30,7 @@ public class PropertyController {
     @PostMapping
     @Operation(summary = "Create a new property.")
     public ResponseEntity<ApiResponse<PropertyResponse>> createProperty(
-            @Valid @RequestBody CreatePropertyRequest request,
+            @Valid @RequestBody PropertyRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUser
             ){
 
@@ -70,6 +69,23 @@ public class PropertyController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Property details fetched successfully", response)
+        );
+
+    }
+
+    @PutMapping("/{propertyId}")
+    @Operation(summary = "Update an existing property")
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT')")
+    public ResponseEntity<ApiResponse<PropertyResponse>> updatePropertyById(
+            @Valid @RequestBody PropertyRequest request,
+            @PathVariable UUID propertyId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ){
+
+        PropertyResponse response = propertyService.updateProperty(propertyId, request, currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Property updated successfully", response)
         );
 
     }

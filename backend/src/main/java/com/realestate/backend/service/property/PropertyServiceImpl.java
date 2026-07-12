@@ -1,7 +1,7 @@
 package com.realestate.backend.service.property;
 
 import com.realestate.backend.dto.media.response.PropertyImageResponse;
-import com.realestate.backend.dto.property.request.CreatePropertyRequest;
+import com.realestate.backend.dto.property.request.PropertyRequest;
 import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
 import com.realestate.backend.dto.property.response.PropertyDetailResponse;
 import com.realestate.backend.dto.property.response.PropertyResponse;
@@ -45,12 +45,9 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     @Transactional
-    public PropertyResponse createProperty(CreatePropertyRequest request, CustomUserDetails currentUser) {
+    public PropertyResponse createProperty(PropertyRequest request, CustomUserDetails currentUser) {
 
-        UserEntity user = userRepository.findById(currentUser.getId())
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with id" + currentUser.getId())
-                );
+        UserEntity user = getCurrentUser(currentUser.getId());
 
         AgencyEntity agency = user.getAgency();
         if (agency == null) {
@@ -78,30 +75,9 @@ public class PropertyServiceImpl implements PropertyService {
             );
         }
 
-        CategoryEntity category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Category not found with id" + request.getCategoryId())
-                );
+        CategoryEntity category = getCategory(request.getCategoryId());
 
-        UserEntity assignedAgent = null;
-
-        if(request.getAssignedAgentId() != null) {
-            assignedAgent = userRepository.findById(request.getAssignedAgentId())
-                    .orElseThrow(
-                            () -> new ResourceNotFoundException("User not found with id" + request.getAssignedAgentId())
-                    );
-
-            boolean isActiveMemberOfThisAgency = agencyMemberRepository
-                    .existsByAgency_IdAndUser_IdAndActiveTrue(agency.getId(), assignedAgent.getId());
-
-            boolean hasAgentRole = assignedAgent.getRoles().stream()
-                    .anyMatch(r -> r.getRoleName() == Role.AGENT);
-
-            if (!isActiveMemberOfThisAgency || !hasAgentRole) {
-                throw new BadRequestException(
-                        "The specified agent does not belong to your agency");
-            }
-        }
+        UserEntity assignedAgent = getAssignedAgent(request, agency);
 
         PropertyEntity newProperty = propertyMapper.toEntity(request);
 
@@ -139,6 +115,85 @@ public class PropertyServiceImpl implements PropertyService {
 
         return propertyMapper.toDetailResponse(property).toBuilder().images(propertyMapper.toImageResponseList(images)).build();
 
+    }
+
+    @Override
+    @Transactional
+    public PropertyResponse updateProperty(UUID propertyId, PropertyRequest request, CustomUserDetails currentUser) {
+
+        UserEntity user = getCurrentUser(currentUser.getId());
+
+        AgencyEntity agency = user.getAgency();
+        if (agency == null) {
+            throw new BadRequestException("You must belong to an agency to create a new property.");
+        }
+
+        PropertyEntity property = propertyRepository.findById(propertyId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Property not found with id: " + propertyId)
+                );
+
+        if (!property.getAgency().getId().equals(agency.getId())) {
+            throw new BadRequestException("You do not have permission to modify a property belonging to another agency.");
+        }
+
+        CategoryEntity category = getCategory(request.getCategoryId());
+
+        UserEntity assignedAgent = getAssignedAgent(request, agency);
+
+        propertyMapper.updateEntityFromDto(request, property);
+
+        property.setCategory(category);
+        property.setAssignedAgent(assignedAgent);
+
+        PropertyEntity updatedProperty = propertyRepository.saveAndFlush(property);
+
+        return propertyMapper.toCreateResponse(updatedProperty);
+    }
+
+    private UserEntity getCurrentUser(UUID userId) {
+
+        return userRepository.findById(userId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("User not found with id" + userId)
+                );
+
+    }
+
+    private CategoryEntity getCategory(UUID categoryId) {
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Category not found with id: " + categoryId
+                        ));
+    }
+
+    private UserEntity getAssignedAgent(PropertyRequest request, AgencyEntity agency) {
+
+        if (request.getAssignedAgentId() == null) {
+            return null;
+        }
+
+        UserEntity assignedAgent = userRepository.findById(request.getAssignedAgentId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found with id: " + request.getAssignedAgentId()
+                        ));
+
+        boolean isActiveMember = agencyMemberRepository
+                .existsByAgency_IdAndUser_IdAndActiveTrue(
+                        agency.getId(),
+                        assignedAgent.getId());
+
+        boolean hasAgentRole = assignedAgent.getRoles().stream()
+                .anyMatch(role -> role.getRoleName() == Role.AGENT);
+
+        if (!isActiveMember || !hasAgentRole) {
+            throw new BadRequestException(
+                    "The specified agent does not belong to your agency.");
+        }
+
+        return assignedAgent;
     }
 
     private boolean canView(PropertyEntity property, CustomUserDetails currentUser) {
