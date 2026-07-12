@@ -1,6 +1,5 @@
 package com.realestate.backend.dto.property.request;
 
-import com.realestate.backend.entity.CategoryEntity;
 import com.realestate.backend.enums.ListingType;
 import com.realestate.backend.utils.validation.ValidFloorChecker;
 import jakarta.validation.constraints.*;
@@ -13,7 +12,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @ValidFloorChecker
-public class CreatePropertyRequest {
+public class PropertyRequest {
 
     @NotBlank(message = "Title is required")
     @Size(max = 200, message = "Title must not exceed 200 characters")
