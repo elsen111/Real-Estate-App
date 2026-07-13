@@ -27,4 +27,6 @@ public interface PropertyService {
 
     void updateStatus(UUID propertyId, PropertyStatusRequest request, CustomUserDetails currentUser);
 
+    PropertyResponse toggleFeaturedProperty(UUID propertyId, CustomUserDetails currentUser);
+
 }
