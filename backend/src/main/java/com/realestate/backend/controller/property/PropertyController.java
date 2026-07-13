@@ -124,4 +124,20 @@ public class PropertyController {
 
     }
 
+    @DeleteMapping("/{propertyId}")
+    @Operation(summary = "Soft delete the existing property")
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER', 'SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> softDeleteProperty(
+            @PathVariable UUID propertyId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ){
+
+        propertyService.softDeleteProperty(propertyId, currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Property deleted successfully", null)
+        );
+
+    }
+
 }
