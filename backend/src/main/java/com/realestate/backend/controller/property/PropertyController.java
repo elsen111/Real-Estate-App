@@ -93,7 +93,7 @@ public class PropertyController {
 
     @PatchMapping("/{propertyId}")
     @Operation(summary = "Update the status of an existing property")
-    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT')")
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<Void>> updatePropertyStatus(
             @Valid @RequestBody PropertyStatusRequest request,
             @PathVariable UUID propertyId,
@@ -104,6 +104,22 @@ public class PropertyController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Property status successfully changed to " + request.getStatus(), null)
+        );
+
+    }
+
+    @PatchMapping("/{propertyId}/featured")
+    @Operation(summary = "Update the featured property of an existing property")
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<PropertyResponse>> toggleFeatured(
+            @PathVariable UUID propertyId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ){
+
+        PropertyResponse response = propertyService.toggleFeaturedProperty(propertyId, currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Property updated successfully", response)
         );
 
     }

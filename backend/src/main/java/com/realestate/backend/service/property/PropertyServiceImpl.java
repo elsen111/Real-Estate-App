@@ -13,6 +13,7 @@ import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ResourceNotFoundException;
+import com.realestate.backend.exception.UnauthorizedException;
 import com.realestate.backend.mapper.property.PropertyMapper;
 import com.realestate.backend.repository.*;
 import com.realestate.backend.repository.specification.PropertySpecification;
@@ -122,13 +123,14 @@ public class PropertyServiceImpl implements PropertyService {
         UserEntity user = getCurrentUser(currentUser.getId());
 
         AgencyEntity agency = user.getAgency();
+
         if (agency == null) {
-            throw new BadRequestException("You must belong to an agency to create a new property.");
+            throw new BadRequestException("You must belong to an agency to update a property.");
         }
 
         PropertyEntity property = getPropertyEntity(propertyId);
 
-        havePermissionOverProperty(property, agency);
+        havePermissionOverProperty(property, agency, currentUser);
 
         CategoryEntity category = getCategory(request.getCategoryId());
 
@@ -150,13 +152,16 @@ public class PropertyServiceImpl implements PropertyService {
         UserEntity user = getCurrentUser(currentUser.getId());
 
         AgencyEntity agency = user.getAgency();
-        if (agency == null) {
-            throw new BadRequestException("You must belong to an agency to create a new property.");
-        }
 
         PropertyEntity property = getPropertyEntity(propertyId);
 
-        havePermissionOverProperty(property, agency);
+        if(!isSuperAdmin(currentUser)) {
+            if (agency == null) {
+                throw new BadRequestException("You must belong to an agency to update a property.");
+            }
+        }
+
+        havePermissionOverProperty(property, agency, currentUser);
 
         if(!ALLOWED_STATUSES_FOR_AGENCIES.contains(request.getStatus())) {
             throw new BadRequestException("New status should be one of these: SOLD, RENTED.");
@@ -164,6 +169,36 @@ public class PropertyServiceImpl implements PropertyService {
 
         property.setStatus(request.getStatus());
         propertyRepository.saveAndFlush(property);
+
+    }
+
+    @Override
+    public PropertyResponse toggleFeaturedProperty(UUID propertyId, CustomUserDetails currentUser) {
+
+        UserEntity user = getCurrentUser(currentUser.getId());
+
+        PropertyEntity property = getPropertyEntity(propertyId);
+
+        AgencyEntity agency = user.getAgency();
+        if(!isSuperAdmin(currentUser)) {
+            if (agency == null) {
+                throw new BadRequestException("You must belong to an agency to update a property.");
+            }
+
+        }
+
+        havePermissionOverProperty(property, agency, currentUser);
+
+        if(property.getAssignedAgent() != null && property.getAssignedAgent().getId().equals(currentUser.getId())) {
+            throw new UnauthorizedException(
+                    "Only agency owners are allowed to change the property's featured characteristics."
+            );
+        }
+
+        property.setFeatured(!property.getFeatured());
+        propertyRepository.saveAndFlush(property);
+
+        return propertyMapper.toCreateResponse(property);
 
     }
 
@@ -212,7 +247,11 @@ public class PropertyServiceImpl implements PropertyService {
         return assignedAgent;
     }
 
-    void havePermissionOverProperty(PropertyEntity property, AgencyEntity agency) {
+    void havePermissionOverProperty(PropertyEntity property, AgencyEntity agency, CustomUserDetails currentUser) {
+        if (isSuperAdmin(currentUser)) {
+            return;
+        }
+
         if (!property.getAgency().getId().equals(agency.getId())) {
             throw new BadRequestException("You do not have permission to modify a property belonging to another agency.");
         }
@@ -248,7 +287,7 @@ public class PropertyServiceImpl implements PropertyService {
     );
 
     private boolean isOwnerAgentOrAdmin(PropertyEntity property, CustomUserDetails currentUser) {
-        if (hasRole(currentUser)) {
+        if (isSuperAdmin(currentUser)) {
             return true;
         }
 
@@ -261,7 +300,7 @@ public class PropertyServiceImpl implements PropertyService {
         return isOwner || isAssignedAgent;
     }
 
-    private boolean hasRole(CustomUserDetails user) {
+    private boolean isSuperAdmin(CustomUserDetails user) {
         String target = SecurityConstants.ROLE_PREFIX + "SUPER_ADMIN";
         return user.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
