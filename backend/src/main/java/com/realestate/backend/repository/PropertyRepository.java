@@ -1,9 +1,11 @@
 package com.realestate.backend.repository;
 
+import aj.org.objectweb.asm.commons.Remapper;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.enums.PropertyStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -51,6 +53,4 @@ public interface PropertyRepository extends JpaRepository<PropertyEntity, UUID>,
         WHERE p.id = :id
     """)
     Optional<PropertyEntity> findByIdWithDetails(@Param("id") UUID id);
-
-
 }

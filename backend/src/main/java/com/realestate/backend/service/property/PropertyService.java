@@ -29,4 +29,6 @@ public interface PropertyService {
 
     PropertyResponse toggleFeaturedProperty(UUID propertyId, CustomUserDetails currentUser);
 
+    void softDeleteProperty(UUID propertyId, CustomUserDetails currentUser);
+
 }

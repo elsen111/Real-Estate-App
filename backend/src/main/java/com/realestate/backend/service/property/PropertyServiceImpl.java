@@ -202,6 +202,34 @@ public class PropertyServiceImpl implements PropertyService {
 
     }
 
+    @Override
+    public void softDeleteProperty(UUID propertyId, CustomUserDetails currentUser) {
+
+        PropertyEntity property = getPropertyEntity(propertyId);
+
+        UserEntity user = getCurrentUser(currentUser.getId());
+
+        AgencyEntity agency = user.getAgency();
+        if(!isSuperAdmin(currentUser)) {
+            if (agency == null) {
+                throw new BadRequestException("You must belong to an agency to delete this property.");
+            }
+
+        }
+
+        havePermissionOverProperty(property, agency, currentUser);
+
+        if(property.getAssignedAgent() != null && property.getAssignedAgent().getId().equals(currentUser.getId())) {
+            throw new UnauthorizedException(
+                    "Only agency owners are allowed to change the property's featured characteristics."
+            );
+        }
+
+        property.setStatus(PropertyStatus.DELETED);
+        propertyRepository.saveAndFlush(property);
+
+    }
+
     private UserEntity getCurrentUser(UUID userId) {
 
         return userRepository.findById(userId)
