@@ -230,6 +230,16 @@ public class PropertyServiceImpl implements PropertyService {
 
     }
 
+    @Override
+    public Page<PropertyResponse> getFeaturedProperties(PropertyPublicFilterRequest filter, Pageable pageable) {
+        Specification<PropertyEntity> specification = PropertySpecification
+                .withFeaturedPublicFilter(filter)
+                .and(PropertySpecification.isFeatured(true));;
+
+        return propertyRepository.findAll(specification, pageable)
+                .map(propertyMapper::toPublicClientResponse);
+    }
+
     private UserEntity getCurrentUser(UUID userId) {
 
         return userRepository.findById(userId)

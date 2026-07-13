@@ -82,6 +82,26 @@ public class PropertySpecification {
                 .and(hasQuery(filterRequest.getQuery()));
     }
 
+    public static Specification<PropertyEntity> withFeaturedPublicFilter(
+            PropertyPublicFilterRequest filterRequest
+    ) {
+        Specification<PropertyEntity> spec = Specification
+                .where(hasStatus(PropertyStatus.ACTIVE));
+
+        if (filterRequest == null) {
+            return spec;
+        }
+
+        return spec
+                .and(hasCity(filterRequest.getCity()))
+                .and(hasAgencyName(filterRequest.getAgencyName()))
+                .and(hasPropertyType(filterRequest.getPropertyType()))
+                .and(hasListingType(filterRequest.getListingType()))
+                .and(priceBetween(filterRequest.getMinPrice(), filterRequest.getMaxPrice()))
+                .and(areaBetween(filterRequest.getMinArea(), filterRequest.getMaxArea()))
+                .and(hasQuery(filterRequest.getQuery()));
+    }
+
     private static Specification<PropertyEntity> hasCity(Object city) {
         return ((root, query, criteriaBuilder) -> city == null ? null : criteriaBuilder.equal(root.get("city"), city));
     }
@@ -100,7 +120,7 @@ public class PropertySpecification {
         return ((root, query, criteriaBuilder) -> status == null ? null : criteriaBuilder.equal(root.get("status"), status));
     }
 
-    private static Specification<PropertyEntity> isFeatured(Boolean isFeatured) {
+    public static Specification<PropertyEntity> isFeatured(Boolean isFeatured) {
         return ((root, query, criteriaBuilder) -> isFeatured == null ? null : criteriaBuilder.equal(root.get("featured"), isFeatured));
     }
 

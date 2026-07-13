@@ -53,4 +53,5 @@ public interface PropertyRepository extends JpaRepository<PropertyEntity, UUID>,
         WHERE p.id = :id
     """)
     Optional<PropertyEntity> findByIdWithDetails(@Param("id") UUID id);
+
 }

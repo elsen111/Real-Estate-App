@@ -140,4 +140,20 @@ public class PropertyController {
 
     }
 
+    @GetMapping("/featured")
+    @Operation(summary = "Get featured properties.")
+    public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getPropertyById(
+            @ModelAttribute PropertyPublicFilterRequest filter,
+            @PageableDefault(sort = "createdAt")
+            Pageable pageable
+    ){
+
+        Page<PropertyResponse> response = propertyService.getFeaturedProperties(filter, pageable);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Featured properties fetched successfully", response)
+        );
+
+    }
+
 }

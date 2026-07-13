@@ -31,4 +31,9 @@ public interface PropertyService {
 
     void softDeleteProperty(UUID propertyId, CustomUserDetails currentUser);
 
+    Page<PropertyResponse> getFeaturedProperties(
+            PropertyPublicFilterRequest filter,
+            Pageable pageable
+    );
+
 }
