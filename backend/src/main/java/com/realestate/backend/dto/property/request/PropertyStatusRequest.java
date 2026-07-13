@@ -1,4 +1,4 @@
-package com.realestate.backend.dto.admin.property.request;
+package com.realestate.backend.dto.property.request;
 
 import com.realestate.backend.enums.PropertyStatus;
 import jakarta.validation.constraints.NotNull;

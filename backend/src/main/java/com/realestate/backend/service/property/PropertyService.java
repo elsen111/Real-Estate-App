@@ -2,8 +2,10 @@ package com.realestate.backend.service.property;
 
 import com.realestate.backend.dto.property.request.PropertyRequest;
 import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
+import com.realestate.backend.dto.property.request.PropertyStatusRequest;
 import com.realestate.backend.dto.property.response.PropertyDetailResponse;
 import com.realestate.backend.dto.property.response.PropertyResponse;
+import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.security.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,5 +24,7 @@ public interface PropertyService {
     PropertyDetailResponse getPropertyDetailsById(UUID propertyId, CustomUserDetails currentUser);
 
     PropertyResponse updateProperty(UUID propertyId, PropertyRequest updatedProperty, CustomUserDetails currentUser);
+
+    void updateStatus(UUID propertyId, PropertyStatusRequest request, CustomUserDetails currentUser);
 
 }

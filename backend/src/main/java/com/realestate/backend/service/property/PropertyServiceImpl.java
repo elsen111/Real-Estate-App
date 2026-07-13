@@ -3,6 +3,7 @@ package com.realestate.backend.service.property;
 import com.realestate.backend.dto.media.response.PropertyImageResponse;
 import com.realestate.backend.dto.property.request.PropertyRequest;
 import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
+import com.realestate.backend.dto.property.request.PropertyStatusRequest;
 import com.realestate.backend.dto.property.response.PropertyDetailResponse;
 import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.entity.*;
@@ -102,10 +103,7 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public PropertyDetailResponse getPropertyDetailsById(UUID propertyId, CustomUserDetails currentUser) {
 
-        PropertyEntity property = propertyRepository.findById(propertyId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Property not found with id: " + propertyId)
-                );
+        PropertyEntity property = getPropertyEntity(propertyId);
 
         List<PropertyImageResponse> images = mediaFileRepository.findByPropertyIdOrderBySortOrderAsc(propertyId);
 
@@ -128,14 +126,9 @@ public class PropertyServiceImpl implements PropertyService {
             throw new BadRequestException("You must belong to an agency to create a new property.");
         }
 
-        PropertyEntity property = propertyRepository.findById(propertyId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Property not found with id: " + propertyId)
-                );
+        PropertyEntity property = getPropertyEntity(propertyId);
 
-        if (!property.getAgency().getId().equals(agency.getId())) {
-            throw new BadRequestException("You do not have permission to modify a property belonging to another agency.");
-        }
+        havePermissionOverProperty(property, agency);
 
         CategoryEntity category = getCategory(request.getCategoryId());
 
@@ -149,6 +142,29 @@ public class PropertyServiceImpl implements PropertyService {
         PropertyEntity updatedProperty = propertyRepository.saveAndFlush(property);
 
         return propertyMapper.toCreateResponse(updatedProperty);
+    }
+
+    @Override
+    public void updateStatus(UUID propertyId, PropertyStatusRequest request, CustomUserDetails currentUser) {
+
+        UserEntity user = getCurrentUser(currentUser.getId());
+
+        AgencyEntity agency = user.getAgency();
+        if (agency == null) {
+            throw new BadRequestException("You must belong to an agency to create a new property.");
+        }
+
+        PropertyEntity property = getPropertyEntity(propertyId);
+
+        havePermissionOverProperty(property, agency);
+
+        if(!ALLOWED_STATUSES_FOR_AGENCIES.contains(request.getStatus())) {
+            throw new BadRequestException("New status should be one of these: SOLD, RENTED.");
+        }
+
+        property.setStatus(request.getStatus());
+        propertyRepository.saveAndFlush(property);
+
     }
 
     private UserEntity getCurrentUser(UUID userId) {
@@ -196,6 +212,19 @@ public class PropertyServiceImpl implements PropertyService {
         return assignedAgent;
     }
 
+    void havePermissionOverProperty(PropertyEntity property, AgencyEntity agency) {
+        if (!property.getAgency().getId().equals(agency.getId())) {
+            throw new BadRequestException("You do not have permission to modify a property belonging to another agency.");
+        }
+    }
+
+    PropertyEntity getPropertyEntity(UUID propertyId) {
+        return propertyRepository.findById(propertyId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Property not found with id: " + propertyId)
+                );
+    }
+
     private boolean canView(PropertyEntity property, CustomUserDetails currentUser) {
         boolean isPrivileged = currentUser != null && isOwnerAgentOrAdmin(property, currentUser);
 
@@ -211,6 +240,11 @@ public class PropertyServiceImpl implements PropertyService {
             PropertyStatus.REJECTED,
             PropertyStatus.DELETED,
             PropertyStatus.CANCELED
+    );
+
+    private static final Set<PropertyStatus> ALLOWED_STATUSES_FOR_AGENCIES = EnumSet.of(
+            PropertyStatus.SOLD,
+            PropertyStatus.RENTED
     );
 
     private boolean isOwnerAgentOrAdmin(PropertyEntity property, CustomUserDetails currentUser) {

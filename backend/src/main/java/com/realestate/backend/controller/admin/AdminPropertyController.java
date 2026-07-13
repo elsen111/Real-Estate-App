@@ -2,7 +2,7 @@ package com.realestate.backend.controller.admin;
 
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.property.request.PropertyFilterRequest;
-import com.realestate.backend.dto.admin.property.request.PropertyStatusRequest;
+import com.realestate.backend.dto.property.request.PropertyStatusRequest;
 import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.service.admin.property.AdminPropertyService;
 import io.swagger.v3.oas.annotations.Operation;
