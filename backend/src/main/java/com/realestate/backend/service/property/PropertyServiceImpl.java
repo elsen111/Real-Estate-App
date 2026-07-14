@@ -1,13 +1,11 @@
 package com.realestate.backend.service.property;
 
 import com.realestate.backend.dto.media.response.PropertyImageResponse;
+import com.realestate.backend.dto.property.request.PropertyMapFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyRequest;
 import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyStatusRequest;
-import com.realestate.backend.dto.property.response.PropertyDetailResponse;
-import com.realestate.backend.dto.property.response.PropertyResponse;
-import com.realestate.backend.dto.property.response.PropertySearchSuggestionResponse;
-import com.realestate.backend.dto.property.response.PropertySuggestionResponse;
+import com.realestate.backend.dto.property.response.*;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.Role;
@@ -33,10 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +45,8 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyRepository propertyRepository;
     private final PropertyMapper propertyMapper;
     private final MediaFileRepository mediaFileRepository;
+
+    private static final int MAP_RESULTS_LIMIT = 500;
 
     @Override
     @Transactional
@@ -289,6 +287,36 @@ public class PropertyServiceImpl implements PropertyService {
 
         return propertyMapper.toSuggestionsResponse(properties, cities, districts);
 
+    }
+
+    @Override
+    public Page<PropertyMapResponse> getMapProperties(PropertyMapFilterRequest request, Pageable pageable) {
+        Specification<PropertyEntity> spec = PropertySpecification.withMapFilter(request);
+
+        int cappedSize = Math.min(pageable.getPageSize(), MAP_RESULTS_LIMIT);
+        Pageable effectivePageable = PageRequest.of(pageable.getPageNumber(), cappedSize, pageable.getSort());
+
+        Page<PropertyEntity> propertyPage = propertyRepository.findAll(spec, effectivePageable);
+
+        if (propertyPage.isEmpty()) {
+            return Page.empty(effectivePageable);
+        }
+
+        List<UUID> propertyIds = propertyPage.getContent().stream()
+                .map(PropertyEntity::getId)
+                .toList();
+
+        Map<UUID, String> mainImageByPropertyId = mediaFileRepository
+                .findMainImagesByPropertyIds(propertyIds).stream()
+                .collect(Collectors.toMap(
+                        m -> m.getProperty().getId(),
+                        MediaFileEntity::getFileUrl,
+                        (first, second) -> first
+                ));
+
+        return propertyPage.map(p ->
+                propertyMapper.toPropertyMapResponse(p, mainImageByPropertyId.get(p.getId()))
+        );
     }
 
     private UserEntity getCurrentUser(UUID userId) {
