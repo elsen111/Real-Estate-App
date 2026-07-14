@@ -5,6 +5,7 @@ import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyStatusRequest;
 import com.realestate.backend.dto.property.response.PropertyDetailResponse;
 import com.realestate.backend.dto.property.response.PropertyResponse;
+import com.realestate.backend.dto.property.response.PropertySearchSuggestionResponse;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.security.CustomUserDetails;
 import org.springframework.data.domain.Page;
@@ -45,5 +46,7 @@ public interface PropertyService {
             UUID propertyId,
             Pageable pageable
     );
+
+    PropertySearchSuggestionResponse getSearchSuggestions(String keyword);
 
 }

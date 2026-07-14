@@ -6,6 +6,7 @@ import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyStatusRequest;
 import com.realestate.backend.dto.property.response.PropertyDetailResponse;
 import com.realestate.backend.dto.property.response.PropertyResponse;
+import com.realestate.backend.dto.property.response.PropertySearchSuggestionResponse;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.property.PropertyService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -183,6 +184,20 @@ public class PropertyController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Similar properties fetched successfully", response)
+        );
+
+    }
+
+    @GetMapping("/search/suggestions")
+    @Operation(summary = "Get search suggestion according to the typed keyword.")
+    public ResponseEntity<ApiResponse<PropertySearchSuggestionResponse>> getSuggestedProperties(
+            @Valid @RequestParam String keyword
+    ){
+
+        PropertySearchSuggestionResponse response = propertyService.getSearchSuggestions(keyword);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Suggested properties fetched successfully", response)
         );
 
     }

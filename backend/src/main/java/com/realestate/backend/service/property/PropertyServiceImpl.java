@@ -6,6 +6,8 @@ import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyStatusRequest;
 import com.realestate.backend.dto.property.response.PropertyDetailResponse;
 import com.realestate.backend.dto.property.response.PropertyResponse;
+import com.realestate.backend.dto.property.response.PropertySearchSuggestionResponse;
+import com.realestate.backend.dto.property.response.PropertySuggestionResponse;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.Role;
@@ -28,6 +30,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.EnumSet;
@@ -267,6 +270,24 @@ public class PropertyServiceImpl implements PropertyService {
 
         return propertyRepository.findAll(effectiveSpec, pageable)
                 .map(propertyMapper::toPublicClientResponse);
+
+    }
+
+    @Override
+    public PropertySearchSuggestionResponse getSearchSuggestions(String keyword) {
+
+        if(!StringUtils.hasText(keyword) || keyword.trim().length() < 2) {
+            throw new BadRequestException("Search keyword must be at least 2 characters long.");
+        }
+
+        String trimmedKeyword = keyword.trim();
+        Pageable limit =  PageRequest.of(0, 8);
+
+        List<PropertySuggestionResponse> properties = propertyRepository.findMatchingTitles(trimmedKeyword, limit);
+        List<String> cities = propertyRepository.findMatchingCities(trimmedKeyword, limit);
+        List<String> districts = propertyRepository.findMatchingDistricts(trimmedKeyword, limit);
+
+        return propertyMapper.toSuggestionsResponse(properties, cities, districts);
 
     }
 

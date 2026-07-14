@@ -6,6 +6,8 @@ import com.realestate.backend.dto.media.response.PropertyImageResponse;
 import com.realestate.backend.dto.property.request.PropertyRequest;
 import com.realestate.backend.dto.property.response.PropertyDetailResponse;
 import com.realestate.backend.dto.property.response.PropertyResponse;
+import com.realestate.backend.dto.property.response.PropertySearchSuggestionResponse;
+import com.realestate.backend.dto.property.response.PropertySuggestionResponse;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.entity.UserEntity;
 import org.mapstruct.Mapper;
@@ -72,4 +74,13 @@ public interface PropertyMapper {
     AgentResponse toAgentResponse(UserEntity agent);
 
     List<PropertyImageResponse> toImageResponseList(List<PropertyImageResponse> images);
+
+    @Mapping(target = "properties", source = "properties")
+    @Mapping(target = "cities", source = "cities")
+    @Mapping(target = "districts", source = "districts")
+    PropertySearchSuggestionResponse toSuggestionsResponse(
+            List<PropertySuggestionResponse> properties,
+            List<String> cities,
+            List<String> districts
+    );
 }
