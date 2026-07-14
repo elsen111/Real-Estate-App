@@ -171,6 +171,20 @@ public class PropertyController {
 
     }
 
+    @GetMapping("/{propertyId}/similar")
+    @Operation(summary = "Get similar properties.")
+    public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getSimilarProperties(
+            @PathVariable  UUID propertyId,
+            @PageableDefault(sort = "featured")
+            Pageable pageable
+    ){
 
+        Page<PropertyResponse> response = propertyService.getSimilarProperties(propertyId, pageable);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Similar properties fetched successfully", response)
+        );
+
+    }
 
 }

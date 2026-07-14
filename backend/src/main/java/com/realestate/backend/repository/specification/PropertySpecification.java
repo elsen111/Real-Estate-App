@@ -13,6 +13,7 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
+import tools.jackson.databind.annotation.JsonAppend;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -118,8 +119,36 @@ public class PropertySpecification {
                 .and(hasQuery(filterRequest.getQuery()));
     }
 
-    private static Specification<PropertyEntity> hasCity(Object city) {
-        return ((root, query, criteriaBuilder) -> city == null ? null : criteriaBuilder.equal(root.get("city"), city));
+    public static Specification<PropertyEntity> withSimilarityFilter(PropertyEntity reference) {
+
+        return Specification.where(hasStatus(PropertyStatus.ACTIVE))
+                .and(hasCity(reference.getCity()))
+                .and(hasCategoryId(reference.getCategory().getId()))
+                .and(hasListingType(reference.getListingType()))
+                .and(excludePropertyId(reference.getId()));
+    }
+
+    public static Specification<PropertyEntity> withSimilarityFilterRelaxed(PropertyEntity reference) {
+
+        BigDecimal price = reference.getPrice();
+        BigDecimal minPrice = price.multiply(BigDecimal.valueOf(0.8));
+        BigDecimal maxPrice = price.multiply(BigDecimal.valueOf(1.2));
+
+        BigDecimal area = reference.getArea();
+        BigDecimal minArea = area.multiply(BigDecimal.valueOf(0.75));
+        BigDecimal maxArea = area.multiply(BigDecimal.valueOf(1.25));
+
+        return Specification.where(hasStatus(PropertyStatus.ACTIVE))
+                .and(hasListingType(reference.getListingType()))
+                .and(areaBetween(minArea, maxArea))
+                .and(priceBetween(minPrice, maxPrice))
+                .and(hasDistrict(reference.getDistrict()))
+                .and(excludePropertyId(reference.getId()));
+    }
+
+
+    private static Specification<PropertyEntity> hasCity(String city) {
+        return ((root, query, cb) -> city == null ? null : cb.equal(cb.lower(root.get("city")), city.trim().toLowerCase()));
     }
 
     private static Specification<PropertyEntity> hasAgencyName(String agencyName) {
@@ -161,7 +190,7 @@ public class PropertySpecification {
     private static Specification<PropertyEntity> hasDistrict(String district) {
         return (root, query, cb) -> !StringUtils.hasText(district)
                 ? null
-                : cb.equal(root.get("district"), district);
+                : cb.equal(cb.lower(root.get("district")), district.trim().toLowerCase());
     }
 
     private static Specification<PropertyEntity> hasPropertyType(PropertyType propertyType) {
@@ -212,8 +241,6 @@ public class PropertySpecification {
         };
     }
 
-
-
     public static Specification<PropertyEntity> hasAssignedAgentId(UUID agentId) {
         return (root, query, cb) -> agentId == null
                 ? null
@@ -224,6 +251,18 @@ public class PropertySpecification {
         return (root, query, cb) -> agencyId == null
                 ? null
                 : cb.equal(root.get("agency").get("id"), agencyId);
+    }
+
+    private static Specification<PropertyEntity> hasCategoryId(UUID  categoryId) {
+        return (root, query, cb) -> categoryId == null
+                ? null
+                : cb.equal(root.get("category").get("id"), categoryId);
+    }
+
+    private static Specification<PropertyEntity> excludePropertyId(UUID propertyId) {
+        return (root, query, cb) -> propertyId == null
+            ? null
+            : cb.notEqual(root.get("id"), propertyId);
     }
 
 
