@@ -64,4 +64,23 @@ public class FavoriteServiceImpl implements FavoriteService {
         return favoriteMapper.toCreateFavoriteResponse(savedFavorite);
 
     }
+
+    @Override
+    @Transactional
+    public void deleteFavorite(UUID propertyId, CustomUserDetails currentUser) {
+
+        UserEntity user = userRepository.findById(currentUser.getId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("User not found with id " +  currentUser.getId())
+                );
+
+        boolean isFavorite = favoriteRepository.existsByUser_IdAndProperty_Id(user.getId(), propertyId);
+
+        if(!isFavorite) {
+            throw new BadRequestException("Favorite does not exist in your list.");
+        }
+
+        favoriteRepository.deleteByUser_IdAndProperty_Id(user.getId(), propertyId);
+
+    }
 }

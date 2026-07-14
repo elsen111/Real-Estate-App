@@ -9,4 +9,6 @@ public interface FavoriteService {
 
     FavoriteResponse addFavorite(UUID propertyId, CustomUserDetails currentUser);
 
+    void deleteFavorite(UUID propertyId, CustomUserDetails currentUser);
+
 }

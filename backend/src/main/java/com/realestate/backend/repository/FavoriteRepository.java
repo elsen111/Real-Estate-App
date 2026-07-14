@@ -19,7 +19,6 @@ public interface FavoriteRepository extends JpaRepository<FavoriteEntity, UUID> 
 
     Page<FavoriteEntity> findByUser_Id(UUID userId, Pageable pageable);
 
-    @Transactional
     void deleteByUser_IdAndProperty_Id(UUID userId, UUID propertyId);
 
 }

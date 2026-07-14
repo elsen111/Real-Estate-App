@@ -8,10 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -33,6 +30,21 @@ public class FavoriteController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Property added to favorites", response)
+        );
+
+    }
+
+    @DeleteMapping("/{propertyId}")
+    @Operation(summary = "Delete favorite from the list.")
+    public ResponseEntity<ApiResponse<Void>> deleteFromFavorites(
+            @PathVariable UUID propertyId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+
+        favoriteService.deleteFavorite(propertyId, currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Property was successfully deleted from favorites list.", null)
         );
 
     }
