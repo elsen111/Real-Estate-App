@@ -1,6 +1,7 @@
 package com.realestate.backend.entity;
 
 import com.realestate.backend.enums.InquiryStatus;
+import com.realestate.backend.enums.InquiryType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -56,11 +57,19 @@ public class InquiryEntity {
     )
     private UserEntity assignedAgent;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "agency_id",
+            foreignKey = @ForeignKey(name = "fk_inquiries_agency_id")
+    )
+    private AgencyEntity agency;
+
     @Column(name = "message", columnDefinition = "TEXT", nullable = false)
     private String message;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "preferred_contact_method", length = 30, nullable = false)
-    private String preferredContactMethod;
+    private InquiryType preferredContactMethod;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
