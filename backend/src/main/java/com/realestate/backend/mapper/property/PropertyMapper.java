@@ -4,10 +4,7 @@ import com.realestate.backend.dto.admin.property.response.AdminAgencyPropertyRes
 import com.realestate.backend.dto.agent.response.AgentResponse;
 import com.realestate.backend.dto.media.response.PropertyImageResponse;
 import com.realestate.backend.dto.property.request.PropertyRequest;
-import com.realestate.backend.dto.property.response.PropertyDetailResponse;
-import com.realestate.backend.dto.property.response.PropertyResponse;
-import com.realestate.backend.dto.property.response.PropertySearchSuggestionResponse;
-import com.realestate.backend.dto.property.response.PropertySuggestionResponse;
+import com.realestate.backend.dto.property.response.*;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.entity.UserEntity;
 import org.mapstruct.Mapper;
@@ -83,4 +80,7 @@ public interface PropertyMapper {
             List<String> cities,
             List<String> districts
     );
+
+    @Mapping(target = "mainImageUrl", source = "mainImageUrl")
+    PropertyMapResponse toPropertyMapResponse(PropertyEntity property, String mainImageUrl);
 }

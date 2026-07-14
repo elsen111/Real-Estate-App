@@ -2,6 +2,7 @@ package com.realestate.backend.repository.specification;
 
 import com.realestate.backend.dto.agency.request.AgencyFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyFilterRequest;
+import com.realestate.backend.dto.property.request.PropertyMapFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
 import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.PropertyEntity;
@@ -144,6 +145,19 @@ public class PropertySpecification {
                 .and(priceBetween(minPrice, maxPrice))
                 .and(hasDistrict(reference.getDistrict()))
                 .and(excludePropertyId(reference.getId()));
+    }
+
+    public static Specification<PropertyEntity> withMapFilter(PropertyMapFilterRequest filterRequest) {
+        Specification<PropertyEntity> spec = Specification.where(hasStatus(PropertyStatus.ACTIVE));
+
+        if (filterRequest == null) {
+            return spec;
+        }
+
+        return spec
+                .and(hasCity(filterRequest.getCity()))
+                .and(hasListingType(filterRequest.getListingType()))
+                .and(priceBetween(filterRequest.getMinPrice(), filterRequest.getMaxPrice()));
     }
 
 

@@ -1,10 +1,12 @@
 package com.realestate.backend.controller.property;
 
 import com.realestate.backend.common.response.ApiResponse;
+import com.realestate.backend.dto.property.request.PropertyMapFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyRequest;
 import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyStatusRequest;
 import com.realestate.backend.dto.property.response.PropertyDetailResponse;
+import com.realestate.backend.dto.property.response.PropertyMapResponse;
 import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.dto.property.response.PropertySearchSuggestionResponse;
 import com.realestate.backend.security.CustomUserDetails;
@@ -198,6 +200,22 @@ public class PropertyController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Suggested properties fetched successfully", response)
+        );
+
+    }
+
+    @GetMapping("/map")
+    @Operation(summary = "Get properties with map details.")
+    public ResponseEntity<ApiResponse<Page<PropertyMapResponse>>> getMapProperties(
+            @ModelAttribute PropertyMapFilterRequest request,
+            @PageableDefault(size = 100)
+            Pageable pageable
+    ){
+
+        Page<PropertyMapResponse> response = propertyService.getMapProperties(request, pageable);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Properties map details fetched successfully", response)
         );
 
     }
