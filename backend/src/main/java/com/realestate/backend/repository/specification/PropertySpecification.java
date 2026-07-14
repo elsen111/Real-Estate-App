@@ -32,7 +32,6 @@ public class PropertySpecification {
         assert filterRequest != null;
 
         return Specification.where(hasCity(filterRequest.getCity()))
-                .and(hasCity(filterRequest.getCity()))
                 .and(hasStatus(filterRequest.getStatus()))
                 .and(hasAgencyName(filterRequest.getAgencyName()))
                 .and(isFeatured(filterRequest.getFeatured()))
@@ -99,6 +98,23 @@ public class PropertySpecification {
                 .and(hasListingType(filterRequest.getListingType()))
                 .and(priceBetween(filterRequest.getMinPrice(), filterRequest.getMaxPrice()))
                 .and(areaBetween(filterRequest.getMinArea(), filterRequest.getMaxArea()))
+                .and(hasQuery(filterRequest.getQuery()));
+    }
+
+    public static Specification<PropertyEntity> withRecentFilter(
+            PropertyPublicFilterRequest filterRequest
+    ) {
+        Specification<PropertyEntity> spec = Specification
+                .where(hasStatus(PropertyStatus.ACTIVE));
+
+        if (filterRequest == null) {
+            return spec;
+        }
+
+        return spec
+                .and(hasCity(filterRequest.getCity()))
+                .and(hasPropertyType(filterRequest.getPropertyType()))
+                .and(hasListingType(filterRequest.getListingType()))
                 .and(hasQuery(filterRequest.getQuery()));
     }
 

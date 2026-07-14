@@ -142,7 +142,7 @@ public class PropertyController {
 
     @GetMapping("/featured")
     @Operation(summary = "Get featured properties.")
-    public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getPropertyById(
+    public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getFeaturedProperties(
             @ModelAttribute PropertyPublicFilterRequest filter,
             @PageableDefault(sort = "createdAt")
             Pageable pageable
@@ -155,5 +155,22 @@ public class PropertyController {
         );
 
     }
+
+    @GetMapping("/recent")
+    @Operation(summary = "Get recent properties.")
+    public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getRecentProperties(
+            @ModelAttribute PropertyPublicFilterRequest filter,
+            @RequestParam(defaultValue = "8") int size
+    ){
+
+        Page<PropertyResponse> response = propertyService.getRecentProperties(filter, size);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Recent properties fetched successfully", response)
+        );
+
+    }
+
+
 
 }
