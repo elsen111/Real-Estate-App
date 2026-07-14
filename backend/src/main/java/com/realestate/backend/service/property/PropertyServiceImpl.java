@@ -253,6 +253,23 @@ public class PropertyServiceImpl implements PropertyService {
                 .map(propertyMapper::toPublicClientResponse);
     }
 
+    @Override
+    public Page<PropertyResponse> getSimilarProperties(UUID propertyId, Pageable pageable) {
+
+        PropertyEntity refProperty = getPropertyEntity(propertyId);
+
+        Specification<PropertyEntity> strictSpec = PropertySpecification.withSimilarityFilter(refProperty);
+        long strictCount = propertyRepository.count(strictSpec);
+
+        Specification<PropertyEntity> effectiveSpec = strictCount >= pageable.getPageSize()
+                ? strictSpec
+                : PropertySpecification.withSimilarityFilterRelaxed(refProperty);
+
+        return propertyRepository.findAll(effectiveSpec, pageable)
+                .map(propertyMapper::toPublicClientResponse);
+
+    }
+
     private UserEntity getCurrentUser(UUID userId) {
 
         return userRepository.findById(userId)

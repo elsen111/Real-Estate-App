@@ -41,4 +41,9 @@ public interface PropertyService {
             int size
     );
 
+    Page<PropertyResponse> getSimilarProperties(
+            UUID propertyId,
+            Pageable pageable
+    );
+
 }
