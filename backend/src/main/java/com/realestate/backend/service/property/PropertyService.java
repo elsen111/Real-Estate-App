@@ -36,4 +36,9 @@ public interface PropertyService {
             Pageable pageable
     );
 
+    Page<PropertyResponse> getRecentProperties(
+            PropertyPublicFilterRequest filter,
+            int size
+    );
+
 }

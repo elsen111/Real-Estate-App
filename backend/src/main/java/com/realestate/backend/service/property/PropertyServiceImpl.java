@@ -21,7 +21,9 @@ import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.security.SecurityConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -235,6 +237,17 @@ public class PropertyServiceImpl implements PropertyService {
         Specification<PropertyEntity> specification = PropertySpecification
                 .withFeaturedPublicFilter(filter)
                 .and(PropertySpecification.isFeatured(true));;
+
+        return propertyRepository.findAll(specification, pageable)
+                .map(propertyMapper::toPublicClientResponse);
+    }
+
+    @Override
+    public Page<PropertyResponse> getRecentProperties(PropertyPublicFilterRequest filter, int size) {
+        Specification<PropertyEntity> specification = PropertySpecification
+                .withRecentFilter(filter);
+
+        Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         return propertyRepository.findAll(specification, pageable)
                 .map(propertyMapper::toPublicClientResponse);
