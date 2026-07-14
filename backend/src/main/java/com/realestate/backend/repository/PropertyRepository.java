@@ -1,6 +1,7 @@
 package com.realestate.backend.repository;
 
 import aj.org.objectweb.asm.commons.Remapper;
+import com.realestate.backend.dto.property.response.PropertySuggestionResponse;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.enums.PropertyStatus;
 import org.springframework.data.domain.Page;
@@ -53,5 +54,31 @@ public interface PropertyRepository extends JpaRepository<PropertyEntity, UUID>,
         WHERE p.id = :id
     """)
     Optional<PropertyEntity> findByIdWithDetails(@Param("id") UUID id);
+
+    @Query("""
+    SELECT new com.realestate.backend.dto.property.response.PropertySuggestionResponse(p.id, p.title)
+    FROM PropertyEntity p
+    WHERE p.status = 'ACTIVE'
+    AND LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    ORDER BY p.title
+    """)
+    List<PropertySuggestionResponse> findMatchingTitles(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("""
+    SELECT DISTINCT p.city FROM PropertyEntity p
+    WHERE p.status = 'ACTIVE'
+    AND LOWER(p.city) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    ORDER BY p.city
+    """)
+    List<String> findMatchingCities(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("""
+    SELECT DISTINCT p.district FROM PropertyEntity p
+    WHERE p.status = 'ACTIVE'
+    AND p.district IS NOT NULL
+    AND LOWER(p.district) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    ORDER BY p.district
+    """)
+    List<String> findMatchingDistricts(@Param("keyword") String keyword, Pageable pageable);
 
 }
