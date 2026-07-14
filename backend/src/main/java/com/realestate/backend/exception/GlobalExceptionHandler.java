@@ -116,6 +116,14 @@ public class GlobalExceptionHandler {
         return error("File size exceeded", HttpStatus.CONTENT_TOO_LARGE, request);
     }
 
+    @ExceptionHandler(DuplicateInquiryException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateInquiryException(
+            DuplicateInquiryException ex,
+            HttpServletRequest request
+    ) {
+        return error(ex.getMessage(), HttpStatus.CONFLICT, request);
+    }
+
     @ExceptionHandler(FileStorageException.class)
     public ResponseEntity<ErrorResponse> handleFileStorageException(
             FileStorageException ex,
