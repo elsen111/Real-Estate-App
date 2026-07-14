@@ -15,6 +15,8 @@ import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.UserRepository;
 import com.realestate.backend.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,6 +71,22 @@ public class InquiryServiceImpl implements InquiryService{
         InquiryEntity savedInquiry = inquiryRepository.saveAndFlush(newInquiry);
 
         return inquiryMapper.toClientResponse(savedInquiry);
+
+    }
+
+    @Override
+    public Page<InquiryClientResponse> getClientInquiries(CustomUserDetails currentUser, InquiryStatus status, Pageable pageable) {
+
+        UserEntity client = userRepository.findById(currentUser.getId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
+                );
+
+        Page<InquiryEntity> inquiries = status == null
+                ? inquiryRepository.findByClientId(currentUser.getId(), pageable)
+                : inquiryRepository.findByClientIdAndStatus(currentUser.getId(), status, pageable);
+
+        return inquiries.map(inquiryMapper::toClientResponse);
 
     }
 }
