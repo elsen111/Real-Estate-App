@@ -48,6 +48,7 @@ public interface PropertyMapper {
     @Mapping(target = "updatedAt", ignore = true)
     PropertyEntity toEntity(PropertyRequest request);
 
+//    Delete this method and use the second one next to below to give response after media implementation
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "agencyId", source = "agency.id")
     @Mapping(target = "agencyName", source = "agency.name")
@@ -56,6 +57,17 @@ public interface PropertyMapper {
     @Mapping(target = "assignedAgentId", source = "assignedAgent.id")
     @Mapping(target = "assignedAgentName", source = "assignedAgent.fullName")
     PropertyResponse toPublicClientResponse(PropertyEntity property);
+
+//    After media implementation connect the method above with this method by changing its name to toPublicClientResponse
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "agencyId", source = "property.agency.id")
+    @Mapping(target = "agencyName", source = "property.agency.name")
+    @Mapping(target = "categoryId", source = "property.category.id")
+    @Mapping(target = "categoryName", source = "property.category.name")
+    @Mapping(target = "assignedAgentId", source = "property.assignedAgent.id")
+    @Mapping(target = "assignedAgentName", source = "property.assignedAgent.fullName")
+    @Mapping(target = "mainImageUrl", source = "mainImageUrl")
+    PropertyResponse toPublicClientResponseWithImage(PropertyEntity property, String mainImageUrl);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "agency", ignore = true)

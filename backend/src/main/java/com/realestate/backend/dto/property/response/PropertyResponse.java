@@ -43,6 +43,8 @@ public class PropertyResponse {
 
     private String address;
 
+    private String mainImageUrl;
+
     private ListingType listingType;
 
     private BigDecimal area;
