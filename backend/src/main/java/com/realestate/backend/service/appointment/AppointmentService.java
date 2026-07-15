@@ -17,4 +17,6 @@ public interface AppointmentService {
 
     Page<AppointmentResponse> getClientAppointments(CustomUserDetails currentUser, AppointmentStatus status, Pageable pageable);
 
+    void cancelAppointment(UUID appointmentId, CustomUserDetails currentUser);
+
 }

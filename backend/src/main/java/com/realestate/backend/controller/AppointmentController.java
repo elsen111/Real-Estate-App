@@ -62,5 +62,20 @@ public class AppointmentController {
 
     }
 
+    @PatchMapping("/appointments/{appointmentId}/cancel")
+    @Operation(summary = "Cancel a pending or approved appointment (client user)")
+    public ResponseEntity<ApiResponse<Void>> cancelAppointment(
+            @PathVariable UUID appointmentId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+
+        appointmentService.cancelAppointment(appointmentId, currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Appointment cancelled successfully", null)
+        );
+
+    }
+
 
 }
