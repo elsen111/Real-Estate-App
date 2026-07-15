@@ -77,5 +77,23 @@ public class AppointmentController {
 
     }
 
+    @GetMapping("/agency/appointments")
+    @Operation(summary = "Get agency's appointments")
+    public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getMyAppointments (
+            @RequestParam(required = false) AppointmentStatus status,
+            @RequestParam(required = false) UUID propertyId,
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+
+        Page<AppointmentResponse> response = appointmentService.getMyAgencyAppointments(currentUser, status, propertyId, pageable);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Appointment list fetched successfully", response)
+        );
+
+    }
+
 
 }

@@ -2,23 +2,24 @@ package com.realestate.backend.service.appointment;
 
 import com.realestate.backend.dto.appointment.request.CreateAppointmentRequest;
 import com.realestate.backend.dto.appointment.response.AppointmentResponse;
-import com.realestate.backend.entity.AppointmentEntity;
-import com.realestate.backend.entity.InquiryEntity;
-import com.realestate.backend.entity.PropertyEntity;
-import com.realestate.backend.entity.UserEntity;
+import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.AppointmentStatus;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.exception.DuplicateAppointmentException;
+import com.realestate.backend.exception.ForbiddenException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.appointment.AppointmentMapper;
+import com.realestate.backend.repository.AgencyMemberRepository;
 import com.realestate.backend.repository.AppointmentRepository;
 import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.UserRepository;
 import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.SecurityConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final PropertyRepository propertyRepository;
     private final AppointmentRepository appointmentRepository;
     private final AppointmentMapper appointmentMapper;
+    private final AgencyMemberRepository agencyMemberRepository;
 
 
     @Override
@@ -109,6 +111,37 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setStatus(AppointmentStatus.CANCELLED);
         appointmentRepository.saveAndFlush(appointment);
 
+    }
+
+    @Override
+    @Transactional
+    public Page<AppointmentResponse> getMyAgencyAppointments(
+            CustomUserDetails currentUser,
+            AppointmentStatus status,
+            UUID propertyId,
+            Pageable pageable) {
+
+        if (hasRole(currentUser, "AGENCY_OWNER") || hasRole(currentUser, "AGENT")) {
+
+            AgencyMemberEntity agencyMember = agencyMemberRepository.findByUser_IdAndActiveTrue(currentUser.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("You are not an active member of any agency"));
+
+            UUID agencyId = agencyMember.getAgency().getId();
+
+            Page<AppointmentEntity> appointments = appointmentRepository
+                    .findByAgencyIdWithFilters(agencyId, status, propertyId, pageable);
+
+            return appointments.map(appointmentMapper::toResponse);
+        }
+
+        throw new ForbiddenException("You do not have permission to view agency appointments");
+    }
+
+    private boolean hasRole(CustomUserDetails user, String roleName) {
+        String target = SecurityConstants.ROLE_PREFIX + roleName;
+        return user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(target::equals);
     }
 
 }
