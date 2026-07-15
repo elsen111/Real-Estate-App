@@ -1,6 +1,7 @@
 package com.realestate.backend.service.inquiry;
 
 import com.realestate.backend.dto.inquiry.request.CreateInquiryRequest;
+import com.realestate.backend.dto.inquiry.request.UpdateInquiryStatusRequest;
 import com.realestate.backend.dto.inquiry.response.InquiryResponse;
 import com.realestate.backend.enums.InquiryStatus;
 import com.realestate.backend.security.CustomUserDetails;
@@ -18,5 +19,7 @@ public interface InquiryService {
     Page<InquiryResponse> getMyAgencyInquiries(CustomUserDetails currentUser, InquiryStatus status, UUID propertyId, Pageable pageable);
 
     InquiryResponse getInquiryById(CustomUserDetails currentUser, UUID id);
+
+    InquiryResponse updateStatus(CustomUserDetails currentUser, UUID inquiryId, UpdateInquiryStatusRequest request);
 
 }

@@ -1,14 +1,15 @@
 package com.realestate.backend.service.inquiry;
 
 import com.realestate.backend.dto.inquiry.request.CreateInquiryRequest;
+import com.realestate.backend.dto.inquiry.request.UpdateInquiryStatusRequest;
 import com.realestate.backend.dto.inquiry.response.InquiryResponse;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.InquiryStatus;
 import com.realestate.backend.enums.PropertyStatus;
+import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.DuplicateInquiryException;
 import com.realestate.backend.exception.ForbiddenException;
 import com.realestate.backend.exception.ResourceNotFoundException;
-import com.realestate.backend.exception.UnauthorizedException;
 import com.realestate.backend.mapper.inquiry.InquiryMapper;
 import com.realestate.backend.repository.*;
 import com.realestate.backend.security.CustomUserDetails;
@@ -20,6 +21,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -32,6 +34,11 @@ public class InquiryServiceImpl implements InquiryService{
     private final PropertyRepository propertyRepository;
     private final AgencyMemberRepository agencyMemberRepository;
     private final AgencyRepository agencyRepository;
+
+    private final List<InquiryStatus> ALLOWED_STATUSES_FOR_UPDATE = List.of(
+            InquiryStatus.CONTACTED,
+            InquiryStatus.CLOSED
+    );
 
     @Override
     @Transactional
@@ -126,6 +133,30 @@ public class InquiryServiceImpl implements InquiryService{
         return inquiryMapper.toResponse(inquiry);
     }
 
+    @Override
+    @Transactional
+    public InquiryResponse updateStatus(CustomUserDetails currentUser, UUID inquiryId, UpdateInquiryStatusRequest request) {
+
+        InquiryEntity inquiry = inquiryRepository.findById(inquiryId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Inquiry not found with id: " + inquiryId)
+                );
+
+        if(!canManageInquiry(inquiry, currentUser)){
+            throw new ForbiddenException("You do not have permission to update this inquiry");
+        }
+
+        if(!ALLOWED_STATUSES_FOR_UPDATE.contains(request.getStatus())){
+            throw new BadRequestException("Allowed statuses:  " + ALLOWED_STATUSES_FOR_UPDATE);
+        }
+
+        inquiry.setStatus(request.getStatus());
+        InquiryEntity updatedInquiry = inquiryRepository.saveAndFlush(inquiry);
+
+        return inquiryMapper.toResponse(updatedInquiry);
+
+    }
+
     private boolean canViewInquiry(InquiryEntity inquiry, CustomUserDetails currentUser) {
         if (hasRole(currentUser, "SUPER_ADMIN")) {
             return true;
@@ -156,5 +187,16 @@ public class InquiryServiceImpl implements InquiryService{
         return user.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(target::equals);
+    }
+
+    private boolean canManageInquiry(InquiryEntity inquiry, CustomUserDetails currentUser) {
+        if (hasRole(currentUser, "SUPER_ADMIN")) {
+            return true;
+        }
+
+        return (hasRole(currentUser, "AGENCY_OWNER") || hasRole(currentUser, "AGENT"))
+                && inquiry.getAgency() != null
+                && agencyMemberRepository.existsByAgencyIdAndUserIdAndActiveTrue(
+                inquiry.getAgency().getId(), currentUser.getId());
     }
 }
