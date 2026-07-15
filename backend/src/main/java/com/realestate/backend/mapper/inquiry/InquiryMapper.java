@@ -1,6 +1,6 @@
 package com.realestate.backend.mapper.inquiry;
 
-import com.realestate.backend.dto.inquiry.response.InquiryClientResponse;
+import com.realestate.backend.dto.inquiry.response.InquiryResponse;
 import com.realestate.backend.entity.InquiryEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,6 +16,6 @@ public interface InquiryMapper {
     @Mapping(target = "clientEmail", source = "client.email")
     @Mapping(target = "assignedAgentId", source = "assignedAgent.id")
     @Mapping(target = "agencyId", source = "agency.id")
-    InquiryClientResponse toClientResponse(InquiryEntity inquiry);
+    InquiryResponse toResponse(InquiryEntity inquiry);
 
 }

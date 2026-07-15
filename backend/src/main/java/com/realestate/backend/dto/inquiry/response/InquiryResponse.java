@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Getter
 @Builder
-public class InquiryClientResponse {
+public class InquiryResponse {
 
     private UUID id;
     private UUID propertyId;

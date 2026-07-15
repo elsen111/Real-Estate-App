@@ -2,7 +2,7 @@ package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.inquiry.request.CreateInquiryRequest;
-import com.realestate.backend.dto.inquiry.response.InquiryClientResponse;
+import com.realestate.backend.dto.inquiry.response.InquiryResponse;
 import com.realestate.backend.enums.InquiryStatus;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.inquiry.InquiryService;
@@ -28,13 +28,13 @@ public class InquiryController {
 
     @PostMapping("/properties/{propertyId}/inquiries")
     @Operation(summary = "Create a new inquiry")
-    public ResponseEntity<ApiResponse<InquiryClientResponse>> createInquiry(
+    public ResponseEntity<ApiResponse<InquiryResponse>> createInquiry(
             @PathVariable UUID propertyId,
             @Valid @RequestBody CreateInquiryRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
 
-        InquiryClientResponse response = inquiryService.createInquiry(propertyId, request, currentUser);
+        InquiryResponse response = inquiryService.createInquiry(propertyId, request, currentUser);
 
         return ResponseEntity.ok(
                 ApiResponse.success("Inquiry created successfully", response)
@@ -44,14 +44,32 @@ public class InquiryController {
 
     @GetMapping("/inquiries/me")
     @Operation(summary = "Get client's inquiries")
-    public ResponseEntity<ApiResponse<Page<InquiryClientResponse>>> getMyInquiries(
+    public ResponseEntity<ApiResponse<Page<InquiryResponse>>> getMyInquiries(
             @RequestParam(required = false)InquiryStatus status,
             @AuthenticationPrincipal CustomUserDetails currentUser,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
 
-        Page<InquiryClientResponse> response = inquiryService.getClientInquiries(currentUser, status, pageable);
+        Page<InquiryResponse> response = inquiryService.getClientInquiries(currentUser, status, pageable);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Inquiry list fetched successfully", response)
+        );
+
+    }
+
+    @GetMapping("/agencies/inquiries")
+    @Operation(summary = "Get agency's inquiries")
+    public ResponseEntity<ApiResponse<Page<InquiryResponse>>> getMyInquiries(
+            @RequestParam(required = false) InquiryStatus status,
+            @RequestParam(required = false) UUID propertyId,
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+
+        Page<InquiryResponse> response = inquiryService.getAgencyInquiries(currentUser, status, propertyId, pageable);
 
         return ResponseEntity.ok(
                 ApiResponse.success("Inquiry list fetched successfully", response)
