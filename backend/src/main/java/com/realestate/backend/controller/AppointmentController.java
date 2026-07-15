@@ -5,11 +5,17 @@ import com.realestate.backend.dto.appointment.request.CreateAppointmentRequest;
 import com.realestate.backend.dto.appointment.response.AppointmentResponse;
 import com.realestate.backend.dto.inquiry.request.CreateInquiryRequest;
 import com.realestate.backend.dto.inquiry.response.InquiryResponse;
+import com.realestate.backend.enums.AppointmentStatus;
+import com.realestate.backend.enums.InquiryStatus;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.appointment.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +41,23 @@ public class AppointmentController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Appointment created successfully", response)
+        );
+
+    }
+
+    @GetMapping("/appointments/me")
+    @Operation(summary = "Get client's appointments")
+    public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getMyAppointments(
+            @RequestParam(required = false) AppointmentStatus status,
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+
+        Page<AppointmentResponse> response = appointmentService.getClientAppointments(currentUser, status, pageable);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Appointment list fetched successfully", response)
         );
 
     }

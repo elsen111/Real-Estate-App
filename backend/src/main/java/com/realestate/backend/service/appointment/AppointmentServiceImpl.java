@@ -3,6 +3,7 @@ package com.realestate.backend.service.appointment;
 import com.realestate.backend.dto.appointment.request.CreateAppointmentRequest;
 import com.realestate.backend.dto.appointment.response.AppointmentResponse;
 import com.realestate.backend.entity.AppointmentEntity;
+import com.realestate.backend.entity.InquiryEntity;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.AppointmentStatus;
@@ -15,6 +16,8 @@ import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.UserRepository;
 import com.realestate.backend.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,6 +73,17 @@ public class AppointmentServiceImpl implements AppointmentService {
         AppointmentEntity savedAppointment = appointmentRepository.saveAndFlush(newAppointment);
 
         return appointmentMapper.toResponse(savedAppointment);
+
+    }
+
+    @Override
+    public Page<AppointmentResponse> getClientAppointments(CustomUserDetails currentUser, AppointmentStatus status, Pageable pageable) {
+
+        Page<AppointmentEntity> inquiries = status == null
+                ? appointmentRepository.findByClientId(currentUser.getId(), pageable)
+                : appointmentRepository.findByClientIdAndStatus(currentUser.getId(), status, pageable);
+
+        return inquiries.map(appointmentMapper::toResponse);
 
     }
 
