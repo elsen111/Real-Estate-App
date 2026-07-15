@@ -1,7 +1,9 @@
 package com.realestate.backend.service.appointment;
 
 import com.realestate.backend.dto.appointment.request.CreateAppointmentRequest;
+import com.realestate.backend.dto.appointment.request.UpdateAppointmentStatusRequest;
 import com.realestate.backend.dto.appointment.response.AppointmentResponse;
+import com.realestate.backend.dto.inquiry.request.UpdateInquiryStatusRequest;
 import com.realestate.backend.dto.inquiry.response.InquiryResponse;
 import com.realestate.backend.enums.AppointmentStatus;
 import com.realestate.backend.enums.InquiryStatus;
@@ -20,5 +22,7 @@ public interface AppointmentService {
     void cancelAppointment(UUID appointmentId, CustomUserDetails currentUser);
 
     Page<AppointmentResponse> getMyAgencyAppointments(CustomUserDetails currentUser, AppointmentStatus status, UUID propertyId, Pageable pageable);
+
+    AppointmentResponse updateStatus(CustomUserDetails currentUser, UUID inquiryId, UpdateAppointmentStatusRequest request);
 
 }
