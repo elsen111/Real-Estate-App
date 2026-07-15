@@ -2,6 +2,7 @@ package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.inquiry.request.CreateInquiryRequest;
+import com.realestate.backend.dto.inquiry.request.UpdateInquiryStatusRequest;
 import com.realestate.backend.dto.inquiry.response.InquiryResponse;
 import com.realestate.backend.enums.InquiryStatus;
 import com.realestate.backend.security.CustomUserDetails;
@@ -90,6 +91,23 @@ public class InquiryController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Inquiry fetched successfully", response)
+        );
+
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PatchMapping("/inquiries/{inquiryId}/status")
+    @Operation(summary = "Update inquiry status")
+    public ResponseEntity<ApiResponse<InquiryResponse>> updateInquiryStatus(
+            @PathVariable UUID inquiryId,
+            @Valid @RequestBody UpdateInquiryStatusRequest request,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+
+        InquiryResponse response = inquiryService.updateStatus(currentUser, inquiryId, request);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Inquiry status updated successfully", response)
         );
 
     }
