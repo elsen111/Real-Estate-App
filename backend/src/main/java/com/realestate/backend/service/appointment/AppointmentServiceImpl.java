@@ -1,14 +1,12 @@
 package com.realestate.backend.service.appointment;
 
 import com.realestate.backend.dto.appointment.request.CreateAppointmentRequest;
+import com.realestate.backend.dto.appointment.request.UpdateAppointmentStatusRequest;
 import com.realestate.backend.dto.appointment.response.AppointmentResponse;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.AppointmentStatus;
 import com.realestate.backend.enums.PropertyStatus;
-import com.realestate.backend.exception.BusinessException;
-import com.realestate.backend.exception.DuplicateAppointmentException;
-import com.realestate.backend.exception.ForbiddenException;
-import com.realestate.backend.exception.ResourceNotFoundException;
+import com.realestate.backend.exception.*;
 import com.realestate.backend.mapper.appointment.AppointmentMapper;
 import com.realestate.backend.repository.AgencyMemberRepository;
 import com.realestate.backend.repository.AppointmentRepository;
@@ -23,6 +21,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -137,11 +136,51 @@ public class AppointmentServiceImpl implements AppointmentService {
         throw new ForbiddenException("You do not have permission to view agency appointments");
     }
 
+    @Override
+    @Transactional
+    public AppointmentResponse updateStatus(CustomUserDetails currentUser, UUID appointmentId, UpdateAppointmentStatusRequest request) {
+
+        AppointmentEntity appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Appointment not found with id: " + appointmentId)
+                );
+
+        if(!canManageAppointment(appointment, currentUser)){
+            throw new ForbiddenException("You do not have permission to update this appointment");
+        }
+
+        if(request.getStatus() == AppointmentStatus.PENDING){
+            throw new BadRequestException("Status cannot be changed to PENDING");
+        }
+
+        if(request.getStatus() == AppointmentStatus.APPROVED){
+            appointment.setConfirmedDateTime(LocalDateTime.now());
+        }
+
+        appointment.setStatus(request.getStatus());
+        appointment.setResponseNote(request.getResponseNote());
+
+        AppointmentEntity updatedAppointment = appointmentRepository.saveAndFlush(appointment);
+
+        return appointmentMapper.toResponse(updatedAppointment);
+    }
+
     private boolean hasRole(CustomUserDetails user, String roleName) {
         String target = SecurityConstants.ROLE_PREFIX + roleName;
         return user.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(target::equals);
+    }
+
+    private boolean canManageAppointment(AppointmentEntity appointment, CustomUserDetails currentUser) {
+        if (hasRole(currentUser, "SUPER_ADMIN")) {
+            return true;
+        }
+
+        return (hasRole(currentUser, "AGENCY_OWNER") || hasRole(currentUser, "AGENT"))
+                && appointment.getAgency() != null
+                && agencyMemberRepository.existsByAgencyIdAndUserIdAndActiveTrue(
+                appointment.getAgency().getId(), currentUser.getId());
     }
 
 }

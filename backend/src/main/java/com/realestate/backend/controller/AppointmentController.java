@@ -2,8 +2,10 @@ package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.appointment.request.CreateAppointmentRequest;
+import com.realestate.backend.dto.appointment.request.UpdateAppointmentStatusRequest;
 import com.realestate.backend.dto.appointment.response.AppointmentResponse;
 import com.realestate.backend.dto.inquiry.request.CreateInquiryRequest;
+import com.realestate.backend.dto.inquiry.request.UpdateInquiryStatusRequest;
 import com.realestate.backend.dto.inquiry.response.InquiryResponse;
 import com.realestate.backend.enums.AppointmentStatus;
 import com.realestate.backend.enums.InquiryStatus;
@@ -17,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -91,6 +94,23 @@ public class AppointmentController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Appointment list fetched successfully", response)
+        );
+
+    }
+
+    @PatchMapping("/appointments/{appointmentId}/status")
+    @Operation(summary = "Update appointment status")
+    public ResponseEntity<ApiResponse<AppointmentResponse>> updateAppointmentStatus(
+            @PathVariable UUID appointmentId,
+            @Valid @RequestBody UpdateAppointmentStatusRequest request,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+
+        AppointmentResponse response = appointmentService.updateStatus(currentUser, appointmentId, request);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Appointment status updated to "
+                        + request.getStatus() + " successfully.", response)
         );
 
     }
