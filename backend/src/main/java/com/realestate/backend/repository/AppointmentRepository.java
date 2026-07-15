@@ -1,6 +1,8 @@
 package com.realestate.backend.repository;
 
 import com.realestate.backend.entity.AppointmentEntity;
+import com.realestate.backend.enums.AppointmentStatus;
+import com.realestate.backend.enums.InquiryStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,5 +18,7 @@ public interface AppointmentRepository extends JpaRepository<AppointmentEntity, 
     Page<AppointmentEntity> findByProperty_Id(UUID propertyId, Pageable pageable);
 
     Page<AppointmentEntity> findByAgent_Id(UUID agentId, Pageable pageable);
+
+    boolean existsByPropertyIdAndClientIdAndStatus(UUID propertyId, UUID clientId, AppointmentStatus status);
 
 }
