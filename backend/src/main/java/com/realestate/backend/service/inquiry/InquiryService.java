@@ -15,6 +15,8 @@ public interface InquiryService {
 
     Page<InquiryResponse> getClientInquiries(CustomUserDetails currentUser, InquiryStatus status, Pageable pageable);
 
-    Page<InquiryResponse> getAgencyInquiries(CustomUserDetails currentUser, InquiryStatus status, UUID propertyId, Pageable pageable);
+    Page<InquiryResponse> getMyAgencyInquiries(CustomUserDetails currentUser, InquiryStatus status, UUID propertyId, Pageable pageable);
+
+    InquiryResponse getInquiryById(CustomUserDetails currentUser, UUID id);
 
 }

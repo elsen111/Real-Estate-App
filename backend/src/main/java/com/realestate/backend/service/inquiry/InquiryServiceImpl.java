@@ -8,6 +8,7 @@ import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.exception.DuplicateInquiryException;
 import com.realestate.backend.exception.ForbiddenException;
 import com.realestate.backend.exception.ResourceNotFoundException;
+import com.realestate.backend.exception.UnauthorizedException;
 import com.realestate.backend.mapper.inquiry.InquiryMapper;
 import com.realestate.backend.repository.*;
 import com.realestate.backend.security.CustomUserDetails;
@@ -92,19 +93,18 @@ public class InquiryServiceImpl implements InquiryService{
     }
 
     @Override
-    public Page<InquiryResponse> getAgencyInquiries(
+    public Page<InquiryResponse> getMyAgencyInquiries(
             CustomUserDetails currentUser, InquiryStatus status,
             UUID propertyId, Pageable pageable) {
 
         AgencyMemberEntity agencyMember = agencyMemberRepository.findByUser_IdAndActiveTrue(currentUser.getId())
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Agency member not found with user id: " + currentUser.getId())
-                );
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "You are not an active member of any agency"));
 
         UUID agencyId = agencyMember.getAgency().getId();
 
-        if (!canViewAgencyInquiries(agencyId, currentUser)) {
-            throw new ForbiddenException("You do not have permission to view this agency's inquiries");
+        if (!hasRole(currentUser, "AGENCY_OWNER") && !hasRole(currentUser, "AGENT")) {
+            throw new ForbiddenException("You do not have permission to view agency inquiries");
         }
 
         Page<InquiryEntity> inquiries = inquiryRepository
@@ -113,8 +113,41 @@ public class InquiryServiceImpl implements InquiryService{
         return inquiries.map(inquiryMapper::toResponse);
     }
 
+    @Override
+    public InquiryResponse getInquiryById(CustomUserDetails currentUser, UUID inquiryId) {
+
+        InquiryEntity inquiry = inquiryRepository.findById(inquiryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Inquiry not found with id: " + inquiryId));
+
+        if (!canViewInquiry(inquiry, currentUser)) {
+            throw new ResourceNotFoundException("Inquiry not found with id: " + inquiryId);
+        }
+
+        return inquiryMapper.toResponse(inquiry);
+    }
+
+    private boolean canViewInquiry(InquiryEntity inquiry, CustomUserDetails currentUser) {
+        if (hasRole(currentUser, "SUPER_ADMIN")) {
+            return true;
+        }
+
+        boolean isOwnInquiry = inquiry.getClient().getId().equals(currentUser.getId());
+
+        boolean isAgencyMember = inquiry.getAgency() != null
+                && agencyMemberRepository.existsByAgencyIdAndUserIdAndActiveTrue(
+                inquiry.getAgency().getId(), currentUser.getId());
+
+        return isOwnInquiry || isAgencyMember;
+    }
+
     private boolean canViewAgencyInquiries(UUID agencyId, CustomUserDetails currentUser) {
-        return (hasRole(currentUser, "AGENCY_OWNER") || hasRole(currentUser, "AGENT"))
+        if (hasRole(currentUser, "SUPER_ADMIN")) {
+            return true;
+        }
+
+        boolean isAuthorizedRole = hasRole(currentUser, "AGENCY_OWNER") || hasRole(currentUser, "AGENT");
+
+        return isAuthorizedRole
                 && agencyMemberRepository.existsByAgencyIdAndUserIdAndActiveTrue(agencyId, currentUser.getId());
     }
 

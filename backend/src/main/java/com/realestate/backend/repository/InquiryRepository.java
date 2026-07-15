@@ -49,4 +49,9 @@ public interface InquiryRepository extends JpaRepository<InquiryEntity, UUID> {
             @Param("status") InquiryStatus status,
             @Param("propertyId") UUID propertyId,
             Pageable pageable);
+
+    boolean existsByClientId(UUID clientId);
+
+    boolean existsByAgencyId(UUID agencyId);
+
 }

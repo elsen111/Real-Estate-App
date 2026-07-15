@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,10 +70,26 @@ public class InquiryController {
             Pageable pageable
     ) {
 
-        Page<InquiryResponse> response = inquiryService.getAgencyInquiries(currentUser, status, propertyId, pageable);
+        Page<InquiryResponse> response = inquiryService.getMyAgencyInquiries(currentUser, status, propertyId, pageable);
 
         return ResponseEntity.ok(
                 ApiResponse.success("Inquiry list fetched successfully", response)
+        );
+
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/inquiries/{inquiryId}")
+    @Operation(summary = "Get inquiry by id")
+    public ResponseEntity<ApiResponse<InquiryResponse>> getInquiryById(
+            @PathVariable UUID inquiryId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+
+        InquiryResponse response = inquiryService.getInquiryById(currentUser, inquiryId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Inquiry fetched successfully", response)
         );
 
     }
