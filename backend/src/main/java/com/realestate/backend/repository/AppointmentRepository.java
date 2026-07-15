@@ -23,6 +23,8 @@ public interface AppointmentRepository extends JpaRepository<AppointmentEntity, 
 
     boolean existsByPropertyIdAndClientIdAndStatus(UUID propertyId, UUID clientId, AppointmentStatus status);
 
+    boolean existsByClientIdAndId(UUID clientId, UUID appointmentId);
+
     @EntityGraph(attributePaths = {"property", "client", "agent", "agency"})
     Page<AppointmentEntity> findByClientId(UUID clientId, Pageable pageable);
 

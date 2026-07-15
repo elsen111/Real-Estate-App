@@ -2,13 +2,12 @@ package com.realestate.backend.enums;
 
 public enum AppointmentStatus {
         PENDING,
-        CONFIRMED,
+        APPROVED,
         TENTATIVE,
         IN_PROGRESS,
         DELAYED,
         COMPLETED,
-        CANCELLED_BY_AGENT,
-        CANCELLED_BY_CLIENT,
+        CANCELLED,
         RESCHEDULED,
         NO_SHOW,
         REJECTED

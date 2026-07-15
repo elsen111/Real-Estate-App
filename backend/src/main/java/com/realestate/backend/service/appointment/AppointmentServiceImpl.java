@@ -8,6 +8,7 @@ import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.AppointmentStatus;
 import com.realestate.backend.enums.PropertyStatus;
+import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.exception.DuplicateAppointmentException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.appointment.AppointmentMapper;
@@ -84,6 +85,29 @@ public class AppointmentServiceImpl implements AppointmentService {
                 : appointmentRepository.findByClientIdAndStatus(currentUser.getId(), status, pageable);
 
         return inquiries.map(appointmentMapper::toResponse);
+
+    }
+
+    @Override
+    @Transactional
+    public void cancelAppointment(UUID appointmentId, CustomUserDetails currentUser) {
+
+        AppointmentEntity appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id: " + appointmentId));
+
+        if (!appointment.getClient().getId().equals(currentUser.getId())) {
+            throw new ResourceNotFoundException("Appointment not found with id: " + appointmentId);
+        }
+
+        if(
+                appointment.getStatus() != AppointmentStatus.PENDING &&
+                appointment.getStatus() != AppointmentStatus.APPROVED
+        ){
+            throw new BusinessException("Only pending and approved appointments can be cancelled.");
+        }
+
+        appointment.setStatus(AppointmentStatus.CANCELLED);
+        appointmentRepository.saveAndFlush(appointment);
 
     }
 
