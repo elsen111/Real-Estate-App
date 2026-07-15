@@ -50,6 +50,13 @@ public class AppointmentEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
+            name = "agency_id",
+            foreignKey = @ForeignKey(name = "fk_inquiries_agency_id")
+    )
+    private AgencyEntity agency;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
             name = "agent_id",
             foreignKey = @ForeignKey(name = "fk_appointments_agent_id")
     )

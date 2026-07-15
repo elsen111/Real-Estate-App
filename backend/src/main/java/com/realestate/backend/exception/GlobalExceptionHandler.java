@@ -124,6 +124,15 @@ public class GlobalExceptionHandler {
         return error(ex.getMessage(), HttpStatus.CONFLICT, request);
     }
 
+    @ExceptionHandler(DuplicateAppointmentException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateAppointmentException(
+            DuplicateAppointmentException ex,
+            HttpServletRequest request
+    ) {
+        return error(ex.getMessage(), HttpStatus.CONFLICT, request);
+    }
+
+
     @ExceptionHandler(FileStorageException.class)
     public ResponseEntity<ErrorResponse> handleFileStorageException(
             FileStorageException ex,
