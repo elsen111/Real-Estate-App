@@ -199,6 +199,8 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
                         () -> new ResourceNotFoundException("Agency not found with id " + agencyId)
                 );
 
+
+
         AgencySubscriptionEntity agencySubscription = agencySubscriptionRepository
                 .findFirstByAgencyIdAndStatusOrderByEndDateDesc(
                     agencyId,

@@ -52,6 +52,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/properties/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/agencies/*/agents").permitAll()
                         .requestMatchers(HttpMethod.GET, "/agents/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/subscription-plans/**").permitAll()
 
 
                         .requestMatchers(
