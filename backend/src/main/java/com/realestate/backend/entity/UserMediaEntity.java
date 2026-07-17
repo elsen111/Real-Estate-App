@@ -36,7 +36,7 @@ public class UserMediaEntity {
             nullable = false,
             foreignKey = @ForeignKey(name = "fk_user_media_user")
     )
-    private UserEntity  userId;
+    private UserEntity  user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
