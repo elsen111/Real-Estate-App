@@ -109,13 +109,15 @@ public class PropertyServiceImpl implements PropertyService {
 
         PropertyEntity property = getPropertyEntity(propertyId);
 
-        List<PropertyImageResponse> images = mediaFileRepository.findByPropertyIdOrderBySortOrderAsc(propertyId);
+//        List<PropertyImageResponse> images = mediaFileRepository.findByPropertyIdOrderBySortOrderAsc(propertyId);
 
         if(!canView(property, currentUser)) {
             throw new ResourceNotFoundException("Active property not found with id: " + propertyId);
         }
 
-        return propertyMapper.toDetailResponse(property).toBuilder().images(propertyMapper.toImageResponseList(images)).build();
+//        return propertyMapper.toDetailResponse(property).toBuilder().images(propertyMapper.toImageResponseList(images)).build();
+
+        return propertyMapper.toDetailResponse(property);
 
     }
 
@@ -306,16 +308,15 @@ public class PropertyServiceImpl implements PropertyService {
                 .map(PropertyEntity::getId)
                 .toList();
 
-        Map<UUID, String> mainImageByPropertyId = mediaFileRepository
-                .findMainImagesByPropertyIds(propertyIds).stream()
-                .collect(Collectors.toMap(
-                        m -> m.getProperty().getId(),
-                        MediaFileEntity::getFileUrl,
-                        (first, second) -> first
-                ));
+//        Map<UUID, String> mainImageByPropertyId = mediaFileRepository
+//                .findMainImagesByPropertyIds(propertyIds).stream()
+//                .collect(Collectors.toMap(
+//                        m -> m.getProperty().getId(),
+//                        MediaFileEntity::getFileUrl,
+//                        (first, second) -> first
+//                ));
 
-        return propertyPage.map(p ->
-                propertyMapper.toPropertyMapResponse(p, mainImageByPropertyId.get(p.getId()))
+        return propertyPage.map(propertyMapper::toPropertyMapResponse
         );
     }
 

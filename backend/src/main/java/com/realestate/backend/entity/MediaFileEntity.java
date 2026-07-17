@@ -2,9 +2,6 @@ package com.realestate.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -12,66 +9,71 @@ import java.util.UUID;
 @Table(
         name = "media_files",
         indexes = {
-                @Index(name = "idx_media_files_property_id", columnList = "property_id"),
-                @Index(name = "idx_media_files_agency_id", columnList = "agency_id"),
-                @Index(name = "idx_media_files_purpose", columnList = "media_purpose")
+                @Index(name = "idx_media_files_media_type", columnList = "media_type")
         }
 )
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class MediaFileEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "property_id",
-            foreignKey = @ForeignKey(name = "fk_media_files_property")
-    )
-    private PropertyEntity property;
+    @Column(name = "storage_key", nullable = false, length = 500)
+    private String storageKey;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "agency_id",
-            foreignKey = @ForeignKey(name = "fk_media_files_agency")
-    )
-    private AgencyEntity agency;
-
-    @Column(name = "file_url", length = 500, nullable = false)
+    @Column(name = "file_url", nullable = false, length = 1000)
     private String fileUrl;
 
-    @Column(name = "file_name")
-    private String fileName;
+    @Column(name = "original_name", nullable = false)
+    private String originalName;
 
-    @Column(name = "file_type", length = 50)
-    private String fileType;
+    @Column(name = "mime_type", nullable = false, length = 100)
+    private String mimeType;
 
-    @Column(name = "file_size")
-    private Long fileSize;
-
-    @Column(name = "media_purpose", length = 50, nullable = false)
-    private String mediaPurpose;
+    @Column(length = 20)
+    private String extension;
 
     @Builder.Default
     @Column(name = "is_main", nullable = false)
     private boolean isMain = false;
 
-    @Builder.Default
-    @Column(name = "sort_order")
-    private Integer sortOrder = 0;
+    @Column(name = "file_size", nullable = false)
+    private Long fileSize;
 
-    @CreationTimestamp
+    @Column(name = "media_type", nullable = false, length = 20)
+    private String mediaType;
+
+    private Integer width;
+
+    private Integer height;
+
+    @Column(name = "duration_seconds")
+    private Integer durationSeconds;
+
+    @Column(length = 128)
+    private String checksum;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @PrePersist
+    protected void onCreate() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID();
+        }
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }
