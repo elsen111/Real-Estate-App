@@ -30,25 +30,27 @@ public class UserMediaEntity {
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "user_id",
             nullable = false,
-            foreignKey = @ForeignKey(name = "fk_user_media_user")
+            unique = true,
+            foreignKey = @ForeignKey(name = "fk_user_media_user_id")
     )
-    private UserEntity  user;
+    private UserEntity user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "media_id",
             nullable = false,
-            foreignKey = @ForeignKey(name = "fk_user_media_media")
+            foreignKey = @ForeignKey(name = "fk_user_media_media_id")
     )
-    private MediaFileEntity mediaId;
+    private MediaFileEntity media;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "purpose", nullable = false, length = 30)
-    private UserMediaPurpose purpose;
+    private UserMediaPurpose purpose = UserMediaPurpose.AVATAR;
 
     @Builder.Default
     @Column(name = "is_primary", nullable = false)

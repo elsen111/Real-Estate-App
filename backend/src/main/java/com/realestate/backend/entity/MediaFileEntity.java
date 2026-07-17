@@ -1,5 +1,6 @@
 package com.realestate.backend.entity;
 
+import com.realestate.backend.enums.MediaType;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -44,8 +45,9 @@ public class MediaFileEntity {
     @Column(name = "file_size", nullable = false)
     private Long fileSize;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "media_type", nullable = false, length = 20)
-    private String mediaType;
+    private MediaType mediaType;
 
     private Integer width;
 

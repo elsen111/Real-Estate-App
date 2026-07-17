@@ -21,6 +21,7 @@ public class UserResponse {
     private boolean emailVerified;
     private Set<String> roles;
     private String position;
+    private String avatarUrl;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

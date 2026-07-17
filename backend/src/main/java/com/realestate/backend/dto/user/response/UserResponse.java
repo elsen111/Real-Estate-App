@@ -26,6 +26,7 @@ public class UserResponse {
     Boolean emailVerified;
     String position;
     String agency;
+    String avatarUrl;
     LocalDateTime createdAt;
 
 }

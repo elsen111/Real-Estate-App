@@ -35,18 +35,21 @@ public interface UserMapper {
     @Mapping(target = "phoneNumber", source = "phoneNumber")
     @Mapping(target = "roles", source = "user", qualifiedByName = "toRoleNames")
     @Mapping(target = "position", source = "user", qualifiedByName = "resolvePosition")
+    @Mapping(target = "avatarUrl", source = "profilePhotoUrl.media.fileUrl")
     com.realestate.backend.dto.auth.response.UserResponse toSummary(UserEntity user);
 
     @Mapping(target = "phoneNumber", source = "phoneNumber")
     @Mapping(target = "agency", source = "agency.name")
     @Mapping(target = "roles", source = "user", qualifiedByName = "toRoleNames")
     @Mapping(target = "position", source = "user", qualifiedByName = "resolvePosition")
+    @Mapping(target = "avatarUrl", source = "profilePhotoUrl.media.fileUrl")
     UserResponse toAdminResponse(UserEntity user);
 
     @Mapping(target = "phoneNumber", source = "phoneNumber")
     @Mapping(target = "agency", source = "agency.name")
     @Mapping(target = "roles", source = "user", qualifiedByName = "toRoleNames")
     @Mapping(target = "position", source = "user", qualifiedByName = "resolvePosition")
+    @Mapping(target = "avatarUrl", source = "profilePhotoUrl.media.fileUrl")
     UserResponse toAgentResponse(UserEntity user);
 
     @Mapping(target = "id", source = "user.id")
@@ -56,6 +59,7 @@ public interface UserMapper {
     @Mapping(target = "position", source = "user", qualifiedByName = "resolvePosition")
     @Mapping(target = "agencyId", source = "agency.id")
     @Mapping(target = "memberId", source = "id")
+    @Mapping(target = "avatarUrl", source = "user.profilePhotoUrl.media.fileUrl")
     AgentResponse toAgentWithUserIdResponse(AgencyMemberEntity agencyMember);
 
     default Page<UserResponse> toAdminResponse(Page<UserEntity> users) {
