@@ -1,7 +1,8 @@
 package com.realestate.backend.service.media;
 
 import com.realestate.backend.entity.MediaFileEntity;
-import com.realestate.backend.enums.MediaType;
+import com.realestate.backend.enums.MediaFolder;
+import com.realestate.backend.mapper.MediaMapper;
 import com.realestate.backend.repository.MediaFileRepository;
 import com.realestate.backend.storage.StorageService;
 import com.realestate.backend.storage.UploadedFile;
@@ -12,31 +13,34 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class MediaServiceImpl implements MediaService {
 
     private final StorageService storageService;
     private final MediaFileRepository mediaFileRepository;
+    private final MediaMapper mediaMapper;
 
     @Override
-    public MediaFileEntity upload(MultipartFile file) {
+    @Transactional
+    public MediaFileEntity upload(
+            MultipartFile file,
+            MediaFolder folder
+    ) {
 
-        UploadedFile uploaded = storageService.upload(file);
+        UploadedFile uploadedFile =
+                storageService.upload(file, folder);
 
-        MediaFileEntity entity = MediaFileEntity.builder()
-                .storageKey(uploaded.storageKey())
-                .fileUrl(uploaded.url())
-                .originalName(uploaded.originalName())
-                .mimeType(uploaded.mimeType())
-                .fileSize(uploaded.fileSize())
-                .mediaType(
-                        String.valueOf(uploaded.mimeType().startsWith("image")
-                                ? MediaType.IMAGE
-                                : MediaType.VIDEO)
-                )
-                .build();
+        MediaFileEntity media =
+                mediaMapper.toEntity(uploadedFile);
 
-        return mediaFileRepository.saveAndFlush(entity);
+        return mediaFileRepository.save(media);
     }
 
+    @Override
+    @Transactional
+    public void delete(MediaFileEntity media) {
+
+        storageService.delete(media.getStorageKey());
+
+        mediaFileRepository.delete(media);
+    }
 }

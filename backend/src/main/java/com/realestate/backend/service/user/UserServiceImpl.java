@@ -3,20 +3,29 @@ package com.realestate.backend.service.user;
 import com.realestate.backend.dto.auth.response.UserResponse;
 import com.realestate.backend.dto.user.request.DeleteAccountRequest;
 import com.realestate.backend.dto.user.request.UpdateProfileRequest;
+import com.realestate.backend.dto.user.response.UserProfilePhotoResponse;
+import com.realestate.backend.entity.MediaFileEntity;
 import com.realestate.backend.entity.UserEntity;
+import com.realestate.backend.entity.UserMediaEntity;
+import com.realestate.backend.enums.MediaFolder;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.exception.UnauthorizedException;
 import com.realestate.backend.mapper.user.UserMapper;
 import com.realestate.backend.repository.RefreshTokenRepository;
+import com.realestate.backend.repository.UserMediaRepository;
 import com.realestate.backend.repository.UserRepository;
 import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.service.media.MediaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Optional;
 
 import static com.realestate.backend.enums.Role.AGENCY_OWNER;
 
@@ -29,6 +38,9 @@ public class UserServiceImpl implements UserService {
 
     private  final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
+
+    private final UserMediaRepository userMediaRepository;
+    private final MediaService mediaService;
 
     @Override
     @Transactional
@@ -78,6 +90,47 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         refreshTokenRepository.deleteAllByUser(user);
+
+    }
+
+    @Override
+    @Transactional
+    public UserProfilePhotoResponse uploadProfilePhoto(
+            MultipartFile file,
+            CustomUserDetails currentUser
+    ) {
+
+        UserEntity user = userRepository.findById(currentUser.getId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("User not found with this id")
+                );
+
+        Optional<UserMediaEntity> existingPhoto =
+                userMediaRepository.findByUserId(user.getId());
+
+        MediaFileEntity uploadedMedia =
+                mediaService.upload(file, MediaFolder.USER_PROFILE);
+
+        if (existingPhoto.isPresent()) {
+
+            UserMediaEntity userMedia = existingPhoto.get();
+
+            userMediaRepository.delete(userMedia);
+
+            mediaService.delete(userMedia.getMedia());
+
+        }
+
+        UserMediaEntity userMedia = UserMediaEntity.builder()
+                .user(user)
+                .media(uploadedMedia)
+                .build();
+
+        userMediaRepository.save(userMedia);
+
+        return UserProfilePhotoResponse.builder()
+                .photoUrl(uploadedMedia.getFileUrl())
+                .build();
 
     }
 

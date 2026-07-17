@@ -1,6 +1,7 @@
 package com.realestate.backend.entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
 import lombok.*;
 import org.hibernate.annotations.*;
 
@@ -57,6 +58,12 @@ public class UserEntity {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<RoleEntity> roles = new HashSet<>();
+
+    @OneToOne(
+            mappedBy = "user",
+            cascade = CascadeType.ALL
+    )
+    private UserMediaEntity profilePhotoUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agency_id")
