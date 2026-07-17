@@ -64,6 +64,7 @@ public class UserController {
             value = "/me/photo",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
+    @Operation(summary = "Upload/edit profile photo")
     public ResponseEntity<ApiResponse<UserProfilePhotoResponse>> uploadProfilePhoto(
             @RequestPart("file") MultipartFile file,
             @AuthenticationPrincipal CustomUserDetails currentUser
@@ -73,6 +74,23 @@ public class UserController {
                 ApiResponse.success(
                 "Profile photo uploaded successfully",
                 userService.uploadProfilePhoto(file, currentUser)
+                )
+        );
+
+    }
+
+    @DeleteMapping( "/me/photo")
+    @Operation(summary = "Remove profile photo")
+    public ResponseEntity<ApiResponse<Void>> removeProfilePhoto(
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+
+        userService.removeProfilePhoto(currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Profile photo removed successfully",
+                        null
                 )
         );
 

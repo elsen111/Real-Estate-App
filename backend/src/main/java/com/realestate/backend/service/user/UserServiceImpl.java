@@ -134,6 +134,23 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    @Transactional
+    public void removeProfilePhoto(CustomUserDetails currentUser) {
+
+        UserMediaEntity userMedia = userMediaRepository
+                .findByUserId(currentUser.getId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Profile photo not found."
+                        ));
+
+        userMediaRepository.delete(userMedia);
+
+        mediaService.delete(userMedia.getMedia());
+
+    }
+
     private void updatePhoneNumber(
             UserEntity user,
             UpdateProfileRequest request

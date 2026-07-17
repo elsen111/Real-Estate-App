@@ -24,4 +24,6 @@ public interface UserService {
             CustomUserDetails currentUser
     );
 
+    void removeProfilePhoto(CustomUserDetails currentUser);
+
 }
