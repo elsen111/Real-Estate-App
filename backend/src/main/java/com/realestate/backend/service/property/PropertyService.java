@@ -12,7 +12,9 @@ import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.security.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface PropertyService {
@@ -52,5 +54,11 @@ public interface PropertyService {
     PropertySearchSuggestionResponse getSearchSuggestions(String keyword);
 
     Page<PropertyMapResponse> getMapProperties(PropertyMapFilterRequest request, Pageable pageable);
+
+//    List<PropertyMediaResponse> uploadMedia(
+//            UUID propertyId,
+//            List<MultipartFile> files,
+//            CustomUserDetails currentUser
+//    );
 
 }
