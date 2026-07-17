@@ -17,6 +17,6 @@ public class PropertyMapResponse {
     private ListingType listingType;
     private BigDecimal latitude;
     private BigDecimal longitude;
-    private String mainImageUrl;
+//    private String mainImageUrl;
 
 }

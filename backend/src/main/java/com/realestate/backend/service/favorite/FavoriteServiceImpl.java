@@ -107,15 +107,19 @@ public class FavoriteServiceImpl implements FavoriteService {
                 .map(f -> f.getProperty().getId())
                 .toList();
 
-        Map<UUID, String> mainImageByPropertyId = mediaFileRepository
-                .findMainImagesByPropertyIds(propertyIds).stream()
-                .collect(Collectors.toMap(
-                        m -> m.getProperty().getId(),
-                        MediaFileEntity::getFileUrl,
-                        (first, second) -> first
-                ));
+//        Map<UUID, String> mainImageByPropertyId = mediaFileRepository
+//                .findMainImagesByPropertyIds(propertyIds).stream()
+//                .collect(Collectors.toMap(
+//                        m -> m.getProperty().getId(),
+//                        MediaFileEntity::getFileUrl,
+//                        (first, second) -> first
+//                ));
+//        return favorites.map(f ->
+//                propertyMapper.toPublicClientResponseWithImage(f.getProperty(), mainImageByPropertyId.get(f.getProperty().getId()))
+//        );
+
         return favorites.map(f ->
-                propertyMapper.toPublicClientResponseWithImage(f.getProperty(), mainImageByPropertyId.get(f.getProperty().getId()))
+                propertyMapper.toPublicClientResponse(f.getProperty())
         );
     }
 }

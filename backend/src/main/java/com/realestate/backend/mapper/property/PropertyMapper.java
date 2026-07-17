@@ -93,6 +93,9 @@ public interface PropertyMapper {
             List<String> districts
     );
 
-    @Mapping(target = "mainImageUrl", source = "mainImageUrl")
-    PropertyMapResponse toPropertyMapResponse(PropertyEntity property, String mainImageUrl);
+//    @Mapping(target = "mainImageUrl", source = "mainImageUrl")
+//    PropertyMapResponse toPropertyMapResponse(PropertyEntity property, String mainImageUrl);
+
+    PropertyMapResponse toPropertyMapResponse(PropertyEntity property);
+
 }
