@@ -239,4 +239,19 @@ public class PropertyController {
 
     }
 
+    @GetMapping("/{propertyId}/images")
+    @Operation(summary = "Get property images.")
+    public ResponseEntity<ApiResponse<List<PropertyMediaResponse>>> getPropertyMedia(
+        @PathVariable UUID propertyId
+    ){
+
+        List<PropertyMediaResponse> response = propertyService.getPropertyMedia(propertyId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Property media files fetched successfully", response)
+        );
+
+    }
+
+
 }
