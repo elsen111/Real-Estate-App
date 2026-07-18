@@ -2600,38 +2600,7 @@ PATCH /media/{mediaId}/main
 
 ---
 
-## 10.4 Reorder Property Images
-
-```http
-PATCH /properties/{propertyId}/images/reorder
-```
-
-**Authorization:** `AGENCY_ADMIN` who owns property, assigned `AGENT`, or `SUPER_ADMIN`
-
-### Request DTO — `ReorderImagesRequestDTO`
-
-```json
-{
-  "order": [
-    { "mediaId": "uuid-2", "sortOrder": 0 },
-    { "mediaId": "uuid-1", "sortOrder": 1 }
-  ]
-}
-```
-
-### Response
-
-```json
-{
-  "success": true,
-  "message": "Images reordered successfully",
-  "data": null
-}
-```
-
----
-
-## 10.5 Delete Media File
+## 10.4 Delete Media File
 
 ```http
 DELETE /media/{mediaId}
@@ -2693,39 +2662,6 @@ file: logo.jpg  (JPEG/PNG/WEBP, max 5MB)
 
 ```
 - Replaces previous logo; delete old file from storage
-```
-
----
-
-## 10.7 Upload Agency Cover Photo
-
-```http
-POST /agencies/{agencyId}/cover
-```
-
-**Authorization:** `AGENCY_ADMIN` who owns agency, or `SUPER_ADMIN`
-
-**Content-Type:** `multipart/form-data`
-
-### Request
-
-```
-file: cover.jpg  (JPEG/PNG/WEBP, max 10MB)
-```
-
-### Response
-
-```json
-{
-  "success": true,
-  "message": "Agency cover uploaded successfully",
-  "data": {
-    "id": "uuid",
-    "fileUrl": "https://example.com/uploads/agencies/1/cover.jpg",
-    "mediaPurpose": "AGENCY_COVER",
-    "isMain": false
-  }
-}
 ```
 
 ---
