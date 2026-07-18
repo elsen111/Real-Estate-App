@@ -1,6 +1,7 @@
 package com.realestate.backend.service.agency;
 
 import com.realestate.backend.dto.agency.request.AgencyAgentFilterRequest;
+import com.realestate.backend.dto.agency.response.AgencyLogoUploadResponse;
 import com.realestate.backend.dto.property.request.PropertyFilterRequest;
 import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.dto.agency.request.AgencyFilterRequest;
@@ -8,10 +9,12 @@ import com.realestate.backend.dto.agency.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.dto.agency.request.UpdateAgencyRequest;
 import com.realestate.backend.dto.agency.response.AgencyResponse;
 import com.realestate.backend.dto.agency.response.AgencySubscriptionResponse;
+import com.realestate.backend.dto.user.response.UserProfilePhotoResponse;
 import com.realestate.backend.dto.user.response.UserResponse;
 import com.realestate.backend.security.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -51,6 +54,11 @@ public interface AgencyService {
             UUID  agencyId,
             AgencyAgentFilterRequest filterRequest,
             Pageable pageable
+    );
+
+    AgencyLogoUploadResponse uploadLogo(
+            MultipartFile file,
+            CustomUserDetails currentUser
     );
 
 }

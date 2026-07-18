@@ -29,7 +29,7 @@ public class AgencyMediaEntity {
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "agency_id",
             nullable = false,
@@ -43,11 +43,12 @@ public class AgencyMediaEntity {
             nullable = false,
             foreignKey = @ForeignKey(name = "fk_agency_media_media")
     )
-    private MediaFileEntity mediaId;
+    private MediaFileEntity media;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "purpose", nullable = false, length = 30)
-    private AgencyMediaPurpose purpose;
+    private AgencyMediaPurpose purpose = AgencyMediaPurpose.LOGO;
 
     @Builder.Default
     @Column(name = "is_primary", nullable = false)

@@ -2,6 +2,7 @@ package com.realestate.backend.entity;
 
 import com.realestate.backend.enums.AgencyStatus;
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
 import lombok.*;
 import org.hibernate.annotations.*;
 
@@ -40,8 +41,11 @@ public class AgencyEntity {
     @Column(name = "website")
     private String website;
 
-    @Column(name = "logo_url", length = 500)
-    private String logoUrl;
+    @OneToOne(
+            mappedBy = "agency",
+            cascade = CascadeType.ALL
+    )
+    private AgencyMediaEntity logoUrl;
 
     @Column(name = "city", nullable = false, length = 100)
     private String city;

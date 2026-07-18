@@ -1,6 +1,7 @@
 package com.realestate.backend.service.agency;
 
 import com.realestate.backend.dto.agency.request.AgencyAgentFilterRequest;
+import com.realestate.backend.dto.agency.response.AgencyLogoUploadResponse;
 import com.realestate.backend.dto.property.request.PropertyFilterRequest;
 import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.dto.agency.request.AgencyFilterRequest;
@@ -8,29 +9,31 @@ import com.realestate.backend.dto.agency.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.dto.agency.request.UpdateAgencyRequest;
 import com.realestate.backend.dto.agency.response.AgencyResponse;
 import com.realestate.backend.dto.agency.response.AgencySubscriptionResponse;
+import com.realestate.backend.dto.user.response.UserProfilePhotoResponse;
 import com.realestate.backend.dto.user.response.UserResponse;
 import com.realestate.backend.entity.*;
+import com.realestate.backend.enums.MediaFolder;
 import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.agency.AgencyMapper;
 import com.realestate.backend.mapper.property.PropertyMapper;
 import com.realestate.backend.mapper.user.UserMapper;
-import com.realestate.backend.repository.AgencyRepository;
-import com.realestate.backend.repository.AgencySubscriptionRepository;
-import com.realestate.backend.repository.PropertyRepository;
-import com.realestate.backend.repository.UserRepository;
+import com.realestate.backend.repository.*;
 import com.realestate.backend.repository.specification.AgencyAgentSpecification;
 import com.realestate.backend.repository.specification.AgencyPropertySpecification;
 import com.realestate.backend.repository.specification.AgencySpecification;
 import com.realestate.backend.repository.specification.PropertySpecification;
 import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.service.media.MediaService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -45,8 +48,11 @@ public class AgencyServiceImpl implements AgencyService {
 
     private final AgencySubscriptionRepository agencySubscriptionRepository;
 
-   private final PropertyRepository propertyRepository;
-   private final PropertyMapper propertyMapper;
+    private final PropertyRepository propertyRepository;
+    private final PropertyMapper propertyMapper;
+    private final AgencyMediaRepository agencyMediaRepository;
+
+    private final MediaService mediaService;
 
     @Override
     public AgencyResponse getCurrentAgency(CustomUserDetails currentUser) {
@@ -218,6 +224,53 @@ public class AgencyServiceImpl implements AgencyService {
 
         return userRepository.findAll(specification, pageable)
                 .map(userMapper::toAgentResponse);
+
+    }
+
+    @Override
+    @Transactional
+    public AgencyLogoUploadResponse uploadLogo(
+            MultipartFile file,
+            CustomUserDetails currentUser
+    ) {
+
+         UserEntity user = userRepository.findById(currentUser.getId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("User not found with this id")
+                );
+
+         AgencyEntity agency = user.getAgency();
+
+         if(agency == null) {
+             throw new ResourceNotFoundException("This user doesn't belong to any agency: " + currentUser.getId());
+         }
+
+        Optional<AgencyMediaEntity> existingLogo =
+                agencyMediaRepository.findByAgencyId(agency.getId());
+
+        MediaFileEntity uploadedMedia =
+                mediaService.upload(file, MediaFolder.AGENCY_LOGO);
+
+        if (existingLogo.isPresent()) {
+
+            AgencyMediaEntity agencyMedia = existingLogo.get();
+
+            agencyMediaRepository.delete(agencyMedia);
+
+            mediaService.delete(agencyMedia.getMedia());
+
+        }
+
+        AgencyMediaEntity agencyMedia = AgencyMediaEntity.builder()
+                .agency(agency)
+                .media(uploadedMedia)
+                .build();
+
+        agencyMediaRepository.save(agencyMedia);
+
+        return AgencyLogoUploadResponse.builder()
+                .logoUrl(uploadedMedia.getFileUrl())
+                .build();
 
     }
 

@@ -7,13 +7,14 @@ import com.realestate.backend.dto.property.request.PropertyRequest;
 import com.realestate.backend.dto.property.response.*;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.entity.UserEntity;
+import com.realestate.backend.mapper.agency.AgencyMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = AgencyMapper.class)
 public interface PropertyMapper {
 
     AdminAgencyPropertyResponse toAdminResponse(PropertyEntity property);
@@ -32,7 +33,7 @@ public interface PropertyMapper {
     PropertyResponse toCreateResponse(PropertyEntity property);
 
     @Mapping(target = "propertyType", source = "category.name")
-    @Mapping(target = "agency", source = "agency")
+    @Mapping(target = "agency", source = "agency", qualifiedByName = "propertyAgency")
     @Mapping(target = "agent", source = "assignedAgent")
     @Mapping(target = "propertyStatus", source = "status")
     @Mapping(target = "images", ignore = true)

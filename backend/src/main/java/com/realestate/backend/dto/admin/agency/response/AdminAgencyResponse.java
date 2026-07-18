@@ -5,6 +5,7 @@ import com.realestate.backend.dto.admin.property.response.AdminAgencyPropertyRes
 import com.realestate.backend.dto.agency.response.AgencyOwnerResponse;
 import com.realestate.backend.dto.agency.response.AgencyStatisticsResponse;
 import com.realestate.backend.dto.agency.response.AgencySubscriptionResponse;
+import com.realestate.backend.entity.AgencyMediaEntity;
 import com.realestate.backend.enums.AgencyStatus;
 import lombok.Builder;
 import lombok.Getter;
