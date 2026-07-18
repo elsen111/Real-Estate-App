@@ -28,4 +28,6 @@ public interface PropertyMediaRepository extends JpaRepository<PropertyMediaEnti
 
     List<PropertyMediaEntity> findByPropertyIdInAndIsPrimaryTrue(List<UUID> propertyIds);
 
+    PropertyMediaEntity findByPropertyIdAndIsPrimary(UUID propertyId, boolean isPrimary);
+
 }

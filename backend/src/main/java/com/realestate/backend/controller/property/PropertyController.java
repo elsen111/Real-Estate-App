@@ -253,5 +253,22 @@ public class PropertyController {
 
     }
 
+    @PatchMapping("/{propertyId}/media/{mediaId}")
+    @Operation(summary = "Set the primary image for property")
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT')")
+    public ResponseEntity<ApiResponse<List<SetPropertyMediaResponse>>> setPrimaryImage(
+            @PathVariable UUID propertyId,
+            @PathVariable UUID mediaId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ){
+
+        List<SetPropertyMediaResponse> response = propertyService.setPrimaryImage(propertyId, mediaId, currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Media has been set as primary", response)
+        );
+
+    }
+
 
 }

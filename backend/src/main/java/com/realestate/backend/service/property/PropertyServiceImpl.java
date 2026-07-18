@@ -362,6 +362,54 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
+    public List<SetPropertyMediaResponse> setPrimaryImage(UUID propertyId, UUID propertyMediaId, CustomUserDetails currentUser) {
+
+        UserEntity user = userRepository.findById(currentUser.getId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("User not found with id " + currentUser.getId())
+                );
+
+        PropertyEntity property = propertyRepository.findById(propertyId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Property not found with id " + propertyId)
+                );
+
+        if(user.getAgency() == null) {
+            throw new ResourceNotFoundException("No agency exists for this user.");
+        }
+
+        if(!propertyMediaRepository.existsById(propertyMediaId)) {
+            throw new ResourceNotFoundException("Property media not found with id " + propertyMediaId);
+        }
+
+        havePermissionOverProperty(property, user.getAgency(), currentUser);
+
+        List<PropertyMediaEntity> mediaFiles = propertyMediaRepository.findByPropertyIdOrderBySortOrderAsc(propertyId);
+
+        PropertyMediaEntity primaryMediaFile = propertyMediaRepository.findByPropertyIdAndIsPrimary(propertyId, true);
+
+        primaryMediaFile.setIsPrimary(false);
+        propertyMediaRepository.save(primaryMediaFile);
+
+        if(mediaFiles.isEmpty()) {
+            throw new ResourceNotFoundException("This property doesn't have uploaded images");
+        }
+
+        for (PropertyMediaEntity mediaFile : mediaFiles) {
+
+            if(mediaFile.getId().equals(propertyMediaId)) {
+                mediaFile.setIsPrimary(true);
+                propertyMediaRepository.save(mediaFile);
+                break;
+            }
+
+        }
+
+        return mediaFiles.stream()
+                .map(propertyMapper::toMediaPriorityResponse).toList();
+    }
+
+    @Override
     @Transactional
     public List<PropertyMediaResponse> uploadMedia(
             UUID propertyId,
