@@ -60,4 +60,6 @@ public interface PropertyService {
 
     List<PropertyMediaResponse> getPropertyMedia(UUID propertyId);
 
+    List<SetPropertyMediaResponse> setPrimaryImage(UUID propertyId, UUID propertyMediaId, CustomUserDetails currentUser);
+
 }

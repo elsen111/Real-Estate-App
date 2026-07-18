@@ -107,11 +107,10 @@ public interface PropertyMapper {
     @Mapping(target = "fileSize", source = "propertyMedia.media.fileSize")
     PropertyMediaResponse toMediaResponse(PropertyMediaEntity propertyMedia);
 
-    @Mapping(target = "fileUrl", source = "propertyMedia.media.fileUrl")
-    @Mapping(target = "fileName", ignore = true)
-    @Mapping(target = "fileType", ignore = true)
-    @Mapping(target = "fileSize", ignore = true)
-    PropertyMediaResponse toMediaList(PropertyMediaEntity propertyMedia);
+    SetPropertyMediaResponse toMediaPriorityResponse(PropertyMediaEntity propertyMedia);
+
+//    @Mapping(target = "fileUrl", source = "propertyMedia.media.fileUrl")
+//    SetPropertyMediaResponse toMediaList(PropertyMediaEntity propertyMedia);
 
 //    List<PropertyMediaResponse> toResponseList(
 //            List<PropertyMediaEntity> entities
