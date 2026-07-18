@@ -5,10 +5,7 @@ import com.realestate.backend.dto.property.request.PropertyMapFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyRequest;
 import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyStatusRequest;
-import com.realestate.backend.dto.property.response.PropertyDetailResponse;
-import com.realestate.backend.dto.property.response.PropertyMapResponse;
-import com.realestate.backend.dto.property.response.PropertyResponse;
-import com.realestate.backend.dto.property.response.PropertySearchSuggestionResponse;
+import com.realestate.backend.dto.property.response.*;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.property.PropertyService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,11 +14,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -216,6 +216,25 @@ public class PropertyController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Properties map details fetched successfully", response)
+        );
+
+    }
+
+    @PostMapping(
+            value = "/{propertyId}/media",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    @Operation(summary = "Upload property media files.")
+    public ResponseEntity<ApiResponse<List<PropertyMediaResponse>>> uploadPropertyMedia(
+            @PathVariable UUID propertyId,
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            @RequestPart("files") List<MultipartFile> files
+    ){
+
+        List<PropertyMediaResponse> response = propertyService.uploadMedia(propertyId, files, currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Property media files uploaded successfully", response)
         );
 
     }

@@ -6,6 +6,7 @@ import com.realestate.backend.dto.media.response.PropertyImageResponse;
 import com.realestate.backend.dto.property.request.PropertyRequest;
 import com.realestate.backend.dto.property.response.*;
 import com.realestate.backend.entity.PropertyEntity;
+import com.realestate.backend.entity.PropertyMediaEntity;
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.mapper.agency.AgencyMapper;
 import org.mapstruct.Mapper;
@@ -19,6 +20,7 @@ public interface PropertyMapper {
 
     AdminAgencyPropertyResponse toAdminResponse(PropertyEntity property);
 
+    @Mapping(target = "assignedAgentName", source = "assignedAgent.fullName")
     PropertyResponse toAdminPropertyResponse(PropertyEntity property);
 
     @Mapping(target = "status", ignore = true)
@@ -98,5 +100,21 @@ public interface PropertyMapper {
 //    PropertyMapResponse toPropertyMapResponse(PropertyEntity property, String mainImageUrl);
 
     PropertyMapResponse toPropertyMapResponse(PropertyEntity property);
+
+    @Mapping(target = "fileUrl", source = "propertyMedia.media.fileUrl")
+    @Mapping(target = "fileName", source = "propertyMedia.media.originalName")
+    @Mapping(target = "fileType", source = "propertyMedia.media.mimeType")
+    @Mapping(target = "fileSize", source = "propertyMedia.media.fileSize")
+    PropertyMediaResponse toMediaResponse(PropertyMediaEntity propertyMedia);
+
+    @Mapping(target = "fileUrl", source = "propertyMedia.media.fileUrl")
+    @Mapping(target = "fileName", ignore = true)
+    @Mapping(target = "fileType", ignore = true)
+    @Mapping(target = "fileSize", ignore = true)
+    PropertyMediaResponse toMediaList(PropertyMediaEntity propertyMedia);
+
+//    List<PropertyMediaResponse> toResponseList(
+//            List<PropertyMediaEntity> entities
+//    );
 
 }

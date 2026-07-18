@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -62,6 +63,8 @@ public class PropertyResponse {
     private boolean featured;
 
     private Long viewCount;
+
+    private List<PropertyMediaResponse> images;
 
     private LocalDateTime createdAt;
 

@@ -4,10 +4,7 @@ import com.realestate.backend.dto.property.request.PropertyMapFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyRequest;
 import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyStatusRequest;
-import com.realestate.backend.dto.property.response.PropertyDetailResponse;
-import com.realestate.backend.dto.property.response.PropertyMapResponse;
-import com.realestate.backend.dto.property.response.PropertyResponse;
-import com.realestate.backend.dto.property.response.PropertySearchSuggestionResponse;
+import com.realestate.backend.dto.property.response.*;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.security.CustomUserDetails;
 import org.springframework.data.domain.Page;
@@ -55,10 +52,10 @@ public interface PropertyService {
 
     Page<PropertyMapResponse> getMapProperties(PropertyMapFilterRequest request, Pageable pageable);
 
-//    List<PropertyMediaResponse> uploadMedia(
-//            UUID propertyId,
-//            List<MultipartFile> files,
-//            CustomUserDetails currentUser
-//    );
+    List<PropertyMediaResponse> uploadMedia(
+            UUID propertyId,
+            List<MultipartFile> files,
+            CustomUserDetails currentUser
+    );
 
 }

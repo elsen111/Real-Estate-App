@@ -8,6 +8,7 @@ import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.PropertyType;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
+@Setter
 @Builder(toBuilder = true)
 public class PropertyDetailResponse {
 
@@ -36,7 +38,7 @@ public class PropertyDetailResponse {
     private BigDecimal longitude;
     private PropertyStatus propertyStatus;
     private Boolean featured;
-    private List<PropertyImageResponse> images;
+    private List<PropertyMediaResponse> images;
     private AgencyResponse agency;
     private AgentResponse agent;
     private LocalDateTime createdAt;
