@@ -62,4 +62,6 @@ public interface PropertyService {
 
     List<SetPropertyMediaResponse> setPrimaryImage(UUID propertyId, UUID propertyMediaId, CustomUserDetails currentUser);
 
+    void removePropertyMediaFile(CustomUserDetails currentUser, UUID propertyMediaId);
+
 }

@@ -81,4 +81,5 @@ public interface PropertyRepository extends JpaRepository<PropertyEntity, UUID>,
     """)
     List<String> findMatchingDistricts(@Param("keyword") String keyword, Pageable pageable);
 
+    boolean existsByAgencyId(UUID id);
 }

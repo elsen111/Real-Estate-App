@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface PropertyMediaRepository extends JpaRepository<PropertyMediaEntity, UUID> {
@@ -30,4 +31,5 @@ public interface PropertyMediaRepository extends JpaRepository<PropertyMediaEnti
 
     PropertyMediaEntity findByPropertyIdAndIsPrimary(UUID propertyId, boolean isPrimary);
 
+    Optional<PropertyMediaEntity> findFirstByPropertyIdOrderBySortOrderAsc(UUID id);
 }

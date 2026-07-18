@@ -411,6 +411,58 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     @Transactional
+    public void removePropertyMediaFile(
+            CustomUserDetails currentUser,
+            UUID propertyMediaId
+    ) {
+
+        UserEntity user = getCurrentUser(currentUser.getId());
+
+        if (user.getAgency() == null) {
+            throw new ResourceNotFoundException(
+                    "No agency exists for this user."
+            );
+        }
+
+        PropertyMediaEntity propertyMedia =
+                propertyMediaRepository.findById(propertyMediaId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Property media not found."
+                                ));
+
+        PropertyEntity property = propertyMedia.getProperty();
+
+        havePermissionOverProperty(
+                property,
+                user.getAgency(),
+                currentUser
+        );
+
+        boolean wasPrimary = propertyMedia.getIsPrimary();
+
+        propertyMediaRepository.delete(propertyMedia);
+
+        mediaService.delete(propertyMedia.getMedia());
+
+        if (wasPrimary) {
+
+            propertyMediaRepository
+                    .findFirstByPropertyIdOrderBySortOrderAsc(property.getId())
+                    .ifPresent(media -> {
+
+                        media.setIsPrimary(true);
+
+                        propertyMediaRepository.save(media);
+
+                    });
+
+        }
+
+    }
+
+    @Override
+    @Transactional
     public List<PropertyMediaResponse> uploadMedia(
             UUID propertyId,
             List<MultipartFile> files,

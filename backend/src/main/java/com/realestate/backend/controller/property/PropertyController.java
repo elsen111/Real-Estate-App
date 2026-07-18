@@ -270,5 +270,21 @@ public class PropertyController {
 
     }
 
+    @DeleteMapping("/media/{mediaId}")
+    @Operation(summary = "Delete the media image.")
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT')")
+    public ResponseEntity<ApiResponse<Void>> deleteImage(
+            @PathVariable UUID mediaId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ){
+
+        propertyService.removePropertyMediaFile(currentUser, mediaId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Media image deleted successfully", null)
+        );
+
+    }
+
 
 }
