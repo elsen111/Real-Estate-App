@@ -7,28 +7,31 @@ import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
 import com.realestate.backend.dto.property.request.PropertyStatusRequest;
 import com.realestate.backend.dto.property.response.*;
 import com.realestate.backend.entity.*;
+import com.realestate.backend.enums.MediaFolder;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.enums.SubscriptionStatus;
-import com.realestate.backend.exception.BadRequestException;
-import com.realestate.backend.exception.ConflictException;
-import com.realestate.backend.exception.ResourceNotFoundException;
-import com.realestate.backend.exception.UnauthorizedException;
+import com.realestate.backend.exception.*;
 import com.realestate.backend.mapper.property.PropertyMapper;
 import com.realestate.backend.repository.*;
 import com.realestate.backend.repository.specification.PropertySpecification;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.security.SecurityConstants;
+import com.realestate.backend.service.media.MediaService;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -45,6 +48,8 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyRepository propertyRepository;
     private final PropertyMapper propertyMapper;
     private final MediaFileRepository mediaFileRepository;
+    private final PropertyMediaRepository propertyMediaRepository;
+    private final MediaService mediaService;
 
     private static final int MAP_RESULTS_LIMIT = 500;
 
@@ -100,8 +105,7 @@ public class PropertyServiceImpl implements PropertyService {
         Specification<PropertyEntity> specification = PropertySpecification
                 .withDetailedPublicFilter(filter);
 
-        return propertyRepository.findAll(specification, pageable)
-                .map(propertyMapper::toPublicClientResponse);
+        return getPropertyResponses(pageable, specification);
     }
 
     @Override
@@ -115,9 +119,21 @@ public class PropertyServiceImpl implements PropertyService {
             throw new ResourceNotFoundException("Active property not found with id: " + propertyId);
         }
 
+        PropertyDetailResponse propertyDetails =
+                propertyMapper.toDetailResponse(property);
+
+        List<PropertyMediaEntity> mediaFiles =
+                propertyMediaRepository
+                        .findByPropertyIdOrderBySortOrderAsc(propertyId);
+
+        List<PropertyMediaResponse> images = mediaFiles.stream()
+                .map(propertyMapper::toMediaResponse).toList();
+
+        propertyDetails.setImages(images);
+
 //        return propertyMapper.toDetailResponse(property).toBuilder().images(propertyMapper.toImageResponseList(images)).build();
 
-        return propertyMapper.toDetailResponse(property);
+        return propertyDetails;
 
     }
 
@@ -241,8 +257,26 @@ public class PropertyServiceImpl implements PropertyService {
                 .withFeaturedPublicFilter(filter)
                 .and(PropertySpecification.isFeatured(true));;
 
-        return propertyRepository.findAll(specification, pageable)
-                .map(propertyMapper::toPublicClientResponse);
+        return getPropertyResponses(pageable, specification);
+
+//        return propertyRepository.findAll(specification, pageable)
+//                .map(propertyMapper::toPublicClientResponse);
+    }
+
+    @NonNull
+    private Page<PropertyResponse> getPropertyResponses(Pageable pageable, Specification<PropertyEntity> specification) {
+        Page<PropertyEntity> propertyPage = propertyRepository.findAll(specification, pageable);
+
+        Map<UUID, String> mainImageByPropertyId = getMainImagesByPropertyIds(
+                propertyPage.getContent().stream().map(PropertyEntity::getId).toList()
+        );
+
+        return propertyPage.map(property ->
+                propertyMapper.toPublicClientResponseWithImage(
+                        property,
+                        mainImageByPropertyId.get(property.getId())
+                )
+        );
     }
 
     @Override
@@ -252,8 +286,11 @@ public class PropertyServiceImpl implements PropertyService {
 
         Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        return propertyRepository.findAll(specification, pageable)
-                .map(propertyMapper::toPublicClientResponse);
+//        return propertyRepository.findAll(specification, pageable)
+//                .map(propertyMapper::toPublicClientResponse);
+
+        return getPropertyResponses(pageable, specification);
+
     }
 
     @Override
@@ -268,8 +305,10 @@ public class PropertyServiceImpl implements PropertyService {
                 ? strictSpec
                 : PropertySpecification.withSimilarityFilterRelaxed(refProperty);
 
-        return propertyRepository.findAll(effectiveSpec, pageable)
-                .map(propertyMapper::toPublicClientResponse);
+        return getPropertyResponses(pageable, effectiveSpec);
+
+//        return propertyRepository.findAll(effectiveSpec, pageable)
+//                .map(propertyMapper::toPublicClientResponse);
 
     }
 
@@ -319,6 +358,90 @@ public class PropertyServiceImpl implements PropertyService {
         return propertyPage.map(propertyMapper::toPropertyMapResponse
         );
     }
+
+    @Override
+    @Transactional
+    public List<PropertyMediaResponse> uploadMedia(
+            UUID propertyId,
+            List<MultipartFile> files,
+            CustomUserDetails currentUser
+    ) {
+
+        UserEntity user = userRepository.findById(currentUser.getId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("User not found with id " + currentUser.getId())
+                );
+
+        PropertyEntity property = getManagedProperty(propertyId, currentUser, user.getAgency());
+
+        validateFiles(files);
+
+        validatePropertyMediaLimit(property, files.size());
+
+        int nextSortOrder = getNextSortOrder(property);
+
+        List<PropertyMediaResponse> responses = new ArrayList<>();
+
+        boolean hasMainImage = propertyMediaRepository
+                .existsByPropertyIdAndIsPrimaryTrue(property.getId());
+
+        for (MultipartFile file : files) {
+
+            MediaFolder folder = resolveFolder(file);
+
+            MediaFileEntity media = mediaService.upload(file, folder);
+
+            PropertyMediaEntity propertyMedia = PropertyMediaEntity.builder()
+                    .property(property)
+                    .media(media)
+                    .isPrimary(!hasMainImage)
+                    .sortOrder(nextSortOrder++)
+                    .build();
+
+            propertyMediaRepository.save(propertyMedia);
+
+            responses.add(
+                    propertyMapper.toMediaResponse(propertyMedia)
+            );
+
+            hasMainImage = true;
+        }
+
+        return responses;
+    }
+
+    private Map<UUID, String> getMainImagesByPropertyIds(List<UUID> propertyIds) {
+        if (propertyIds.isEmpty()) {
+            return Map.of();
+        }
+
+        return propertyMediaRepository.findByPropertyIdInAndIsPrimaryTrue(propertyIds).stream()
+                .collect(Collectors.toMap(
+                        m -> m.getProperty().getId(),
+                        m -> m.getMedia().getFileUrl(),
+                        (first, second) -> first
+                ));
+    }
+
+//    private void attachMedia(PropertyResponse response) {
+//
+//        List<PropertyMediaEntity> media =
+//                propertyMediaRepository.findByPropertyIdOrderBySortOrderAsc(
+//                        response.getId()
+//                );
+//
+//        response.setMedia(
+//                propertyMapper.toResponseList(media)
+//        );
+//
+//        media.stream()
+//                .filter(PropertyMediaEntity::getIsPrimary)
+//                .findFirst()
+//                .ifPresent(item ->
+//                        response.setMainImageUrl(
+//                                item.getMedia().getFileUrl()
+//                        ));
+//    }
 
     private UserEntity getCurrentUser(UUID userId) {
 
@@ -424,4 +547,117 @@ public class PropertyServiceImpl implements PropertyService {
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(target::equals);
     }
+
+    private PropertyEntity getManagedProperty(
+            UUID propertyId,
+            CustomUserDetails currentUser,
+            AgencyEntity agency
+    ) {
+
+        PropertyEntity property = propertyRepository.findById(propertyId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Property not found."));
+
+        havePermissionOverProperty(property, agency, currentUser);
+
+        return property;
+    }
+
+    private void validateFiles(List<MultipartFile> files) {
+
+        if (files == null || files.isEmpty()) {
+            throw new FileStorageException(
+                    "At least one file is required."
+            );
+        }
+
+        if (files.size() > 20) {
+            throw new FileStorageException(
+                    "Maximum 20 files can be uploaded at once."
+            );
+        }
+
+        for (MultipartFile file : files) {
+
+            if (file.isEmpty()) {
+                throw new FileStorageException(
+                        "One of the uploaded files is empty."
+                );
+            }
+
+            if (file.getSize() > 10 * 1024 * 1024) {
+                throw new FileStorageException(
+                        "Each file must not exceed 10 MB."
+                );
+            }
+
+            String contentType = file.getContentType();
+
+            if (contentType == null) {
+                throw new FileStorageException(
+                        "Unknown file type."
+                );
+            }
+
+            if (!(contentType.startsWith("image/")
+                    || contentType.startsWith("video/"))) {
+
+                throw new FileStorageException(
+                        "Only image and video files are allowed."
+                );
+            }
+        }
+    }
+
+    private void validatePropertyMediaLimit(
+            PropertyEntity property,
+            int newFiles
+    ) {
+
+        long existing =
+                propertyMediaRepository.countByPropertyId(
+                        property.getId()
+                );
+
+        if (existing + newFiles > 20) {
+
+            throw new FileStorageException(
+                    "A property can contain a maximum of 20 media files."
+            );
+
+        }
+
+    }
+
+    private int getNextSortOrder(PropertyEntity property) {
+
+        Integer max =
+                propertyMediaRepository
+                        .findMaxSortOrder(property.getId());
+
+        return max == null
+                ? 0
+                : max + 1;
+
+    }
+
+    private MediaFolder resolveFolder(MultipartFile file) {
+
+        String type = file.getContentType();
+
+        assert type != null;
+        if (type.startsWith("image/")) {
+            return MediaFolder.PROPERTY_IMAGE;
+        }
+
+        if (type.startsWith("video/")) {
+            return MediaFolder.PROPERTY_VIDEO;
+        }
+
+        throw new FileStorageException(
+                "Unsupported media type."
+        );
+
+    }
+
 }

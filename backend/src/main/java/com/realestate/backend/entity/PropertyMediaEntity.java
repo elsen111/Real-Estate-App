@@ -43,7 +43,7 @@ public class PropertyMediaEntity {
             nullable = false,
             foreignKey = @ForeignKey(name = "fk_property_media_media")
     )
-    private MediaFileEntity mediaId;
+    private MediaFileEntity media;
 
     @Builder.Default
     @Column(name = "is_primary", nullable = false)
