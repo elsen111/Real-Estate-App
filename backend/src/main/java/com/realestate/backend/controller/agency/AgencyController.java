@@ -2,6 +2,7 @@ package com.realestate.backend.controller.agency;
 
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.agency.request.AgencyAgentFilterRequest;
+import com.realestate.backend.dto.agency.response.AgencyLogoUploadResponse;
 import com.realestate.backend.dto.property.request.PropertyFilterRequest;
 import com.realestate.backend.dto.property.response.PropertyResponse;
 import com.realestate.backend.dto.agency.request.AgencyFilterRequest;
@@ -18,10 +19,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -58,6 +61,25 @@ public class AgencyController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Agency information updated successfully", response)
+        );
+
+    }
+
+    @PostMapping(
+            value = "/me/logo",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER', 'AGENT')")
+    @Operation(summary = "Update agency profile logo")
+    public ResponseEntity<ApiResponse<AgencyLogoUploadResponse>> uploadAgencyLogo(
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            @RequestPart("file") MultipartFile file
+    ) {
+
+        AgencyLogoUploadResponse response = agencyService.uploadLogo(file, currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Agency logo uploaded successfully", response)
         );
 
     }

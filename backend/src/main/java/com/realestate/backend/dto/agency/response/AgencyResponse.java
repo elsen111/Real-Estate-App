@@ -1,6 +1,7 @@
 package com.realestate.backend.dto.agency.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.realestate.backend.entity.AgencyMediaEntity;
 import com.realestate.backend.enums.AgencyStatus;
 import lombok.Builder;
 import lombok.Getter;
