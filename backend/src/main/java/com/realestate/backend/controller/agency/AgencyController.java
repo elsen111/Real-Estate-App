@@ -186,4 +186,21 @@ public class AgencyController {
 
     }
 
+    @DeleteMapping( "/me/logo")
+    @Operation(summary = "Remove agency logo")
+    public ResponseEntity<ApiResponse<Void>> removeAgencyLogo(
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+
+        agencyService.removeAgencyLogo(currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Agency logo removed successfully",
+                        null
+                )
+        );
+
+    }
+
 }

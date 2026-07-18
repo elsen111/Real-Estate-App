@@ -61,4 +61,6 @@ public interface AgencyService {
             CustomUserDetails currentUser
     );
 
+    void removeAgencyLogo(CustomUserDetails currentUser);
+
 }

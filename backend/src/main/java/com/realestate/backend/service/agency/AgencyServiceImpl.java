@@ -274,4 +274,26 @@ public class AgencyServiceImpl implements AgencyService {
 
     }
 
+    @Override
+    @Transactional
+    public void removeAgencyLogo(CustomUserDetails currentUser) {
+
+        UserEntity user = userRepository.findById(currentUser.getId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("User not found with id " + currentUser.getId())
+                );
+
+        AgencyMediaEntity agencyMedia = agencyMediaRepository
+                .findByAgencyId(user.getAgency().getId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Logo not found."
+                        ));
+
+        agencyMediaRepository.delete(agencyMedia);
+
+        mediaService.delete(agencyMedia.getMedia());
+
+    }
+
 }
