@@ -58,4 +58,6 @@ public interface PropertyService {
             CustomUserDetails currentUser
     );
 
+    List<PropertyMediaResponse> getPropertyMedia(UUID propertyId);
+
 }

@@ -113,8 +113,6 @@ public class PropertyServiceImpl implements PropertyService {
 
         PropertyEntity property = getPropertyEntity(propertyId);
 
-//        List<PropertyImageResponse> images = mediaFileRepository.findByPropertyIdOrderBySortOrderAsc(propertyId);
-
         if(!canView(property, currentUser)) {
             throw new ResourceNotFoundException("Active property not found with id: " + propertyId);
         }
@@ -286,9 +284,6 @@ public class PropertyServiceImpl implements PropertyService {
 
         Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-//        return propertyRepository.findAll(specification, pageable)
-//                .map(propertyMapper::toPublicClientResponse);
-
         return getPropertyResponses(pageable, specification);
 
     }
@@ -306,9 +301,6 @@ public class PropertyServiceImpl implements PropertyService {
                 : PropertySpecification.withSimilarityFilterRelaxed(refProperty);
 
         return getPropertyResponses(pageable, effectiveSpec);
-
-//        return propertyRepository.findAll(effectiveSpec, pageable)
-//                .map(propertyMapper::toPublicClientResponse);
 
     }
 
@@ -347,16 +339,26 @@ public class PropertyServiceImpl implements PropertyService {
                 .map(PropertyEntity::getId)
                 .toList();
 
-//        Map<UUID, String> mainImageByPropertyId = mediaFileRepository
-//                .findMainImagesByPropertyIds(propertyIds).stream()
-//                .collect(Collectors.toMap(
-//                        m -> m.getProperty().getId(),
-//                        MediaFileEntity::getFileUrl,
-//                        (first, second) -> first
-//                ));
-
         return propertyPage.map(propertyMapper::toPropertyMapResponse
         );
+    }
+
+    @Override
+    public List<PropertyMediaResponse> getPropertyMedia(UUID propertyId) {
+
+        if(!propertyRepository.existsById(propertyId)) {
+            throw new ResourceNotFoundException("Property not found with id: " + propertyId);
+        }
+
+        List<PropertyMediaEntity> mediaFiles = propertyMediaRepository.findByPropertyIdOrderBySortOrderAsc(propertyId);
+
+        if(mediaFiles.isEmpty()) {
+            throw new ResourceNotFoundException("This property doesn't have uploaded images");
+        }
+
+        return mediaFiles.stream()
+                .map(propertyMapper::toMediaResponse).toList();
+
     }
 
     @Override
@@ -422,26 +424,6 @@ public class PropertyServiceImpl implements PropertyService {
                         (first, second) -> first
                 ));
     }
-
-//    private void attachMedia(PropertyResponse response) {
-//
-//        List<PropertyMediaEntity> media =
-//                propertyMediaRepository.findByPropertyIdOrderBySortOrderAsc(
-//                        response.getId()
-//                );
-//
-//        response.setMedia(
-//                propertyMapper.toResponseList(media)
-//        );
-//
-//        media.stream()
-//                .filter(PropertyMediaEntity::getIsPrimary)
-//                .findFirst()
-//                .ifPresent(item ->
-//                        response.setMainImageUrl(
-//                                item.getMedia().getFileUrl()
-//                        ));
-//    }
 
     private UserEntity getCurrentUser(UUID userId) {
 
