@@ -11,8 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.Normalizer;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +23,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+
+    private static final Pattern NON_ALPHANUMERIC = Pattern.compile("[^a-z0-9\\s-]");
+    private static final Pattern WHITESPACE_OR_HYPHEN = Pattern.compile("[\\s-]+");
+    private static final Pattern DIACRITICS = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
 
 
     @Override
@@ -72,11 +79,34 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryResponse createCategory(CreateCategoryRequest request) {
 
-        CategoryEntity newCategory = categoryMapper.toEntity(request);
+        CategoryEntity newCategory = categoryMapper.toCreatedEntity(request);
+
+        String slug = generateSlug(request.getName().trim());
+        newCategory.setSlug(slug);
 
         CategoryEntity savedCategory = categoryRepository.saveAndFlush(newCategory);
 
         return categoryMapper.toResponse(savedCategory);
 
     }
+
+
+
+//    HELPER METHOD
+public static String generateSlug(String str) {
+
+    if (str == null || str.isBlank()) {
+        return "";
+    }
+
+    String slug = str.toLowerCase(Locale.ENGLISH).trim();
+
+    slug = Normalizer.normalize(slug, Normalizer.Form.NFD);
+    slug = DIACRITICS.matcher(slug).replaceAll("");
+    slug = NON_ALPHANUMERIC.matcher(slug).replaceAll("");
+    slug = WHITESPACE_OR_HYPHEN.matcher(slug).replaceAll("-");
+
+    return slug;
+}
+
 }

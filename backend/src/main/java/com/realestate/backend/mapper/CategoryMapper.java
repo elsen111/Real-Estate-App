@@ -12,9 +12,10 @@ public interface CategoryMapper {
     CategoryResponse toResponse(CategoryEntity category);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "slug", ignore = true)
     @Mapping(target = "active", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    CategoryEntity toEntity(CreateCategoryRequest request);
+    CategoryEntity toCreatedEntity(CreateCategoryRequest request);
 
 }

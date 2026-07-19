@@ -13,10 +13,6 @@ public class CreateCategoryRequest {
     @Size(max = 100, message = "Category name should be at most 100 character length")
     private String name;
 
-    @NotNull(message = "Category slug is required")
-    @Size(max = 100, message = "Category slug should be at most 100 character length")
-    private String slug;
-
     @Size(max = 2000, message = "Category description should be at most 2000 character length")
     private String description;
 
