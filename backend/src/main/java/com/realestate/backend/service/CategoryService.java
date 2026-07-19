@@ -22,4 +22,6 @@ public interface CategoryService {
 
     CategoryResponse updateCategory(UpdateCategoryRequest request, UUID categoryId);
 
+    String toggleStatus(UUID categoryId);
+
 }

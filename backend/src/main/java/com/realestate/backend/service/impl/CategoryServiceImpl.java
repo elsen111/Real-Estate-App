@@ -4,9 +4,12 @@ import com.realestate.backend.dto.request.CreateCategoryRequest;
 import com.realestate.backend.dto.request.UpdateCategoryRequest;
 import com.realestate.backend.dto.response.CategoryResponse;
 import com.realestate.backend.entity.CategoryEntity;
+import com.realestate.backend.enums.PropertyStatus;
+import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.CategoryMapper;
 import com.realestate.backend.repository.CategoryRepository;
+import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+
+    private final PropertyRepository propertyRepository;
 
     private static final Pattern NON_ALPHANUMERIC = Pattern.compile("[^a-z0-9\\s-]");
     private static final Pattern WHITESPACE_OR_HYPHEN = Pattern.compile("[\\s-]+");
@@ -92,6 +97,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public CategoryResponse updateCategory(UpdateCategoryRequest request, UUID categoryId) {
 
         CategoryEntity oldCategory = categoryRepository.findById(categoryId)
@@ -109,22 +115,45 @@ public class CategoryServiceImpl implements CategoryService {
 
     }
 
+    @Override
+    public String toggleStatus(UUID categoryId) {
 
-    //    HELPER METHOD
-public static String generateSlug(String str) {
+        CategoryEntity category = categoryRepository.findById(categoryId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Category not found with id " + categoryId)
+                );
 
-    if (str == null || str.isBlank()) {
-        return "";
+        boolean isCategoryAssignedToProperty = propertyRepository.existsByCategoryIdAndStatus(categoryId, PropertyStatus.ACTIVE);
+
+        if(isCategoryAssignedToProperty) {
+            throw new BusinessException("Cannot deactivate a category that is already assigned to an existing property");
+        }
+
+        boolean newStatus = !category.isActive();
+
+        category.setActive(newStatus);
+        categoryRepository.save(category);
+
+        return newStatus ? "Category is activated" : "Category is deactivated";
+
     }
 
-    String slug = str.toLowerCase(Locale.ENGLISH).trim();
 
-    slug = Normalizer.normalize(slug, Normalizer.Form.NFD);
-    slug = DIACRITICS.matcher(slug).replaceAll("");
-    slug = NON_ALPHANUMERIC.matcher(slug).replaceAll("");
-    slug = WHITESPACE_OR_HYPHEN.matcher(slug).replaceAll("-");
+    //    HELPER METHOD
+    public static String generateSlug(String str) {
 
-    return slug;
-}
+        if (str == null || str.isBlank()) {
+            return "";
+        }
+
+        String slug = str.toLowerCase(Locale.ENGLISH).trim();
+
+        slug = Normalizer.normalize(slug, Normalizer.Form.NFD);
+        slug = DIACRITICS.matcher(slug).replaceAll("");
+        slug = NON_ALPHANUMERIC.matcher(slug).replaceAll("");
+        slug = WHITESPACE_OR_HYPHEN.matcher(slug).replaceAll("-");
+
+        return slug;
+    }
 
 }

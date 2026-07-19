@@ -81,4 +81,19 @@ public class AdminCategoryController {
 
     }
 
+    @PatchMapping("/{categoryId}/status")
+    @Operation(summary = "Change the status (activity) of an existing category")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
+    public ResponseEntity<ApiResponse<CategoryResponse>> toggleCategoryStatus(
+            @PathVariable UUID categoryId
+    ) {
+
+        String response = categoryService.toggleStatus(categoryId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(response, null)
+        );
+
+    }
+
 }
