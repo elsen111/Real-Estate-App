@@ -24,4 +24,6 @@ public interface CategoryService {
 
     String toggleStatus(UUID categoryId);
 
+    void softDeleteCategory(UUID categoryId);
+
 }

@@ -6,6 +6,7 @@ import com.realestate.backend.dto.response.CategoryResponse;
 import com.realestate.backend.entity.CategoryEntity;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.exception.BusinessException;
+import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.CategoryMapper;
 import com.realestate.backend.repository.CategoryRepository;
@@ -41,7 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
         List<CategoryEntity> activeCategories = categoryRepository.findAllByActiveTrue();
 
         return activeCategories.stream().map(
-                categoryMapper::toResponse
+                categoryMapper::toPublicResponse
         ).toList();
 
     }
@@ -55,7 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
             throw new ResourceNotFoundException("Category not found with id " + categoryId);
         }
 
-        return categoryMapper.toResponse(category);
+        return categoryMapper.toPublicResponse(category);
 
     }
 
@@ -65,7 +66,7 @@ public class CategoryServiceImpl implements CategoryService {
         List<CategoryEntity> activeCategories = categoryRepository.findAll();
 
         return activeCategories.stream().map(
-                categoryMapper::toResponse
+                categoryMapper::toAdminResponse
         ).toList();
 
     }
@@ -78,12 +79,16 @@ public class CategoryServiceImpl implements CategoryService {
                         () -> new ResourceNotFoundException("Category not found with id " + categoryId)
                 );
 
-        return categoryMapper.toResponse(category);
+        return categoryMapper.toAdminResponse(category);
     }
 
     @Override
     @Transactional
     public CategoryResponse createCategory(CreateCategoryRequest request) {
+
+        if(categoryRepository.existsByNameIgnoreCaseAndDeletedFalse(request.getName())) {
+            throw new ConflictException("Category with name " + request.getName() + " already exists");
+        }
 
         CategoryEntity newCategory = categoryMapper.toCreatedEntity(request);
 
@@ -92,7 +97,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         CategoryEntity savedCategory = categoryRepository.saveAndFlush(newCategory);
 
-        return categoryMapper.toResponse(savedCategory);
+        return categoryMapper.toAdminResponse(savedCategory);
 
     }
 
@@ -105,13 +110,17 @@ public class CategoryServiceImpl implements CategoryService {
                         () -> new ResourceNotFoundException("Category not found with id " + categoryId)
                 );
 
+        if(categoryRepository.existsByNameIgnoreCaseAndIdNotAndDeletedFalse(request.getName(), categoryId)) {
+            throw new ConflictException("Category with name " + request.getName() + " already exists");
+        }
+
         categoryMapper.toUpdatedEntity(request, oldCategory);
 
         CategoryEntity updatedCategory = categoryRepository.save(oldCategory);
 
         updatedCategory.setSlug(generateSlug(request.getName().trim()));
 
-        return categoryMapper.toResponse(updatedCategory);
+        return categoryMapper.toAdminResponse(updatedCategory);
 
     }
 
@@ -135,6 +144,28 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.save(category);
 
         return newStatus ? "Category is activated" : "Category is deactivated";
+
+    }
+
+    @Override
+    @Transactional
+    public void softDeleteCategory(UUID categoryId) {
+
+        CategoryEntity category = categoryRepository.findById(categoryId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Category not found with id " + categoryId)
+                );
+
+        boolean isCategoryAssignedToProperty = propertyRepository.existsByCategoryIdAndStatus(categoryId, PropertyStatus.ACTIVE);
+
+        if(isCategoryAssignedToProperty) {
+            throw new BusinessException("Cannot delete a category as it is already assigned to an existing property");
+        }
+
+        category.setActive(false);
+        category.setDeleted(true);
+
+        categoryRepository.save(category);
 
     }
 

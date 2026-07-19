@@ -96,4 +96,19 @@ public class AdminCategoryController {
 
     }
 
+    @DeleteMapping("/{categoryId}")
+    @Operation(summary = "Delete an existing category")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> softDeleteCategory(
+            @PathVariable UUID categoryId
+    ) {
+
+        categoryService.softDeleteCategory(categoryId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Category successfully deleted", null)
+        );
+
+    }
+
 }
