@@ -1,5 +1,6 @@
 package com.realestate.backend.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import lombok.Setter;
 @Setter
 public class CreateCategoryRequest {
 
-    @NotNull(message = "Category name is required")
+    @NotBlank(message = "Category name is required")
     @Size(max = 100, message = "Category name should be at most 100 character length")
     private String name;
 

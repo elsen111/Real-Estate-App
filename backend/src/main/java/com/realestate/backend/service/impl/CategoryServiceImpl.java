@@ -1,6 +1,7 @@
 package com.realestate.backend.service.impl;
 
 import com.realestate.backend.dto.request.CreateCategoryRequest;
+import com.realestate.backend.dto.request.UpdateCategoryRequest;
 import com.realestate.backend.dto.response.CategoryResponse;
 import com.realestate.backend.entity.CategoryEntity;
 import com.realestate.backend.exception.ResourceNotFoundException;
@@ -90,9 +91,26 @@ public class CategoryServiceImpl implements CategoryService {
 
     }
 
+    @Override
+    public CategoryResponse updateCategory(UpdateCategoryRequest request, UUID categoryId) {
+
+        CategoryEntity oldCategory = categoryRepository.findById(categoryId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Category not found with id " + categoryId)
+                );
+
+        categoryMapper.toUpdatedEntity(request, oldCategory);
+
+        CategoryEntity updatedCategory = categoryRepository.save(oldCategory);
+
+        updatedCategory.setSlug(generateSlug(request.getName().trim()));
+
+        return categoryMapper.toResponse(updatedCategory);
+
+    }
 
 
-//    HELPER METHOD
+    //    HELPER METHOD
 public static String generateSlug(String str) {
 
     if (str == null || str.isBlank()) {

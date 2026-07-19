@@ -2,6 +2,7 @@ package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.request.CreateCategoryRequest;
+import com.realestate.backend.dto.request.UpdateCategoryRequest;
 import com.realestate.backend.dto.response.CategoryResponse;
 import com.realestate.backend.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,6 +61,22 @@ public class AdminCategoryController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Category created successfully", response)
+        );
+
+    }
+
+    @PutMapping("/{categoryId}")
+    @Operation(summary = "Update an existing category")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
+    public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
+            @PathVariable UUID categoryId,
+            @Valid @RequestBody UpdateCategoryRequest request
+    ) {
+
+        CategoryResponse response = categoryService.updateCategory(request, categoryId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Category updated successfully", response)
         );
 
     }

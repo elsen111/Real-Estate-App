@@ -1,6 +1,7 @@
 package com.realestate.backend.service;
 
 import com.realestate.backend.dto.request.CreateCategoryRequest;
+import com.realestate.backend.dto.request.UpdateCategoryRequest;
 import com.realestate.backend.dto.response.CategoryResponse;
 import com.realestate.backend.entity.CategoryEntity;
 
@@ -18,5 +19,7 @@ public interface CategoryService {
     CategoryResponse getCategoryById(UUID categoryId);
 
     CategoryResponse createCategory(CreateCategoryRequest request);
+
+    CategoryResponse updateCategory(UpdateCategoryRequest request, UUID categoryId);
 
 }
