@@ -6,7 +6,6 @@ import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.CategoryMapper;
 import com.realestate.backend.repository.CategoryRepository;
 import com.realestate.backend.service.CategoryService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +41,17 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         return categoryMapper.toResponse(category);
+
+    }
+
+    @Override
+    public List<CategoryResponse> getAllCategories() {
+
+        List<CategoryEntity> activeCategories = categoryRepository.findAll();
+
+        return activeCategories.stream().map(
+                categoryMapper::toResponse
+        ).toList();
 
     }
 }
