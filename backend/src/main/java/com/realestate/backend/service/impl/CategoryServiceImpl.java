@@ -1,5 +1,6 @@
 package com.realestate.backend.service.impl;
 
+import com.realestate.backend.dto.request.CreateCategoryRequest;
 import com.realestate.backend.dto.response.CategoryResponse;
 import com.realestate.backend.entity.CategoryEntity;
 import com.realestate.backend.exception.ResourceNotFoundException;
@@ -8,6 +9,7 @@ import com.realestate.backend.repository.CategoryRepository;
 import com.realestate.backend.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -64,5 +66,17 @@ public class CategoryServiceImpl implements CategoryService {
                 );
 
         return categoryMapper.toResponse(category);
+    }
+
+    @Override
+    @Transactional
+    public CategoryResponse createCategory(CreateCategoryRequest request) {
+
+        CategoryEntity newCategory = categoryMapper.toEntity(request);
+
+        CategoryEntity savedCategory = categoryRepository.saveAndFlush(newCategory);
+
+        return categoryMapper.toResponse(savedCategory);
+
     }
 }

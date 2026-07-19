@@ -1,5 +1,6 @@
 package com.realestate.backend.service;
 
+import com.realestate.backend.dto.request.CreateCategoryRequest;
 import com.realestate.backend.dto.response.CategoryResponse;
 import com.realestate.backend.entity.CategoryEntity;
 
@@ -15,5 +16,7 @@ public interface CategoryService {
     List<CategoryResponse> getAllCategories();
 
     CategoryResponse getCategoryById(UUID categoryId);
+
+    CategoryResponse createCategory(CreateCategoryRequest request);
 
 }
