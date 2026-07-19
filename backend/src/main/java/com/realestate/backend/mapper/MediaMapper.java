@@ -16,6 +16,9 @@ public interface MediaMapper {
     @Mapping(target = "updatedAt", ignore = true)
     MediaFileEntity toEntity(UploadedFile uploadedFile);
 
+
+
+//    HELPER METHOD
     default MediaType resolveMediaType(String mimeType) {
 
         if (mimeType == null) {

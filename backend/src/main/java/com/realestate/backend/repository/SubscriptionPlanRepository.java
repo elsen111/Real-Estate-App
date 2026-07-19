@@ -12,15 +12,7 @@ import java.util.UUID;
 @Repository
 public interface SubscriptionPlanRepository extends JpaRepository<SubscriptionPlanEntity, UUID>, JpaSpecificationExecutor<SubscriptionPlanEntity> {
 
-    Optional<SubscriptionPlanEntity> findByNameIgnoreCase(String name);
-
-    List<SubscriptionPlanEntity> findAllByOrderByPriceAsc();
-
     boolean existsByNameIgnoreCase(String name);
-
-    List<SubscriptionPlanEntity> findByActiveTrueOrderByPriceAsc();
-
-    List<SubscriptionPlanEntity> findByActiveTrueOrderByPriceDesc();
 
     boolean existsByIdAndActiveTrue(UUID id);
 

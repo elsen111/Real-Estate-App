@@ -1,6 +1,6 @@
 package com.realestate.backend.repository.specification;
 
-import com.realestate.backend.dto.agency.request.AgencyAgentFilterRequest;
+import com.realestate.backend.dto.request.AgencyAgentFilterRequest;
 import com.realestate.backend.entity.RoleEntity;
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.Role;
@@ -31,6 +31,9 @@ public class AgencyAgentSpecification {
                 .and(hasQuery(filterRequest.getQuery()));
     }
 
+
+
+//    HELPER METHODS
     private static Specification<UserEntity> hasAgencyId(UUID agencyId) {
         return (root, query, cb) -> cb.equal(root.get("agency").get("id"), agencyId);
     }

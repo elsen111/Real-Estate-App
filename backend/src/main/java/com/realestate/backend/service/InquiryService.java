@@ -1,0 +1,25 @@
+package com.realestate.backend.service;
+
+import com.realestate.backend.dto.request.CreateInquiryRequest;
+import com.realestate.backend.dto.request.UpdateInquiryStatusRequest;
+import com.realestate.backend.dto.response.InquiryResponse;
+import com.realestate.backend.enums.InquiryStatus;
+import com.realestate.backend.security.CustomUserDetails;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.util.UUID;
+
+public interface InquiryService {
+
+    InquiryResponse createInquiry(UUID propertyId, CreateInquiryRequest request, CustomUserDetails currentUser);
+
+    Page<InquiryResponse> getClientInquiries(CustomUserDetails currentUser, InquiryStatus status, Pageable pageable);
+
+    Page<InquiryResponse> getMyAgencyInquiries(CustomUserDetails currentUser, InquiryStatus status, UUID propertyId, Pageable pageable);
+
+    InquiryResponse getInquiryById(CustomUserDetails currentUser, UUID id);
+
+    InquiryResponse updateStatus(CustomUserDetails currentUser, UUID inquiryId, UpdateInquiryStatusRequest request);
+
+}

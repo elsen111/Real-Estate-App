@@ -1,6 +1,5 @@
 package com.realestate.backend.entity;
 
-import com.realestate.backend.enums.AgencyMediaPurpose;
 import com.realestate.backend.enums.UserMediaPurpose;
 import jakarta.persistence.*;
 import lombok.*;

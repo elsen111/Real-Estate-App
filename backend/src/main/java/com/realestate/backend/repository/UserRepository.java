@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<UserEntity, UUID>, JpaSpecificationExecutor<UserEntity> {
+
     @EntityGraph(attributePaths = "roles")
     Optional<UserEntity> findByEmail(String email);
 

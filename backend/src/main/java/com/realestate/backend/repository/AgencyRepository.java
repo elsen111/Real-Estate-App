@@ -16,14 +16,4 @@ public interface AgencyRepository extends JpaRepository<AgencyEntity, UUID>, Jpa
 
     boolean existsByEmail(String email);
 
-    Page<AgencyEntity> findByEmail(String email, Pageable pageable);
-
-    Page<AgencyEntity> findByName(String name, Pageable pageable);
-
-    Page<AgencyEntity> findByStatus(AgencyStatus status, Pageable pageable);
-
-    Page<AgencyEntity> findByCity(String city, Pageable pageable);
-
-    Optional<AgencyEntity> findByEmail(String email);
-
 }

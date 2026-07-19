@@ -1,6 +1,5 @@
 package com.realestate.backend.entity;
 
-import com.realestate.backend.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

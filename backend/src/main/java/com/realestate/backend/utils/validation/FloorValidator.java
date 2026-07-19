@@ -1,6 +1,6 @@
 package com.realestate.backend.utils.validation;
 
-import com.realestate.backend.dto.property.request.PropertyRequest;
+import com.realestate.backend.dto.request.PropertyRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

@@ -1,7 +1,6 @@
 package com.realestate.backend.repository.specification;
 
-import com.realestate.backend.dto.admin.subscription.request.AdminSubscriptionPlanFilterRequest;
-import com.realestate.backend.entity.PropertyEntity;
+import com.realestate.backend.dto.request.AdminSubscriptionPlanFilterRequest;
 import com.realestate.backend.entity.SubscriptionPlanEntity;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -23,6 +22,9 @@ public class AdminSubscriptionPlanSpecification {
 
     }
 
+
+
+//    HELPER METHODS
     private static Specification<SubscriptionPlanEntity> isActive(Boolean isActive) {
         return ((root, query, criteriaBuilder) -> isActive == null ? null : criteriaBuilder.equal(root.get("active"), isActive));
     }

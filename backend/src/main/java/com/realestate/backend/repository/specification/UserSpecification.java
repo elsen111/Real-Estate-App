@@ -1,6 +1,6 @@
 package com.realestate.backend.repository.specification;
 
-import com.realestate.backend.dto.admin.user.request.AdminUserFilterRequest;
+import com.realestate.backend.dto.request.AdminUserFilterRequest;
 import com.realestate.backend.entity.UserEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,6 +24,9 @@ public class UserSpecification {
 
     }
 
+
+
+//    HELPER METHODS
     private static Specification<UserEntity> hasRole(Object role) {
         return ((root, query, criteriaBuilder) -> role == null ? null : criteriaBuilder.equal(root.get("role"), role));
     }

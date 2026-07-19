@@ -1,10 +1,8 @@
 package com.realestate.backend.repository.specification;
 
-import com.realestate.backend.dto.admin.agency.request.AdminAgencyFilterRequest;
-import com.realestate.backend.dto.admin.user.request.AdminUserFilterRequest;
-import com.realestate.backend.dto.agency.request.AgencyFilterRequest;
+import com.realestate.backend.dto.request.AdminAgencyFilterRequest;
+import com.realestate.backend.dto.request.AgencyFilterRequest;
 import com.realestate.backend.entity.AgencyEntity;
-import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.AgencyStatus;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
@@ -50,6 +48,9 @@ public class AgencySpecification {
 
     }
 
+
+
+//    HELPER METHODS
     private static Specification<AgencyEntity> hasCity(Object city) {
         return ((root, query, criteriaBuilder) -> city == null ? null : criteriaBuilder.equal(root.get("city"), city));
     }

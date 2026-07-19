@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public enum Role {
-
     SUPER_ADMIN("Super Admin"),
     ADMIN("Admin"),
     AGENCY_OWNER("Agency Owner"),
@@ -17,5 +16,4 @@ public enum Role {
     CLIENT("Client");
 
     private String label;
-
 }

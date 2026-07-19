@@ -17,10 +17,6 @@ public interface FavoriteRepository extends JpaRepository<FavoriteEntity, UUID> 
 
     boolean existsByUser_IdAndProperty_Id(UUID user, UUID propertyId);
 
-    Optional<FavoriteEntity> findByUser_IdAndProperty_Id(UUID userId, UUID propertyId);
-
-    Page<FavoriteEntity> findByUser_Id(UUID userId, Pageable pageable);
-
     void deleteByUser_IdAndProperty_Id(UUID userId, UUID propertyId);
 
     @Query(value = """
