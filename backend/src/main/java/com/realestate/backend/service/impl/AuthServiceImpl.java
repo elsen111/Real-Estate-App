@@ -5,6 +5,7 @@ import com.realestate.backend.dto.response.AuthResponse;
 import com.realestate.backend.dto.response.RefreshTokenResponse;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.Role;
+import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.exception.UnauthorizedException;
@@ -15,6 +16,7 @@ import com.realestate.backend.repository.*;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.security.JwtService;
 import com.realestate.backend.security.SecurityConstants;
+import com.realestate.backend.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,23 +29,28 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl {
+public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+
     private final RefreshTokenServiceImpl refreshTokenService;
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
+
     private final RoleRepository roleRepository;
+
     private final AgencyRepository agencyRepository;
+    private final AgencyMapper agencyMapper;
+
     private final AgencyMemberRepository agencyMemberRepository;
 
     private final AuthMapper authMapper;
-    private final UserMapper userMapper;
-    private final AgencyMapper agencyMapper;
 
     @Transactional
+    @Override
     public AuthResponse registerUser(
             UserRegisterRequest request,
             String type,
@@ -74,6 +81,7 @@ public class AuthServiceImpl {
     }
 
     @Transactional
+    @Override
     public AuthResponse registerAgencyOwner(
             AgencyOwnerRegisterRequest request,
             HttpServletRequest servletRequest
@@ -114,6 +122,7 @@ public class AuthServiceImpl {
     }
 
     @Transactional
+    @Override
     public AuthResponse login(
             LoginRequest request,
             HttpServletRequest servletRequest
@@ -156,6 +165,7 @@ public class AuthServiceImpl {
     }
 
     @Transactional
+    @Override
     public RefreshTokenResponse refreshToken(
             RefreshTokenRequest request,
             HttpServletRequest servletRequest
@@ -178,11 +188,13 @@ public class AuthServiceImpl {
     }
 
     @Transactional
+    @Override
     public void logout(LogoutRequest request) {
         refreshTokenService.revokeRefreshToken(request.getRefreshToken());
     }
 
     @Transactional(readOnly = true)
+    @Override
     public AuthResponse currentUser(CustomUserDetails currentUser) {
         UserEntity user = userRepository.findByEmail(currentUser.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -201,6 +213,39 @@ public class AuthServiceImpl {
                 .build();
     }
 
+    @Override
+    @Transactional
+    public void changePassword(ChangePasswordRequest request, CustomUserDetails currentUser) {
+
+        UserEntity user = userRepository.findById(currentUser.getId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("User not found with this id")
+                );
+
+        if(!request.getNewPassword().equals(request.getConfirmNewPassword())) {
+            throw new BadRequestException("Passwords don't match.");
+        }
+
+        boolean isCurrentPasswordMatching = passwordEncoder.matches(
+                request.getCurrentPassword(),
+                currentUser.getPassword()
+        );
+
+        if(!isCurrentPasswordMatching) {
+            throw new BadRequestException("Current password is wrong.");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+
+        userRepository.save(user);
+
+        refreshTokenService.revokeAllUserRefreshTokens(currentUser.getId());
+
+    }
+
+
+
+//    HELPER METHODS
     private AuthResponse buildAuthResponse(
             UserEntity user,
             String refreshToken,
@@ -224,12 +269,6 @@ public class AuthServiceImpl {
     private void ensureUserEmailIsFree(String email) {
         if (userRepository.existsByEmail(email)) {
             throw new ConflictException("User already exists with this email");
-        }
-    }
-
-    private void ensureAgencyEmailIsFree(String email) {
-        if (agencyRepository.existsByEmail(email)) {
-            throw new ConflictException("Agency already exists with this email");
         }
     }
 

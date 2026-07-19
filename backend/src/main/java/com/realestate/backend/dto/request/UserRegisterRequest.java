@@ -11,16 +11,16 @@ import lombok.Setter;
 public class UserRegisterRequest {
 
     @NotBlank(message = "Full name is required")
-    @Size(max = 100, message = "Full name must be at most 100 characters")
+    @Size(max = 100, message = "Fullname must be at most 100 characters")
     private String fullName;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Email format is invalid")
-    @Size(max = 150, message = "Email name must be at most 150 characters")
+    @Size(max = 150, message = "Email must be at most 150 characters")
     private String email;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 8, max = 72, message = "Email name must be between 8 and 72 characters")
+    @Size(min = 8, max = 72, message = "Password must be between 8 and 72 characters")
     private String password;
 
     @Size(max = 30, message = "Phone number name must be at most 30 characters")
