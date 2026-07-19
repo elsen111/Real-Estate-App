@@ -7,10 +7,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @RestController
@@ -28,6 +30,20 @@ public class CategoryController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Category list fetched successfully", response)
+        );
+
+    }
+
+    @GetMapping("/{categoryId}")
+    @Operation(summary = "Get active category by id")
+    public ResponseEntity<ApiResponse<CategoryResponse>> getActiveCategoryById(
+            @PathVariable UUID categoryId
+    ) {
+
+        CategoryResponse response = categoryService.getActiveCategoryById(categoryId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Category fetched successfully", response)
         );
 
     }
