@@ -10,16 +10,4 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetTokenEntity, UUID> {
-
-    Optional<PasswordResetTokenEntity> findByToken(String token);
-
-    Optional<PasswordResetTokenEntity> findByTokenAndUsedFalseAndExpiryDateAfter(
-            String token,
-            LocalDateTime currentDateTime
-    );
-
-    @Transactional
-    void deleteByUser_Id(UUID userId);
-
-}
+public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetTokenEntity, UUID> {}

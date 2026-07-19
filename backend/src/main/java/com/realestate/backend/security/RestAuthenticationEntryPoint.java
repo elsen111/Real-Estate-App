@@ -18,7 +18,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     private final ObjectMapper objectMapper;
 
     @Override

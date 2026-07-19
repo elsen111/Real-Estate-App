@@ -1,12 +1,10 @@
 package com.realestate.backend.repository.specification;
 
-import com.realestate.backend.dto.agency.request.AgencyFilterRequest;
-import com.realestate.backend.dto.property.request.PropertyFilterRequest;
-import com.realestate.backend.dto.property.request.PropertyMapFilterRequest;
-import com.realestate.backend.dto.property.request.PropertyPublicFilterRequest;
+import com.realestate.backend.dto.request.PropertyFilterRequest;
+import com.realestate.backend.dto.request.PropertyMapFilterRequest;
+import com.realestate.backend.dto.request.PropertyPublicFilterRequest;
 import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.PropertyEntity;
-import com.realestate.backend.enums.AgencyStatus;
 import com.realestate.backend.enums.ListingType;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.PropertyType;
@@ -14,7 +12,6 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
-import tools.jackson.databind.annotation.JsonAppend;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -161,6 +158,8 @@ public class PropertySpecification {
     }
 
 
+
+//    HELPER METHODS
     private static Specification<PropertyEntity> hasCity(String city) {
         return ((root, query, cb) -> city == null ? null : cb.equal(cb.lower(root.get("city")), city.trim().toLowerCase()));
     }

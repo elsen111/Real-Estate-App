@@ -1,6 +1,6 @@
 package com.realestate.backend.repository.specification;
 
-import com.realestate.backend.dto.agency.request.AgencyPropertyFilterRequest;
+import com.realestate.backend.dto.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.enums.PropertyStatus;
 import org.springframework.data.jpa.domain.Specification;
@@ -30,6 +30,9 @@ public class AgencyPropertySpecification {
 
     }
 
+
+
+//    HELPER METHODS
     public static Specification<PropertyEntity> hasAgencyId(UUID agencyId) {
         return (root, query, cb) -> {
             if (agencyId == null) {

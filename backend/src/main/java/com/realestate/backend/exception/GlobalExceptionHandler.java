@@ -1,6 +1,5 @@
 package com.realestate.backend.exception;
 
-import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.common.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;

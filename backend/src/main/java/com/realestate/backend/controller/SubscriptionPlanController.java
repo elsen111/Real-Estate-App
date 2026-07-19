@@ -1,8 +1,8 @@
 package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
-import com.realestate.backend.dto.subscription.response.SubscriptionPlanResponse;
-import com.realestate.backend.service.subscription.SubscriptionPlanService;
+import com.realestate.backend.dto.response.SubscriptionPlanResponse;
+import com.realestate.backend.service.SubscriptionPlanService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

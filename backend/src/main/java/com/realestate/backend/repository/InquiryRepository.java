@@ -21,10 +21,6 @@ public interface InquiryRepository extends JpaRepository<InquiryEntity, UUID> {
     @EntityGraph(attributePaths = {"property", "client", "assignedAgent", "agency"})
     Page<InquiryEntity> findByClientIdAndStatus(UUID clientId, InquiryStatus status, Pageable pageable);
 
-    Page<InquiryEntity> findByProperty_Id(UUID propertyId, Pageable pageable);
-
-    Page<InquiryEntity> findByAssignedAgent_Id(UUID assignedAgentId, Pageable pageable);
-
     boolean existsByPropertyIdAndClientIdAndStatusNot(UUID propertyId, UUID clientId, InquiryStatus status);
 
     @Query(value = """
@@ -49,9 +45,5 @@ public interface InquiryRepository extends JpaRepository<InquiryEntity, UUID> {
             @Param("status") InquiryStatus status,
             @Param("propertyId") UUID propertyId,
             Pageable pageable);
-
-    boolean existsByClientId(UUID clientId);
-
-    boolean existsByAgencyId(UUID agencyId);
 
 }

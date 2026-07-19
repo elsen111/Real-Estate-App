@@ -10,8 +10,6 @@ import java.util.UUID;
 
 public interface PropertyMediaRepository extends JpaRepository<PropertyMediaEntity, UUID> {
 
-    List<PropertyMediaEntity> findByPropertyIdOrderBySortOrder(UUID propertyId);
-
     boolean existsByPropertyIdAndIsPrimaryTrue(UUID propertyId);
 
     long countByPropertyId(UUID propertyId);

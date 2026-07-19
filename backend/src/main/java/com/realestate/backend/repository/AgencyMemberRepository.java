@@ -19,18 +19,9 @@ public interface AgencyMemberRepository extends JpaRepository<AgencyMemberEntity
 
     boolean existsByUser_IdAndActiveTrue(UUID userId);
 
-    Optional<AgencyMemberEntity> findByAgency_IdAndUser_Id(UUID agencyId, UUID userId);
-
     Optional<AgencyMemberEntity> findByAgency_IdAndUser_IdAndActiveTrue(UUID agencyId, UUID userId);
 
-
-    Page<AgencyMemberEntity> findByAgency_Id(UUID agencyId, Pageable pageable);
-
-    Page<AgencyMemberEntity> findByUser_Id(UUID userId, Pageable pageable);
-
     Optional<AgencyMemberEntity> findByUserAndActiveTrue(UserEntity user);
-
-    boolean existsByUser_Id(UUID id);
 
     @Query("""
 select am
@@ -50,5 +41,4 @@ and r.roleName = 'AGENCY_OWNER'
 
     boolean existsByAgencyIdAndUserIdAndActiveTrue(UUID agencyId, UUID iuserId);
 
-    Optional<AgencyMemberEntity> findByUserId(UUID userId);
 }

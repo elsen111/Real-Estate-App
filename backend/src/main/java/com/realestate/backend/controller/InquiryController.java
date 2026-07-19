@@ -1,12 +1,11 @@
 package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
-import com.realestate.backend.dto.inquiry.request.CreateInquiryRequest;
-import com.realestate.backend.dto.inquiry.request.UpdateInquiryStatusRequest;
-import com.realestate.backend.dto.inquiry.response.InquiryResponse;
+import com.realestate.backend.dto.request.UpdateInquiryStatusRequest;
+import com.realestate.backend.dto.response.InquiryResponse;
 import com.realestate.backend.enums.InquiryStatus;
 import com.realestate.backend.security.CustomUserDetails;
-import com.realestate.backend.service.inquiry.InquiryService;
+import com.realestate.backend.service.InquiryService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,29 +21,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping
+@RequestMapping("/inquiries")
 @RequiredArgsConstructor
 public class InquiryController {
 
     private final InquiryService inquiryService;
 
-    @PostMapping("/properties/{propertyId}/inquiries")
-    @Operation(summary = "Create a new inquiry")
-    public ResponseEntity<ApiResponse<InquiryResponse>> createInquiry(
-            @PathVariable UUID propertyId,
-            @Valid @RequestBody CreateInquiryRequest request,
-            @AuthenticationPrincipal CustomUserDetails currentUser
-    ) {
-
-        InquiryResponse response = inquiryService.createInquiry(propertyId, request, currentUser);
-
-        return ResponseEntity.ok(
-                ApiResponse.success("Inquiry created successfully", response)
-        );
-
-    }
-
-    @GetMapping("/inquiries/me")
+    @GetMapping("/me")
     @Operation(summary = "Get client's inquiries")
     public ResponseEntity<ApiResponse<Page<InquiryResponse>>> getMyInquiries(
             @RequestParam(required = false)InquiryStatus status,
@@ -61,26 +44,8 @@ public class InquiryController {
 
     }
 
-    @GetMapping("/agencies/inquiries")
-    @Operation(summary = "Get agency's inquiries")
-    public ResponseEntity<ApiResponse<Page<InquiryResponse>>> getMyInquiries(
-            @RequestParam(required = false) InquiryStatus status,
-            @RequestParam(required = false) UUID propertyId,
-            @AuthenticationPrincipal CustomUserDetails currentUser,
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
-            Pageable pageable
-    ) {
-
-        Page<InquiryResponse> response = inquiryService.getMyAgencyInquiries(currentUser, status, propertyId, pageable);
-
-        return ResponseEntity.ok(
-                ApiResponse.success("Inquiry list fetched successfully", response)
-        );
-
-    }
-
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/inquiries/{inquiryId}")
+    @GetMapping("/{inquiryId}")
     @Operation(summary = "Get inquiry by id")
     public ResponseEntity<ApiResponse<InquiryResponse>> getInquiryById(
             @PathVariable UUID inquiryId,
@@ -96,7 +61,7 @@ public class InquiryController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PatchMapping("/inquiries/{inquiryId}/status")
+    @PatchMapping("/{inquiryId}/status")
     @Operation(summary = "Update inquiry status")
     public ResponseEntity<ApiResponse<InquiryResponse>> updateInquiryStatus(
             @PathVariable UUID inquiryId,

@@ -16,14 +16,7 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshTokenEntity
 
     Optional<RefreshTokenEntity> findByTokenHash(String tokenHash);
 
-    Optional<RefreshTokenEntity> findByTokenHashAndRevokedFalseAndExpiryDateAfter(
-            String tokenHash,
-            LocalDateTime currentDateTime
-    );
     List<RefreshTokenEntity> findAllByUser_IdAndRevokedFalse(UUID userId);
-
-    @Transactional
-    void deleteByUser_Id(UUID userId);
 
     void deleteAllByUser(UserEntity user);
 }

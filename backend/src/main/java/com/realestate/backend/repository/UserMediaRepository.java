@@ -10,6 +10,4 @@ public interface UserMediaRepository extends JpaRepository<UserMediaEntity, UUID
 
     Optional<UserMediaEntity> findByUserId(UUID uuid);
 
-    boolean existsByUserId(UUID userId);
-
 }
