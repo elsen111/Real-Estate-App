@@ -54,4 +54,15 @@ public class CategoryServiceImpl implements CategoryService {
         ).toList();
 
     }
+
+    @Override
+    public CategoryResponse getCategoryById(UUID categoryId) {
+
+        CategoryEntity category = categoryRepository.findById(categoryId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Category not found with id " + categoryId)
+                );
+
+        return categoryMapper.toResponse(category);
+    }
 }

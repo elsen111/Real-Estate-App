@@ -14,4 +14,6 @@ public interface CategoryService {
 
     List<CategoryResponse> getAllCategories();
 
+    CategoryResponse getCategoryById(UUID categoryId);
+
 }
