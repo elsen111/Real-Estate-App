@@ -4,6 +4,8 @@ import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.AgencyMemberEntity;
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.Role;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -32,5 +34,7 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID>, JpaSpec
             "WHERE u.id = :userId " +
             "AND r.roleName = com.realestate.backend.enums.Role.AGENT")
     Optional<AgencyMemberEntity> findAgentMemberByUserId(@Param("userId") UUID userId);
+
+    Optional<UserEntity> findByEmailIgnoreCase(String email);
 
 }

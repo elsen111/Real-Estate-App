@@ -91,6 +91,14 @@ public class GlobalExceptionHandler {
         return error(ex.getMessage(), HttpStatus.FORBIDDEN, request);
     }
 
+    @ExceptionHandler(InvalidOtpException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidOtpException(
+            InvalidOtpException ex,
+            HttpServletRequest request
+    ) {
+        return error(ex.getMessage(), HttpStatus.BAD_REQUEST, request);
+    }
+
     @ExceptionHandler({
             UnauthorizedException.class,
             BadCredentialsException.class,

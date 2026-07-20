@@ -46,7 +46,9 @@ public class SecurityConfig {
                                 "/auth/register",
                                 "/auth/register/**",
                                 "/auth/login",
-                                "/auth/refresh-token"
+                                "/auth/refresh-token",
+                                "/auth/forgot-password",
+                                "/auth/reset-password"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/agencies/public/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/properties/**").permitAll()
