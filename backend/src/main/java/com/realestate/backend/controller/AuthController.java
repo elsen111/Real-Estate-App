@@ -6,6 +6,7 @@ import com.realestate.backend.dto.response.AuthResponse;
 import com.realestate.backend.dto.response.RefreshTokenResponse;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.impl.AuthServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -102,6 +103,32 @@ public class AuthController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Password successfully changed.", null)
+        );
+    }
+
+    @PostMapping("/forgot-password")
+    @Operation(summary = "Send an otp to the email.")
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request
+    ) {
+
+        authService.forgotPassword(request);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("If the email has been registered, an OTP has been sent.", null)
+        );
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(summary = "Verify the otp and reset the password.")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request
+    ) {
+
+        authService.resetPassword(request);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Password has been changed successfully.", null)
         );
     }
 

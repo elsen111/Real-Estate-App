@@ -38,4 +38,8 @@ public interface AuthService {
             CustomUserDetails currentUser
     );
 
+    void forgotPassword(ForgotPasswordRequest request);
+
+    void resetPassword(ResetPasswordRequest request);
+
 }

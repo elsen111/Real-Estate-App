@@ -17,6 +17,7 @@ import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.security.JwtService;
 import com.realestate.backend.security.SecurityConstants;
 import com.realestate.backend.service.AuthService;
+import com.realestate.backend.service.OtpService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,6 +28,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -35,6 +38,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
+    private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenServiceImpl refreshTokenService;
 
     private final UserRepository userRepository;
@@ -48,6 +52,10 @@ public class AuthServiceImpl implements AuthService {
     private final AgencyMemberRepository agencyMemberRepository;
 
     private final AuthMapper authMapper;
+
+    private final OtpService otpService;
+
+    private final PasswordResetOtpRepository passwordResetOtpRepository;
 
     @Transactional
     @Override
@@ -243,9 +251,54 @@ public class AuthServiceImpl implements AuthService {
 
     }
 
+    @Override
+    @Transactional
+    public void forgotPassword(ForgotPasswordRequest request) {
+
+        userRepository.findByEmailIgnoreCase(request.getEmail())
+                .ifPresent(otpService::generateAndSendOtp);
+
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new BadRequestException("Passwords do not match.");
+        }
+
+        UserEntity user = userRepository.findByEmailIgnoreCase(request.getEmail())
+                .orElseThrow(() -> new BadRequestException("Invalid email or OTP."));
+
+        PasswordResetOtpEntity otpEntity =
+                passwordResetOtpRepository
+                        .findTopByUserAndUsedFalseOrderByCreatedAtDesc(user)
+                        .orElseThrow(() -> new BadRequestException("Invalid email or OTP."));
+
+        if (!otpEntity.getOtp().equals(request.getOtp())) {
+            throw new BadRequestException("Invalid email or OTP.");
+        }
+
+        if (otpEntity.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("OTP has expired.");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+
+        userRepository.save(user);
+
+        otpEntity.setUsed(true);
+
+        passwordResetOtpRepository.save(otpEntity);
+
+        passwordResetOtpRepository.deleteByUser(user);
+
+        refreshTokenRepository.deleteAllByUser(user);
+    }
 
 
-//    HELPER METHODS
+    //    HELPER METHODS
     private AuthResponse buildAuthResponse(
             UserEntity user,
             String refreshToken,
