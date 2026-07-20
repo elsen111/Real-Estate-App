@@ -28,10 +28,11 @@ EstateFlow is a RESTful backend for a real estate CRM and marketplace platform. 
 - [14. Subscription Plan API](#14-subscription-plan-api)
 - [15. Notification API](#15-notification-api)
 - [16. Dashboard API](#16-dashboard-api)
-- [17. Enum Values](#17-enum-values)
-- [18. Controller Map](#18-controller-map)
-- [19. HTTP Status Codes](#19-http-status-codes)
-- [20. Security Notes](#20-security-notes)
+- [17. Review API](#17-review-api)
+- [18. Enum Values](#18-enum-values)
+- [19. Controller Map](#19-controller-map)
+- [20. HTTP Status Codes](#20-http-status-codes)
+- [21. Security Notes](#21-security-notes)
 
 ---
 
@@ -3515,7 +3516,459 @@ GET /dashboard/client
 
 ---
 
-# 17. Enum Values
+## 17. Review API
+
+**Controller:** `ReviewController`
+
+**Prefixes:**
+- `/properties`
+- `/agencies`
+- `/reviews`
+- `/admin/reviews`
+
+---
+
+### Overview
+
+The Review API allows authenticated clients to leave reviews for properties and agencies.
+
+**Features**
+- Create property reviews
+- Create agency reviews
+- View paginated reviews
+- Update own review
+- Delete own review
+- Admin moderation (optional)
+
+**Authorization**
+- `CLIENT` → Create, update and delete own reviews
+- `SUPER_ADMIN` → Moderate reviews
+- Public → View approved reviews
+
+**Business Rules**
+- One review per user per property.
+- One review per user per agency.
+- Rating must be between **1 and 5**.
+- Only approved reviews are visible publicly.
+- If moderation is enabled, new or edited reviews become `PENDING`.
+
+---
+
+## DTOs
+
+### CreateReviewRequestDTO
+
+```json
+{
+  "rating": 5,
+  "comment": "Very professional agency with excellent service."
+}
+```
+
+### Validation Rules
+
+| Field | Rules |
+|------|------|
+| rating | required, integer, min 1, max 5 |
+| comment | required, min 5, max 1000 characters |
+
+---
+
+### UpdateReviewRequestDTO
+
+```json
+{
+  "rating": 4,
+  "comment": "Updated review after completing the purchase."
+}
+```
+
+Validation rules are identical to `CreateReviewRequestDTO`.
+
+---
+
+### ReviewResponseDTO
+
+```json
+{
+  "id": 12,
+  "rating": 5,
+  "comment": "Very professional agency with excellent service.",
+  "status": "APPROVED",
+  "reviewer": {
+    "id": 8,
+    "firstName": "Elshan",
+    "lastName": "Hasanov"
+  },
+  "createdAt": "2026-07-15T12:15:00",
+  "updatedAt": "2026-07-15T12:15:00"
+}
+```
+
+---
+
+# Property Reviews
+
+## 17.1 Create Property Review
+
+**Endpoint**
+
+```http
+POST /properties/{propertyId}/reviews
+```
+
+**Authorization**
+
+`CLIENT`
+
+### Request DTO
+
+```json
+{
+  "rating": 5,
+  "comment": "Amazing apartment."
+}
+```
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "Review submitted successfully",
+  "data": {
+    "id": 12,
+    "rating": 5,
+    "comment": "Amazing apartment.",
+    "status": "PENDING"
+  }
+}
+```
+
+### Business Rules
+
+- Property must exist.
+- Only authenticated CLIENT users may review.
+- One review per property per client.
+- Status defaults to:
+  - `PENDING` (moderation enabled)
+  - `APPROVED` (moderation disabled)
+
+---
+
+## 17.2 Get Property Reviews
+
+**Endpoint**
+
+```http
+GET /properties/{propertyId}/reviews
+```
+
+**Authorization**
+
+Public
+
+### Query Parameters
+
+| Parameter | Default | Description |
+|------------|---------|-------------|
+| page | 0 | Page number |
+| size | 10 | Page size |
+| sort | createdAt,desc | Sorting |
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "Reviews fetched successfully",
+  "data": {
+    "content": [
+      {
+        "id": 12,
+        "rating": 5,
+        "comment": "Amazing apartment.",
+        "reviewer": {
+          "id": 5,
+          "firstName": "John",
+          "lastName": "Doe"
+        },
+        "createdAt": "2026-07-15T12:15:00"
+      }
+    ],
+    "page": 0,
+    "size": 10,
+    "totalElements": 45,
+    "totalPages": 5,
+    "last": false
+  }
+}
+```
+
+### Business Rules
+
+- Returns only `APPROVED` reviews.
+
+---
+
+# Agency Reviews
+
+## 17.3 Create Agency Review
+
+**Endpoint**
+
+```http
+POST /agencies/{agencyId}/reviews
+```
+
+**Authorization**
+
+`CLIENT`
+
+### Request DTO
+
+```json
+{
+  "rating": 5,
+  "comment": "Excellent agency."
+}
+```
+
+### Response
+
+Same as Property Review.
+
+### Business Rules
+
+- Agency must exist.
+- One review per agency per client.
+- Status defaults to `PENDING` when moderation is enabled.
+
+---
+
+## 17.4 Get Agency Reviews
+
+**Endpoint**
+
+```http
+GET /agencies/{agencyId}/reviews
+```
+
+**Authorization**
+
+Public
+
+### Query Parameters
+
+| Parameter | Default | Description |
+|------------|---------|-------------|
+| page | 0 | Page number |
+| size | 10 | Page size |
+| sort | createdAt,desc | Sorting |
+
+### Response
+
+Paginated `ReviewResponseDTO`
+
+### Business Rules
+
+- Returns only approved reviews.
+
+---
+
+# User Review Management
+
+## 17.5 Update My Review
+
+**Endpoint**
+
+```http
+PUT /reviews/{reviewId}
+```
+
+**Authorization**
+
+`CLIENT`
+
+### Request DTO
+
+```json
+{
+  "rating": 4,
+  "comment": "Updated review."
+}
+```
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "Review updated successfully",
+  "data": {
+    "id": 12,
+    "rating": 4,
+    "comment": "Updated review.",
+    "status": "PENDING"
+  }
+}
+```
+
+### Business Rules
+
+- User may update only their own review.
+- Edited reviews return to `PENDING` when moderation is enabled.
+
+---
+
+## 17.6 Delete My Review
+
+**Endpoint**
+
+```http
+DELETE /reviews/{reviewId}
+```
+
+**Authorization**
+
+`CLIENT`
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "Review deleted successfully",
+  "data": null
+}
+```
+
+### Business Rules
+
+- User may delete only their own review.
+
+---
+
+# Admin Review Moderation
+
+**Controller:** `AdminReviewController`
+
+**Prefix:** `/admin/reviews`
+
+**Authorization:** `SUPER_ADMIN`
+
+---
+
+## 17.7 Get Reviews
+
+**Endpoint**
+
+```http
+GET /admin/reviews
+```
+
+### Query Parameters
+
+| Parameter | Description |
+|------------|-------------|
+| page | Page number |
+| size | Page size |
+| status | PENDING, APPROVED, REJECTED |
+| targetType | PROPERTY, AGENCY |
+
+### Response
+
+Paginated `ReviewResponseDTO`
+
+---
+
+## 17.8 Moderate Review
+
+**Endpoint**
+
+```http
+PATCH /admin/reviews/{reviewId}/status
+```
+
+### Request DTO
+
+```json
+{
+  "status": "APPROVED"
+}
+```
+
+or
+
+```json
+{
+  "status": "REJECTED"
+}
+```
+
+### Validation Rules
+
+| Field | Rules |
+|------|------|
+| status | required, APPROVED or REJECTED |
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "Review status updated successfully",
+  "data": {
+    "id": 12,
+    "status": "APPROVED"
+  }
+}
+```
+
+### Business Rules
+
+- Only `SUPER_ADMIN` can moderate.
+- Only `PENDING` reviews can be moderated.
+
+---
+
+## ReviewStatus Enum
+
+```java
+public enum ReviewStatus {
+    PENDING,
+    APPROVED,
+    REJECTED
+}
+```
+
+---
+
+## ReviewTargetType Enum
+
+```java
+public enum ReviewTargetType {
+    PROPERTY,
+    AGENCY
+}
+```
+
+---
+
+## Endpoint Summary
+
+| Method | Endpoint | Authorization |
+|---------|----------|---------------|
+| POST | `/properties/{propertyId}/reviews` | CLIENT |
+| GET | `/properties/{propertyId}/reviews` | Public |
+| POST | `/agencies/{agencyId}/reviews` | CLIENT |
+| GET | `/agencies/{agencyId}/reviews` | Public |
+| PUT | `/reviews/{reviewId}` | CLIENT |
+| DELETE | `/reviews/{reviewId}` | CLIENT |
+| GET | `/admin/reviews` | SUPER_ADMIN |
+| PATCH | `/admin/reviews/{reviewId}/status` | SUPER_ADMIN |
+
+# 18. Enum Values
 
 ## User Roles
 
@@ -3629,7 +4082,7 @@ GET /dashboard/client
 
 ---
 
-# 18. Controller Map
+# 19. Controller Map
 
 | Controller | Prefix | Roles |
 |---|---|---|
@@ -3652,7 +4105,7 @@ GET /dashboard/client
 
 ---
 
-# 19. Complete Endpoint Summary
+# 20. Complete Endpoint Summary
 
 | Module | Method | Endpoint | Authorization |
 |---|---|---|---|
@@ -3744,7 +4197,7 @@ GET /dashboard/client
 
 ---
 
-# 20. HTTP Status Codes
+# 21. HTTP Status Codes
 
 | Code | Meaning |
 |---|---|
@@ -3762,7 +4215,7 @@ GET /dashboard/client
 
 ---
 
-# 21. Security Notes
+# 22. Security Notes
 
 ```
 - Passwords stored using BCrypt (min cost factor 12)
