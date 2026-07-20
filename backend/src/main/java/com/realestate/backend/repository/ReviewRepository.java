@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<ReviewEntity, UUID> {}
+public interface ReviewRepository extends JpaRepository<ReviewEntity, UUID> {
+    boolean existsByReviewerIdAndPropertyId(UUID reviewerId, UUID propertyId);
+}

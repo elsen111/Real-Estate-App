@@ -1,6 +1,7 @@
 package com.realestate.backend.entity;
 
 import com.realestate.backend.enums.ReviewStatus;
+import com.realestate.backend.enums.ReviewTargetType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -32,7 +33,7 @@ public class ReviewEntity {
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
             name = "reviewer_id",
             nullable = false,
@@ -60,10 +61,14 @@ public class ReviewEntity {
     @Column(name = "comment", columnDefinition = "TEXT")
     private String comment;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "target", nullable = false)
+    private ReviewTargetType target;
+
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 30, nullable = false)
-    private ReviewStatus status = ReviewStatus.PENDING;
+    private ReviewStatus status = ReviewStatus.APPROVED;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
