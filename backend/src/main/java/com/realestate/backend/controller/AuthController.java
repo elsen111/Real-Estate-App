@@ -91,4 +91,18 @@ public class AuthController {
                 ApiResponse.success("Current user fetched successfully", response)
         );
     }
+
+    @PatchMapping("/change-password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            @Valid @RequestBody ChangePasswordRequest request
+    ) {
+
+        authService.changePassword(request, currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Password successfully changed.", null)
+        );
+    }
+
 }
