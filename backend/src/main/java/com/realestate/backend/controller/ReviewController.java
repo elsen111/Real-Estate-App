@@ -27,7 +27,7 @@ public class ReviewController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/properties/{propertyId}/reviews")
-    @Operation(summary = "Create a new review.")
+    @Operation(summary = "Create a new review for property.")
     public ResponseEntity<ApiResponse<ReviewResponse>> createPropertyReview(
             @PathVariable UUID propertyId,
             @Valid @RequestBody CreateReviewRequest request,
@@ -57,5 +57,23 @@ public class ReviewController {
         );
 
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/agencies/{agencyId}/reviews")
+    @Operation(summary = "Create a new review for agency.")
+    public ResponseEntity<ApiResponse<ReviewResponse>> createAgencyReview(
+            @PathVariable UUID agencyId,
+            @Valid @RequestBody CreateReviewRequest request,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+
+        ReviewResponse response = reviewService.createAgencyReview(agencyId, request, currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Review created successfully", response)
+        );
+
+    }
+
 
 }
