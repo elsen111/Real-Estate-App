@@ -2,6 +2,7 @@ package com.realestate.backend.exception;
 
 import com.realestate.backend.common.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -35,6 +37,12 @@ public class GlobalExceptionHandler {
                 errors
         );
 
+        log.warn(
+                "Validation failed at {}: {} field error(s)",
+                request.getRequestURI(),
+                errors.size()
+        );
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
@@ -43,6 +51,12 @@ public class GlobalExceptionHandler {
             AuthorizationDeniedException ex,
             HttpServletRequest request
     ) {
+
+        log.warn(
+                "Access denied at {}: {}",
+                request.getRequestURI(),
+                ex.getMessage()
+        );
 
         return error(
                 "You do not have permission to access this resource",
@@ -56,6 +70,12 @@ public class GlobalExceptionHandler {
             ResourceNotFoundException ex,
             HttpServletRequest request
     ) {
+        log.warn(
+                "{} at {}: {}",
+                ex.getClass().getSimpleName(),
+                request.getRequestURI(),
+                ex.getMessage()
+        );
         return error(ex.getMessage(), HttpStatus.NOT_FOUND, request);
     }
 
@@ -64,7 +84,15 @@ public class GlobalExceptionHandler {
             BadRequestException ex,
             HttpServletRequest request
     ) {
+
+        log.warn(
+                "Bad request at {}: {}",
+                request.getRequestURI(),
+                ex.getMessage()
+        );
+
         return error(ex.getMessage(), HttpStatus.BAD_REQUEST, request);
+
     }
 
     @ExceptionHandler(BusinessException.class)
@@ -72,6 +100,13 @@ public class GlobalExceptionHandler {
             BusinessException ex,
             HttpServletRequest request
     ) {
+
+        log.warn(
+                "Business rule violated at {}: {}",
+                request.getRequestURI(),
+                ex.getMessage()
+        );
+
         return error(ex.getMessage(), HttpStatus.BAD_REQUEST, request);
     }
 
@@ -80,6 +115,13 @@ public class GlobalExceptionHandler {
             ConflictException ex,
             HttpServletRequest request
     ) {
+
+        log.warn(
+                "Conflict at {}: {}",
+                request.getRequestURI(),
+                ex.getMessage()
+        );
+
         return error(ex.getMessage(), HttpStatus.CONFLICT, request);
     }
 
@@ -88,7 +130,15 @@ public class GlobalExceptionHandler {
             ForbiddenException ex,
             HttpServletRequest request
     ) {
+
+        log.warn(
+                "Forbidden request at {}: {}",
+                request.getRequestURI(),
+                ex.getMessage()
+        );
+
         return error(ex.getMessage(), HttpStatus.FORBIDDEN, request);
+
     }
 
     @ExceptionHandler(InvalidOtpException.class)
@@ -96,6 +146,12 @@ public class GlobalExceptionHandler {
             InvalidOtpException ex,
             HttpServletRequest request
     ) {
+        log.warn(
+                "Invalid otp at {}: {}",
+                request.getRequestURI(),
+                ex.getMessage()
+        );
+
         return error(ex.getMessage(), HttpStatus.BAD_REQUEST, request);
     }
 
@@ -112,6 +168,11 @@ public class GlobalExceptionHandler {
                 ? ex.getMessage()
                 : "Invalid email or password";
 
+        log.warn(
+                "Unauthorized access attempt at {}",
+                request.getRequestURI()
+        );
+
         return error(message, HttpStatus.UNAUTHORIZED, request);
     }
 
@@ -120,6 +181,11 @@ public class GlobalExceptionHandler {
             org.springframework.web.multipart.MaxUploadSizeExceededException ex,
             HttpServletRequest request
     ) {
+        log.warn(
+                "Upload rejected at {}: file size exceeded",
+                request.getRequestURI()
+        );
+
         return error("File size exceeded", HttpStatus.CONTENT_TOO_LARGE, request);
     }
 
@@ -128,6 +194,12 @@ public class GlobalExceptionHandler {
             DuplicateInquiryException ex,
             HttpServletRequest request
     ) {
+        log.warn(
+                "Duplicate inquiry attempt at {}: {}",
+                request.getRequestURI(),
+                ex.getMessage()
+        );
+
         return error(ex.getMessage(), HttpStatus.CONFLICT, request);
     }
 
@@ -136,6 +208,12 @@ public class GlobalExceptionHandler {
             DuplicateAppointmentException ex,
             HttpServletRequest request
     ) {
+        log.warn(
+                "Duplicate appointment attempt at {}: {}",
+                request.getRequestURI(),
+                ex.getMessage()
+        );
+
         return error(ex.getMessage(), HttpStatus.CONFLICT, request);
     }
 
@@ -145,6 +223,13 @@ public class GlobalExceptionHandler {
             FileStorageException ex,
             HttpServletRequest request
     ) {
+        log.error(
+                "File storage error at {}: {}",
+                request.getRequestURI(),
+                ex.getMessage(),
+                ex
+        );
+
         return error(ex.getMessage(), ex.getStatus(), request);
     }
 
@@ -153,6 +238,12 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request
     ) {
+        log.error(
+                "Unhandled exception at {}",
+                request.getRequestURI(),
+                ex
+        );
+
         return error("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
