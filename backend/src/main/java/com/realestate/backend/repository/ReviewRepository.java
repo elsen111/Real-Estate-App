@@ -21,4 +21,6 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, UUID>, Jpa
     boolean existsByReviewerIdAndAgencyId(UUID reviewerId, UUID agencyId);
 
     Page<ReviewEntity> findAllByAgencyIdAndStatusIs(UUID agencyId, Pageable pageable, ReviewStatus status);
+
+    boolean existsByIdAndReviewerId(UUID reviewId, UUID reviewerId);
 }

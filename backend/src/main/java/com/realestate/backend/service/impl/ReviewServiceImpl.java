@@ -1,6 +1,6 @@
 package com.realestate.backend.service.impl;
 
-import com.realestate.backend.dto.request.CreateReviewRequest;
+import com.realestate.backend.dto.request.ReviewRequest;
 import com.realestate.backend.dto.response.ReviewResponse;
 import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.ReviewEntity;
@@ -42,7 +42,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public ReviewResponse createPropertyReview(UUID propertyId, CreateReviewRequest request, CustomUserDetails currentUser) {
+    public ReviewResponse createPropertyReview(UUID propertyId, ReviewRequest request, CustomUserDetails currentUser) {
 
         boolean isClient = currentUser.getAuthorities().stream()
                 .allMatch(auth -> Objects.equals(auth.getAuthority(), "ROLE_CLIENT"));
@@ -86,7 +86,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public ReviewResponse createAgencyReview(UUID agencyId, CreateReviewRequest request, CustomUserDetails currentUser) {
+    public ReviewResponse createAgencyReview(UUID agencyId, ReviewRequest request, CustomUserDetails currentUser) {
 
         boolean isClient = currentUser.getAuthorities().stream()
                 .allMatch(auth -> Objects.equals(auth.getAuthority(), "ROLE_CLIENT"));
@@ -125,6 +125,31 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         return reviewRepository.findAllByAgencyIdAndStatusIs(agencyId, pageable, ReviewStatus.APPROVED).map(reviewMapper::toResponse);
+
+    }
+
+    @Override
+    @Transactional
+    public ReviewResponse updateOwnReview(UUID reviewId, ReviewRequest request, CustomUserDetails currentUser) {
+
+        if(!reviewRepository.existsByIdAndReviewerId(reviewId, currentUser.getId())) {
+            throw new ResourceNotFoundException("Review with id " + reviewId + " not found");
+        }
+
+        UserEntity user = userRepository.findById(currentUser.getId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("User with id " + currentUser.getId() + " not found")
+                );
+
+        ReviewEntity review = reviewRepository.findById(reviewId).orElseThrow(
+                () -> new ResourceNotFoundException("Review with id " + reviewId + " not found")
+        );
+
+        reviewMapper.toEntity(request, user, review);
+
+        ReviewEntity  savedReview = reviewRepository.saveAndFlush(review);
+
+        return  reviewMapper.toResponse(savedReview);
 
     }
 

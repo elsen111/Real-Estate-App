@@ -1,7 +1,7 @@
 package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
-import com.realestate.backend.dto.request.CreateReviewRequest;
+import com.realestate.backend.dto.request.ReviewRequest;
 import com.realestate.backend.dto.response.ReviewResponse;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.ReviewService;
@@ -30,7 +30,7 @@ public class ReviewController {
     @Operation(summary = "Create a new review for property.")
     public ResponseEntity<ApiResponse<ReviewResponse>> createPropertyReview(
             @PathVariable UUID propertyId,
-            @Valid @RequestBody CreateReviewRequest request,
+            @Valid @RequestBody ReviewRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
 
@@ -63,7 +63,7 @@ public class ReviewController {
     @Operation(summary = "Create a new review for agency.")
     public ResponseEntity<ApiResponse<ReviewResponse>> createAgencyReview(
             @PathVariable UUID agencyId,
-            @Valid @RequestBody CreateReviewRequest request,
+            @Valid @RequestBody ReviewRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
 
@@ -87,6 +87,22 @@ public class ReviewController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Agency review list fetched successfully", response)
+        );
+
+    }
+
+    @PutMapping("/reviews/{reviewId}")
+    @Operation(summary = "Update own review.")
+    public ResponseEntity<ApiResponse<ReviewResponse>> updateOwnReview(
+            @PathVariable UUID reviewId,
+            @Valid @RequestBody ReviewRequest request,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+
+        ReviewResponse response = reviewService.updateOwnReview(reviewId, request, currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Review updated successfully", response)
         );
 
     }

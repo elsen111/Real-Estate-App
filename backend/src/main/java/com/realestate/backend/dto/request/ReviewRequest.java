@@ -1,6 +1,5 @@
 package com.realestate.backend.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -9,7 +8,7 @@ import org.hibernate.validator.constraints.Range;
 
 @Getter
 @Setter
-public class CreateReviewRequest {
+public class ReviewRequest {
 
     @NotNull(message = "Rating score is required")
     @Range(min = 1, max = 5, message = "Rating score must be between 1 and 5")
