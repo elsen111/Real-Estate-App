@@ -17,6 +17,7 @@ public class ReviewResponse {
     private UUID agencyId;
     private String reviewerName;
     private String reviewerEmail;
+    private String reviewerAvatarUrl;
     private Integer rating;
     private String comment;
     private ReviewStatus status;

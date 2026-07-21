@@ -29,6 +29,7 @@ public interface ReviewMapper {
     @Mapping(target = "agencyId", source = "agency.id")
     @Mapping(target = "reviewerName", source = "reviewer.fullName")
     @Mapping(target = "reviewerEmail", source = "reviewer.email")
+    @Mapping(target = "reviewerAvatarUrl", source = "reviewer.profilePhotoUrl.media.fileUrl")
     ReviewResponse toResponse(ReviewEntity reviewEntity);
 
 }

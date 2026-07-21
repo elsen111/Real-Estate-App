@@ -5,6 +5,7 @@ import com.realestate.backend.dto.response.ReviewResponse;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.entity.ReviewEntity;
 import com.realestate.backend.entity.UserEntity;
+import com.realestate.backend.enums.ReviewStatus;
 import com.realestate.backend.enums.ReviewTargetType;
 import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.exception.ForbiddenException;
@@ -16,6 +17,8 @@ import com.realestate.backend.repository.UserRepository;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,6 +66,17 @@ public class ReviewServiceImpl implements ReviewService {
         ReviewEntity savedReview = reviewRepository.saveAndFlush(createdReview);
 
         return  reviewMapper.toResponse(savedReview);
+
+    }
+
+    @Override
+    public Page<ReviewResponse> getPropertyReviews(UUID propertyId, Pageable pageable) {
+
+        if(!propertyRepository.existsById(propertyId)) {
+            throw new ResourceNotFoundException("Property with id " + propertyId + " not found");
+        }
+
+        return reviewRepository.findAllByPropertyIdAndStatusIs(propertyId, pageable, ReviewStatus.APPROVED).map(reviewMapper::toResponse);
 
     }
 
