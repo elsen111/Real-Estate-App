@@ -85,6 +85,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional
     public ReviewResponse createAgencyReview(UUID agencyId, CreateReviewRequest request, CustomUserDetails currentUser) {
 
         boolean isClient = currentUser.getAuthorities().stream()
@@ -113,6 +114,17 @@ public class ReviewServiceImpl implements ReviewService {
         ReviewEntity savedReview = reviewRepository.saveAndFlush(createdReview);
 
         return  reviewMapper.toResponse(savedReview);
+
+    }
+
+    @Override
+    public Page<ReviewResponse> getAgencyReviews(UUID agencyId, Pageable pageable) {
+
+        if(!agencyRepository.existsById(agencyId)) {
+            throw new ResourceNotFoundException("Agency with id " + agencyId + " not found");
+        }
+
+        return reviewRepository.findAllByAgencyIdAndStatusIs(agencyId, pageable, ReviewStatus.APPROVED).map(reviewMapper::toResponse);
 
     }
 

@@ -16,4 +16,6 @@ public interface ReviewService {
 
     ReviewResponse createAgencyReview(UUID agencyId, CreateReviewRequest request, CustomUserDetails currentUser);
 
+    Page<ReviewResponse> getAgencyReviews(UUID agencyId, Pageable pageable);
+
 }

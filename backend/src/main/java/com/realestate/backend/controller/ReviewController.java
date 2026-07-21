@@ -75,5 +75,20 @@ public class ReviewController {
 
     }
 
+    @GetMapping("/agencies/{agencyId}/reviews")
+    @Operation(summary = "Get agency reviews.")
+    public ResponseEntity<ApiResponse<Page<ReviewResponse>>> getAgencyReviews(
+            @PathVariable UUID agencyId,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+
+        Page<ReviewResponse> response = reviewService.getAgencyReviews(agencyId, pageable);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Agency review list fetched successfully", response)
+        );
+
+    }
 
 }
