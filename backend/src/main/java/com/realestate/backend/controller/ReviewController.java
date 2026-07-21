@@ -107,4 +107,19 @@ public class ReviewController {
 
     }
 
+    @DeleteMapping("/reviews/{reviewId}")
+    @Operation(summary = "Delete own review.")
+    public ResponseEntity<ApiResponse<Void>> deleteOwnReview(
+            @PathVariable UUID reviewId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+
+        reviewService.deleteOwnReview(reviewId, currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Review deleted successfully", null)
+        );
+
+    }
+
 }

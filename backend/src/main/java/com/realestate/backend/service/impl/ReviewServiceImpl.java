@@ -153,4 +153,18 @@ public class ReviewServiceImpl implements ReviewService {
 
     }
 
+    @Override
+    @Transactional
+    public void deleteOwnReview(UUID reviewId, CustomUserDetails currentUser) {
+
+        ReviewEntity review = reviewRepository.findByIdAndReviewerId(reviewId, currentUser.getId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Review with id " + reviewId + " not found")
+                );
+
+        reviewRepository.delete(review);
+
+    }
+
+
 }

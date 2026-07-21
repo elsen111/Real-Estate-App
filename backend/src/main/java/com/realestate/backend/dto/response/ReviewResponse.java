@@ -1,6 +1,7 @@
 package com.realestate.backend.dto.response;
 
 import com.realestate.backend.enums.ReviewStatus;
+import com.realestate.backend.enums.ReviewTargetType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -21,6 +22,7 @@ public class ReviewResponse {
     private Integer rating;
     private String comment;
     private ReviewStatus status;
+    private ReviewTargetType target;
     private LocalDateTime createdAt;
 
 }

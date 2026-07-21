@@ -20,4 +20,6 @@ public interface ReviewService {
 
     ReviewResponse updateOwnReview(UUID reviewId, ReviewRequest request, CustomUserDetails currentUser);
 
+    void deleteOwnReview(UUID reviewId, CustomUserDetails currentUser);
+
 }
