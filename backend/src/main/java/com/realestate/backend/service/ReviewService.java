@@ -1,0 +1,25 @@
+package com.realestate.backend.service;
+
+import com.realestate.backend.dto.request.ReviewRequest;
+import com.realestate.backend.dto.response.ReviewResponse;
+import com.realestate.backend.security.CustomUserDetails;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.util.UUID;
+
+public interface ReviewService {
+
+    ReviewResponse createPropertyReview(UUID propertyId, ReviewRequest request, CustomUserDetails currentUser);
+
+    Page<ReviewResponse> getPropertyReviews(UUID propertyId, Pageable pageable);
+
+    ReviewResponse createAgencyReview(UUID agencyId, ReviewRequest request, CustomUserDetails currentUser);
+
+    Page<ReviewResponse> getAgencyReviews(UUID agencyId, Pageable pageable);
+
+    ReviewResponse updateOwnReview(UUID reviewId, ReviewRequest request, CustomUserDetails currentUser);
+
+    void deleteOwnReview(UUID reviewId, CustomUserDetails currentUser);
+
+}
