@@ -6,6 +6,7 @@ import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.exception.UnauthorizedException;
 import com.realestate.backend.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,8 +17,10 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenServiceImpl {
@@ -48,6 +51,11 @@ public class RefreshTokenServiceImpl {
 
         refreshTokenRepository.save(entity);
 
+        log.info(
+                "Refresh token created for user {}",
+                user.getEmail()
+        );
+
         return new CreatedRefreshToken(rawToken, entity);
     }
 
@@ -75,6 +83,11 @@ public class RefreshTokenServiceImpl {
 
         refreshTokenRepository.save(oldToken);
         refreshTokenRepository.save(newToken);
+
+        log.info(
+                "Refresh token rotated for user {}",
+                oldToken.getUser().getId()
+        );
 
         return new CreatedRefreshToken(newRawToken, newToken);
     }
@@ -105,16 +118,29 @@ public class RefreshTokenServiceImpl {
                 .ifPresent(token -> {
                     token.revoke(null);
                     refreshTokenRepository.save(token);
+
+                    log.info(
+                            "Refresh token revoked for user {}",
+                            token.getUser().getId()
+                    );
                 });
     }
 
     @Transactional
     public void revokeAllUserRefreshTokens(UUID userId) {
-        refreshTokenRepository.findAllByUser_IdAndRevokedFalse(userId)
-                .forEach(token -> {
+        List<RefreshTokenEntity> tokens = refreshTokenRepository.findAllByUser_IdAndRevokedFalse(userId);
+
+        tokens.forEach(token -> {
                     token.revoke(null);
                     refreshTokenRepository.save(token);
                 });
+
+        log.info(
+                "Revoked {} refresh token(s) for user {}",
+                tokens.size(),
+                userId
+        );
+
     }
 
     public String hash(String rawToken) {

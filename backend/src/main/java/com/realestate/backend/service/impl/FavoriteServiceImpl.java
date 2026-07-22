@@ -18,6 +18,7 @@ import com.realestate.backend.repository.UserRepository;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.FavoriteService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FavoriteServiceImpl implements FavoriteService {
@@ -70,6 +72,12 @@ public class FavoriteServiceImpl implements FavoriteService {
 
         FavoriteEntity savedFavorite = favoriteRepository.saveAndFlush(addedFavorite);
 
+        log.info(
+                "User {} added property {} to favorites",
+                user.getId(),
+                propertyId
+        );
+
         return favoriteMapper.toCreateFavoriteResponse(savedFavorite);
 
     }
@@ -90,6 +98,12 @@ public class FavoriteServiceImpl implements FavoriteService {
         }
 
         favoriteRepository.deleteByUser_IdAndProperty_Id(user.getId(), propertyId);
+
+        log.info(
+                "User {} removed property {} from favorites",
+                user.getId(),
+                propertyId
+        );
 
     }
 

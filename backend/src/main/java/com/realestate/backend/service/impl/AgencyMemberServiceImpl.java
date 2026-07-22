@@ -17,6 +17,7 @@ import com.realestate.backend.repository.UserRepository;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.AgencyMemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AgencyMemberServiceImpl implements AgencyMemberService {
@@ -95,7 +97,18 @@ public class AgencyMemberServiceImpl implements AgencyMemberService {
                 .active(true)
                 .build();
 
-        return agencyMemberMapper.toResponse(agencyMemberRepository.save(member));
+        AgencyMemberEntity savedMember = agencyMemberRepository.save(member);
+
+        log.info(
+                "User '{}' ({}) assigned to agency '{}' ({}) as {}",
+                targetUser.getEmail(),
+                targetUser.getId(),
+                agency.getName(),
+                agency.getId(),
+                role
+        );
+
+        return agencyMemberMapper.toResponse(savedMember);
     }
 
 

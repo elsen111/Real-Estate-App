@@ -1,8 +1,10 @@
 package com.realestate.backend.service.impl;
 
+import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.service.EmailService;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -12,6 +14,7 @@ import org.thymeleaf.context.Context;
 
 import java.nio.charset.StandardCharsets;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
@@ -51,13 +54,14 @@ public class EmailServiceImpl implements EmailService {
 
             helper.setText(html, true);
 
+            log.info("Sending password reset OTP email to {}", toEmail);
+
             mailSender.send(message);
 
+            log.info("Password reset OTP email sent successfully to {}", toEmail);
+
         } catch (Exception e) {
-            throw new RuntimeException(
-                    "Failed to send password reset OTP email",
-                    e
-            );
+            throw new BusinessException("Failed to send password reset OTP email");
         }
     }
 }

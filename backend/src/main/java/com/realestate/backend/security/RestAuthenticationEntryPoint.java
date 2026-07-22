@@ -5,6 +5,7 @@ import com.realestate.backend.common.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,7 +17,10 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 
     private final ObjectMapper objectMapper;
 
@@ -31,6 +35,8 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
                 HttpStatus.UNAUTHORIZED.value(),
                 request.getRequestURI()
         );
+
+        log.warn("Unauthenticated request to {}: {}", request.getRequestURI(), authException.getMessage());
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

@@ -16,6 +16,7 @@ import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.security.SecurityConstants;
 import com.realestate.backend.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AppointmentServiceImpl implements AppointmentService {
@@ -78,6 +80,13 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         AppointmentEntity savedAppointment = appointmentRepository.saveAndFlush(newAppointment);
 
+        log.info(
+                "Appointment {} created for property {} by client {}",
+                savedAppointment.getId(),
+                propertyId,
+                client.getId()
+        );
+
         return appointmentMapper.toResponse(savedAppointment);
 
     }
@@ -113,6 +122,12 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         appointment.setStatus(AppointmentStatus.CANCELLED);
         appointmentRepository.saveAndFlush(appointment);
+
+        log.info(
+                "Appointment {} cancelled by client {}",
+                appointment.getId(),
+                currentUser.getId()
+        );
 
     }
 
@@ -165,6 +180,14 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setResponseNote(request.getResponseNote());
 
         AppointmentEntity updatedAppointment = appointmentRepository.saveAndFlush(appointment);
+
+        log.info(
+                "Appointment {} status changed to {} by user {}",
+                appointment.getId(),
+                updatedAppointment.getStatus(),
+                currentUser.getId()
+        );
+
 
         return appointmentMapper.toResponse(updatedAppointment);
     }

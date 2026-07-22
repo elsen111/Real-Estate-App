@@ -21,6 +21,7 @@ import com.realestate.backend.repository.specification.AgencySpecification;
 import com.realestate.backend.service.AdminAgencyService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -31,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminAgencyServiceImpl implements AdminAgencyService {
@@ -125,6 +127,13 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
 
         agencyRepository.save(agency);
 
+        log.info(
+                "Agency '{}' ({}) status changed to {}",
+                agency.getName(),
+                agency.getId(),
+                status
+        );
+
         return agency.getName() + "'s status changed to " + status.toString();
 
     }
@@ -141,6 +150,12 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         agency.setIsDeleted(true);
 
         agencyRepository.save(agency);
+
+        log.info(
+                "Agency '{}' ({}) soft deleted",
+                agency.getName(),
+                agency.getId()
+        );
 
         return agency.getName() + "has been deleted successfully";
 
@@ -170,9 +185,14 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         } else if (isAgencyDeleted) {
             throw new  BadRequestException("Agency has been deleted.");
         } else if(!isAgencyApproved)  {
+            log.warn(
+                    "Attempt to create subscription for unapproved agency {}",
+                    agencyId
+            );
+
             throw new  BadRequestException("Agency has not been approved.Only approved agencies are allowed to get subscriptions.");
         } else  if(hasActiveSubscription) {
-            throw new  BadRequestException("Agency has already an active subscription.");
+             throw new  BadRequestException("Agency has already an active subscription.");
         }
 
         LocalDateTime startDate = LocalDateTime.now();
@@ -188,6 +208,14 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
                         .build();
 
         AgencySubscriptionEntity createdAgencySubscription = agencySubscriptionRepository.saveAndFlush(agencySubscription);
+
+        log.info(
+                "Subscription '{}' assigned to agency '{}' ({}) until {}",
+                subscriptionPlan.getName(),
+                agency.getName(),
+                agency.getId(),
+                createdAgencySubscription.getEndDate()
+        );
 
         return subscriptionMapper.toAdminResponse(createdAgencySubscription);
 

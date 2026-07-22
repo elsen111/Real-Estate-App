@@ -27,6 +27,7 @@ import com.realestate.backend.service.AgencyService;
 import com.realestate.backend.service.MediaService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -36,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AgencyServiceImpl implements AgencyService {
@@ -99,6 +101,14 @@ public class AgencyServiceImpl implements AgencyService {
         agency.setAddress(request.getAddress());
 
         agencyRepository.save(agency);
+
+        log.info(
+                "Agency '{}' ({}) updated by user {}",
+                agency.getName(),
+                agency.getId(),
+                currentUser.getId()
+        );
+
         return agencyMapper.toAgencyOwnerResponse(agency);
 
     }
@@ -249,6 +259,12 @@ public class AgencyServiceImpl implements AgencyService {
         Optional<AgencyMediaEntity> existingLogo =
                 agencyMediaRepository.findByAgencyId(agency.getId());
 
+        log.info(
+                "Uploading logo for agency '{}' ({})",
+                agency.getName(),
+                agency.getId()
+        );
+
         MediaFileEntity uploadedMedia =
                 mediaService.upload(file, MediaFolder.AGENCY_LOGO);
 
@@ -260,6 +276,12 @@ public class AgencyServiceImpl implements AgencyService {
 
             mediaService.delete(agencyMedia.getMedia());
 
+            log.info(
+                    "Replacing existing logo for agency '{}' ({})",
+                    agency.getName(),
+                    agency.getId()
+            );
+
         }
 
         AgencyMediaEntity agencyMedia = AgencyMediaEntity.builder()
@@ -268,6 +290,12 @@ public class AgencyServiceImpl implements AgencyService {
                 .build();
 
         agencyMediaRepository.save(agencyMedia);
+
+        log.info(
+                "Logo uploaded successfully for agency '{}' ({})",
+                agency.getName(),
+                agency.getId()
+        );
 
         return AgencyLogoUploadResponse.builder()
                 .logoUrl(uploadedMedia.getFileUrl())

@@ -19,6 +19,7 @@ import com.realestate.backend.repository.specification.PropertySpecification;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.AgentService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -28,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Objects;
 import java.util.UUID;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AgentServiceImpl implements AgentService {
@@ -90,6 +91,14 @@ public class AgentServiceImpl implements AgentService {
         agent.setAgency(null);
         agent.getRoles().removeIf(role -> role.getRoleName() == Role.AGENT);
         userRepository.save(agent);
+
+        log.info(
+                "User '{}' removed agent '{}' ({}) from agency '{}'",
+                currentUser.getUsername(),
+                agent.getEmail(),
+                agent.getId(),
+                membership.getAgency().getId()
+        );
 
     }
 

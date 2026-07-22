@@ -16,6 +16,7 @@ import com.realestate.backend.repository.specification.AgencySpecification;
 import com.realestate.backend.repository.specification.ReviewSpecification;
 import com.realestate.backend.service.AdminReviewService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminReviewServiceImpl implements AdminReviewService {
@@ -59,6 +61,12 @@ public class AdminReviewServiceImpl implements AdminReviewService {
         }
 
         review.setStatus(request.getStatus());
+
+        log.info(
+                "Review ({}) status changed to {}",
+                review.getId(),
+                review.getStatus()
+        );
 
     }
 
