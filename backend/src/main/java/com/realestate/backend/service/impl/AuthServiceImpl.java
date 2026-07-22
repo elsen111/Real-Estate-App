@@ -20,6 +20,7 @@ import com.realestate.backend.service.AuthService;
 import com.realestate.backend.service.OtpService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -85,6 +87,12 @@ public class AuthServiceImpl implements AuthService {
                         servletRequest.getHeader("User-Agent")
                 );
 
+        log.info(
+                "User registered successfully: email={}, role={}",
+                user.getEmail(),
+                role
+        );
+
         return buildAuthResponse(user, refreshToken.rawToken(), null);
     }
 
@@ -125,6 +133,12 @@ public class AuthServiceImpl implements AuthService {
                         extractIpAddress(servletRequest),
                         servletRequest.getHeader("User-Agent")
                 );
+
+        log.info(
+                "Agency '{}' registered successfully with owner {}",
+                agency.getName(),
+                owner.getEmail()
+        );
 
         return buildAuthResponse(owner, refreshToken.rawToken(), agency);
     }
@@ -169,6 +183,11 @@ public class AuthServiceImpl implements AuthService {
                         servletRequest.getHeader("User-Agent")
                 );
 
+        log.info(
+                "User '{}' logged in successfully",
+                user.getEmail()
+        );
+
         return buildAuthResponse(user, refreshToken.rawToken(), agency);
     }
 
@@ -187,6 +206,11 @@ public class AuthServiceImpl implements AuthService {
 
         UserEntity user = rotatedToken.entity().getUser();
 
+        log.info(
+                "Refresh token rotated for user '{}'",
+                user.getEmail()
+        );
+
         return RefreshTokenResponse.builder()
                 .accessToken(jwtService.generateAccessToken(user))
                 .refreshToken(rotatedToken.rawToken())
@@ -199,6 +223,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(LogoutRequest request) {
         refreshTokenService.revokeRefreshToken(request.getRefreshToken());
+
+        log.info("User logged out successfully");
     }
 
     @Transactional(readOnly = true)
@@ -249,6 +275,11 @@ public class AuthServiceImpl implements AuthService {
 
         refreshTokenService.revokeAllUserRefreshTokens(currentUser.getId());
 
+        log.info(
+                "Password changed successfully for user '{}'",
+                user.getEmail()
+        );
+
     }
 
     @Override
@@ -257,6 +288,11 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.findByEmailIgnoreCase(request.getEmail())
                 .ifPresent(otpService::generateAndSendOtp);
+
+        log.info(
+                "Password reset requested for email '{}'",
+                request.getEmail()
+        );
 
     }
 
@@ -295,6 +331,12 @@ public class AuthServiceImpl implements AuthService {
         passwordResetOtpRepository.deleteByUser(user);
 
         refreshTokenRepository.deleteAllByUser(user);
+
+        log.info(
+                "Password reset completed for user '{}'",
+                user.getEmail()
+        );
+
     }
 
 

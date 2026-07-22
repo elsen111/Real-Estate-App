@@ -6,12 +6,14 @@ import com.realestate.backend.exception.StorageException;
 import io.minio.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MinioStorageService implements StorageService {
@@ -42,6 +44,13 @@ public class MinioStorageService implements StorageService {
                             .build()
             );
 
+            log.info(
+                    "File uploaded successfully: storageKey='{}', folder='{}', size={} bytes",
+                    storageKey,
+                    folder,
+                    file.getSize()
+            );
+
             return new UploadedFile(
                     storageKey,
                     buildFileUrl(storageKey),
@@ -51,6 +60,13 @@ public class MinioStorageService implements StorageService {
             );
 
         } catch (Exception e) {
+
+            log.error(
+                    "Failed to upload file '{}' to folder '{}'",
+                    file.getOriginalFilename(),
+                    folder,
+                    e
+            );
 
             throw new StorageException(
                     "Failed to upload file to storage.",
@@ -73,7 +89,18 @@ public class MinioStorageService implements StorageService {
                             .build()
             );
 
+            log.info(
+                    "File deleted successfully: storageKey='{}'",
+                    storageKey
+            );
+
         } catch (Exception e) {
+
+            log.error(
+                    "Failed to delete file: storageKey='{}'",
+                    storageKey,
+                    e
+            );
 
             throw new StorageException(
                     "Failed to delete file from storage.",
@@ -103,9 +130,21 @@ public class MinioStorageService implements StorageService {
                                 .build()
                 );
 
+                log.info("Created MinIO bucket '{}'", properties.getBucket());
+
+            } else {
+
+                log.info("MinIO bucket '{}' already exists", properties.getBucket());
+
             }
 
         } catch (Exception e) {
+
+            log.error(
+                    "Failed to initialize MinIO bucket '{}'",
+                    properties.getBucket(),
+                    e
+            );
 
             throw new StorageException(
                     "Failed to initialize MinIO bucket.",

@@ -8,11 +8,13 @@ import com.realestate.backend.service.EmailService;
 import com.realestate.backend.service.OtpService;
 import com.realestate.backend.utils.otp.OtpGenerator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OtpServiceImpl implements OtpService {
@@ -43,6 +45,11 @@ public class OtpServiceImpl implements OtpService {
                 user.getEmail(),
                 otp
         );
+
+        log.info(
+                "Password reset OTP generated and sent to user '{}'",
+                user.getEmail()
+        );
     }
 
     @Override
@@ -62,6 +69,12 @@ public class OtpServiceImpl implements OtpService {
         entity.setUsed(true);
 
         passwordResetOtpRepository.save(entity);
+
+        log.info(
+                "Password reset OTP verified successfully for user '{}'",
+                user.getEmail()
+        );
+
     }
     
 }

@@ -19,6 +19,7 @@ import com.realestate.backend.security.SecurityConstants;
 import com.realestate.backend.service.MediaService;
 import com.realestate.backend.service.PropertyService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +36,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PropertyServiceImpl implements PropertyService {
@@ -112,6 +114,13 @@ public class PropertyServiceImpl implements PropertyService {
 
         propertyRepository.saveAndFlush(newProperty);
 
+        log.info(
+                "Property '{}' ({}) created for agency '{}'",
+                newProperty.getTitle(),
+                newProperty.getId(),
+                agency.getName()
+        );
+
         return propertyMapper.toCreateResponse(newProperty);
     }
 
@@ -177,6 +186,12 @@ public class PropertyServiceImpl implements PropertyService {
 
         PropertyEntity updatedProperty = propertyRepository.saveAndFlush(property);
 
+        log.info(
+                "Property '{}' ({}) updated",
+                updatedProperty.getTitle(),
+                updatedProperty.getId()
+        );
+
         return propertyMapper.toCreateResponse(updatedProperty);
     }
 
@@ -202,8 +217,17 @@ public class PropertyServiceImpl implements PropertyService {
             throw new BadRequestException("New status should be one of these: SOLD, RENTED.");
         }
 
+        PropertyStatus previousStatus = property.getStatus();
+
         property.setStatus(request.getStatus());
         propertyRepository.saveAndFlush(property);
+
+        log.info(
+                "Property {} status changed from {} to {}",
+                property.getId(),
+                previousStatus,
+                request.getStatus()
+        );
 
     }
 
@@ -233,6 +257,12 @@ public class PropertyServiceImpl implements PropertyService {
 
         property.setFeatured(!property.getFeatured());
         propertyRepository.saveAndFlush(property);
+
+        log.info(
+                "Property {} featured status changed to {}",
+                property.getId(),
+                property.getFeatured()
+        );
 
         return propertyMapper.toCreateResponse(property);
 
@@ -264,6 +294,12 @@ public class PropertyServiceImpl implements PropertyService {
 
         property.setStatus(PropertyStatus.DELETED);
         propertyRepository.saveAndFlush(property);
+
+        log.info(
+                "Property '{}' ({}) marked as deleted",
+                property.getTitle(),
+                property.getId()
+        );
 
     }
 
@@ -402,6 +438,12 @@ public class PropertyServiceImpl implements PropertyService {
 
         }
 
+        log.info(
+                "Primary image changed for property {} to media {}",
+                propertyId,
+                propertyMediaId
+        );
+
         return mediaFiles.stream()
                 .map(propertyMapper::toMediaPriorityResponse).toList();
     }
@@ -441,6 +483,12 @@ public class PropertyServiceImpl implements PropertyService {
         propertyMediaRepository.delete(propertyMedia);
 
         mediaService.delete(propertyMedia.getMedia());
+
+        log.info(
+                "Media {} removed from property {}",
+                propertyMediaId,
+                property.getId()
+        );
 
         if (wasPrimary) {
 
@@ -505,6 +553,12 @@ public class PropertyServiceImpl implements PropertyService {
 
             hasMainImage = true;
         }
+
+        log.info(
+                "{} media file(s) uploaded for property {}",
+                responses.size(),
+                propertyId
+        );
 
         return responses;
     }

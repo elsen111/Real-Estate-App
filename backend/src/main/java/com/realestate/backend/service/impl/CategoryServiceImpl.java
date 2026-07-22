@@ -13,6 +13,7 @@ import com.realestate.backend.repository.CategoryRepository;
 import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
@@ -97,6 +99,12 @@ public class CategoryServiceImpl implements CategoryService {
 
         CategoryEntity savedCategory = categoryRepository.saveAndFlush(newCategory);
 
+        log.info(
+                "Category '{}' ({}) created",
+                savedCategory.getName(),
+                savedCategory.getId()
+        );
+
         return categoryMapper.toAdminResponse(savedCategory);
 
     }
@@ -114,11 +122,20 @@ public class CategoryServiceImpl implements CategoryService {
             throw new ConflictException("Category with name " + request.getName() + " already exists");
         }
 
+        String oldName = oldCategory.getName();
+
         categoryMapper.toUpdatedEntity(request, oldCategory);
 
         CategoryEntity updatedCategory = categoryRepository.save(oldCategory);
 
         updatedCategory.setSlug(generateSlug(request.getName().trim()));
+
+        log.info(
+                "Category '{}' ({}) updated to '{}'",
+                oldName,
+                categoryId,
+                updatedCategory.getName()
+        );
 
         return categoryMapper.toAdminResponse(updatedCategory);
 
@@ -143,6 +160,13 @@ public class CategoryServiceImpl implements CategoryService {
         category.setActive(newStatus);
         categoryRepository.save(category);
 
+        log.info(
+                "Category '{}' ({}) {}",
+                category.getName(),
+                categoryId,
+                newStatus ? "activated" : "deactivated"
+        );
+
         return newStatus ? "Category is activated" : "Category is deactivated";
 
     }
@@ -166,6 +190,12 @@ public class CategoryServiceImpl implements CategoryService {
         category.setDeleted(true);
 
         categoryRepository.save(category);
+
+        log.info(
+                "Category '{}' ({}) soft deleted",
+                category.getName(),
+                categoryId
+        );
 
     }
 

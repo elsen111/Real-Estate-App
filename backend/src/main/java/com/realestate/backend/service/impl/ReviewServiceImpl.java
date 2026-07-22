@@ -18,6 +18,7 @@ import com.realestate.backend.repository.UserRepository;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Objects;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
@@ -69,7 +71,14 @@ public class ReviewServiceImpl implements ReviewService {
 
         ReviewEntity savedReview = reviewRepository.saveAndFlush(createdReview);
 
-        return  reviewMapper.toResponse(savedReview);
+        log.info(
+                "User {} created a review {} for property {}",
+                user.getId(),
+                savedReview.getId(),
+                propertyId
+        );
+
+        return reviewMapper.toResponse(savedReview);
 
     }
 
@@ -113,6 +122,13 @@ public class ReviewServiceImpl implements ReviewService {
 
         ReviewEntity savedReview = reviewRepository.saveAndFlush(createdReview);
 
+        log.info(
+                "User {} created a review {} for agency {}",
+                user.getId(),
+                savedReview.getId(),
+                agencyId
+        );
+
         return  reviewMapper.toResponse(savedReview);
 
     }
@@ -149,6 +165,12 @@ public class ReviewServiceImpl implements ReviewService {
 
         ReviewEntity  savedReview = reviewRepository.saveAndFlush(review);
 
+        log.info(
+                "User {} updated review {}",
+                currentUser.getId(),
+                reviewId
+        );
+
         return  reviewMapper.toResponse(savedReview);
 
     }
@@ -163,6 +185,12 @@ public class ReviewServiceImpl implements ReviewService {
                 );
 
         reviewRepository.delete(review);
+
+        log.info(
+                "User {} deleted review {}",
+                currentUser.getId(),
+                reviewId
+        );
 
     }
 

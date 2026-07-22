@@ -19,6 +19,7 @@ import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.MediaService;
 import com.realestate.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -58,6 +60,12 @@ public class UserServiceImpl implements UserService {
 
         user = userRepository.save(user);
 
+        log.info(
+                "User '{}' ({}) updated profile",
+                user.getEmail(),
+                user.getId()
+        );
+
         return userMapper.toSummary(user);
 
     }
@@ -84,6 +92,12 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         refreshTokenRepository.deleteAllByUser(user);
+
+        log.info(
+                "User '{}' ({}) deleted their account",
+                user.getEmail(),
+                user.getId()
+        );
 
     }
 
@@ -122,6 +136,12 @@ public class UserServiceImpl implements UserService {
 
         userMediaRepository.save(userMedia);
 
+        log.info(
+                "Profile photo uploaded for user '{}' ({})",
+                user.getEmail(),
+                user.getId()
+        );
+
         return UserProfilePhotoResponse.builder()
                 .photoUrl(uploadedMedia.getFileUrl())
                 .build();
@@ -142,6 +162,12 @@ public class UserServiceImpl implements UserService {
         userMediaRepository.delete(userMedia);
 
         mediaService.delete(userMedia.getMedia());
+
+        log.info(
+                "Profile photo removed for user '{}' ({})",
+                currentUser.getEmail(),
+                currentUser.getId()
+        );
 
     }
 

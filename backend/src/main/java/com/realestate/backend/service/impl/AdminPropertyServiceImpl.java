@@ -11,6 +11,7 @@ import com.realestate.backend.repository.specification.PropertySpecification;
 import com.realestate.backend.service.AdminPropertyService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminPropertyServiceImpl implements AdminPropertyService {
@@ -49,6 +51,13 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
         property.setStatus(status);
 
         propertyRepository.save(property);
+
+        log.info(
+                "Property '{}' ({}) status changed to {}",
+                property.getTitle(),
+                property.getId(),
+                property.getStatus()
+        );
 
         return "\"" + property.getTitle() + "\"'s status changed to " + status.toString();
     }

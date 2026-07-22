@@ -13,6 +13,7 @@ import com.realestate.backend.repository.SubscriptionPlanRepository;
 import com.realestate.backend.repository.specification.AdminSubscriptionPlanSpecification;
 import com.realestate.backend.service.AdminSubscriptionPlanService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -41,6 +43,12 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
         SubscriptionPlanEntity subscriptionPlanEntity = subscriptionPlanMapper.toSubscriptionPlanEntity(request);
 
         subscriptionPlanRepository.saveAndFlush(subscriptionPlanEntity);
+
+        log.info(
+                "Subscription plan '{}' ({}) created",
+                subscriptionPlanEntity.getName(),
+                subscriptionPlanEntity.getId()
+        );
 
         return  subscriptionPlanMapper.toAdminSubscriptionPlanResponse(subscriptionPlanEntity);
 
@@ -88,6 +96,12 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
 
         SubscriptionPlanEntity updatedSubscriptionPlan = subscriptionPlanRepository.save(subscriptionPlan);
 
+        log.info(
+                "Subscription plan '{}' ({}) updated",
+                subscriptionPlan.getName(),
+                subscriptionPlan.getId()
+        );
+
         return subscriptionPlanMapper.toAdminSubscriptionPlanResponse(updatedSubscriptionPlan);
 
     }
@@ -105,6 +119,12 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
         subscriptionPlan.setActive(newStatus);
         subscriptionPlanRepository.save(subscriptionPlan);
 
+        log.info(
+                "Subscription plan '{}' ({}) {}",
+                subscriptionPlan.getName(),
+                subscriptionPlan.getId(),
+                newStatus ? "activated" : "deactivated"
+        );
     }
 
     @Override
@@ -122,6 +142,12 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
         subscriptionPlan.setActive(false);
 
         subscriptionPlanRepository.save(subscriptionPlan);
+
+        log.info(
+                "Subscription plan '{}' ({}) soft deleted",
+                subscriptionPlan.getName(),
+                subscriptionPlan.getId()
+        );
 
         return subscriptionPlan.getName() + " plan deleted successfully";
 

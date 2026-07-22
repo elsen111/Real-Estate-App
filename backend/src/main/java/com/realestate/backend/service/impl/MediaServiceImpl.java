@@ -8,10 +8,12 @@ import com.realestate.backend.service.MediaService;
 import com.realestate.backend.storage.StorageService;
 import com.realestate.backend.storage.UploadedFile;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MediaServiceImpl implements MediaService {
@@ -31,8 +33,20 @@ public class MediaServiceImpl implements MediaService {
         UploadedFile uploadedFile =
                 storageService.upload(file, folder);
 
+        log.info(
+                "File uploaded to storage. Folder: {}, Storage key: {}",
+                folder,
+                uploadedFile.storageKey()
+        );
+
         MediaFileEntity media =
                 mediaMapper.toEntity(uploadedFile);
+
+        log.info(
+                "Media record {} created for storage key {}",
+                media.getId(),
+                media.getStorageKey()
+        );
 
         return mediaRepository.save(media);
 
@@ -45,6 +59,11 @@ public class MediaServiceImpl implements MediaService {
         storageService.delete(media.getStorageKey());
 
         mediaRepository.delete(media);
+
+        log.info(
+                "Media {} deleted successfully",
+                media.getId()
+        );
 
     }
 }

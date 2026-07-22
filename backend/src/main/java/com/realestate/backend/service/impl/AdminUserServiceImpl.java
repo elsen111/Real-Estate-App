@@ -13,6 +13,7 @@ import com.realestate.backend.repository.UserRepository;
 import com.realestate.backend.repository.specification.UserSpecification;
 import com.realestate.backend.service.AdminUserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminUserServiceImpl implements AdminUserService {
@@ -70,6 +72,13 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         userRepository.save(user);
 
+        log.info(
+                "User '{}' ({}) has been {}",
+                user.getEmail(),
+                user.getId(),
+                newStatus ? "enabled" : "disabled"
+        );
+
         return newStatus
                 ? "User has been enabled successfully"
                 : "User has been disabled successfully";
@@ -99,8 +108,13 @@ public class AdminUserServiceImpl implements AdminUserService {
         user.getRoles().add(adminRoleEntity);
         userRepository.save(user);
 
+        log.info(
+                "Admin role assigned to user '{}' ({})",
+                user.getEmail(),
+                user.getId()
+        );
+
         return "Admin role successfully assigned to user: " + userId;
     }
-
 
 }

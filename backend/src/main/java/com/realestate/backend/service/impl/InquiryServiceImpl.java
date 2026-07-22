@@ -16,6 +16,7 @@ import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.security.SecurityConstants;
 import com.realestate.backend.service.InquiryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InquiryServiceImpl implements InquiryService {
@@ -81,6 +83,13 @@ public class InquiryServiceImpl implements InquiryService {
                 .build();
 
         InquiryEntity savedInquiry = inquiryRepository.saveAndFlush(newInquiry);
+
+        log.info(
+                "Inquiry {} created by user {} for property {}",
+                savedInquiry.getId(),
+                client.getId(),
+                propertyId
+        );
 
         return inquiryMapper.toResponse(savedInquiry);
 
@@ -153,8 +162,17 @@ public class InquiryServiceImpl implements InquiryService {
             throw new BadRequestException("Allowed statuses:  " + ALLOWED_STATUSES_FOR_UPDATE);
         }
 
+        InquiryStatus previousStatus = inquiry.getStatus();
+
         inquiry.setStatus(request.getStatus());
         InquiryEntity updatedInquiry = inquiryRepository.saveAndFlush(inquiry);
+
+        log.info(
+                "Inquiry {} status changed from {} to {}",
+                inquiryId,
+                previousStatus,
+                updatedInquiry.getStatus()
+        );
 
         return inquiryMapper.toResponse(updatedInquiry);
 
