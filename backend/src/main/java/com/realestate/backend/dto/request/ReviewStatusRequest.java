@@ -1,10 +1,12 @@
 package com.realestate.backend.dto.request;
 
 import com.realestate.backend.enums.ReviewStatus;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class ReviewStatusRequest {
 

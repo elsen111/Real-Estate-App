@@ -39,7 +39,7 @@ public class CategoryEntity {
 
         @Builder.Default
         @Column(name = "active", nullable = false)
-        private boolean active = true;
+        private Boolean active = true;
 
         @Builder.Default
         @Column(name="deleted", nullable = false)

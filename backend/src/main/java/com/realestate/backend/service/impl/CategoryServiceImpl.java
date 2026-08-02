@@ -155,7 +155,7 @@ public class CategoryServiceImpl implements CategoryService {
             throw new BusinessException("Cannot deactivate a category that is already assigned to an existing property");
         }
 
-        boolean newStatus = !category.isActive();
+        boolean newStatus = !category.getActive();
 
         category.setActive(newStatus);
         categoryRepository.save(category);

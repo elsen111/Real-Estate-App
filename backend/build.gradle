@@ -67,6 +67,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'com.h2database:h2'
 
 // Spock
     testImplementation 'org.spockframework:spock-core:2.4-groovy-5.0'
@@ -92,4 +93,7 @@ compileJava {
 
 tasks.named('test') {
     useJUnitPlatform()
+
+    environment "DB_USERNAME", System.getenv("DB_USERNAME")
+    environment "DB_PASSWORD", System.getenv("DB_PASSWORD")
 }
