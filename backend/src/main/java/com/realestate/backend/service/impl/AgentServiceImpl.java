@@ -113,6 +113,15 @@ public class AgentServiceImpl implements AgentService {
             return;
         }
 
+        UserEntity user = userRepository.findById(currentUser.getId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
+                );
+
+        if(!user.getAgency().getId().equals(agencyId)) {
+            throw new ForbiddenException("You don't have permission to remove the agent belonging to another agency.");
+        }
+
         agencyMemberRepository
                 .findByAgency_IdAndUser_IdAndActiveTrue(agencyId, currentUser.getId())
                 .filter(member -> member.getUser().getRoles().stream()
