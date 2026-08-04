@@ -1,5 +1,6 @@
 package com.realestate.backend.dto.request;
 
+import com.realestate.backend.enums.Currency;
 import com.realestate.backend.enums.ListingType;
 import com.realestate.backend.enums.PropertyType;
 import lombok.Getter;
@@ -19,6 +20,7 @@ public class PropertyPublicFilterRequest {
     private ListingType listingType;
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
+    private Currency currency;
     private Integer roomCount;
     private BigDecimal minArea;
     private BigDecimal maxArea;
