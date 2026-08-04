@@ -88,6 +88,7 @@ public class UserServiceImpl implements UserService {
         }
 
         user.setEnabled(false);
+        user.setDeleted(true);
 
         userRepository.save(user);
 

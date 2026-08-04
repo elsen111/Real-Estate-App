@@ -20,6 +20,7 @@ public class UserSpecification {
         assert filterRequest != null;
         return Specification.where(hasRole(filterRequest.getRole()))
                 .and(isEnabled(filterRequest.getEnabled()))
+                .and(isDeleted(filterRequest.getDeleted()))
                 .and(hasQuery(filterRequest.getQuery()));
 
     }
@@ -33,6 +34,10 @@ public class UserSpecification {
 
     private static Specification<UserEntity> isEnabled(Boolean enabled) {
         return ((root, query, criteriaBuilder) -> enabled == null ? null : criteriaBuilder.equal(root.get("enabled"), enabled));
+    }
+
+    private static Specification<UserEntity> isDeleted(Boolean deleted) {
+        return ((root, query, criteriaBuilder) -> deleted == null ? null : criteriaBuilder.equal(root.get("deleted"), deleted));
     }
 
     private static Specification<UserEntity> hasQuery(String keyword) {

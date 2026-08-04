@@ -10,6 +10,7 @@ public class AdminUserFilterRequest {
 
     Role role;
     Boolean enabled;
+    Boolean deleted;
     String query;
 
 }

@@ -51,6 +51,10 @@ public class UserEntity {
     private boolean emailVerified = false;
 
     @Builder.Default
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted = false;
+
+    @Builder.Default
     @ManyToMany(fetch =  FetchType.EAGER)
     @JoinTable(
             name = "user_roles",

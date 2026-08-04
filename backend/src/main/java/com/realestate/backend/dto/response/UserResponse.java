@@ -26,6 +26,7 @@ import java.util.UUID;
         "position",
         "roles",
         "enabled",
+        "deleted",
         "emailVerified",
         "createdAt"
 })
@@ -41,6 +42,7 @@ public class UserResponse {
     Set<String> roles;
     Boolean enabled;
     Boolean emailVerified;
+    Boolean deleted;
     LocalDateTime createdAt;
 
 }
