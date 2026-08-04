@@ -1,5 +1,6 @@
 package com.realestate.backend.dto.request;
 
+import com.realestate.backend.enums.Currency;
 import com.realestate.backend.enums.ListingType;
 import com.realestate.backend.utils.validation.ValidFloorChecker;
 import jakarta.validation.constraints.*;
@@ -29,6 +30,9 @@ public class PropertyRequest {
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
     private BigDecimal price;
+
+    @NotNull(message = "Currency is required")
+    private Currency currency;
 
     @NotBlank(message = "City is required")
     @Size(max = 100)

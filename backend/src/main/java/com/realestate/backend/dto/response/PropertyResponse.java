@@ -2,6 +2,7 @@ package com.realestate.backend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.realestate.backend.enums.Currency;
 import com.realestate.backend.enums.ListingType;
 import com.realestate.backend.enums.PropertyStatus;
 import lombok.Builder;
@@ -22,6 +23,7 @@ import java.util.UUID;
         "title",
         "description",
         "price",
+        "currency",
         "listingType",
         "featured",
         "area",
@@ -51,6 +53,7 @@ public class PropertyResponse {
     private String title;
     private String description;
     private BigDecimal price;
+    private Currency currency;
     private ListingType listingType;
     private boolean featured;
     private BigDecimal area;

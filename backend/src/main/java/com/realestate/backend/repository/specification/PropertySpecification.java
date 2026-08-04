@@ -5,6 +5,7 @@ import com.realestate.backend.dto.request.PropertyMapFilterRequest;
 import com.realestate.backend.dto.request.PropertyPublicFilterRequest;
 import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.PropertyEntity;
+import com.realestate.backend.enums.Currency;
 import com.realestate.backend.enums.ListingType;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.PropertyType;
@@ -74,6 +75,7 @@ public class PropertySpecification {
                 .and(hasPropertyType(filterRequest.getPropertyType()))
                 .and(hasListingType(filterRequest.getListingType()))
                 .and(priceBetween(filterRequest.getMinPrice(), filterRequest.getMaxPrice()))
+                .and(hasCurrency(filterRequest.getCurrency()))
                 .and(areaBetween(filterRequest.getMinArea(), filterRequest.getMaxArea()))
                 .and(hasRooms(filterRequest.getRoomCount()))
                 .and(isFeatured(filterRequest.getFeatured()))
@@ -96,6 +98,7 @@ public class PropertySpecification {
                 .and(hasPropertyType(filterRequest.getPropertyType()))
                 .and(hasListingType(filterRequest.getListingType()))
                 .and(priceBetween(filterRequest.getMinPrice(), filterRequest.getMaxPrice()))
+                .and(hasCurrency(filterRequest.getCurrency()))
                 .and(areaBetween(filterRequest.getMinArea(), filterRequest.getMaxArea()))
                 .and(hasQuery(filterRequest.getQuery()));
     }
@@ -154,7 +157,9 @@ public class PropertySpecification {
         return spec
                 .and(hasCity(filterRequest.getCity()))
                 .and(hasListingType(filterRequest.getListingType()))
-                .and(priceBetween(filterRequest.getMinPrice(), filterRequest.getMaxPrice()));
+                .and(priceBetween(filterRequest.getMinPrice(), filterRequest.getMaxPrice()))
+                .and(hasCurrency(filterRequest.getCurrency()));
+
     }
 
 
@@ -216,6 +221,12 @@ public class PropertySpecification {
         return (root, query, cb) -> listingType == null
                 ? null
                 : cb.equal(root.get("listingType"), listingType);
+    }
+
+    private static Specification<PropertyEntity> hasCurrency(Currency currency) {
+        return (root, query, cb) -> currency == null
+                ? null
+                : cb.equal(root.get("currency"), currency);
     }
 
     private static Specification<PropertyEntity> priceBetween(BigDecimal minPrice, BigDecimal maxPrice) {

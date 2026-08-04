@@ -1,5 +1,6 @@
 package com.realestate.backend.entity;
 
+import com.realestate.backend.enums.Currency;
 import com.realestate.backend.enums.ListingType;
 import com.realestate.backend.enums.PropertyStatus;
 import jakarta.persistence.*;
@@ -71,6 +72,10 @@ public class PropertyEntity {
 
     @Column(name = "price", precision = 15, scale = 2, nullable = false)
     private BigDecimal price;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "currency", nullable = false, length = 3)
+    private Currency currency;
 
     @Column(name = "city", length = 100, nullable = false)
     private String city;
