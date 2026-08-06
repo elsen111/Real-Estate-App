@@ -80,4 +80,17 @@ public class AdminUserController {
         );
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<ApiResponse<Void>> softDeleteUser(
+            @PathVariable UUID userId
+    ) {
+
+        adminUserService.softDeleteUser(userId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("User deleted successfully.", null)
+        );
+    }
+
 }

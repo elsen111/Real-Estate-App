@@ -2,14 +2,15 @@ package com.realestate.backend.service.impl;
 
 import com.realestate.backend.dto.request.AdminUserFilterRequest;
 import com.realestate.backend.dto.response.UserResponse;
+import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.RoleEntity;
 import com.realestate.backend.entity.UserEntity;
+import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.UserMapper;
-import com.realestate.backend.repository.RoleRepository;
-import com.realestate.backend.repository.UserRepository;
+import com.realestate.backend.repository.*;
 import com.realestate.backend.repository.specification.UserSpecification;
 import com.realestate.backend.service.AdminUserService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
+    private final AgencyRepository agencyRepository;
+    private final PropertyRepository propertyRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
 
     @Override
@@ -115,6 +119,60 @@ public class AdminUserServiceImpl implements AdminUserService {
         );
 
         return "Admin role successfully assigned to user: " + userId;
+    }
+
+    @Override
+    @Transactional
+    public void softDeleteUser(UUID userId) {
+
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("User not found with id" + userId)
+                );
+
+        boolean isUserSuperAdmin = user.getRoles()
+                .stream()
+                .map(RoleEntity::getRoleName)
+                .anyMatch(role -> role == Role.SUPER_ADMIN);
+
+        boolean isUserAgencyOwner = user.getRoles()
+                .stream()
+                .map(RoleEntity::getRoleName)
+                .anyMatch(role -> role == Role.AGENCY_OWNER);
+
+        if(isUserSuperAdmin){
+            throw new BusinessException("Cannot delete super admin.");
+        }
+
+        if(isUserAgencyOwner) {
+
+            AgencyEntity agency = agencyRepository.findById(user.getAgency().getId())
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException("Agency not found with id " + user.getAgency().getId())
+                    );
+
+            boolean hasActiveListings = propertyRepository.existsByAgencyIdAndStatus(agency.getId(), PropertyStatus.ACTIVE);
+
+            if(hasActiveListings) {
+                throw new BusinessException("Cannot delete the user (agency owner) whose agency has active listings.");
+            }
+
+            agency.setIsDeleted(true);
+
+            agencyRepository.save(agency);
+
+        }
+
+        refreshTokenRepository.deleteAllByUser(user);
+
+        user.setEnabled(false);
+        user.setDeleted(true);
+        user.setFullName("Deleted user");
+        user.setPhoneNumber(null);
+        user.setProfilePhotoUrl(null);
+
+        userRepository.save(user);
+
     }
 
 }
