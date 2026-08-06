@@ -20,4 +20,6 @@ public interface AdminUserService {
 
     String assignAdminRoleToUser(UUID userId);
 
+    void softDeleteUser(UUID userId);
+
 }

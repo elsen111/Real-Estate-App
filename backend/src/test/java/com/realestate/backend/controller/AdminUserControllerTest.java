@@ -16,15 +16,32 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.realestate.backend.exception.BusinessException;
+import com.realestate.backend.exception.ResourceNotFoundException;
+import com.realestate.backend.security.CustomUserDetailsService;
+import com.realestate.backend.security.JwtService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class AdminUserControllerTest {
@@ -161,4 +178,77 @@ class AdminUserControllerTest {
 
         verify(adminUserService).assignAdminRoleToUser(userId);
     }
+
+    @Test
+    void softDeleteUser_returnsSuccessMessage_whenUserExists() {
+
+        // Given
+        UUID userId = UUID.randomUUID();
+
+        doNothing().when(adminUserService).softDeleteUser(userId);
+
+        // When
+        ResponseEntity<ApiResponse<Void>> response =
+                controller.softDeleteUser(userId);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().isSuccess()).isTrue();
+        assertThat(response.getBody().getMessage())
+                .isEqualTo("User deleted successfully.");
+        assertThat(response.getBody().getData()).isNull();
+
+        verify(adminUserService).softDeleteUser(userId);
+        verifyNoMoreInteractions(adminUserService);
+    }
+
+    @Test
+    void softDeleteUser_throwsResourceNotFoundException_whenUserDoesNotExist() {
+
+        // Given
+        UUID userId = UUID.randomUUID();
+
+        doThrow(new ResourceNotFoundException("User not found with id " + userId))
+                .when(adminUserService)
+                .softDeleteUser(userId);
+
+        // When / Then
+        ResourceNotFoundException exception =
+                assertThrows(
+                        ResourceNotFoundException.class,
+                        () -> controller.softDeleteUser(userId)
+                );
+
+        assertThat(exception.getMessage())
+                .isEqualTo("User not found with id " + userId);
+
+        verify(adminUserService).softDeleteUser(userId);
+        verifyNoMoreInteractions(adminUserService);
+    }
+
+    @Test
+    void softDeleteUser_throwsBusinessException_whenDeletionIsNotAllowed() {
+
+        // Given
+        UUID userId = UUID.randomUUID();
+
+        doThrow(new BusinessException("Cannot delete super admin."))
+                .when(adminUserService)
+                .softDeleteUser(userId);
+
+        // When / Then
+        BusinessException exception =
+                assertThrows(
+                        BusinessException.class,
+                        () -> controller.softDeleteUser(userId)
+                );
+
+        assertThat(exception.getMessage())
+                .isEqualTo("Cannot delete super admin.");
+
+        verify(adminUserService).softDeleteUser(userId);
+        verifyNoMoreInteractions(adminUserService);
+    }
+
 }
