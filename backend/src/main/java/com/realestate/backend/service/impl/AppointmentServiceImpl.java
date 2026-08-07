@@ -6,6 +6,7 @@ import com.realestate.backend.dto.response.AppointmentResponse;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.AppointmentStatus;
 import com.realestate.backend.enums.PropertyStatus;
+import com.realestate.backend.enums.Role;
 import com.realestate.backend.exception.*;
 import com.realestate.backend.mapper.AppointmentMapper;
 import com.realestate.backend.repository.AgencyMemberRepository;
@@ -100,6 +101,54 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         return inquiries.map(appointmentMapper::toResponse);
 
+    }
+
+    @Override
+    public AppointmentResponse getAppointmentById(
+            CustomUserDetails currentUser,
+            UUID appointmentId) {
+
+        AppointmentEntity appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Appointment not found with id: " + appointmentId));
+
+        boolean canViewAppointment = false;
+
+        if (hasRole(Role.SUPER_ADMIN, currentUser)) {
+            canViewAppointment = true;
+        }
+
+        else if (appointment.getClient() != null
+                && appointment.getClient().getId().equals(currentUser.getId())) {
+            canViewAppointment = true;
+        }
+
+        else if (appointment.getAgent() != null
+                && appointment.getAgent().getId().equals(currentUser.getId())) {
+            canViewAppointment = true;
+        }
+
+        else if (hasRole(Role.AGENCY_OWNER, currentUser)) {
+
+            UserEntity authenticatedUser = userRepository.findById(currentUser.getId())
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException(
+                                    "User not found with id: " + currentUser.getId()));
+
+            canViewAppointment =
+                    authenticatedUser.getAgency() != null
+                            && appointment.getAgency() != null
+                            && authenticatedUser.getAgency().getId()
+                            .equals(appointment.getAgency().getId());
+        }
+
+        if (!canViewAppointment) {
+            throw new ResourceNotFoundException(
+                    "Appointment not found with id: " + appointmentId);
+        }
+
+        return appointmentMapper.toResponse(appointment);
     }
 
     @Override
@@ -211,6 +260,12 @@ public class AppointmentServiceImpl implements AppointmentService {
                 && appointment.getAgency() != null
                 && agencyMemberRepository.existsByAgencyIdAndUserIdAndActiveTrue(
                 appointment.getAgency().getId(), currentUser.getId());
+    }
+
+    public boolean hasRole(Role role, CustomUserDetails currentUser) {
+        return currentUser.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(authority -> authority.equals("ROLE_" + role.name()));
     }
 
 }

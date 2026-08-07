@@ -2,6 +2,7 @@ package com.realestate.backend.service;
 
 import com.realestate.backend.dto.request.CreateAppointmentRequest;
 import com.realestate.backend.dto.request.UpdateAppointmentStatusRequest;
+import com.realestate.backend.dto.response.AppointmentResponse;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.AppointmentStatus;
 import com.realestate.backend.enums.PropertyStatus;
@@ -10,6 +11,7 @@ import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.exception.DuplicateAppointmentException;
 import com.realestate.backend.exception.ForbiddenException;
 import com.realestate.backend.exception.ResourceNotFoundException;
+import com.realestate.backend.mapper.AppointmentMapper;
 import com.realestate.backend.repository.AppointmentRepository;
 import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.UserRepository;
@@ -25,6 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
@@ -34,6 +37,7 @@ class AppointmentServiceImplTest {
     @Mock private AppointmentRepository appointmentRepository;
     @Mock private UserRepository userRepository;
     @Mock private PropertyRepository propertyRepository;
+    @Mock private AppointmentMapper appointmentMapper;
 
     @InjectMocks private AppointmentServiceImpl service;
 
@@ -128,4 +132,162 @@ class AppointmentServiceImplTest {
         assertThatThrownBy(() -> service.updateStatus(owner, appointmentId, request))
                 .isInstanceOf(com.realestate.backend.exception.BadRequestException.class);
     }
+
+    @Test
+    void getAppointmentById_throws_whenAppointmentNotFound() {
+        UUID appointmentId = UUID.randomUUID();
+
+        when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() ->
+                service.getAppointmentById(clientUser(UUID.randomUUID()), appointmentId))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining(appointmentId.toString());
+    }
+
+    @Test
+    void getAppointmentById_returnsAppointment_whenCallerIsSuperAdmin() {
+        UUID appointmentId = UUID.randomUUID();
+        AppointmentEntity appointment = AppointmentEntity.builder()
+                .id(appointmentId)
+                .client(UserEntity.builder().id(UUID.randomUUID()).build())
+                .status(AppointmentStatus.PENDING)
+                .build();
+        AppointmentResponse expected = AppointmentResponse.builder().id(appointmentId).build();
+
+        CustomUserDetails superAdmin = userWithRole(UUID.randomUUID(), Role.SUPER_ADMIN);
+
+        when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(appointment));
+        when(appointmentMapper.toResponse(appointment)).thenReturn(expected);
+
+        AppointmentResponse result = service.getAppointmentById(superAdmin, appointmentId);
+
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    void getAppointmentById_returnsAppointment_whenCallerIsTheClient() {
+        UUID appointmentId = UUID.randomUUID();
+        UUID clientId = UUID.randomUUID();
+        AppointmentEntity appointment = AppointmentEntity.builder()
+                .id(appointmentId)
+                .client(UserEntity.builder().id(clientId).build())
+                .status(AppointmentStatus.PENDING)
+                .build();
+        AppointmentResponse expected = AppointmentResponse.builder().id(appointmentId).build();
+
+        when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(appointment));
+        when(appointmentMapper.toResponse(appointment)).thenReturn(expected);
+
+        AppointmentResponse result = service.getAppointmentById(clientUser(clientId), appointmentId);
+
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    void getAppointmentById_returnsAppointment_whenCallerIsTheAssignedAgent() {
+        UUID appointmentId = UUID.randomUUID();
+        UUID agentId = UUID.randomUUID();
+        AppointmentEntity appointment = AppointmentEntity.builder()
+                .id(appointmentId)
+                .client(UserEntity.builder().id(UUID.randomUUID()).build())
+                .agent(UserEntity.builder().id(agentId).build())
+                .status(AppointmentStatus.APPROVED)
+                .build();
+        AppointmentResponse expected = AppointmentResponse.builder().id(appointmentId).build();
+
+        CustomUserDetails agentUser = userWithRole(agentId, Role.AGENT);
+
+        when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(appointment));
+        when(appointmentMapper.toResponse(appointment)).thenReturn(expected);
+
+        AppointmentResponse result = service.getAppointmentById(agentUser, appointmentId);
+
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    void getAppointmentById_returnsAppointment_whenCallerIsAgencyOwnerOfMatchingAgency() {
+        UUID appointmentId = UUID.randomUUID();
+        UUID ownerId = UUID.randomUUID();
+        UUID agencyId = UUID.randomUUID();
+
+        AgencyEntity agency = AgencyEntity.builder().id(agencyId).build();
+        AppointmentEntity appointment = AppointmentEntity.builder()
+                .id(appointmentId)
+                .client(UserEntity.builder().id(UUID.randomUUID()).build())
+                .agency(agency)
+                .status(AppointmentStatus.PENDING)
+                .build();
+        AppointmentResponse expected = AppointmentResponse.builder().id(appointmentId).build();
+
+        UserEntity ownerEntity = UserEntity.builder()
+                .id(ownerId)
+                .agency(agency)
+                .roles(Set.of(RoleEntity.builder().roleName(Role.AGENCY_OWNER).build()))
+                .build();
+        CustomUserDetails owner = CustomUserDetails.from(ownerEntity);
+
+        when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(appointment));
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(ownerEntity));
+        when(appointmentMapper.toResponse(appointment)).thenReturn(expected);
+
+        AppointmentResponse result = service.getAppointmentById(owner, appointmentId);
+
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    void getAppointmentById_throws_whenAgencyOwnerBelongsToDifferentAgency() {
+        UUID appointmentId = UUID.randomUUID();
+        UUID ownerId = UUID.randomUUID();
+
+        AgencyEntity appointmentAgency = AgencyEntity.builder().id(UUID.randomUUID()).build();
+        AgencyEntity ownerAgency = AgencyEntity.builder().id(UUID.randomUUID()).build();
+
+        AppointmentEntity appointment = AppointmentEntity.builder()
+                .id(appointmentId)
+                .client(UserEntity.builder().id(UUID.randomUUID()).build())
+                .agency(appointmentAgency)
+                .status(AppointmentStatus.PENDING)
+                .build();
+
+        UserEntity ownerEntity = UserEntity.builder()
+                .id(ownerId)
+                .agency(ownerAgency)
+                .roles(Set.of(RoleEntity.builder().roleName(Role.AGENCY_OWNER).build()))
+                .build();
+        CustomUserDetails owner = CustomUserDetails.from(ownerEntity);
+
+        when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(appointment));
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(ownerEntity));
+
+        assertThatThrownBy(() -> service.getAppointmentById(owner, appointmentId))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining(appointmentId.toString());
+    }
+
+    @Test
+    void getAppointmentById_throws_whenCallerIsUnrelatedClient() {
+        UUID appointmentId = UUID.randomUUID();
+        AppointmentEntity appointment = AppointmentEntity.builder()
+                .id(appointmentId)
+                .client(UserEntity.builder().id(UUID.randomUUID()).build())
+                .status(AppointmentStatus.PENDING)
+                .build();
+
+        when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(appointment));
+
+        assertThatThrownBy(() ->
+                service.getAppointmentById(clientUser(UUID.randomUUID()), appointmentId))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining(appointmentId.toString());
+    }
+
+//    HELPER METHODS
+    private CustomUserDetails userWithRole(UUID id, Role role) {
+        return CustomUserDetails.from(UserEntity.builder().id(id).roles(Set.of(
+                RoleEntity.builder().roleName(role).build())).build());
+    }
+
 }
