@@ -4,53 +4,41 @@ import com.realestate.backend.dto.request.AgencyOwnerRegisterRequest;
 import com.realestate.backend.dto.request.UserRegisterRequest;
 import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.UserEntity;
-import com.realestate.backend.enums.AgencyStatus;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
-import java.util.HashSet;
+@Mapper(componentModel = "spring")
+public interface AuthMapper {
 
-@Component
-public class AuthMapper {
+    @Mapping(target = "fullName", source = "fullName", qualifiedByName = "normalize")
+    @Mapping(target = "email", source = "email", qualifiedByName = "normalize")
+    @Mapping(target = "phoneNumber", source = "phoneNumber", qualifiedByName = "normalize")
+    @Mapping(target = "roles", expression = "java(new java.util.HashSet<>())")
+    @Mapping(target = "enabled", constant = "true")
+    @Mapping(target = "emailVerified", constant = "false")
+    UserEntity toUserEntity(UserRegisterRequest userRegisterRequest);
 
-    public UserEntity toUserEntity(UserRegisterRequest request) {
+    @Mapping(target = "fullName", source = "fullName", qualifiedByName = "normalize")
+    @Mapping(target = "email", source = "email", qualifiedByName = "normalize")
+    @Mapping(target = "phoneNumber", source = "businessPhone", qualifiedByName = "normalize")
+    @Mapping(target = "roles", expression = "java(new java.util.HashSet<>())")
+    @Mapping(target = "enabled", constant = "true")
+    @Mapping(target = "emailVerified", constant = "false")
+    UserEntity toAgencyOwnerUser(AgencyOwnerRegisterRequest request);
 
-        return UserEntity.builder()
-                .fullName(normalizeValue(request.getFullName()))
-                .email(normalizeValue(request.getEmail()))
-                .phoneNumber(normalizeValue(request.getPhoneNumber()))
-                .enabled(true)
-                .emailVerified(false)
-                .roles(new HashSet<>())
-                .build();
-    }
+    @Mapping(target = "name", source = "agencyName", qualifiedByName = "normalize")
+    @Mapping(target = "description", source = "agencyDescription", qualifiedByName = "normalize")
+    @Mapping(target = "phoneNumber", source = "businessPhone", qualifiedByName = "normalize")
+    @Mapping(target = "website", source = "agencyWebsiteUrl", qualifiedByName = "normalize")
+    @Mapping(target = "email", source = "email", qualifiedByName = "normalize")
+    @Mapping(target = "city", source = "city", qualifiedByName = "normalize")
+    @Mapping(target = "address", source = "address", qualifiedByName = "normalize")
+    @Mapping(target = "status", expression = "java(com.realestate.backend.enums.AgencyStatus.PENDING)")
+    AgencyEntity toAgencyEntity(AgencyOwnerRegisterRequest request);
 
-    public UserEntity toAgencyOwnerUser(AgencyOwnerRegisterRequest request) {
-
-        return UserEntity.builder()
-                .fullName(normalizeValue(request.getFullName()))
-                .email(normalizeValue(request.getEmail()))
-                .phoneNumber(normalizeValue(request.getBusinessPhone()))
-                .enabled(true)
-                .emailVerified(false)
-                .roles(new HashSet<>())
-                .build();
-    }
-
-    public AgencyEntity toAgencyEntity(AgencyOwnerRegisterRequest request) {
-
-        return AgencyEntity.builder()
-                .name(normalizeValue(request.getAgencyName()))
-                .description(normalizeValue(request.getAgencyDescription()))
-                .phoneNumber(normalizeValue(request.getBusinessPhone()))
-                .website(normalizeValue(request.getAgencyWebsiteUrl()))
-                .email(normalizeValue(request.getEmail()))
-                .city(normalizeValue(request.getCity()))
-                .address(normalizeValue(request.getAddress()))
-                .status(AgencyStatus.PENDING)
-                .build();
-    }
-
-    private String normalizeValue(String value) {
+    @Named("normalize")
+    default String normalizeValue(String value) {
         if(value == null)
             return null;
 
