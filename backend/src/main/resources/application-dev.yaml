@@ -1,0 +1,107 @@
+spring:
+  application:
+    name: backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/real_estate_dev_db
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+
+    # hikari:
+    #   maximum-pool-size: 10
+    #   minimum-idle: 5
+    #   idle-timeout: 300000
+    #   connection-timeout: 20000
+    #   max-lifetime: 1200000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog-master.yaml
+
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 100MB
+
+      # enabled: true
+      # max-file-size: 10MB
+      # max-request-size: 20MB
+
+  devtools:
+    restart:
+      enabled: false
+
+    # restart:
+    #   enabled: true
+    # livereload:
+    #   enabled: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+app:
+  jwt:
+    # Open application.yaml and change this line:
+    secret-key: ${JWT_SECRET:4qVb7xRkW9zP1mN8sT2vX5yZ3cBcDeFgHiJkLmNoPqR}
+    access-token-expiration-minutes: 90
+    refresh-token-expiration-days: 18
+
+  mail:
+    from: ${MAIL_USERNAME}
+    from-name: EstateFlow
+
+  # upload:
+  #   dir: uploads/properties
+
+minio:
+  endpoint: ${MINIO_URL}
+  access-key: ${MINIO_USERNAME}
+  secret-key: ${MINIO_SECRET_KEY}
+  bucket: ${MINIO_BUCKET_NAME:estateflow}
+
+springdoc:
+  api-docs:
+    path: /api-docs
+
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+
+  packages-to-scan: com.realestate.backend.controller
+
+logging:
+  level:
+    com.realestate.backend: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    # org.hibernate.type.descriptor.sql: TRACE
+    # org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: ERROR
