@@ -66,7 +66,6 @@ public class PropertyResponse {
     private String address;
     private UUID categoryId;
     private String categoryName;
-    private List<PropertyMediaResponse> images;
     private String mainImageUrl;
     private Long viewCount;
     private UUID agencyId;
