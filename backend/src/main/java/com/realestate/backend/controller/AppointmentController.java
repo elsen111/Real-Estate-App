@@ -75,5 +75,19 @@ public class AppointmentController {
 
     }
 
+    @GetMapping("/{appointmentId}")
+    @Operation(summary = "Get appointment by id")
+    public ResponseEntity<ApiResponse<AppointmentResponse>> getAppointmentById(
+            @PathVariable UUID appointmentId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+
+        AppointmentResponse response = appointmentService.getAppointmentById(currentUser,appointmentId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Appointment fetched successfully.", response)
+        );
+    }
+
 
 }

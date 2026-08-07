@@ -165,4 +165,41 @@ class AppointmentControllerTest {
 
         assertThat(response.getBody().getMessage()).isEqualTo("Appointment status updated to REJECTED successfully.");
     }
+
+    @Test
+    void getAppointmentById_returnsOk_withAppointment() {
+        UUID appointmentId = UUID.randomUUID();
+        AppointmentResponse expected = buildAppointment(appointmentId, AppointmentStatus.APPROVED);
+
+        when(appointmentService.getAppointmentById(currentUser, appointmentId)).thenReturn(expected);
+
+        ResponseEntity<ApiResponse<AppointmentResponse>> response =
+                controller.getAppointmentById(appointmentId, currentUser);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().isSuccess()).isTrue();
+        assertThat(response.getBody().getMessage()).isEqualTo("Appointment fetched successfully.");
+        assertThat(response.getBody().getData()).isEqualTo(expected);
+
+        verify(appointmentService).getAppointmentById(currentUser, appointmentId);
+        verifyNoMoreInteractions(appointmentService);
+    }
+
+    @Test
+    void getAppointmentById_propagatesException_whenServiceThrows() {
+        UUID appointmentId = UUID.randomUUID();
+
+        when(appointmentService.getAppointmentById(currentUser, appointmentId))
+                .thenThrow(new RuntimeException("Appointment not found with id: " + appointmentId));
+
+        try {
+            controller.getAppointmentById(appointmentId, currentUser);
+        } catch (RuntimeException ex) {
+            assertThat(ex.getMessage()).isEqualTo("Appointment not found with id: " + appointmentId);
+        }
+
+        verify(appointmentService).getAppointmentById(currentUser, appointmentId);
+    }
+
 }
