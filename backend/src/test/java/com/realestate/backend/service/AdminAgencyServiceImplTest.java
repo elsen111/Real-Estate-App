@@ -1,11 +1,14 @@
 package com.realestate.backend.service;
 
+import com.realestate.backend.dto.request.UpdateAgencyRequest;
+import com.realestate.backend.dto.response.AdminAgencyResponse;
 import com.realestate.backend.dto.response.AgencySubscriptionResponse;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.AgencyStatus;
 import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.ResourceNotFoundException;
+import com.realestate.backend.mapper.AgencyMapper;
 import com.realestate.backend.mapper.SubscriptionPlanMapper;
 import com.realestate.backend.repository.*;
 import com.realestate.backend.service.impl.AdminAgencyServiceImpl;
@@ -29,9 +32,11 @@ import static org.mockito.Mockito.*;
 class AdminAgencyServiceImplTest {
 
     @Mock private AgencyRepository agencyRepository;
+    @Mock private AgencyMapper agencyMapper;
     @Mock private AgencySubscriptionRepository agencySubscriptionRepository;
     @Mock private SubscriptionPlanMapper subscriptionMapper;
     @Mock private SubscriptionPlanRepository subscriptionPlanRepository;
+    @Mock private AgencyService agencyService;
 
     @InjectMocks private AdminAgencyServiceImpl service;
 
@@ -133,5 +138,82 @@ class AdminAgencyServiceImplTest {
 
         assertThatThrownBy(() -> service.getAgencySubscription(agencyId))
                 .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void updateAgency_delegatesToAgencyService_andReturnsMappedResponse() {
+        UpdateAgencyRequest request = new UpdateAgencyRequest();
+        request.setName("Acme Realty Updated");
+        request.setDescription("An even better leading agency");
+        request.setPhoneNumber("+994501234567");
+        request.setEmail("updated@acme-realty.com");
+        request.setWebsite("https://acme-realty.com");
+        request.setCity("Baku");
+        request.setAddress("Nizami Street 12");
+
+        AgencyEntity updatedAgency = AgencyEntity.builder()
+                .id(agencyId)
+                .name(request.getName())
+                .description(request.getDescription())
+                .phoneNumber(request.getPhoneNumber())
+                .email(request.getEmail())
+                .website(request.getWebsite())
+                .city(request.getCity())
+                .address(request.getAddress())
+                .status(AgencyStatus.APPROVED)
+                .isDeleted(false)
+                .build();
+
+        AdminAgencyResponse expectedResponse = AdminAgencyResponse.builder()
+                .id(agencyId)
+                .name(request.getName())
+                .email(request.getEmail())
+                .status(AgencyStatus.APPROVED)
+                .isDeleted(false)
+                .build();
+
+        when(agencyService.updateAgency(agencyId, request)).thenReturn(updatedAgency);
+        when(agencyMapper.toAdminResponse(updatedAgency)).thenReturn(expectedResponse);
+
+        AdminAgencyResponse result = service.updateAgency(agencyId, request);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(agencyId);
+        assertThat(result.getName()).isEqualTo("Acme Realty Updated");
+        assertThat(result.getEmail()).isEqualTo("updated@acme-realty.com");
+        verify(agencyService).updateAgency(agencyId, request);
+        verify(agencyMapper).toAdminResponse(updatedAgency);
+    }
+
+    @Test
+    void updateAgency_throws_whenAgencyNotFound() {
+        UpdateAgencyRequest request = new UpdateAgencyRequest();
+        request.setName("Acme Realty Updated");
+        request.setEmail("updated@acme-realty.com");
+
+        when(agencyService.updateAgency(any(UUID.class), any(UpdateAgencyRequest.class)))
+                .thenThrow(new ResourceNotFoundException("Agency not found with id: " + agencyId));
+
+        assertThatThrownBy(() -> service.updateAgency(agencyId, request))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("Agency not found");
+
+        verify(agencyMapper, never()).toAdminResponse(any());
+    }
+
+    @Test
+    void updateAgency_throws_whenEmailAlreadyExistsForAnotherAgency() {
+        UpdateAgencyRequest request = new UpdateAgencyRequest();
+        request.setName("Acme Realty Updated");
+        request.setEmail("taken@acme-realty.com");
+
+        when(agencyService.updateAgency(any(UUID.class), any(UpdateAgencyRequest.class)))
+                .thenThrow(new BadRequestException("Email already exists for another agency."));
+
+        assertThatThrownBy(() -> service.updateAgency(agencyId, request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Email already exists");
+
+        verify(agencyMapper, never()).toAdminResponse(any());
     }
 }
