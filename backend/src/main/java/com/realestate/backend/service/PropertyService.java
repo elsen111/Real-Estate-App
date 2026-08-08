@@ -1,9 +1,6 @@
 package com.realestate.backend.service;
 
-import com.realestate.backend.dto.request.PropertyMapFilterRequest;
-import com.realestate.backend.dto.request.PropertyRequest;
-import com.realestate.backend.dto.request.PropertyPublicFilterRequest;
-import com.realestate.backend.dto.request.PropertyStatusRequest;
+import com.realestate.backend.dto.request.*;
 import com.realestate.backend.dto.response.*;
 import com.realestate.backend.security.CustomUserDetails;
 import org.springframework.data.domain.Page;
@@ -62,5 +59,7 @@ public interface PropertyService {
     List<SetPropertyMediaResponse> setPrimaryImage(UUID propertyId, UUID propertyMediaId, CustomUserDetails currentUser);
 
     void removePropertyMediaFile(CustomUserDetails currentUser, UUID propertyMediaId);
+
+    void assignAgentToProperty(UUID propertyId, AssignAgentToPropertyRequest request, CustomUserDetails currentUser);
 
 }
