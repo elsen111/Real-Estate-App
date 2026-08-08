@@ -7,6 +7,7 @@ import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.AgencyStatus;
 import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.BadRequestException;
+import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.AgencyMapper;
 import com.realestate.backend.mapper.SubscriptionPlanMapper;
@@ -215,5 +216,97 @@ class AdminAgencyServiceImplTest {
                 .hasMessageContaining("Email already exists");
 
         verify(agencyMapper, never()).toAdminResponse(any());
+    }
+
+    @Test
+    void approveAgency_updatesStatusToApproved_whenAgencyIsPending() {
+        agency.setStatus(AgencyStatus.PENDING);
+        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
+
+        String result = service.approveAgency(agencyId);
+
+        assertThat(agency.getStatus()).isEqualTo(AgencyStatus.APPROVED);
+        assertThat(result).contains("Acme Realty").contains("approved successfully");
+        verify(agencyRepository).save(agency);
+    }
+
+    @Test
+    void approveAgency_throws_whenAgencyNotFound() {
+        when(agencyRepository.findById(agencyId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.approveAgency(agencyId))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("Agency not found");
+
+        verify(agencyRepository, never()).save(any());
+    }
+
+    @Test
+    void approveAgency_throws_whenAgencyIsDeleted() {
+        agency.setIsDeleted(true);
+        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
+
+        assertThatThrownBy(() -> service.approveAgency(agencyId))
+                .isInstanceOf(ResourceNotFoundException.class);
+
+        verify(agencyRepository, never()).save(any());
+    }
+
+    @Test
+    void approveAgency_throws_whenAgencyIsNotPending() {
+        agency.setStatus(AgencyStatus.APPROVED);
+        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
+
+        assertThatThrownBy(() -> service.approveAgency(agencyId))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("Only pending agencies can be approved");
+
+        verify(agencyRepository, never()).save(any());
+    }
+
+    @Test
+    void rejectAgency_updatesStatusToRejected_whenAgencyIsPending() {
+        agency.setStatus(AgencyStatus.PENDING);
+        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
+
+        String result = service.rejectAgency(agencyId);
+
+        assertThat(agency.getStatus()).isEqualTo(AgencyStatus.REJECTED);
+        assertThat(result).contains("Acme Realty").contains("rejected successfully");
+        verify(agencyRepository).save(agency);
+    }
+
+    @Test
+    void rejectAgency_throws_whenAgencyNotFound() {
+        when(agencyRepository.findById(agencyId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.rejectAgency(agencyId))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("Agency not found");
+
+        verify(agencyRepository, never()).save(any());
+    }
+
+    @Test
+    void rejectAgency_throws_whenAgencyIsDeleted() {
+        agency.setIsDeleted(true);
+        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
+
+        assertThatThrownBy(() -> service.rejectAgency(agencyId))
+                .isInstanceOf(ResourceNotFoundException.class);
+
+        verify(agencyRepository, never()).save(any());
+    }
+
+    @Test
+    void rejectAgency_throws_whenAgencyIsNotPending() {
+        agency.setStatus(AgencyStatus.APPROVED);
+        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
+
+        assertThatThrownBy(() -> service.rejectAgency(agencyId))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("Only pending agencies can be rejected");
+
+        verify(agencyRepository, never()).save(any());
     }
 }

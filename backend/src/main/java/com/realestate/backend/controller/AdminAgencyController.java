@@ -137,4 +137,34 @@ public class AdminAgencyController {
 
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    @PutMapping("/{agencyId}/approve")
+    @Operation(summary = "Approve an agency")
+    public ResponseEntity<ApiResponse<Void>> approveAgency(
+            @PathVariable UUID agencyId
+    ) {
+
+        String message = adminAgencyService.approveAgency(agencyId);
+
+        return ResponseEntity.ok(ApiResponse.success(
+                message, null
+        ));
+
+    }
+
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    @PutMapping("/{agencyId}/reject")
+    @Operation(summary = "Reject an agency")
+    public ResponseEntity<ApiResponse<Void>> rejectAgency(
+            @PathVariable UUID agencyId
+    ) {
+
+        String message = adminAgencyService.rejectAgency(agencyId);
+
+        return ResponseEntity.ok(ApiResponse.success(
+                message, null
+        ));
+
+    }
+
 }

@@ -29,4 +29,8 @@ public interface AdminAgencyService {
 
     AgencySubscriptionResponse getAgencySubscription(UUID agencyId);
 
+    String approveAgency(UUID agencyId);
+
+    String rejectAgency(UUID agencyId);
+
 }

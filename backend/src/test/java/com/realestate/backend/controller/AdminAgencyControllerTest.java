@@ -312,4 +312,78 @@ class AdminAgencyControllerTest {
         verify(adminAgencyService, never())
                 .updateAgency(any(UUID.class), any(UpdateAgencyRequest.class));
     }
+
+    @Test
+    void approveAgency_returnsSuccessMessage_whenAgencyIsPending() throws Exception {
+        when(adminAgencyService.approveAgency(agencyId))
+                .thenReturn("Agency Acme Realty is approved successfully.");
+
+        mockMvc.perform(put("/admin/agencies/{agencyId}/approve", agencyId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Agency Acme Realty is approved successfully."))
+                .andExpect(jsonPath("$.data").doesNotExist());
+
+        verify(adminAgencyService).approveAgency(agencyId);
+    }
+
+    @Test
+    void approveAgency_returnsNotFound_whenAgencyDoesNotExist() throws Exception {
+        when(adminAgencyService.approveAgency(agencyId))
+                .thenThrow(new ResourceNotFoundException("Agency not found with id " + agencyId));
+
+        mockMvc.perform(put("/admin/agencies/{agencyId}/approve", agencyId))
+                .andExpect(status().isNotFound());
+
+        verify(adminAgencyService).approveAgency(agencyId);
+    }
+
+    @Test
+    void approveAgency_returnsBadRequest_whenAgencyIsNotPending() throws Exception {
+        when(adminAgencyService.approveAgency(agencyId))
+                .thenThrow(new com.realestate.backend.exception.BusinessException(
+                        "Only pending agencies can be approved."));
+
+        mockMvc.perform(put("/admin/agencies/{agencyId}/approve", agencyId))
+                .andExpect(status().isBadRequest());
+
+        verify(adminAgencyService).approveAgency(agencyId);
+    }
+
+    @Test
+    void rejectAgency_returnsSuccessMessage_whenAgencyIsPending() throws Exception {
+        when(adminAgencyService.rejectAgency(agencyId))
+                .thenReturn("Agency Acme Realty is rejected successfully.");
+
+        mockMvc.perform(put("/admin/agencies/{agencyId}/reject", agencyId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Agency Acme Realty is rejected successfully."))
+                .andExpect(jsonPath("$.data").doesNotExist());
+
+        verify(adminAgencyService).rejectAgency(agencyId);
+    }
+
+    @Test
+    void rejectAgency_returnsNotFound_whenAgencyDoesNotExist() throws Exception {
+        when(adminAgencyService.rejectAgency(agencyId))
+                .thenThrow(new ResourceNotFoundException("Agency not found with id " + agencyId));
+
+        mockMvc.perform(put("/admin/agencies/{agencyId}/reject", agencyId))
+                .andExpect(status().isNotFound());
+
+        verify(adminAgencyService).rejectAgency(agencyId);
+    }
+
+    @Test
+    void rejectAgency_returnsBadRequest_whenAgencyIsNotPending() throws Exception {
+        when(adminAgencyService.rejectAgency(agencyId))
+                .thenThrow(new com.realestate.backend.exception.BusinessException(
+                        "Only pending agencies can be rejected."));
+
+        mockMvc.perform(put("/admin/agencies/{agencyId}/reject", agencyId))
+                .andExpect(status().isBadRequest());
+
+        verify(adminAgencyService).rejectAgency(agencyId);
+    }
 }

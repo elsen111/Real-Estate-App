@@ -8,6 +8,7 @@ import com.realestate.backend.enums.AgencyStatus;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.BadRequestException;
+import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.AgencyMapper;
 import com.realestate.backend.mapper.AgencyOwnerMapper;
@@ -260,6 +261,62 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
 
         return subscriptionMapper.toAdminResponse(agencySubscription);
 
+    }
+
+    @Transactional
+    @Override
+    public String approveAgency(UUID agencyId) {
+
+        AgencyEntity agency = agencyRepository
+                .findById(agencyId)
+                .filter(a -> !a.getIsDeleted())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Agency not found with id " + agencyId)
+                );
+
+        if(!AgencyStatus.PENDING.equals(agency.getStatus())) {
+            throw new BusinessException("Only pending agencies can be approved.");
+        }
+
+        agency.setStatus(AgencyStatus.APPROVED);
+        agencyRepository.save(agency);
+
+        log.info(
+                "Agency {} (with id {}) is approved by admin/super_admin at {}",
+                agency.getName(),
+                agency.getId(),
+                LocalDateTime.now()
+        );
+
+        return "Agency " + agency.getName() + " is approved successfully.";
+
+    }
+
+    @Transactional
+    @Override
+    public String rejectAgency(UUID agencyId) {
+        AgencyEntity agency = agencyRepository
+                .findById(agencyId)
+                .filter(a -> !a.getIsDeleted())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Agency not found with id " + agencyId)
+                );
+
+        if(!AgencyStatus.PENDING.equals(agency.getStatus())) {
+            throw new BusinessException("Only pending agencies can be rejected.");
+        }
+
+        agency.setStatus(AgencyStatus.REJECTED);
+        agencyRepository.save(agency);
+
+        log.info(
+                "Agency {} (with id {}) is rejected by admin/super_admin at {}",
+                agency.getName(),
+                agency.getId(),
+                LocalDateTime.now()
+        );
+
+        return "Agency " + agency.getName() + " is rejected successfully.";
     }
 
 }
