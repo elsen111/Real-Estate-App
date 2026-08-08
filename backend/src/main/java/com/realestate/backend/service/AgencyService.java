@@ -10,6 +10,7 @@ import com.realestate.backend.dto.request.UpdateAgencyRequest;
 import com.realestate.backend.dto.response.AgencyResponse;
 import com.realestate.backend.dto.response.AgencySubscriptionResponse;
 import com.realestate.backend.dto.response.UserResponse;
+import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.security.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,11 @@ public interface AgencyService {
 
     AgencyResponse updateOwnAgency(
             CustomUserDetails currentUser,
+            UpdateAgencyRequest request
+    );
+
+    AgencyEntity updateAgency(
+            UUID agencyId,
             UpdateAgencyRequest request
     );
 

@@ -1,6 +1,7 @@
 package com.realestate.backend.service;
 
 import com.realestate.backend.dto.request.AdminAgencyFilterRequest;
+import com.realestate.backend.dto.request.UpdateAgencyRequest;
 import com.realestate.backend.dto.response.AdminAgencyResponse;
 import com.realestate.backend.dto.response.AgencySubscriptionResponse;
 import com.realestate.backend.enums.AgencyStatus;
@@ -17,6 +18,8 @@ public interface AdminAgencyService {
     );
 
     AdminAgencyResponse getAgencyById(UUID id);
+
+    AdminAgencyResponse updateAgency(UUID agencyId, UpdateAgencyRequest request);
 
     String changeAgencyStatus(UUID id, AgencyStatus status);
 

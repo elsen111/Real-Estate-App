@@ -3,6 +3,7 @@ package com.realestate.backend.controller;
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.request.AdminAgencyFilterRequest;
 import com.realestate.backend.dto.request.AgencyStatusRequest;
+import com.realestate.backend.dto.request.UpdateAgencyRequest;
 import com.realestate.backend.dto.response.AdminAgencyResponse;
 import com.realestate.backend.dto.response.AgencySubscriptionResponse;
 import com.realestate.backend.service.AdminAgencyService;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -115,6 +117,22 @@ public class AdminAgencyController {
 
         return ResponseEntity.ok(ApiResponse.success(
                 "Agency subscription fetched successfully", response
+        ));
+
+    }
+
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    @PutMapping("/{agencyId}")
+    @Operation(summary = "Update agency information")
+    public ResponseEntity<ApiResponse<AdminAgencyResponse>> updateAgency(
+            @PathVariable UUID agencyId,
+            @Valid @RequestBody UpdateAgencyRequest request
+    ) {
+
+        AdminAgencyResponse response = adminAgencyService.updateAgency(agencyId, request);
+
+        return ResponseEntity.ok(ApiResponse.success(
+                "Agency information updated successfully", response
         ));
 
     }

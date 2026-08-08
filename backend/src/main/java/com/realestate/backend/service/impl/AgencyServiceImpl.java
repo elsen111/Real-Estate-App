@@ -13,6 +13,7 @@ import com.realestate.backend.dto.response.UserResponse;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.MediaFolder;
 import com.realestate.backend.enums.SubscriptionStatus;
+import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.AgencyMapper;
 import com.realestate.backend.mapper.PropertyMapper;
@@ -87,20 +88,12 @@ public class AgencyServiceImpl implements AgencyService {
                         () -> new ResourceNotFoundException("User not found with id " + currentUser.getId())
                 );
 
-        AgencyEntity agency = agencyRepository.findById(user.getAgency().getId())
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Agency not found with id " + user.getAgency().getId())
-                );
+//        AgencyEntity agency = agencyRepository.findById(user.getAgency().getId())
+//                .orElseThrow(
+//                        () -> new ResourceNotFoundException("Agency not found with id " + user.getAgency().getId())
+//                );
 
-        agency.setName(request.getName());
-        agency.setDescription(request.getDescription());
-        agency.setPhoneNumber(request.getPhoneNumber());
-        agency.setEmail(request.getEmail());
-        agency.setWebsite(request.getWebsite());
-        agency.setCity(request.getCity());
-        agency.setAddress(request.getAddress());
-
-        agencyRepository.save(agency);
+        AgencyEntity agency = updateAgency(user.getAgency().getId(), request);
 
         log.info(
                 "Agency '{}' ({}) updated by user {}",
@@ -322,6 +315,34 @@ public class AgencyServiceImpl implements AgencyService {
         agencyMediaRepository.delete(agencyMedia);
 
         mediaService.delete(agencyMedia.getMedia());
+
+    }
+
+    //      SHARED METHOD
+    @Transactional
+    @Override
+    public AgencyEntity updateAgency(UUID agencyId, UpdateAgencyRequest request) {
+
+        AgencyEntity agency = agencyRepository.findById(agencyId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Agency not found with id: " + agencyId)
+                );
+
+        if(agencyRepository.existsByEmail(request.getEmail()) && !agency.getEmail().equals(request.getEmail())) {
+            throw new BadRequestException("Email already exists for another agency.");
+        }
+
+        agency.setName(request.getName());
+        agency.setDescription(request.getDescription());
+        agency.setPhoneNumber(request.getPhoneNumber());
+        agency.setEmail(request.getEmail());
+        agency.setWebsite(request.getWebsite());
+        agency.setCity(request.getCity());
+        agency.setAddress(request.getAddress());
+
+        agencyRepository.save(agency);
+
+        return agency;
 
     }
 

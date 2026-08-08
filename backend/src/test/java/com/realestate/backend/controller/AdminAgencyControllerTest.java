@@ -2,10 +2,12 @@ package com.realestate.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.realestate.backend.dto.request.AgencyStatusRequest;
+import com.realestate.backend.dto.request.UpdateAgencyRequest;
 import com.realestate.backend.dto.response.AdminAgencyResponse;
 import com.realestate.backend.dto.response.AgencySubscriptionResponse;
 import com.realestate.backend.enums.AgencyStatus;
 import com.realestate.backend.enums.SubscriptionStatus;
+import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.security.CustomUserDetailsService;
 import com.realestate.backend.security.JwtService;
@@ -28,6 +30,9 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -86,6 +91,18 @@ class AdminAgencyControllerTest {
                 .usedAgents(2)
                 .remainingAgents(8)
                 .build();
+    }
+
+    private UpdateAgencyRequest validUpdateAgencyRequest() {
+        UpdateAgencyRequest request = new UpdateAgencyRequest();
+        request.setName("Acme Realty Updated");
+        request.setDescription("An even better leading agency");
+        request.setPhoneNumber("+994501234567");
+        request.setEmail("updated@acme-realty.com");
+        request.setWebsite("https://acme-realty.com");
+        request.setCity("Baku");
+        request.setAddress("Nizami Street 12");
+        return request;
     }
 
     @Test
@@ -192,5 +209,107 @@ class AdminAgencyControllerTest {
 
         mockMvc.perform(get("/admin/agencies/{agencyId}/subscription-plan", agencyId))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateAgency_returnsUpdatedAgency_whenValidRequest() throws Exception {
+        UpdateAgencyRequest request = validUpdateAgencyRequest();
+
+        AdminAgencyResponse updatedResponse = AdminAgencyResponse.builder()
+                .id(agencyId)
+                .name(request.getName())
+                .description(request.getDescription())
+                .phoneNumber(request.getPhoneNumber())
+                .email(request.getEmail())
+                .website(request.getWebsite())
+                .city(request.getCity())
+                .address(request.getAddress())
+                .status(AgencyStatus.APPROVED)
+                .isDeleted(false)
+                .build();
+
+        when(adminAgencyService.updateAgency(eq(agencyId), any(UpdateAgencyRequest.class)))
+                .thenReturn(updatedResponse);
+
+        mockMvc.perform(put("/admin/agencies/{agencyId}", agencyId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Agency information updated successfully"))
+                .andExpect(jsonPath("$.data.id").value(agencyId.toString()))
+                .andExpect(jsonPath("$.data.name").value("Acme Realty Updated"))
+                .andExpect(jsonPath("$.data.email").value("updated@acme-realty.com"))
+                .andExpect(jsonPath("$.data.website").value("https://acme-realty.com"));
+
+        verify(adminAgencyService).updateAgency(eq(agencyId), any(UpdateAgencyRequest.class));
+    }
+
+    @Test
+    void updateAgency_returnsNotFound_whenAgencyDoesNotExist() throws Exception {
+        UpdateAgencyRequest request = validUpdateAgencyRequest();
+
+        when(adminAgencyService.updateAgency(eq(agencyId), any(UpdateAgencyRequest.class)))
+                .thenThrow(new ResourceNotFoundException("Agency not found with id: " + agencyId));
+
+        mockMvc.perform(put("/admin/agencies/{agencyId}", agencyId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateAgency_returnsBadRequest_whenEmailAlreadyExistsForAnotherAgency() throws Exception {
+        UpdateAgencyRequest request = validUpdateAgencyRequest();
+
+        when(adminAgencyService.updateAgency(eq(agencyId), any(UpdateAgencyRequest.class)))
+                .thenThrow(new BadRequestException("Email already exists for another agency."));
+
+        mockMvc.perform(put("/admin/agencies/{agencyId}", agencyId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void updateAgency_returnsBadRequest_whenNameIsBlank() throws Exception {
+        UpdateAgencyRequest request = validUpdateAgencyRequest();
+        request.setName(" ");
+
+        mockMvc.perform(put("/admin/agencies/{agencyId}", agencyId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+
+        verify(adminAgencyService, never())
+                .updateAgency(any(UUID.class), any(UpdateAgencyRequest.class));
+    }
+
+    @Test
+    void updateAgency_returnsBadRequest_whenEmailIsInvalid() throws Exception {
+        UpdateAgencyRequest request = validUpdateAgencyRequest();
+        request.setEmail("not-an-email");
+
+        mockMvc.perform(put("/admin/agencies/{agencyId}", agencyId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+
+        verify(adminAgencyService, never())
+                .updateAgency(any(UUID.class), any(UpdateAgencyRequest.class));
+    }
+
+    @Test
+    void updateAgency_returnsBadRequest_whenPhoneNumberIsInvalid() throws Exception {
+        UpdateAgencyRequest request = validUpdateAgencyRequest();
+        request.setPhoneNumber("abc-not-a-phone");
+
+        mockMvc.perform(put("/admin/agencies/{agencyId}", agencyId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+
+        verify(adminAgencyService, never())
+                .updateAgency(any(UUID.class), any(UpdateAgencyRequest.class));
     }
 }

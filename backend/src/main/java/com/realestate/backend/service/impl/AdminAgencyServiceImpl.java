@@ -1,11 +1,8 @@
 package com.realestate.backend.service.impl;
 
 import com.realestate.backend.dto.request.AdminAgencyFilterRequest;
-import com.realestate.backend.dto.response.AdminAgencyResponse;
-import com.realestate.backend.dto.response.AdminAgencyPropertyResponse;
-import com.realestate.backend.dto.response.AgencyOwnerResponse;
-import com.realestate.backend.dto.response.AgencyStatisticsResponse;
-import com.realestate.backend.dto.response.AgencySubscriptionResponse;
+import com.realestate.backend.dto.request.UpdateAgencyRequest;
+import com.realestate.backend.dto.response.*;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.AgencyStatus;
 import com.realestate.backend.enums.PropertyStatus;
@@ -19,6 +16,7 @@ import com.realestate.backend.mapper.SubscriptionPlanMapper;
 import com.realestate.backend.repository.*;
 import com.realestate.backend.repository.specification.AgencySpecification;
 import com.realestate.backend.service.AdminAgencyService;
+import com.realestate.backend.service.AgencyService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +48,8 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
     private final PropertyMapper propertyMapper;
 
     private final SubscriptionPlanRepository subscriptionPlanRepository;
+
+    private final AgencyService agencyService;
 
     @Override
     public Page<AdminAgencyResponse> getAllAgencies(AdminAgencyFilterRequest filter, Pageable pageable) {
@@ -135,6 +135,25 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         );
 
         return agency.getName() + "'s status changed to " + status.toString();
+
+    }
+
+    @Transactional
+    @Override
+    public AdminAgencyResponse updateAgency(
+            UUID agencyId,
+            UpdateAgencyRequest request
+    ) {
+
+        AgencyEntity agency = agencyService.updateAgency(agencyId, request);
+
+        log.info(
+                "Agency '{}' ({}) updated by Super Admin/ Admin",
+                agency.getName(),
+                agency.getId()
+        );
+
+        return agencyMapper.toAdminResponse(agency);
 
     }
 
@@ -242,4 +261,5 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         return subscriptionMapper.toAdminResponse(agencySubscription);
 
     }
+
 }
