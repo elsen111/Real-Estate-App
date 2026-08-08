@@ -1,9 +1,6 @@
 package com.realestate.backend.service.impl;
 
-import com.realestate.backend.dto.request.PropertyMapFilterRequest;
-import com.realestate.backend.dto.request.PropertyRequest;
-import com.realestate.backend.dto.request.PropertyPublicFilterRequest;
-import com.realestate.backend.dto.request.PropertyStatusRequest;
+import com.realestate.backend.dto.request.*;
 import com.realestate.backend.dto.response.*;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.MediaFolder;
@@ -504,6 +501,162 @@ public class PropertyServiceImpl implements PropertyService {
 
         }
 
+    }
+
+    @Transactional
+    @Override
+    public void assignAgentToProperty(
+            UUID propertyId,
+            AssignAgentToPropertyRequest request,
+            CustomUserDetails currentUser
+    ) {
+
+        UUID ownerId = currentUser.getId();
+        UUID agentId = request.getAgentId();
+
+        log.info(
+                "Assigning property {} to agent {} by agency owner {}",
+                propertyId,
+                agentId,
+                ownerId
+        );
+
+        UserEntity owner = userRepository.findById(ownerId)
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Agency owner not found while assigning property {}. Owner: {}",
+                            propertyId,
+                            ownerId
+                    );
+
+                    return new ResourceNotFoundException(
+                            "Agency owner not found with id: " + ownerId
+                    );
+                });
+
+        if (owner.getAgency() == null) {
+            log.warn(
+                    "Agency owner {} has no associated agency. Property: {}",
+                    ownerId,
+                    propertyId
+            );
+
+            throw new BusinessException(
+                    "Agency owner is not associated with an agency."
+            );
+        }
+
+        PropertyEntity property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Property {} not found. Assignment requested by owner {}",
+                            propertyId,
+                            ownerId
+                    );
+
+                    return new ResourceNotFoundException(
+                            "Property not found with id: " + propertyId
+                    );
+                });
+
+        UUID agencyId = owner.getAgency().getId();
+
+        if (!agencyId.equals(property.getAgency().getId())) {
+            log.warn(
+                    "Property assignment denied. Property {} belongs to agency {}, " +
+                            "but owner {} belongs to agency {}",
+                    propertyId,
+                    property.getAgency().getId(),
+                    ownerId,
+                    agencyId
+            );
+
+            throw new ForbiddenException(
+                    "You cannot assign a property from another agency."
+            );
+        }
+
+        if (!PropertyStatus.ACTIVE.equals(property.getStatus())) {
+            log.warn(
+                    "Property assignment rejected. Property {} has status {}",
+                    propertyId,
+                    property.getStatus()
+            );
+
+            throw new BusinessException(
+                    "Agents can only be assigned to active properties."
+            );
+        }
+
+        if (property.getAssignedAgent() != null && property.getAssignedAgent().getId().equals(agentId)) {
+            log.warn(
+                    "Property {} is already assigned to agent {}",
+                    propertyId,
+                    property.getAssignedAgent().getId()
+            );
+
+            throw new ConflictException(
+                    "This property is already assigned to this agent."
+            );
+        }
+
+        UserEntity agent = userRepository.findById(agentId)
+                .filter(user ->
+                        Boolean.TRUE.equals(user.getEnabled()) &&
+                                Boolean.FALSE.equals(user.getDeleted())
+                )
+                .orElseThrow(() -> {
+                    log.warn(
+                            "Active agent {} not found while assigning property {}",
+                            agentId,
+                            propertyId
+                    );
+
+                    return new ResourceNotFoundException(
+                            "Agent not found with id: " + agentId
+                    );
+                });
+
+        if (agent.getAgency() == null ||
+                !agencyId.equals(agent.getAgency().getId())) {
+
+            log.warn(
+                    "Agent assignment denied. Agent {} does not belong to agency {}. " +
+                            "Property: {}, Owner: {}",
+                    agentId,
+                    agencyId,
+                    propertyId,
+                    ownerId
+            );
+
+            throw new BadRequestException(
+                    "Agent does not belong to this agency."
+            );
+        }
+
+        if (agent.getRoles().stream().noneMatch(
+                role -> role.getRoleName() == Role.AGENT
+        )) {
+
+            log.warn(
+                    "User {} cannot be assigned to property {} because they are not an agent",
+                    agentId,
+                    propertyId
+            );
+
+            throw new BadRequestException(
+                    "Selected user is not an agent."
+            );
+        }
+
+        property.setAssignedAgent(agent);
+
+        log.info(
+                "Property {} successfully assigned to agent {} by agency owner {}",
+                propertyId,
+                agentId,
+                ownerId
+        );
     }
 
     @Override

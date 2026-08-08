@@ -1,6 +1,7 @@
 package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
+import com.realestate.backend.dto.request.AssignAgentToPropertyRequest;
 import com.realestate.backend.dto.request.CreateAppointmentRequest;
 import com.realestate.backend.dto.request.CreateInquiryRequest;
 import com.realestate.backend.dto.request.PropertyMapFilterRequest;
@@ -480,5 +481,24 @@ class PropertyControllerTest {
 
         verify(appointmentService).createAppointment(propertyId, request, currentUser);
         verifyNoMoreInteractions(appointmentService);
+    }
+
+    @Test
+    void assignAgentToProperty_returnsOk_withNoData() {
+        UUID propertyId = UUID.randomUUID();
+        AssignAgentToPropertyRequest request = new AssignAgentToPropertyRequest();
+        request.setAgentId(UUID.randomUUID());
+
+        ResponseEntity<ApiResponse<Void>> response =
+                controller.assignAgentToProperty(propertyId, request, currentUser);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().isSuccess()).isTrue();
+        assertThat(response.getBody().getMessage()).isEqualTo("Agent assigned to the property successfully");
+        assertThat(response.getBody().getData()).isNull();
+
+        verify(propertyService).assignAgentToProperty(propertyId, request, currentUser);
+        verifyNoMoreInteractions(propertyService);
     }
 }

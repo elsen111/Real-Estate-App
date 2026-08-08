@@ -60,4 +60,5 @@ public interface PropertyRepository extends JpaRepository<PropertyEntity, UUID>,
     boolean existsByCategoryIdAndStatus(UUID categoryId, PropertyStatus status);
 
     boolean existsByAgencyIdAndStatus(UUID id, PropertyStatus status);
+
 }

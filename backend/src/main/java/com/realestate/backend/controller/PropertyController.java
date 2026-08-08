@@ -304,7 +304,7 @@ public class PropertyController {
     }
 
     @PostMapping("/{propertyId}/appointments")
-    @Operation(summary = "Create a new appointment for the speicific property.")
+    @Operation(summary = "Create a new appointment for the specific property.")
     public ResponseEntity<ApiResponse<AppointmentResponse>> createAppointment (
             @PathVariable UUID propertyId,
             @Valid @RequestBody CreateAppointmentRequest request,
@@ -315,6 +315,24 @@ public class PropertyController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Appointment created successfully", response)
+        );
+
+    }
+
+
+    @PreAuthorize("hasRole('AGENCY_OWNER')")
+    @PutMapping("/{propertyId}/agent")
+    @Operation(summary = "Assign agent to a property")
+    public ResponseEntity<ApiResponse<Void>> assignAgentToProperty (
+            @PathVariable UUID propertyId,
+            @Valid @RequestBody AssignAgentToPropertyRequest request,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+
+        propertyService.assignAgentToProperty(propertyId, request, currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Agent assigned to the property successfully", null)
         );
 
     }
