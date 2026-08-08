@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class AgencyFilterRequest {
 
+    private String name;
     private String city;
     private String query;
 
