@@ -81,7 +81,7 @@ class AgentControllerTest {
                 PropertyResponse.builder().id(UUID.randomUUID()).title("Assigned listing").build()
         ));
 
-        when(agentService.getAgentProperties(userId, filter, pageable)).thenReturn(page);
+        when(agentService.getPublicAgentProperties(userId, filter, pageable)).thenReturn(page);
 
         ResponseEntity<ApiResponse<Page<PropertyResponse>>> response =
                 controller.getAllAgencies(userId, filter, pageable);
@@ -92,7 +92,7 @@ class AgentControllerTest {
         assertThat(response.getBody().getMessage()).isEqualTo("Agent's properties fetched successfully");
         assertThat(response.getBody().getData().getContent()).hasSize(1);
 
-        verify(agentService).getAgentProperties(userId, filter, pageable);
+        verify(agentService).getPublicAgentProperties(userId, filter, pageable);
     }
 
     @Test
@@ -101,7 +101,7 @@ class AgentControllerTest {
         PropertyFilterRequest filter = new PropertyFilterRequest();
         Pageable pageable = Pageable.ofSize(10);
 
-        when(agentService.getAgentProperties(any(), any(), any())).thenReturn(new PageImpl<>(List.of()));
+        when(agentService.getPublicAgentProperties(any(), any(), any())).thenReturn(new PageImpl<>(List.of()));
 
         ResponseEntity<ApiResponse<Page<PropertyResponse>>> response =
                 controller.getAllAgencies(userId, filter, pageable);

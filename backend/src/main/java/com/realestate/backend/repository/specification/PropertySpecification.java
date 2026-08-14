@@ -179,7 +179,7 @@ public class PropertySpecification {
         };
     }
 
-    private static Specification<PropertyEntity> hasStatus(PropertyStatus status) {
+    public static Specification<PropertyEntity> hasStatus(PropertyStatus status) {
         return ((root, query, criteriaBuilder) -> status == null ? null : criteriaBuilder.equal(root.get("status"), status));
     }
 

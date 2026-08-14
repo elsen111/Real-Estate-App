@@ -7,6 +7,7 @@ import com.realestate.backend.dto.response.PropertyResponse;
 import com.realestate.backend.entity.AgencyMemberEntity;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.entity.UserEntity;
+import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.exception.ForbiddenException;
 import com.realestate.backend.exception.ResourceNotFoundException;
@@ -56,13 +57,14 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public Page<PropertyResponse> getAgentProperties(UUID userId, PropertyFilterRequest filter, Pageable pageable) {
+    public Page<PropertyResponse> getPublicAgentProperties(UUID userId, PropertyFilterRequest filter, Pageable pageable) {
 
         userRepository.findAgentMemberByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Agent not found with user id: " + userId));
 
         Specification<PropertyEntity> specification = PropertySpecification
-                .hasAssignedAgentId(userId);
+                .hasAssignedAgentId(userId)
+                .and(PropertySpecification.hasStatus(PropertyStatus.ACTIVE));
 
         return propertyRepository.findAll(specification, pageable)
                 .map(propertyMapper::toPublicAgencyPropertyResponse);

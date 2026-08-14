@@ -39,6 +39,7 @@ public class AgentController {
 
     }
 
+//    Public endpoint
     @GetMapping("/{userId}/properties")
     @Operation(summary = "Get agent's assigned properties")
     public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getAllAgencies(
@@ -48,7 +49,7 @@ public class AgentController {
             Pageable pageable
     ) {
 
-        Page<PropertyResponse> response = agentService.getAgentProperties(userId, filter, pageable);
+        Page<PropertyResponse> response = agentService.getPublicAgentProperties(userId, filter, pageable);
 
         ApiResponse<Page<PropertyResponse>> apiResponse =
                 ApiResponse.success("Agent's properties fetched successfully", response);
