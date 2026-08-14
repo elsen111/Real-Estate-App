@@ -13,7 +13,7 @@ public interface AgentService {
 
     AgentResponse getAgentByUserId(UUID userId);
 
-    Page<PropertyResponse> getAgentProperties(
+    Page<PropertyResponse> getPublicAgentProperties(
             UUID  userId,
             PropertyFilterRequest filter,
             Pageable pageable
