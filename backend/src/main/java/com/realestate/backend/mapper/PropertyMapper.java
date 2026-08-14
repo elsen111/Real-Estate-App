@@ -14,12 +14,18 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = AgencyMapper.class)
 public interface PropertyMapper {
 
+    @Mapping(target = "categoryId", source = "category.id")
+    @Mapping(target = "categoryName", source = "category.name")
     AdminAgencyPropertyResponse toAdminResponse(PropertyEntity property);
 
     @Mapping(target = "assignedAgentName", source = "assignedAgent.fullName")
+    @Mapping(target = "categoryId", source = "category.id")
+    @Mapping(target = "categoryName", source = "category.name")
     PropertyResponse toAdminPropertyResponse(PropertyEntity property);
 
     @Mapping(target = "status", ignore = true)
+    @Mapping(target = "categoryId", source = "category.id")
+    @Mapping(target = "categoryName", source = "category.name")
     PropertyResponse toPublicAgencyPropertyResponse(PropertyEntity property);
 
     @Mapping(target = "agencyId", source = "agency.id")
@@ -34,6 +40,7 @@ public interface PropertyMapper {
     @Mapping(target = "agency", source = "agency", qualifiedByName = "propertyAgency")
     @Mapping(target = "agent", source = "assignedAgent")
     @Mapping(target = "propertyStatus", source = "status")
+    @Mapping(target = "categoryName", source = "category.name")
     @Mapping(target = "images", ignore = true)
     PropertyDetailResponse toDetailResponse(PropertyEntity property);
 

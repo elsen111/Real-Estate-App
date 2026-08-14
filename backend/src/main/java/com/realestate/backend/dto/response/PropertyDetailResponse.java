@@ -38,6 +38,7 @@ import java.util.UUID;
         "images",
         "agency",
         "agent",
+        "categoryName",
         "propertyStatus",
         "createdAt",
         "updatedAt"
@@ -65,6 +66,8 @@ public class PropertyDetailResponse {
     private List<PropertyMediaResponse> images;
     private AgencyResponse agency;
     private AgentResponse agent;
+    private UUID categoryId;
+    private String categoryName;
     private PropertyStatus propertyStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

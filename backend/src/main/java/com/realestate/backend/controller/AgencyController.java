@@ -89,7 +89,7 @@ public class AgencyController {
 
     @GetMapping("/me/subscription")
     @Operation(summary = "Get current agency's subscription.")
-    @PreAuthorize("hasAnyRole('AGENCY_OWNER', 'AGENT')")
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER', 'AGENT', 'LANDLORD')")
     public ResponseEntity<ApiResponse<AgencySubscriptionResponse>> getMySubscription(
             @AuthenticationPrincipal CustomUserDetails currentUser
     ){
