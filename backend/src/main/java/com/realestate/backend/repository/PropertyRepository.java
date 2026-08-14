@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,5 +61,7 @@ public interface PropertyRepository extends JpaRepository<PropertyEntity, UUID>,
     boolean existsByCategoryIdAndStatus(UUID categoryId, PropertyStatus status);
 
     boolean existsByAgencyIdAndStatus(UUID id, PropertyStatus status);
+
+    long countByAgencyIdAndStatusIn(UUID id, Collection<PropertyStatus> propertyStatus);
 
 }

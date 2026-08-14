@@ -79,16 +79,21 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         AgencySubscriptionResponse subscriptionResponse =
                 subscriptionMapper.toAdminResponse(subscription);
 
+//        '-1' is for Agency Owner
         long totalAgents =
-                agencyMemberRepository.countByAgencyIdAndActiveTrue(id);
+                agencyMemberRepository.countByAgencyIdAndActiveTrue(id) - 1;
 
         long totalProperties =
                 propertyRepository.countByAgencyId(id);
+                propertyRepository.countByAgencyId(id);
 
         long activeListings =
-                propertyRepository.countByAgencyIdAndStatus(
+                propertyRepository.countByAgencyIdAndStatusIn(
                         id,
-                        PropertyStatus.ACTIVE
+                        List.of(
+                                PropertyStatus.ACTIVE
+
+                        )
                 );
 
         AgencyStatisticsResponse statistics =
@@ -249,8 +254,6 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
                         () -> new ResourceNotFoundException("Agency not found with id " + agencyId)
                 );
 
-
-
         AgencySubscriptionEntity agencySubscription = agencySubscriptionRepository
                 .findFirstByAgencyIdAndStatusOrderByEndDateDesc(
                     agencyId,
@@ -259,7 +262,33 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
                 () -> new ResourceNotFoundException("This agency does not have any active subscription currently")
         );
 
-        return subscriptionMapper.toAdminResponse(agencySubscription);
+//        -1 is for Agency Owner
+        long usedAgents = agencyMemberRepository.countByAgencyIdAndActiveTrue(agencyId) - 1;
+
+        long usedListings =
+                propertyRepository.countByAgencyIdAndStatusIn(
+                        agencyId,
+                        List.of(
+                                PropertyStatus.PENDING,
+                                PropertyStatus.ACTIVE
+                        )
+                );
+
+        AgencySubscriptionResponse response =
+                subscriptionMapper.toAdminResponse(agencySubscription);
+
+        System.out.println("Id: " + agencyId );
+
+        int maxAgents = agencySubscription.getPlan().getMaxAgents();
+        int maxListings = agencySubscription.getPlan().getMaxListings();
+
+        response.setUsedAgents((int) usedAgents);
+        response.setRemainingAgents(Math.max(0, maxAgents - (int) usedAgents));
+
+        response.setUsedListings((int) usedListings);
+        response.setRemainingListings(Math.max(0, maxListings - (int) usedListings));
+
+        return response;
 
     }
 
