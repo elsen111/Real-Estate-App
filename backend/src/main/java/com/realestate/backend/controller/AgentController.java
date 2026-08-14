@@ -42,7 +42,7 @@ public class AgentController {
 //    Public endpoint
     @GetMapping("/{userId}/properties")
     @Operation(summary = "Get agent's assigned properties")
-    public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getAllAgencies(
+    public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getAgentProperties(
             @PathVariable UUID userId,
             @ModelAttribute PropertyFilterRequest filter,
             @PageableDefault(sort = "createdAt")
@@ -70,6 +70,25 @@ public class AgentController {
         return ResponseEntity.ok(
                 ApiResponse.success("Agent removed successfully", null)
         );
+    }
+
+    @PreAuthorize("hasRole('AGENT')")
+    @GetMapping("/me/properties")
+    @Operation(summary = "Get agent's own assigned properties")
+    public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getOwnProperties(
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            @ModelAttribute PropertyFilterRequest filter,
+            @PageableDefault(sort = "createdAt")
+            Pageable pageable
+    ) {
+
+        Page<PropertyResponse> response = agentService.getOwnAssignedProperties(currentUser, filter, pageable);
+
+        ApiResponse<Page<PropertyResponse>> apiResponse =
+                ApiResponse.success("Properties fetched successfully", response);
+
+        return ResponseEntity.ok(apiResponse);
+
     }
 
 }
