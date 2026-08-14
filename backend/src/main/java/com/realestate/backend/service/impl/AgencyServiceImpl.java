@@ -12,6 +12,7 @@ import com.realestate.backend.dto.response.AgencySubscriptionResponse;
 import com.realestate.backend.dto.response.UserResponse;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.MediaFolder;
+import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.ResourceNotFoundException;
@@ -35,6 +36,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -131,7 +133,13 @@ public class AgencyServiceImpl implements AgencyService {
                         () -> new ResourceNotFoundException("Agency currently doesn't have active subscription. Id: " + agency.getId())
                 );
 
-        long usedListings = propertyRepository.countByAgencyId(agency.getId());
+        long usedListings = propertyRepository.countByAgencyIdAndStatusIn(
+                agency.getId(),
+                List.of(
+                        PropertyStatus.PENDING,
+                        PropertyStatus.ACTIVE
+                )
+        );
         long usedAgents = userRepository.countByAgency(agency);
         SubscriptionPlanEntity subscriptionPlan = agencySubscription.getPlan();
 

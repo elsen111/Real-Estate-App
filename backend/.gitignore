@@ -38,4 +38,4 @@ out/
 .vscode/
 
 #Local environment files
-#.env
+.env
