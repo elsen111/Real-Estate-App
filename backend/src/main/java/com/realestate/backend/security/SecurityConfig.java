@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/agencies/*/agents").permitAll()
                         .requestMatchers(HttpMethod.GET, "/agencies/*/reviews").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/agents/me/properties").authenticated()
                         .requestMatchers(HttpMethod.GET, "/agents/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/subscription-plans/**").permitAll()
 

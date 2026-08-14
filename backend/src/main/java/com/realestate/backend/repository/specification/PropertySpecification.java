@@ -15,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.UUID;
 
 public class PropertySpecification {
@@ -183,6 +184,13 @@ public class PropertySpecification {
         return ((root, query, criteriaBuilder) -> status == null ? null : criteriaBuilder.equal(root.get("status"), status));
     }
 
+    public static Specification<PropertyEntity> hasStatusIn(
+            Collection<PropertyStatus> statuses
+    ) {
+        return (root, query, cb) ->
+                root.get("status").in(statuses);
+    }
+
     public static Specification<PropertyEntity> isFeatured(Boolean isFeatured) {
         return ((root, query, criteriaBuilder) -> isFeatured == null ? null : criteriaBuilder.equal(root.get("featured"), isFeatured));
     }
@@ -288,6 +296,5 @@ public class PropertySpecification {
             ? null
             : cb.notEqual(root.get("id"), propertyId);
     }
-
 
 }

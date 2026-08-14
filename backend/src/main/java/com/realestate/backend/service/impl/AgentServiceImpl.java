@@ -27,6 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -62,12 +63,35 @@ public class AgentServiceImpl implements AgentService {
         userRepository.findAgentMemberByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Agent not found with user id: " + userId));
 
-        Specification<PropertyEntity> specification = PropertySpecification
-                .hasAssignedAgentId(userId)
-                .and(PropertySpecification.hasStatus(PropertyStatus.ACTIVE));
+        Specification<PropertyEntity> specification = PropertySpecification.withPublicFilter(filter)
+                .and(PropertySpecification.hasAssignedAgentId(userId));
 
         return propertyRepository.findAll(specification, pageable)
                 .map(propertyMapper::toPublicAgencyPropertyResponse);
+    }
+
+    @Override
+    public Page<PropertyResponse> getOwnAssignedProperties(
+            CustomUserDetails currentUser,
+            PropertyFilterRequest filter,
+            Pageable pageable
+    ) {
+
+        Specification<PropertyEntity> specification = PropertySpecification
+                .withFilter(filter)
+                .and(PropertySpecification.hasAssignedAgentId(currentUser.getId()))
+                .and(PropertySpecification.hasStatusIn(
+                        List.of(
+                                PropertyStatus.PENDING,
+                                PropertyStatus.ACTIVE,
+                                PropertyStatus.SOLD,
+                                PropertyStatus.RENTED
+                        )
+                ));
+
+        return propertyRepository.findAll(specification, pageable)
+                .map(propertyMapper::toAdminPropertyResponse);
+
     }
 
     @Override
@@ -120,8 +144,11 @@ public class AgentServiceImpl implements AgentService {
                         () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
                 );
 
-        if(!user.getAgency().getId().equals(agencyId)) {
-            throw new ForbiddenException("You don't have permission to remove the agent belonging to another agency.");
+        if (user.getAgency() == null ||
+                !user.getAgency().getId().equals(agencyId)) {
+            throw new ForbiddenException(
+                    "You don't have permission to remove the agent belonging to another agency."
+            );
         }
 
         agencyMemberRepository

@@ -19,5 +19,11 @@ public interface AgentService {
             Pageable pageable
     );
 
+    Page<PropertyResponse> getOwnAssignedProperties(
+            CustomUserDetails currentUser,
+            PropertyFilterRequest filter,
+            Pageable pageable
+    );
+
     void deleteAgentFromAgency(UUID agentId, CustomUserDetails currentUser );
 }

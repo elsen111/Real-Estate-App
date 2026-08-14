@@ -71,7 +71,7 @@ class AgentControllerTest {
     }
 
     @Test
-    void getAllAgencies_returnsOk_withAgentProperties() {
+    void getAgentProperties_returnsOk_withAgentProperties() {
         UUID userId = UUID.randomUUID();
         PropertyFilterRequest filter = new PropertyFilterRequest();
         filter.setCity("Baku");
@@ -84,7 +84,7 @@ class AgentControllerTest {
         when(agentService.getPublicAgentProperties(userId, filter, pageable)).thenReturn(page);
 
         ResponseEntity<ApiResponse<Page<PropertyResponse>>> response =
-                controller.getAllAgencies(userId, filter, pageable);
+                controller.getAgentProperties(userId, filter, pageable);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
@@ -96,7 +96,7 @@ class AgentControllerTest {
     }
 
     @Test
-    void getAllAgencies_returnsOk_withEmptyPage_whenNoPropertiesAssigned() {
+    void getAgentProperties_returnsOk_withEmptyPage_whenNoPropertiesAssigned() {
         UUID userId = UUID.randomUUID();
         PropertyFilterRequest filter = new PropertyFilterRequest();
         Pageable pageable = Pageable.ofSize(10);
@@ -104,7 +104,7 @@ class AgentControllerTest {
         when(agentService.getPublicAgentProperties(any(), any(), any())).thenReturn(new PageImpl<>(List.of()));
 
         ResponseEntity<ApiResponse<Page<PropertyResponse>>> response =
-                controller.getAllAgencies(userId, filter, pageable);
+                controller.getAgentProperties(userId, filter, pageable);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody().getData().getContent()).isEmpty();
@@ -141,5 +141,87 @@ class AgentControllerTest {
         }
 
         verify(agentService).deleteAgentFromAgency(agentId, currentUser);
+    }
+
+    @Test
+    void getOwnProperties_returnsOk_withOwnAssignedProperties() {
+        PropertyFilterRequest filter = new PropertyFilterRequest();
+        filter.setCity("Baku");
+        Pageable pageable = Pageable.ofSize(10);
+
+        Page<PropertyResponse> page = new PageImpl<>(List.of(
+                PropertyResponse.builder().id(UUID.randomUUID()).title("My assigned listing").build()
+        ));
+
+        when(agentService.getOwnAssignedProperties(currentUser, filter, pageable)).thenReturn(page);
+
+        ResponseEntity<ApiResponse<Page<PropertyResponse>>> response =
+                controller.getOwnProperties(currentUser, filter, pageable);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().isSuccess()).isTrue();
+        assertThat(response.getBody().getMessage()).isEqualTo("Properties fetched successfully");
+        assertThat(response.getBody().getData()).isEqualTo(page);
+        assertThat(response.getBody().getData().getContent()).hasSize(1);
+
+        verify(agentService).getOwnAssignedProperties(currentUser, filter, pageable);
+        verifyNoMoreInteractions(agentService);
+    }
+
+    @Test
+    void getOwnProperties_returnsOk_withEmptyPage_whenAgentHasNoAssignedProperties() {
+        PropertyFilterRequest filter = new PropertyFilterRequest();
+        Pageable pageable = Pageable.ofSize(10);
+
+        when(agentService.getOwnAssignedProperties(any(), any(), any())).thenReturn(new PageImpl<>(List.of()));
+
+        ResponseEntity<ApiResponse<Page<PropertyResponse>>> response =
+                controller.getOwnProperties(currentUser, filter, pageable);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getData().getContent()).isEmpty();
+
+        verify(agentService).getOwnAssignedProperties(currentUser, filter, pageable);
+    }
+
+    @Test
+    void getOwnProperties_usesCurrentUserFromAuthenticationPrincipal_notPathParameter() {
+        PropertyFilterRequest filter = new PropertyFilterRequest();
+        Pageable pageable = Pageable.ofSize(10);
+        CustomUserDetails anotherUser = mock(CustomUserDetails.class);
+
+        Page<PropertyResponse> page = new PageImpl<>(List.of(
+                PropertyResponse.builder().id(UUID.randomUUID()).title("Listing for anotherUser").build()
+        ));
+
+        when(agentService.getOwnAssignedProperties(anotherUser, filter, pageable)).thenReturn(page);
+
+        ResponseEntity<ApiResponse<Page<PropertyResponse>>> response =
+                controller.getOwnProperties(anotherUser, filter, pageable);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().getData().getContent()).hasSize(1);
+
+        verify(agentService).getOwnAssignedProperties(anotherUser, filter, pageable);
+        verify(agentService, org.mockito.Mockito.never()).getOwnAssignedProperties(currentUser, filter, pageable);
+    }
+
+    @Test
+    void getOwnProperties_propagatesException_whenServiceThrows() {
+        PropertyFilterRequest filter = new PropertyFilterRequest();
+        Pageable pageable = Pageable.ofSize(10);
+
+        when(agentService.getOwnAssignedProperties(currentUser, filter, pageable))
+                .thenThrow(new RuntimeException("Unable to fetch assigned properties"));
+
+        try {
+            controller.getOwnProperties(currentUser, filter, pageable);
+        } catch (RuntimeException ex) {
+            assertThat(ex.getMessage()).isEqualTo("Unable to fetch assigned properties");
+        }
+
+        verify(agentService).getOwnAssignedProperties(currentUser, filter, pageable);
     }
 }
