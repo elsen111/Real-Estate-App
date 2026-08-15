@@ -4,6 +4,7 @@ import com.realestate.backend.dto.request.PropertyFilterRequest;
 import com.realestate.backend.dto.response.PropertyResponse;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.enums.PropertyStatus;
+import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.PropertyMapper;
 import com.realestate.backend.repository.PropertyRepository;
@@ -17,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -27,6 +30,41 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
 
     private final PropertyRepository propertyRepository;
     private final PropertyMapper propertyMapper;
+
+    private static final Map<PropertyStatus, Set<PropertyStatus>> ALLOWED_STATUS_TRANSITIONS =
+            Map.of(
+                    PropertyStatus.PENDING,
+                    Set.of(
+                            PropertyStatus.ACTIVE,
+                            PropertyStatus.REJECTED
+                    ),
+
+                    PropertyStatus.ACTIVE,
+                    Set.of(
+                            PropertyStatus.RENTED,
+                            PropertyStatus.SOLD,
+                            PropertyStatus.REJECTED,
+                            PropertyStatus.DELETED
+                    ),
+
+                    PropertyStatus.REJECTED,
+                    Set.of(
+                            PropertyStatus.PENDING
+                    ),
+
+                    PropertyStatus.SOLD,
+                    Set.of(),
+
+                    PropertyStatus.RENTED,
+                    Set.of(),
+
+                    PropertyStatus.CANCELED,
+                    Set.of(),
+
+                    PropertyStatus.DELETED,
+                    Set.of()
+
+            );
 
     @Override
     public Page<PropertyResponse> getAllProperties(PropertyFilterRequest filter, Pageable pageable) {
@@ -41,25 +79,66 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
 
     @Override
     @Transactional
-    public String changePropertyStatus(UUID id, PropertyStatus status) {
+    public String changePropertyStatus(UUID id, PropertyStatus newStatus) {
 
         PropertyEntity property =  propertyRepository.findById(id)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Property not found with id: " + id)
                 );
 
-        property.setStatus(status);
+        PropertyStatus currentStatus = property.getStatus();
+        validateStatusTransition(currentStatus, newStatus);
+
+        property.setStatus(newStatus);
 
         propertyRepository.save(property);
 
         log.info(
-                "Property '{}' ({}) status changed to {}",
-                property.getTitle(),
+                "Property status changed successfully: propertyId={}, title='{}', oldStatus={}, newStatus={}",
                 property.getId(),
-                property.getStatus()
+                property.getTitle(),
+                currentStatus,
+                newStatus
         );
 
-        return "\"" + property.getTitle() + "\"'s status changed to " + status.toString();
+        return "'" + property.getTitle() + "'s status changed to " + newStatus.toString();
+    }
+
+//    HELPER METHODS
+    private void validateStatusTransition(
+            PropertyStatus currentStatus,
+            PropertyStatus newStatus
+    ) {
+
+        if(currentStatus == newStatus) {
+            log.warn(
+                    "Property status change rejected: property already has status={}",
+                    currentStatus
+            );
+
+            throw new BadRequestException(
+                    "Property is already in status: " + currentStatus
+            );
+        }
+
+        Set<PropertyStatus> allowedStatuses = ALLOWED_STATUS_TRANSITIONS
+                .getOrDefault(currentStatus, Set.of());
+
+        if(!allowedStatuses.contains(newStatus)) {
+            log.warn(
+                    "Invalid property status transition attempted: currentStatus={}, requestedStatus={}",
+                    currentStatus,
+                    newStatus
+            );
+
+            throw new BadRequestException(
+                    "Cannot change property status from "
+                    + currentStatus
+                    + " to "
+                    + newStatus
+            );
+        }
+
     }
 
 }

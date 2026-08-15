@@ -150,8 +150,6 @@ public class PropertyServiceImpl implements PropertyService {
 
         propertyDetails.setImages(images);
 
-//        return propertyMapper.toDetailResponse(property).toBuilder().images(propertyMapper.toImageResponseList(images)).build();
-
         return propertyDetails;
 
     }
