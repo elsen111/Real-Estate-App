@@ -34,6 +34,7 @@ public class PropertyController {
 
     @PostMapping
     @Operation(summary = "Create a new property.")
+    @PreAuthorize("hasRole('AGENCY_OWNER')")
     public ResponseEntity<ApiResponse<PropertyResponse>> createProperty(
             @Valid @RequestBody PropertyRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUser
@@ -97,7 +98,7 @@ public class PropertyController {
 
     @PatchMapping("/{propertyId}")
     @Operation(summary = "Update the status of an existing property")
-    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<ApiResponse<Void>> updatePropertyStatus(
             @Valid @RequestBody PropertyStatusRequest request,
             @PathVariable UUID propertyId,
@@ -114,7 +115,7 @@ public class PropertyController {
 
     @PatchMapping("/{propertyId}/featured")
     @Operation(summary = "Update the featured property of an existing property")
-    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<ApiResponse<PropertyResponse>> toggleFeatured(
             @PathVariable UUID propertyId,
             @AuthenticationPrincipal CustomUserDetails currentUser
@@ -130,7 +131,7 @@ public class PropertyController {
 
     @DeleteMapping("/{propertyId}")
     @Operation(summary = "Soft delete the existing property")
-    @PreAuthorize("hasAnyRole('AGENCY_OWNER', 'SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER', 'SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<ApiResponse<Void>> softDeleteProperty(
             @PathVariable UUID propertyId,
             @AuthenticationPrincipal CustomUserDetails currentUser
@@ -221,6 +222,7 @@ public class PropertyController {
 
     }
 
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER', 'AGENT')")
     @PostMapping(
             value = "/{propertyId}/media",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
@@ -287,6 +289,7 @@ public class PropertyController {
 
     }
 
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'LANDLORD')")
     @PostMapping("/{propertyId}/inquiries")
     @Operation(summary = "Create a new inquiry for the specific property")
     public ResponseEntity<ApiResponse<InquiryResponse>> createInquiry(
@@ -303,6 +306,7 @@ public class PropertyController {
 
     }
 
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'LANDLORD')")
     @PostMapping("/{propertyId}/appointments")
     @Operation(summary = "Create a new appointment for the specific property.")
     public ResponseEntity<ApiResponse<AppointmentResponse>> createAppointment (

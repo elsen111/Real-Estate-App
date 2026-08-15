@@ -23,6 +23,7 @@ public class AdminUserController {
 
     private final AdminUserServiceImpl adminUserService;
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
     @GetMapping
     @Operation(summary = "Get all users")
     public ResponseEntity<ApiResponse<Page<UserResponse>>> getAllUsers(
@@ -40,6 +41,7 @@ public class AdminUserController {
 
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
     @GetMapping("/{userId}")
     @Operation(summary = "Get user by id")
     public ResponseEntity<ApiResponse<UserResponse>> getUserById(
@@ -54,6 +56,7 @@ public class AdminUserController {
 
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
     @Transactional
     @PatchMapping("/{userId}/status")
     @Operation(summary = "Toggle user status")

@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,7 @@ public class AdminSubscriptionController {
 
     private final AdminSubscriptionPlanService adminSubscriptionPlanService;
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping
     @Operation(summary = "Create a new subscription plan")
     public ResponseEntity<ApiResponse<AdminSubscriptionPlanResponse>> createSubscriptionPlan(
@@ -37,6 +39,7 @@ public class AdminSubscriptionController {
 
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
     @GetMapping
     @Operation(summary = "Get all subscription plans")
     public ResponseEntity<ApiResponse<List<AdminSubscriptionPlanResponse>>> getAllSubscriptionPlans(
@@ -50,6 +53,7 @@ public class AdminSubscriptionController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @GetMapping("/{planId}")
     @Operation(summary = "Get subscription plan by id")
     public ResponseEntity<ApiResponse<AdminSubscriptionPlanResponse>> getSubscriptionPlanById(
@@ -62,6 +66,7 @@ public class AdminSubscriptionController {
         );
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PutMapping("/{planId}")
     @Operation(summary = "Update subscription plan")
     public ResponseEntity<ApiResponse<AdminSubscriptionPlanResponse>> updateSubscriptionPlan(
@@ -77,6 +82,7 @@ public class AdminSubscriptionController {
 
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PatchMapping("/{planId}/status")
     @Operation(summary = "Change subscription plan status")
     public ResponseEntity<ApiResponse<Void>> toggleSubscriptionPlanStatus(
@@ -91,6 +97,7 @@ public class AdminSubscriptionController {
 
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Transactional
     @DeleteMapping("/{planId}")
     @Operation(summary = "Delete a subscription plan")

@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +26,7 @@ public class UserController {
 
     private  final UserService userService;
 
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/me/profile")
     @Operation(summary = "Update own profile")
     public ResponseEntity<ApiResponse<AuthUserResponse>> updateProfile(
@@ -40,6 +42,7 @@ public class UserController {
 
     }
 
+    @PreAuthorize("isAuthenticated()")
     @Transactional
     @DeleteMapping("/account")
     @Operation(summary = "Delete own profile")
@@ -60,6 +63,7 @@ public class UserController {
         );
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping(
             value = "/me/photo",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
@@ -79,6 +83,7 @@ public class UserController {
 
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping( "/me/photo")
     @Operation(summary = "Remove profile photo")
     public ResponseEntity<ApiResponse<Void>> removeProfilePhoto(

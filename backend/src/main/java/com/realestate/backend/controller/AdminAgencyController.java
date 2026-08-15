@@ -28,6 +28,7 @@ public class AdminAgencyController {
 
     private final AdminAgencyService adminAgencyService;
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
     @GetMapping
     @Operation(summary = "Get all agencies")
     public ResponseEntity<ApiResponse<Page<AdminAgencyResponse>>> getAllAgencies(
@@ -45,6 +46,7 @@ public class AdminAgencyController {
 
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
     @GetMapping("/{agencyId}")
     @Operation(summary = "Get agency by id")
     public ResponseEntity<ApiResponse<AdminAgencyResponse>> getAgencyById(
@@ -59,6 +61,7 @@ public class AdminAgencyController {
 
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
     @PutMapping("/{agencyId}/status")
     @Operation(summary = "Change agency status")
     public ResponseEntity<ApiResponse<Void>> changeAgencyStatus(
@@ -74,7 +77,7 @@ public class AdminAgencyController {
 
     }
 
-
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Transactional
     @DeleteMapping("/{agencyId}")
     @Operation(summary = "Delete a specific agency")
@@ -91,6 +94,7 @@ public class AdminAgencyController {
         );
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Transactional
     @PostMapping("/{agencyId}/subscription-plans/{subscriptionId}")
     @Operation(summary = "Assign subscription plan to an agency")
@@ -107,6 +111,7 @@ public class AdminAgencyController {
 
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
     @GetMapping("/{agencyId}/subscription-plan")
     @Operation(summary = "Get agency subscription")
     public ResponseEntity<ApiResponse<AgencySubscriptionResponse>> getAgencySubscription(

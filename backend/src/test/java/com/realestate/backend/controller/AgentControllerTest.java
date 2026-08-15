@@ -58,7 +58,7 @@ class AgentControllerTest {
         when(agentService.getAgentByUserId(userId)).thenReturn(expected);
 
         ResponseEntity<ApiResponse<AgentResponse>> response =
-                controller.getAgencyPublicInfo(userId);
+                controller.getAgentPublicInfo(userId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();

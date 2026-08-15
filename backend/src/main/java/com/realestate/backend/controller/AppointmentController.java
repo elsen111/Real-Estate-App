@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,7 @@ public class AppointmentController {
 
     @GetMapping("/me")
     @Operation(summary = "Get client's appointments")
+    @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getMyAppointments(
             @RequestParam(required = false) AppointmentStatus status,
             @AuthenticationPrincipal CustomUserDetails currentUser,
@@ -45,6 +47,7 @@ public class AppointmentController {
 
     @PatchMapping("/{appointmentId}/cancel")
     @Operation(summary = "Cancel a pending or approved appointment (client user)")
+    @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<ApiResponse<Void>> cancelAppointment(
             @PathVariable UUID appointmentId,
             @AuthenticationPrincipal CustomUserDetails currentUser
@@ -60,6 +63,7 @@ public class AppointmentController {
 
     @PatchMapping("/{appointmentId}/status")
     @Operation(summary = "Update appointment status")
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'LANDLORD')")
     public ResponseEntity<ApiResponse<AppointmentResponse>> updateAppointmentStatus(
             @PathVariable UUID appointmentId,
             @Valid @RequestBody UpdateAppointmentStatusRequest request,
@@ -77,6 +81,7 @@ public class AppointmentController {
 
     @GetMapping("/{appointmentId}")
     @Operation(summary = "Get appointment by id")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<AppointmentResponse>> getAppointmentById(
             @PathVariable UUID appointmentId,
             @AuthenticationPrincipal CustomUserDetails currentUser
