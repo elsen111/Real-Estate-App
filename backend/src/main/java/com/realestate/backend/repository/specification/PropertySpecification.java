@@ -73,7 +73,7 @@ public class PropertySpecification {
                 .and(hasDistrict(filterRequest.getDistrict()))
                 .and(hasCity(filterRequest.getCity()))
                 .and(hasAgencyName(filterRequest.getAgencyName()))
-                .and(hasPropertyType(filterRequest.getPropertyType()))
+                .and(hasCategoryName(filterRequest.getCategory()))
                 .and(hasListingType(filterRequest.getListingType()))
                 .and(priceBetween(filterRequest.getMinPrice(), filterRequest.getMaxPrice()))
                 .and(hasCurrency(filterRequest.getCurrency()))
@@ -96,7 +96,7 @@ public class PropertySpecification {
         return spec
                 .and(hasCity(filterRequest.getCity()))
                 .and(hasAgencyName(filterRequest.getAgencyName()))
-                .and(hasPropertyType(filterRequest.getPropertyType()))
+                .and(hasCategoryName(filterRequest.getCategory()))
                 .and(hasListingType(filterRequest.getListingType()))
                 .and(priceBetween(filterRequest.getMinPrice(), filterRequest.getMaxPrice()))
                 .and(hasCurrency(filterRequest.getCurrency()))
@@ -116,7 +116,7 @@ public class PropertySpecification {
 
         return spec
                 .and(hasCity(filterRequest.getCity()))
-                .and(hasPropertyType(filterRequest.getPropertyType()))
+                .and(hasCategoryName(filterRequest.getCategory()))
                 .and(hasListingType(filterRequest.getListingType()))
                 .and(hasQuery(filterRequest.getQuery()));
     }
@@ -219,11 +219,24 @@ public class PropertySpecification {
                 : cb.equal(cb.lower(root.get("district")), district.trim().toLowerCase());
     }
 
-    private static Specification<PropertyEntity> hasPropertyType(PropertyType propertyType) {
-        return (root, query, cb) -> propertyType == null
-                ? null
-                : cb.equal(root.get("propertyType"), propertyType);
+    private static Specification<PropertyEntity> hasCategoryName(String categoryName) {
+        return (root, query, cb) -> {
+            if (categoryName == null || categoryName.isBlank()) {
+                return null;
+            }
+
+            return cb.like(
+                    cb.lower(root.get("category").get("name")),
+                    "%" + categoryName.trim().toLowerCase() + "%"
+            );
+        };
     }
+
+//    private static Specification<PropertyEntity> hasCategoryName(String categoryName) {
+//        return (root, query, cb) -> categoryName == null
+//                ? null
+//                : cb.equal(root.get("category").get("name"), categoryName.trim());
+//    }
 
     private static Specification<PropertyEntity> hasListingType(ListingType listingType) {
         return (root, query, cb) -> listingType == null

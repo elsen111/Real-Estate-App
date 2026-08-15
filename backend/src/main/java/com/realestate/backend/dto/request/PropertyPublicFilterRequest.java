@@ -16,7 +16,7 @@ public class PropertyPublicFilterRequest {
     private String city;
     private String district;
     private String agencyName;
-    private PropertyType propertyType;
+    private String category;
     private ListingType listingType;
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
