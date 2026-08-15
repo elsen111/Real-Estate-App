@@ -28,6 +28,7 @@ public class InquiryController {
     private final InquiryService inquiryService;
 
     @GetMapping("/me")
+    @PreAuthorize("hasRole('CLIENT')")
     @Operation(summary = "Get client's inquiries")
     public ResponseEntity<ApiResponse<Page<InquiryResponse>>> getMyInquiries(
             @RequestParam(required = false)InquiryStatus status,

@@ -91,6 +91,7 @@ public class ReviewController {
 
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/reviews/{reviewId}")
     @Operation(summary = "Update own review.")
     public ResponseEntity<ApiResponse<ReviewResponse>> updateOwnReview(
@@ -107,6 +108,7 @@ public class ReviewController {
 
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/reviews/{reviewId}")
     @Operation(summary = "Delete own review.")
     public ResponseEntity<ApiResponse<Void>> deleteOwnReview(

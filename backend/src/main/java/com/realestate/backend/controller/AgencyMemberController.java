@@ -21,7 +21,7 @@ public class AgencyMemberController {
     private final AgencyMemberServiceImpl agencyMemberService;
 
     @PostMapping("/agents/{userId}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'AGENCY_OWNER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'AGENCY_OWNER')")
     public ResponseEntity<ApiResponse<AgencyMemberResponse>> assignAgent(
             @PathVariable UUID agencyId,
             @PathVariable UUID userId,

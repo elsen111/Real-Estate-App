@@ -38,6 +38,7 @@ public class AgencyController {
     private final InquiryService inquiryService;
     private final AppointmentService appointmentService;
 
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT')")
     @GetMapping("/me")
     @Operation(summary = "Get current agency information.")
     public ResponseEntity<ApiResponse<AgencyResponse>> getCurrentAgency(
@@ -72,7 +73,7 @@ public class AgencyController {
             value = "/me/logo",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    @PreAuthorize("hasAnyRole('AGENCY_OWNER', 'AGENT')")
+    @PreAuthorize("hasRole('AGENCY_OWNER')")
     @Operation(summary = "Update agency profile logo")
     public ResponseEntity<ApiResponse<AgencyLogoUploadResponse>> uploadAgencyLogo(
             @AuthenticationPrincipal CustomUserDetails currentUser,
@@ -191,6 +192,7 @@ public class AgencyController {
 
     @DeleteMapping( "/me/logo")
     @Operation(summary = "Remove agency logo")
+    @PreAuthorize("hasRole('AGENCY_OWNER')")
     public ResponseEntity<ApiResponse<Void>> removeAgencyLogo(
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
@@ -208,6 +210,7 @@ public class AgencyController {
 
     @GetMapping("/me/inquiries")
     @Operation(summary = "Get current user's agency's inquiries")
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'LANDLORD')")
     public ResponseEntity<ApiResponse<Page<InquiryResponse>>> getMyAgencyInquiries(
             @RequestParam(required = false) InquiryStatus status,
             @RequestParam(required = false) UUID propertyId,
@@ -224,6 +227,7 @@ public class AgencyController {
 
     }
 
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'LANDLORD')")
     @GetMapping("/agencies/me/appointments")
     @Operation(summary = "Get agency's appointments")
     public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getMyAgencyAppointments (
