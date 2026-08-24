@@ -1,10 +1,46 @@
 # EstateFlow — Real Estate CRM & Marketplace
 
+<p align="left">
+  <img src="https://komarev.com/ghpvc/?username=estateflow&label=Profile%20Views&color=0e75b6&style=flat" alt="views" />
+  <img src="https://img.shields.io/github/stars/your-username/EstateFlow?style=flat&color=yellow" alt="stars" />
+  <img src="https://img.shields.io/github/forks/your-username/EstateFlow?style=flat&color=blue" alt="forks" />
+  <img src="https://img.shields.io/github/issues/your-username/EstateFlow?style=flat&color=red" alt="issues" />
+  <img src="https://img.shields.io/github/last-commit/your-username/EstateFlow?style=flat&color=green" alt="last commit" />
+  <img src="https://img.shields.io/github/license/your-username/EstateFlow?style=flat&color=lightgrey" alt="license" />
+</p>
+
 This is a full-stack real estate platform for agencies, agents, property owners, buyers, and renters. It combines property listings, map-based search, agency management, inquiries, viewing requests, dashboards, and basic subscription logic in one system.
 
 ---
 
-## Features
+## 📑 Table of Contents
+
+- [✨ Features](#-features)
+- [👥 User Roles](#-user-roles)
+- [🛠️ Tech Stack](#️-tech-stack)
+  - [⚙️ Backend](#️-backend)
+  - [🎨 Frontend](#-frontend)
+- [📁 Project Structure](#-project-structure)
+- [🧩 Main Modules](#-main-modules)
+  - [🔐 Authentication](#-authentication)
+  - [🏠 Properties](#-properties)
+  - [🗺️ Search & Map](#️-search--map)
+  - [📩 Inquiries & Viewings](#-inquiries--viewings)
+  - [📊 Dashboards](#-dashboards)
+- [🗄️ Database Tables](#️-database-tables)
+- [🔧 Environment Variables](#-environment-variables)
+- [🚀 How to Run](#-how-to-run)
+- [🖥️ Backend Setup](#️-backend-setup)
+- [💻 Frontend Setup](#-frontend-setup)
+- [🐳 Run with Docker](#-run-with-docker)
+- [🔑 Default Development Accounts](#-default-development-accounts)
+- [🔮 Future Improvements](#-future-improvements)
+
+<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+
+---
+
+## ✨ Features
 
 - User authentication with JWT
 - Role-based access control
@@ -20,20 +56,36 @@ This is a full-stack real estate platform for agencies, agents, property owners,
 - Admin, agency, agent, and client dashboards
 - Basic agency subscription control
 
+<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+
 ---
 
-## User Roles
+## 👥 User Roles
 
 - **Super Admin** — manages users, agencies, properties, subscriptions, and platform statistics.
 - **Agency Admin** — manages agency profile, agents, properties, inquiries, and viewing requests.
 - **Agent** — manages assigned properties, inquiries, and viewing requests.
 - **Client** — searches properties, saves favorites, sends inquiries, and requests viewings.
 
+<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-### Backend
+### ⚙️ Backend
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java" />
+  <img src="https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot" />
+  <img src="https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white" alt="Spring Security" />
+  <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white" alt="JWT" />
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge&logo=hibernate&logoColor=white" alt="Hibernate" />
+  <img src="https://img.shields.io/badge/Liquibase-2962FF?style=for-the-badge&logo=liquibase&logoColor=white" alt="Liquibase" />
+  <img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" alt="Swagger" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+</p>
 
 - Java
 - Spring Boot
@@ -46,7 +98,19 @@ This is a full-stack real estate platform for agencies, agents, property owners,
 - Swagger / OpenAPI
 - Docker
 
-### Frontend
+### 🎨 Frontend
+
+<p align="left">
+  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/React%20Router-CA4245?style=for-the-badge&logo=reactrouter&logoColor=white" alt="React Router" />
+  <img src="https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white" alt="Axios" />
+  <img src="https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/Leaflet-199900?style=for-the-badge&logo=leaflet&logoColor=white" alt="Leaflet" />
+  <img src="https://img.shields.io/badge/Google%20Maps-4285F4?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Google Maps" />
+  <img src="https://img.shields.io/badge/Recharts-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white" alt="Recharts" />
+</p>
 
 - React
 - TypeScript
@@ -61,9 +125,11 @@ This is a full-stack real estate platform for agencies, agents, property owners,
 - React Hook Form (Planned for the future)
 - Zod (Planned for the future)
 
+<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```bash
 EstateFlow/
@@ -99,11 +165,13 @@ EstateFlow/
 └── README.md
 ```
 
+<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+
 ---
 
-## Main Modules
+## 🧩 Main Modules
 
-### Authentication
+### 🔐 Authentication
 
 - Register
 - Login
@@ -112,7 +180,7 @@ EstateFlow/
 - Protected endpoints
 - Protected frontend routes
 
-### Properties
+### 🏠 Properties
 
 - Create, update, delete, and view properties
 - Upload property images
@@ -121,7 +189,7 @@ EstateFlow/
 - Set property type: apartment, house, villa, office, or land
 - Set property status: pending, active, sold, or rented
 
-### Search & Map
+### 🗺️ Search & Map
 
 - Search by keyword
 - Filter by city, property type, listing type, price range, and rooms
@@ -129,23 +197,25 @@ EstateFlow/
 - Show properties on map
 - Open property details from map marker popup
 
-### Inquiries & Viewings
+### 📩 Inquiries & Viewings
 
 - Client sends inquiry for a property
 - Agent or agency admin updates inquiry status
 - Client requests property viewing
 - Agent or agency admin approves, rejects, or completes viewing request
 
-### Dashboards
+### 📊 Dashboards
 
 - Super Admin dashboard
 - Agency Admin dashboard
 - Agent dashboard
 - Client dashboard
 
+<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+
 ---
 
-## Database Tables
+## 🗄️ Database Tables
 
 Main tables:
 
@@ -166,11 +236,13 @@ Main tables:
 - subscription_plans
 - agency_subscriptions
 
+<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+
 ---
 
-## Environment Variables
+## 🔧 Environment Variables
 
-### Backend
+### ⚙️ Backend
 
 ```env
 SERVER_PORT=8080
@@ -185,7 +257,7 @@ JWT_REFRESH_EXPIRATION=604800000
 FILE_UPLOAD_DIR=uploads
 ```
 
-### Frontend
+### 🎨 Frontend
 
 ```env
 VITE_API_BASE_URL=http://localhost:8080/api
@@ -193,9 +265,11 @@ VITE_MAP_PROVIDER=openstreetmap
 VITE_MAPS_API_KEY=
 ```
 
+<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+
 ---
 
-## How to Run
+## 🚀 How to Run
 
 ### 1. Clone the Repository
 
@@ -204,9 +278,11 @@ git clone https://github.com/your-username/EstateFlow.git
 cd EstateFlow
 ```
 
+<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+
 ---
 
-## Backend Setup
+## 🖥️ Backend Setup
 
 ### 1. Create PostgreSQL Database
 
@@ -261,9 +337,11 @@ Swagger runs on:
 http://localhost:8080/api/swagger-ui.html
 ```
 
+<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+
 ---
 
-## Frontend Setup
+## 💻 Frontend Setup
 
 ### 1. Install Dependencies
 
@@ -292,9 +370,11 @@ Frontend runs on:
 http://localhost:5173
 ```
 
+<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+
 ---
 
-## Run with Docker
+## 🐳 Run with Docker
 
 Create `.env` in the project root:
 
@@ -320,9 +400,11 @@ Stop containers:
 docker compose down
 ```
 
+<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+
 ---
 
-## Default Development Accounts
+## 🔑 Default Development Accounts
 
 ```txt
 Super Admin
@@ -342,9 +424,11 @@ Email: client@estateflow.com
 Password: Client123!
 ```
 
+<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+
 ---
 
-## Future Improvements
+## 🔮 Future Improvements
 
 - Multilanguage support
 - Currencies
