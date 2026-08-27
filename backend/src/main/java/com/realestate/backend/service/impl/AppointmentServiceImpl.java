@@ -1,5 +1,6 @@
 package com.realestate.backend.service.impl;
 
+import com.realestate.backend.dto.request.AppointmentFilterRequest;
 import com.realestate.backend.dto.request.CreateAppointmentRequest;
 import com.realestate.backend.dto.request.UpdateAppointmentStatusRequest;
 import com.realestate.backend.dto.response.AppointmentResponse;
@@ -13,6 +14,7 @@ import com.realestate.backend.repository.AgencyMemberRepository;
 import com.realestate.backend.repository.AppointmentRepository;
 import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.UserRepository;
+import com.realestate.backend.repository.specification.AppointmentSpecification;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.security.SecurityConstants;
 import com.realestate.backend.service.AppointmentService;
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -241,9 +244,18 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointmentMapper.toResponse(updatedAppointment);
     }
 
+    @Override
+    public Page<AppointmentResponse> getAllAppointments(AppointmentFilterRequest filter, Pageable pageable) {
+
+        Specification<AppointmentEntity> specification = AppointmentSpecification.withFilter(filter);
+
+        return appointmentRepository.findAll(specification, pageable)
+                .map(appointmentMapper::toResponse);
+
+    }
 
 
-//    HELPER METHODS
+    //    HELPER METHODS
     private boolean hasRole(CustomUserDetails user, String roleName) {
         String target = SecurityConstants.ROLE_PREFIX + roleName;
         return user.getAuthorities().stream()

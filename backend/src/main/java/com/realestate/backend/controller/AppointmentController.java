@@ -1,6 +1,7 @@
 package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
+import com.realestate.backend.dto.request.AppointmentFilterRequest;
 import com.realestate.backend.dto.request.UpdateAppointmentStatusRequest;
 import com.realestate.backend.dto.response.AppointmentResponse;
 import com.realestate.backend.enums.AppointmentStatus;
@@ -92,6 +93,23 @@ public class AppointmentController {
         return ResponseEntity.ok(
                 ApiResponse.success("Appointment fetched successfully.", response)
         );
+    }
+
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    @GetMapping
+    @Operation(summary = "Get all appointments")
+    public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getAllAppointments(
+            @ModelAttribute AppointmentFilterRequest filter,
+            @PageableDefault(sort = "createdAt")
+            Pageable pageable
+    ) {
+
+        Page<AppointmentResponse> response = appointmentService.getAllAppointments(filter, pageable);
+
+        return ResponseEntity.ok(ApiResponse.success(
+                "All appointments fetched successfully", response
+        ));
+
     }
 
 
