@@ -1,6 +1,7 @@
 package com.realestate.backend.service.impl;
 
 import com.realestate.backend.dto.request.CreateInquiryRequest;
+import com.realestate.backend.dto.request.InquiryFilterRequest;
 import com.realestate.backend.dto.request.UpdateInquiryStatusRequest;
 import com.realestate.backend.dto.response.InquiryResponse;
 import com.realestate.backend.entity.*;
@@ -12,6 +13,8 @@ import com.realestate.backend.exception.ForbiddenException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.InquiryMapper;
 import com.realestate.backend.repository.*;
+import com.realestate.backend.repository.specification.InquirySpecification;
+import com.realestate.backend.repository.specification.UserSpecification;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.security.SecurityConstants;
 import com.realestate.backend.service.InquiryService;
@@ -19,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +48,7 @@ public class InquiryServiceImpl implements InquiryService {
             InquiryStatus.CONTACTED,
             InquiryStatus.CLOSED
     );
+    private final AgencyRepository agencyRepository;
 
     @Override
     @Transactional
@@ -178,9 +183,25 @@ public class InquiryServiceImpl implements InquiryService {
 
     }
 
+    @Override
+    public Page<InquiryResponse> getAgencyInquiriesById(UUID agencyId, InquiryFilterRequest filter, Pageable pageable) {
+
+        if(!agencyRepository.existsById(agencyId)){
+            throw new ResourceNotFoundException("Agency not found with id: " + agencyId);
+        }
+
+        Specification<InquiryEntity> specification = InquirySpecification.withAgencyIdFilter(
+                agencyId,
+                filter
+        );
+
+        return inquiryRepository.findAll(specification, pageable)
+                .map(inquiryMapper::toResponse);
+
+    }
 
 
-//    HELPER METHODS
+    //    HELPER METHODS
     private boolean canViewInquiry(InquiryEntity inquiry, CustomUserDetails currentUser) {
         if (hasRole(currentUser, "SUPER_ADMIN")) {
             return true;
