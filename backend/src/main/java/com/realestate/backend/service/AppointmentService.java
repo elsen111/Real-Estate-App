@@ -1,5 +1,6 @@
 package com.realestate.backend.service;
 
+import com.realestate.backend.dto.request.AppointmentFilterRequest;
 import com.realestate.backend.dto.request.CreateAppointmentRequest;
 import com.realestate.backend.dto.request.UpdateAppointmentStatusRequest;
 import com.realestate.backend.dto.response.AppointmentResponse;
@@ -23,5 +24,7 @@ public interface AppointmentService {
     Page<AppointmentResponse> getMyAgencyAppointments(CustomUserDetails currentUser, AppointmentStatus status, UUID propertyId, Pageable pageable);
 
     AppointmentResponse updateStatus(CustomUserDetails currentUser, UUID inquiryId, UpdateAppointmentStatusRequest request);
+
+    Page<AppointmentResponse> getAllAppointments(AppointmentFilterRequest filter, Pageable pageable);
 
 }
