@@ -5,13 +5,17 @@ import com.realestate.backend.dto.request.AgencyStatusRequest;
 import com.realestate.backend.dto.request.UpdateAgencyRequest;
 import com.realestate.backend.dto.response.AdminAgencyResponse;
 import com.realestate.backend.dto.response.AgencySubscriptionResponse;
+import com.realestate.backend.dto.response.InquiryResponse;
 import com.realestate.backend.enums.AgencyStatus;
+import com.realestate.backend.enums.InquiryStatus;
+import com.realestate.backend.enums.InquiryType;
 import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.security.CustomUserDetailsService;
 import com.realestate.backend.security.JwtService;
 import com.realestate.backend.service.AdminAgencyService;
+import com.realestate.backend.service.InquiryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +53,9 @@ class AdminAgencyControllerTest {
 
     @MockitoBean
     private AdminAgencyService adminAgencyService; // (or CategoryService for the other test)
+
+    @MockitoBean
+    private InquiryService inquiryService;
 
     @MockitoBean
     private JwtService jwtService;
@@ -166,6 +173,7 @@ class AdminAgencyControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = {"SUPER_ADMIN"})
     void deleteAccount_returnsSuccessMessage_whenAgencyExists() throws Exception {
         when(adminAgencyService.softDeleteAgency(agencyId))
                 .thenReturn("Agency deleted successfully");
@@ -177,6 +185,7 @@ class AdminAgencyControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = {"SUPER_ADMIN"})
     void assignSubscriptionPlan_returnsCreatedSubscription() throws Exception {
         when(adminAgencyService.createAgencySubscription(agencyId, subscriptionId))
                 .thenReturn(subscriptionResponse);
@@ -385,5 +394,69 @@ class AdminAgencyControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(adminAgencyService).rejectAgency(agencyId);
+    }
+
+    // ----- New endpoint: GET /admin/agencies/{agencyId}/inquiries -----
+
+    @Test
+    void getAgencyInquiries_returnsPagedInquiries_whenAgencyExists() throws Exception {
+        InquiryResponse inquiryResponse = InquiryResponse.builder()
+                .id(UUID.randomUUID())
+                .status(InquiryStatus.NEW)
+                .message("Interested in this property")
+                .preferredContactMethod(InquiryType.EMAIL)
+                .propertyId(UUID.randomUUID())
+                .propertyTitle("3-room apartment")
+                .clientId(UUID.randomUUID())
+                .clientFullName("Jane Doe")
+                .agencyId(agencyId)
+                .build();
+
+        when(inquiryService.getAgencyInquiriesById(eq(agencyId), any(), any()))
+                .thenReturn(new PageImpl<>(List.of(inquiryResponse), PageRequest.of(0, 10), 1));
+
+        mockMvc.perform(get("/admin/agencies/{agencyId}/inquiries", agencyId)
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Agency inquiries fetched successfully"))
+                .andExpect(jsonPath("$.data.content[0].id").value(inquiryResponse.getId().toString()))
+                .andExpect(jsonPath("$.data.content[0].propertyTitle").value("3-room apartment"))
+                .andExpect(jsonPath("$.data.content[0].status").value("NEW"));
+
+        verify(inquiryService).getAgencyInquiriesById(eq(agencyId), any(), any());
+    }
+
+    @Test
+    void getAgencyInquiries_returnsEmptyPage_whenAgencyHasNoInquiries() throws Exception {
+        when(inquiryService.getAgencyInquiriesById(eq(agencyId), any(), any()))
+                .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 10), 0));
+
+        mockMvc.perform(get("/admin/agencies/{agencyId}/inquiries", agencyId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.content").isEmpty());
+    }
+
+    @Test
+    void getAgencyInquiries_returnsNotFound_whenAgencyDoesNotExist() throws Exception {
+        when(inquiryService.getAgencyInquiriesById(eq(agencyId), any(), any()))
+                .thenThrow(new ResourceNotFoundException("Agency not found with id: " + agencyId));
+
+        mockMvc.perform(get("/admin/agencies/{agencyId}/inquiries", agencyId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getAgencyInquiries_appliesStatusFilter_whenProvided() throws Exception {
+        when(inquiryService.getAgencyInquiriesById(eq(agencyId), any(), any()))
+                .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 10), 0));
+
+        mockMvc.perform(get("/admin/agencies/{agencyId}/inquiries", agencyId)
+                        .param("status", "CLOSED"))
+                .andExpect(status().isOk());
+
+        verify(inquiryService).getAgencyInquiriesById(eq(agencyId), any(), any());
     }
 }

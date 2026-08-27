@@ -79,6 +79,7 @@ class AdminPropertyControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = {"SUPER_ADMIN"})
     void getAllProperties_returnsPagedProperties() throws Exception {
         when(adminPropertyService.getAllProperties(any(), any()))
                 .thenReturn(new PageImpl<>(List.of(propertyResponse), PageRequest.of(0, 10), 1));
@@ -94,6 +95,7 @@ class AdminPropertyControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = {"SUPER_ADMIN"})
     void getAllProperties_returnsFilteredProperties_whenFilterParamsProvided() throws Exception {
         when(adminPropertyService.getAllProperties(any(), any()))
                 .thenReturn(new PageImpl<>(List.of(propertyResponse), PageRequest.of(0, 10), 1));
@@ -108,6 +110,7 @@ class AdminPropertyControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = {"SUPER_ADMIN"})
     void changeAgencyStatus_returnsSuccessMessage_whenValidRequest() throws Exception {
         PropertyStatusRequest request = new PropertyStatusRequest();
         request.setStatus(PropertyStatus.ACTIVE);
@@ -139,6 +142,7 @@ class AdminPropertyControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = {"SUPER_ADMIN"})
     void changeAgencyStatus_returnsNotFound_whenPropertyDoesNotExist() throws Exception {
         PropertyStatusRequest request = new PropertyStatusRequest();
         request.setStatus(PropertyStatus.REJECTED);

@@ -3,10 +3,13 @@ package com.realestate.backend.controller;
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.request.AdminAgencyFilterRequest;
 import com.realestate.backend.dto.request.AgencyStatusRequest;
+import com.realestate.backend.dto.request.InquiryFilterRequest;
 import com.realestate.backend.dto.request.UpdateAgencyRequest;
 import com.realestate.backend.dto.response.AdminAgencyResponse;
 import com.realestate.backend.dto.response.AgencySubscriptionResponse;
+import com.realestate.backend.dto.response.InquiryResponse;
 import com.realestate.backend.service.AdminAgencyService;
+import com.realestate.backend.service.InquiryService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -27,6 +30,7 @@ import java.util.UUID;
 public class AdminAgencyController {
 
     private final AdminAgencyService adminAgencyService;
+    private final InquiryService inquiryService;
 
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
     @GetMapping
@@ -168,6 +172,24 @@ public class AdminAgencyController {
 
         return ResponseEntity.ok(ApiResponse.success(
                 message, null
+        ));
+
+    }
+
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    @GetMapping("/{agencyId}/inquiries")
+    @Operation(summary = "Get agency's inquiries using its id")
+    public ResponseEntity<ApiResponse<Page<InquiryResponse>>> getAgencyInquiries(
+            @PathVariable UUID agencyId,
+            @ModelAttribute InquiryFilterRequest filter,
+            @PageableDefault(sort = "createdAt")
+            Pageable pageable
+    ) {
+
+        Page<InquiryResponse> response = inquiryService.getAgencyInquiriesById(agencyId, filter, pageable);
+
+        return ResponseEntity.ok(ApiResponse.success(
+                "Agency inquiries fetched successfully", response
         ));
 
     }
