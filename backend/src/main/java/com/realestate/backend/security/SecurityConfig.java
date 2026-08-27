@@ -1,5 +1,6 @@
 package com.realestate.backend.security;
 
+import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +29,7 @@ public class SecurityConfig {
     private final RestAccessDeniedHandler accessDeniedHandler;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, RateLimitFilter rateLimitFilter) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
@@ -69,6 +70,11 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
 
                         .anyRequest().authenticated()
+                )
+                .addFilterBefore(
+                        rateLimitFilter,
+                        UsernamePasswordAuthenticationFilter.class
+
                 )
                 .addFilterBefore(
                         jwtAuthenticationFilter,
