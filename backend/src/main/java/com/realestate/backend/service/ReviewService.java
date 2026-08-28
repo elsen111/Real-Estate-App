@@ -1,5 +1,6 @@
 package com.realestate.backend.service;
 
+import com.realestate.backend.dto.request.PublicReviewFilterRequest;
 import com.realestate.backend.dto.request.ReviewRequest;
 import com.realestate.backend.dto.response.ReviewResponse;
 import com.realestate.backend.security.CustomUserDetails;
@@ -12,11 +13,11 @@ public interface ReviewService {
 
     ReviewResponse createPropertyReview(UUID propertyId, ReviewRequest request, CustomUserDetails currentUser);
 
-    Page<ReviewResponse> getPropertyReviews(UUID propertyId, Pageable pageable);
+    Page<ReviewResponse> getPropertyReviews(UUID propertyId, PublicReviewFilterRequest filter, Pageable pageable);
 
     ReviewResponse createAgencyReview(UUID agencyId, ReviewRequest request, CustomUserDetails currentUser);
 
-    Page<ReviewResponse> getAgencyReviews(UUID agencyId, Pageable pageable);
+    Page<ReviewResponse> getAgencyReviews(UUID agencyId, PublicReviewFilterRequest filter, Pageable pageable);
 
     ReviewResponse updateOwnReview(UUID reviewId, ReviewRequest request, CustomUserDetails currentUser);
 

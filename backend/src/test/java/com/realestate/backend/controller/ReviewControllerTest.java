@@ -1,6 +1,7 @@
 package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
+import com.realestate.backend.dto.request.PublicReviewFilterRequest;
 import com.realestate.backend.dto.request.ReviewRequest;
 import com.realestate.backend.dto.response.ReviewResponse;
 import com.realestate.backend.enums.ReviewStatus;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -45,6 +47,11 @@ class ReviewControllerTest {
         return request;
     }
 
+    private PublicReviewFilterRequest buildPublicFilter(Integer rating) {
+        PublicReviewFilterRequest filter = new PublicReviewFilterRequest(rating);
+        return filter;
+    }
+
     private ReviewResponse buildReviewResponse(UUID id, ReviewTargetType target) {
         return ReviewResponse.builder()
                 .id(id)
@@ -60,9 +67,13 @@ class ReviewControllerTest {
     void createPropertyReview_returnsOk_withCreatedReview() {
         UUID propertyId = UUID.randomUUID();
         ReviewRequest request = buildValidRequest();
-        ReviewResponse expected = buildReviewResponse(UUID.randomUUID(), ReviewTargetType.PROPERTY);
+        ReviewResponse expected = buildReviewResponse(
+                UUID.randomUUID(),
+                ReviewTargetType.PROPERTY
+        );
 
-        when(reviewService.createPropertyReview(propertyId, request, currentUser)).thenReturn(expected);
+        when(reviewService.createPropertyReview(propertyId, request, currentUser))
+                .thenReturn(expected);
 
         ResponseEntity<ApiResponse<ReviewResponse>> response =
                 controller.createPropertyReview(propertyId, request, currentUser);
@@ -70,10 +81,12 @@ class ReviewControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().isSuccess()).isTrue();
-        assertThat(response.getBody().getMessage()).isEqualTo("Review created successfully");
+        assertThat(response.getBody().getMessage())
+                .isEqualTo("Review created successfully");
         assertThat(response.getBody().getData()).isEqualTo(expected);
 
-        verify(reviewService).createPropertyReview(propertyId, request, currentUser);
+        verify(reviewService)
+                .createPropertyReview(propertyId, request, currentUser);
         verifyNoMoreInteractions(reviewService);
     }
 
@@ -83,62 +96,91 @@ class ReviewControllerTest {
         ReviewRequest request = buildValidRequest();
 
         when(reviewService.createPropertyReview(propertyId, request, currentUser))
-                .thenThrow(new RuntimeException("You have already reviewed this property"));
+                .thenThrow(
+                        new RuntimeException(
+                                "You have already reviewed this property"
+                        )
+                );
 
         try {
             controller.createPropertyReview(propertyId, request, currentUser);
         } catch (RuntimeException ex) {
-            assertThat(ex.getMessage()).isEqualTo("You have already reviewed this property");
+            assertThat(ex.getMessage())
+                    .isEqualTo("You have already reviewed this property");
         }
 
-        verify(reviewService).createPropertyReview(propertyId, request, currentUser);
+        verify(reviewService)
+                .createPropertyReview(propertyId, request, currentUser);
     }
 
     @Test
     void getPropertyReviews_returnsOk_withReviewPage() {
         UUID propertyId = UUID.randomUUID();
+        PublicReviewFilterRequest filter = buildPublicFilter(5);
         Pageable pageable = Pageable.ofSize(10);
 
-        Page<ReviewResponse> page = new PageImpl<>(List.of(
-                buildReviewResponse(UUID.randomUUID(), ReviewTargetType.PROPERTY)
-        ));
+        Page<ReviewResponse> page = new PageImpl<>(
+                List.of(
+                        buildReviewResponse(
+                                UUID.randomUUID(),
+                                ReviewTargetType.PROPERTY
+                        )
+                )
+        );
 
-        when(reviewService.getPropertyReviews(propertyId, pageable)).thenReturn(page);
+        when(reviewService.getPropertyReviews(propertyId, filter, pageable))
+                .thenReturn(page);
 
         ResponseEntity<ApiResponse<Page<ReviewResponse>>> response =
-                controller.getPropertyReviews(propertyId, pageable);
+                controller.getPropertyReviews(propertyId, filter, pageable);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().isSuccess()).isTrue();
-        assertThat(response.getBody().getMessage()).isEqualTo("Property review list fetched successfully");
+        assertThat(response.getBody().getMessage())
+                .isEqualTo("Property review list fetched successfully");
         assertThat(response.getBody().getData().getContent()).hasSize(1);
 
-        verify(reviewService).getPropertyReviews(propertyId, pageable);
+        verify(reviewService)
+                .getPropertyReviews(propertyId, filter, pageable);
         verifyNoMoreInteractions(reviewService);
     }
 
     @Test
     void getPropertyReviews_returnsOk_withEmptyPage_whenNoReviews() {
         UUID propertyId = UUID.randomUUID();
+        PublicReviewFilterRequest filter = buildPublicFilter(null);
         Pageable pageable = Pageable.ofSize(10);
 
-        when(reviewService.getPropertyReviews(propertyId, pageable)).thenReturn(new PageImpl<>(List.of()));
+        Page<ReviewResponse> emptyPage = new PageImpl<>(List.of());
+
+        when(reviewService.getPropertyReviews(propertyId, filter, pageable))
+                .thenReturn(emptyPage);
 
         ResponseEntity<ApiResponse<Page<ReviewResponse>>> response =
-                controller.getPropertyReviews(propertyId, pageable);
+                controller.getPropertyReviews(propertyId, filter, pageable);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().isSuccess()).isTrue();
         assertThat(response.getBody().getData().getContent()).isEmpty();
+
+        verify(reviewService)
+                .getPropertyReviews(propertyId, filter, pageable);
+        verifyNoMoreInteractions(reviewService);
     }
 
     @Test
     void createAgencyReview_returnsOk_withCreatedReview() {
         UUID agencyId = UUID.randomUUID();
         ReviewRequest request = buildValidRequest();
-        ReviewResponse expected = buildReviewResponse(UUID.randomUUID(), ReviewTargetType.AGENCY);
+        ReviewResponse expected = buildReviewResponse(
+                UUID.randomUUID(),
+                ReviewTargetType.AGENCY
+        );
 
-        when(reviewService.createAgencyReview(agencyId, request, currentUser)).thenReturn(expected);
+        when(reviewService.createAgencyReview(agencyId, request, currentUser))
+                .thenReturn(expected);
 
         ResponseEntity<ApiResponse<ReviewResponse>> response =
                 controller.createAgencyReview(agencyId, request, currentUser);
@@ -146,34 +188,69 @@ class ReviewControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().isSuccess()).isTrue();
-        assertThat(response.getBody().getMessage()).isEqualTo("Review created successfully");
+        assertThat(response.getBody().getMessage())
+                .isEqualTo("Review created successfully");
         assertThat(response.getBody().getData()).isEqualTo(expected);
 
-        verify(reviewService).createAgencyReview(agencyId, request, currentUser);
+        verify(reviewService)
+                .createAgencyReview(agencyId, request, currentUser);
         verifyNoMoreInteractions(reviewService);
     }
 
     @Test
     void getAgencyReviews_returnsOk_withReviewPage() {
         UUID agencyId = UUID.randomUUID();
+        PublicReviewFilterRequest filter = buildPublicFilter(5);
         Pageable pageable = Pageable.ofSize(10);
 
-        Page<ReviewResponse> page = new PageImpl<>(List.of(
-                buildReviewResponse(UUID.randomUUID(), ReviewTargetType.AGENCY)
-        ));
+        Page<ReviewResponse> page = new PageImpl<>(
+                List.of(
+                        buildReviewResponse(
+                                UUID.randomUUID(),
+                                ReviewTargetType.AGENCY
+                        )
+                )
+        );
 
-        when(reviewService.getAgencyReviews(agencyId, pageable)).thenReturn(page);
+        when(reviewService.getAgencyReviews(agencyId, filter, pageable))
+                .thenReturn(page);
 
         ResponseEntity<ApiResponse<Page<ReviewResponse>>> response =
-                controller.getAgencyReviews(agencyId, pageable);
+                controller.getAgencyReviews(agencyId, filter, pageable);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().isSuccess()).isTrue();
-        assertThat(response.getBody().getMessage()).isEqualTo("Agency review list fetched successfully");
+        assertThat(response.getBody().getMessage())
+                .isEqualTo("Agency review list fetched successfully");
         assertThat(response.getBody().getData().getContent()).hasSize(1);
 
-        verify(reviewService).getAgencyReviews(agencyId, pageable);
+        verify(reviewService)
+                .getAgencyReviews(agencyId, filter, pageable);
+        verifyNoMoreInteractions(reviewService);
+    }
+
+    @Test
+    void getAgencyReviews_returnsOk_withEmptyPage_whenNoReviews() {
+        UUID agencyId = UUID.randomUUID();
+        PublicReviewFilterRequest filter = buildPublicFilter(null);
+        Pageable pageable = Pageable.ofSize(10);
+
+        Page<ReviewResponse> emptyPage = new PageImpl<>(List.of());
+
+        when(reviewService.getAgencyReviews(agencyId, filter, pageable))
+                .thenReturn(emptyPage);
+
+        ResponseEntity<ApiResponse<Page<ReviewResponse>>> response =
+                controller.getAgencyReviews(agencyId, filter, pageable);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().isSuccess()).isTrue();
+        assertThat(response.getBody().getData().getContent()).isEmpty();
+
+        verify(reviewService)
+                .getAgencyReviews(agencyId, filter, pageable);
         verifyNoMoreInteractions(reviewService);
     }
 
@@ -181,9 +258,13 @@ class ReviewControllerTest {
     void updateOwnReview_returnsOk_withUpdatedReview() {
         UUID reviewId = UUID.randomUUID();
         ReviewRequest request = buildValidRequest();
-        ReviewResponse expected = buildReviewResponse(reviewId, ReviewTargetType.PROPERTY);
+        ReviewResponse expected = buildReviewResponse(
+                reviewId,
+                ReviewTargetType.PROPERTY
+        );
 
-        when(reviewService.updateOwnReview(reviewId, request, currentUser)).thenReturn(expected);
+        when(reviewService.updateOwnReview(reviewId, request, currentUser))
+                .thenReturn(expected);
 
         ResponseEntity<ApiResponse<ReviewResponse>> response =
                 controller.updateOwnReview(reviewId, request, currentUser);
@@ -191,10 +272,12 @@ class ReviewControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().isSuccess()).isTrue();
-        assertThat(response.getBody().getMessage()).isEqualTo("Review updated successfully");
+        assertThat(response.getBody().getMessage())
+                .isEqualTo("Review updated successfully");
         assertThat(response.getBody().getData()).isEqualTo(expected);
 
-        verify(reviewService).updateOwnReview(reviewId, request, currentUser);
+        verify(reviewService)
+                .updateOwnReview(reviewId, request, currentUser);
         verifyNoMoreInteractions(reviewService);
     }
 
@@ -204,15 +287,21 @@ class ReviewControllerTest {
         ReviewRequest request = buildValidRequest();
 
         when(reviewService.updateOwnReview(reviewId, request, currentUser))
-                .thenThrow(new RuntimeException("You are not allowed to update this review"));
+                .thenThrow(
+                        new RuntimeException(
+                                "You are not allowed to update this review"
+                        )
+                );
 
         try {
             controller.updateOwnReview(reviewId, request, currentUser);
         } catch (RuntimeException ex) {
-            assertThat(ex.getMessage()).isEqualTo("You are not allowed to update this review");
+            assertThat(ex.getMessage())
+                    .isEqualTo("You are not allowed to update this review");
         }
 
-        verify(reviewService).updateOwnReview(reviewId, request, currentUser);
+        verify(reviewService)
+                .updateOwnReview(reviewId, request, currentUser);
     }
 
     @Test
@@ -225,7 +314,8 @@ class ReviewControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().isSuccess()).isTrue();
-        assertThat(response.getBody().getMessage()).isEqualTo("Review deleted successfully");
+        assertThat(response.getBody().getMessage())
+                .isEqualTo("Review deleted successfully");
         assertThat(response.getBody().getData()).isNull();
 
         verify(reviewService).deleteOwnReview(reviewId, currentUser);
@@ -236,8 +326,9 @@ class ReviewControllerTest {
     void deleteOwnReview_propagatesException_whenReviewNotFound() {
         UUID reviewId = UUID.randomUUID();
 
-        org.mockito.Mockito.doThrow(new RuntimeException("Review not found"))
-                .when(reviewService).deleteOwnReview(reviewId, currentUser);
+        doThrow(new RuntimeException("Review not found"))
+                .when(reviewService)
+                .deleteOwnReview(reviewId, currentUser);
 
         try {
             controller.deleteOwnReview(reviewId, currentUser);

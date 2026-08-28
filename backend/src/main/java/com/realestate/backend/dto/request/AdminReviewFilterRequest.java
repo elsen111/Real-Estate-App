@@ -13,5 +13,6 @@ public class AdminReviewFilterRequest {
     private ReviewTargetType targetType;
     private String agencyName;
     private String propertyTitle;
+    private Integer rating;
 
 }
