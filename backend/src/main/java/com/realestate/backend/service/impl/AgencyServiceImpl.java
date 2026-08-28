@@ -209,7 +209,7 @@ public class AgencyServiceImpl implements AgencyService {
                         () -> new ResourceNotFoundException("Agency not found with id " + agencyId)
                 );
 
-        long totalAgents = userRepository.countByAgency(agency);
+        long totalAgents = userRepository.countByAgency(agency) - 1;
 
         return agencyMapper.toPublicAgencyResponse(agency, totalAgents);
 
