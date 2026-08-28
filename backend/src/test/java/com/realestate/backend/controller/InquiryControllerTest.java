@@ -5,6 +5,7 @@ import com.realestate.backend.dto.request.UpdateInquiryStatusRequest;
 import com.realestate.backend.dto.response.InquiryResponse;
 import com.realestate.backend.enums.InquiryStatus;
 import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.InquiryService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +34,9 @@ class InquiryControllerTest {
 
     @Mock
     private InquiryService inquiryService;
+
+    @Mock
+    private RateLimitFilter rateLimitFilter;
 
     @InjectMocks
     private InquiryController controller;

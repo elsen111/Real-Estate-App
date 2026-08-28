@@ -2,8 +2,10 @@ package com.realestate.backend.repository.specification;
 
 import com.realestate.backend.dto.request.InquiryFilterRequest;
 import com.realestate.backend.entity.InquiryEntity;
+import com.realestate.backend.entity.ReviewEntity;
 import com.realestate.backend.enums.InquiryStatus;
 import com.realestate.backend.enums.InquiryType;
+import com.realestate.backend.enums.ReviewStatus;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Root;
@@ -16,7 +18,7 @@ public class InquirySpecification {
 
     public InquirySpecification() {}
 
-    public static Specification<InquiryEntity> withAgencyIdFilter(
+    public static Specification<InquiryEntity> withAgencyIdFilterForAdmin(
             UUID agencyId,
             InquiryFilterRequest filterRequest
     ) {
@@ -38,6 +40,28 @@ public class InquirySpecification {
                 .and(hasPropertyTitle(filterRequest.propertyTitle()))
                 .and(hasContactMethod(filterRequest.contact()))
                 .and(createTimeBetween(filterRequest.startDate(), filterRequest.endDate()));
+
+    }
+
+    public static Specification<InquiryEntity> withAgentFilter(
+            UUID agentId,
+            InquiryFilterRequest filterRequest
+    ) {
+
+        Specification<InquiryEntity> spec = Specification.where(hasAgentId(agentId));
+
+        if (filterRequest != null) {
+            spec = spec.and(hasStatus(filterRequest.status()))
+                    .and(hasClientId(filterRequest.clientId()))
+                    .and(hasClientEmail(filterRequest.clientEmail()))
+                    .and(hasClientName(filterRequest.clientName()))
+                    .and(hasPropertyId(filterRequest.propertyId()))
+                    .and(hasPropertyTitle(filterRequest.propertyTitle()))
+                    .and(hasContactMethod(filterRequest.contact()))
+                    .and(createTimeBetween(filterRequest.startDate(), filterRequest.endDate()));;
+        }
+
+        return spec;
 
     }
 

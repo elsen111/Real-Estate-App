@@ -6,6 +6,7 @@ import com.realestate.backend.dto.request.UpdateProfileRequest;
 import com.realestate.backend.dto.response.AuthUserResponse;
 import com.realestate.backend.dto.response.UserProfilePhotoResponse;
 import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +32,9 @@ class UserControllerTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private RateLimitFilter rateLimitFilter;
 
     @InjectMocks
     private UserController controller;

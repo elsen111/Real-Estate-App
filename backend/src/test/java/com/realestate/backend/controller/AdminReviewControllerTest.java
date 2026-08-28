@@ -6,6 +6,7 @@ import com.realestate.backend.dto.request.ReviewStatusRequest;
 import com.realestate.backend.dto.response.ReviewResponse;
 import com.realestate.backend.enums.ReviewStatus;
 import com.realestate.backend.enums.ReviewTargetType;
+import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.AdminReviewService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,6 +35,9 @@ class AdminReviewControllerTest {
 
     @Mock
     private AdminReviewService adminReviewService;
+
+    @MockitoBean
+    private RateLimitFilter rateLimitFilter;
 
     @InjectMocks
     private AdminReviewController controller;

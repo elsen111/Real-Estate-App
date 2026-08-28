@@ -1,7 +1,9 @@
 package com.realestate.backend.service;
 
+import com.realestate.backend.dto.request.InquiryFilterRequest;
 import com.realestate.backend.dto.response.AgentResponse;
 import com.realestate.backend.dto.request.PropertyFilterRequest;
+import com.realestate.backend.dto.response.InquiryResponse;
 import com.realestate.backend.dto.response.PropertyResponse;
 import com.realestate.backend.security.CustomUserDetails;
 import org.springframework.data.domain.Page;
@@ -26,4 +28,10 @@ public interface AgentService {
     );
 
     void deleteAgentFromAgency(UUID agentId, CustomUserDetails currentUser );
+
+    Page<InquiryResponse> getOwnInquiries(
+            CustomUserDetails currentUser,
+            InquiryFilterRequest filter,
+            Pageable pageable
+    );
 }

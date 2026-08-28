@@ -190,7 +190,7 @@ public class InquiryServiceImpl implements InquiryService {
             throw new ResourceNotFoundException("Agency not found with id: " + agencyId);
         }
 
-        Specification<InquiryEntity> specification = InquirySpecification.withAgencyIdFilter(
+        Specification<InquiryEntity> specification = InquirySpecification.withAgencyIdFilterForAdmin(
                 agencyId,
                 filter
         );

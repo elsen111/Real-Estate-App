@@ -1,10 +1,13 @@
 package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
+import com.realestate.backend.dto.request.InquiryFilterRequest;
 import com.realestate.backend.dto.request.PropertyFilterRequest;
 import com.realestate.backend.dto.response.AgentResponse;
+import com.realestate.backend.dto.response.InquiryResponse;
 import com.realestate.backend.dto.response.PropertyResponse;
 import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.AgentService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +38,9 @@ class AgentControllerTest {
 
     @InjectMocks
     private AgentController controller;
+
+    @Mock
+    private RateLimitFilter rateLimitFilter;
 
     private final CustomUserDetails currentUser = mock(CustomUserDetails.class);
 
@@ -78,10 +84,14 @@ class AgentControllerTest {
         Pageable pageable = Pageable.ofSize(10);
 
         Page<PropertyResponse> page = new PageImpl<>(List.of(
-                PropertyResponse.builder().id(UUID.randomUUID()).title("Assigned listing").build()
+                PropertyResponse.builder()
+                        .id(UUID.randomUUID())
+                        .title("Assigned listing")
+                        .build()
         ));
 
-        when(agentService.getPublicAgentProperties(userId, filter, pageable)).thenReturn(page);
+        when(agentService.getPublicAgentProperties(userId, filter, pageable))
+                .thenReturn(page);
 
         ResponseEntity<ApiResponse<Page<PropertyResponse>>> response =
                 controller.getAgentProperties(userId, filter, pageable);
@@ -89,7 +99,8 @@ class AgentControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().isSuccess()).isTrue();
-        assertThat(response.getBody().getMessage()).isEqualTo("Agent's properties fetched successfully");
+        assertThat(response.getBody().getMessage())
+                .isEqualTo("Agent's properties fetched successfully");
         assertThat(response.getBody().getData().getContent()).hasSize(1);
 
         verify(agentService).getPublicAgentProperties(userId, filter, pageable);
@@ -101,7 +112,8 @@ class AgentControllerTest {
         PropertyFilterRequest filter = new PropertyFilterRequest();
         Pageable pageable = Pageable.ofSize(10);
 
-        when(agentService.getPublicAgentProperties(any(), any(), any())).thenReturn(new PageImpl<>(List.of()));
+        when(agentService.getPublicAgentProperties(any(), any(), any()))
+                .thenReturn(new PageImpl<>(List.of()));
 
         ResponseEntity<ApiResponse<Page<PropertyResponse>>> response =
                 controller.getAgentProperties(userId, filter, pageable);
@@ -132,7 +144,8 @@ class AgentControllerTest {
         UUID agentId = UUID.randomUUID();
 
         org.mockito.Mockito.doThrow(new RuntimeException("Agent not found in agency"))
-                .when(agentService).deleteAgentFromAgency(agentId, currentUser);
+                .when(agentService)
+                .deleteAgentFromAgency(agentId, currentUser);
 
         try {
             controller.deleteAgent(agentId, currentUser);
@@ -150,10 +163,14 @@ class AgentControllerTest {
         Pageable pageable = Pageable.ofSize(10);
 
         Page<PropertyResponse> page = new PageImpl<>(List.of(
-                PropertyResponse.builder().id(UUID.randomUUID()).title("My assigned listing").build()
+                PropertyResponse.builder()
+                        .id(UUID.randomUUID())
+                        .title("My assigned listing")
+                        .build()
         ));
 
-        when(agentService.getOwnAssignedProperties(currentUser, filter, pageable)).thenReturn(page);
+        when(agentService.getOwnAssignedProperties(currentUser, filter, pageable))
+                .thenReturn(page);
 
         ResponseEntity<ApiResponse<Page<PropertyResponse>>> response =
                 controller.getOwnProperties(currentUser, filter, pageable);
@@ -161,11 +178,13 @@ class AgentControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().isSuccess()).isTrue();
-        assertThat(response.getBody().getMessage()).isEqualTo("Properties fetched successfully");
+        assertThat(response.getBody().getMessage())
+                .isEqualTo("Properties fetched successfully");
         assertThat(response.getBody().getData()).isEqualTo(page);
         assertThat(response.getBody().getData().getContent()).hasSize(1);
 
-        verify(agentService).getOwnAssignedProperties(currentUser, filter, pageable);
+        verify(agentService)
+                .getOwnAssignedProperties(currentUser, filter, pageable);
         verifyNoMoreInteractions(agentService);
     }
 
@@ -174,7 +193,8 @@ class AgentControllerTest {
         PropertyFilterRequest filter = new PropertyFilterRequest();
         Pageable pageable = Pageable.ofSize(10);
 
-        when(agentService.getOwnAssignedProperties(any(), any(), any())).thenReturn(new PageImpl<>(List.of()));
+        when(agentService.getOwnAssignedProperties(any(), any(), any()))
+                .thenReturn(new PageImpl<>(List.of()));
 
         ResponseEntity<ApiResponse<Page<PropertyResponse>>> response =
                 controller.getOwnProperties(currentUser, filter, pageable);
@@ -183,7 +203,8 @@ class AgentControllerTest {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getData().getContent()).isEmpty();
 
-        verify(agentService).getOwnAssignedProperties(currentUser, filter, pageable);
+        verify(agentService)
+                .getOwnAssignedProperties(currentUser, filter, pageable);
     }
 
     @Test
@@ -193,10 +214,14 @@ class AgentControllerTest {
         CustomUserDetails anotherUser = mock(CustomUserDetails.class);
 
         Page<PropertyResponse> page = new PageImpl<>(List.of(
-                PropertyResponse.builder().id(UUID.randomUUID()).title("Listing for anotherUser").build()
+                PropertyResponse.builder()
+                        .id(UUID.randomUUID())
+                        .title("Listing for anotherUser")
+                        .build()
         ));
 
-        when(agentService.getOwnAssignedProperties(anotherUser, filter, pageable)).thenReturn(page);
+        when(agentService.getOwnAssignedProperties(anotherUser, filter, pageable))
+                .thenReturn(page);
 
         ResponseEntity<ApiResponse<Page<PropertyResponse>>> response =
                 controller.getOwnProperties(anotherUser, filter, pageable);
@@ -204,8 +229,11 @@ class AgentControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody().getData().getContent()).hasSize(1);
 
-        verify(agentService).getOwnAssignedProperties(anotherUser, filter, pageable);
-        verify(agentService, org.mockito.Mockito.never()).getOwnAssignedProperties(currentUser, filter, pageable);
+        verify(agentService)
+                .getOwnAssignedProperties(anotherUser, filter, pageable);
+
+        verify(agentService, org.mockito.Mockito.never())
+                .getOwnAssignedProperties(currentUser, filter, pageable);
     }
 
     @Test
@@ -219,9 +247,169 @@ class AgentControllerTest {
         try {
             controller.getOwnProperties(currentUser, filter, pageable);
         } catch (RuntimeException ex) {
-            assertThat(ex.getMessage()).isEqualTo("Unable to fetch assigned properties");
+            assertThat(ex.getMessage())
+                    .isEqualTo("Unable to fetch assigned properties");
         }
 
-        verify(agentService).getOwnAssignedProperties(currentUser, filter, pageable);
+        verify(agentService)
+                .getOwnAssignedProperties(currentUser, filter, pageable);
     }
+
+// ----- New endpoint: GET /agents/me/inquiries -----
+
+    @Test
+    void getMyInquiries_returnsOk_withAgentInquiries() {
+        InquiryFilterRequest filter = new InquiryFilterRequest(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+        Pageable pageable = Pageable.ofSize(10);
+
+        InquiryResponse inquiry = InquiryResponse.builder()
+                .id(UUID.randomUUID())
+                .message("I am interested in this property")
+                .build();
+
+        Page<InquiryResponse> page = new PageImpl<>(List.of(inquiry));
+
+        when(agentService.getOwnInquiries(currentUser, filter, pageable))
+                .thenReturn(page);
+
+        ResponseEntity<ApiResponse<Page<InquiryResponse>>> response =
+                controller.getMyInquiries(currentUser, filter, pageable);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().isSuccess()).isTrue();
+        assertThat(response.getBody().getMessage())
+                .isEqualTo("Inquiry list fetched successfully");
+        assertThat(response.getBody().getData()).isEqualTo(page);
+        assertThat(response.getBody().getData().getContent()).hasSize(1);
+        assertThat(response.getBody().getData().getContent().getFirst())
+                .isEqualTo(inquiry);
+
+        verify(agentService)
+                .getOwnInquiries(currentUser, filter, pageable);
+        verifyNoMoreInteractions(agentService);
+    }
+
+    @Test
+    void getMyInquiries_returnsOk_withEmptyPage_whenAgentHasNoInquiries() {
+        InquiryFilterRequest filter = new InquiryFilterRequest(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+        Pageable pageable = Pageable.ofSize(10);
+
+        Page<InquiryResponse> emptyPage = new PageImpl<>(List.of());
+
+        when(agentService.getOwnInquiries(currentUser, filter, pageable))
+                .thenReturn(emptyPage);
+
+        ResponseEntity<ApiResponse<Page<InquiryResponse>>> response =
+                controller.getMyInquiries(currentUser, filter, pageable);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().isSuccess()).isTrue();
+        assertThat(response.getBody().getMessage())
+                .isEqualTo("Inquiry list fetched successfully");
+        assertThat(response.getBody().getData().getContent()).isEmpty();
+
+        verify(agentService)
+                .getOwnInquiries(currentUser, filter, pageable);
+        verifyNoMoreInteractions(agentService);
+    }
+
+    @Test
+    void getMyInquiries_passesCurrentAuthenticatedUserToService() {
+        InquiryFilterRequest filter = new InquiryFilterRequest(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+        Pageable pageable = Pageable.ofSize(10);
+        CustomUserDetails anotherUser = mock(CustomUserDetails.class);
+
+        Page<InquiryResponse> page = new PageImpl<>(List.of(
+                InquiryResponse.builder()
+                        .id(UUID.randomUUID())
+                        .message("Inquiry for another agent")
+                        .build()
+        ));
+
+        when(agentService.getOwnInquiries(anotherUser, filter, pageable))
+                .thenReturn(page);
+
+        ResponseEntity<ApiResponse<Page<InquiryResponse>>> response =
+                controller.getMyInquiries(anotherUser, filter, pageable);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getData().getContent()).hasSize(1);
+
+        verify(agentService)
+                .getOwnInquiries(anotherUser, filter, pageable);
+
+        verify(agentService, org.mockito.Mockito.never())
+                .getOwnInquiries(currentUser, filter, pageable);
+    }
+
+    @Test
+    void getMyInquiries_propagatesException_whenServiceThrows() {
+        InquiryFilterRequest filter = new InquiryFilterRequest(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+        Pageable pageable = Pageable.ofSize(10);
+
+        when(agentService.getOwnInquiries(currentUser, filter, pageable))
+                .thenThrow(new RuntimeException("Unable to fetch agent inquiries"));
+
+        try {
+            controller.getMyInquiries(currentUser, filter, pageable);
+        } catch (RuntimeException ex) {
+            assertThat(ex.getMessage())
+                    .isEqualTo("Unable to fetch agent inquiries");
+        }
+
+        verify(agentService)
+                .getOwnInquiries(currentUser, filter, pageable);
+    }
+
 }

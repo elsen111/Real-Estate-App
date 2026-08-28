@@ -1,21 +1,27 @@
 package com.realestate.backend.service.impl;
 
 
+import com.realestate.backend.dto.request.InquiryFilterRequest;
 import com.realestate.backend.dto.response.AgentResponse;
 import com.realestate.backend.dto.request.PropertyFilterRequest;
+import com.realestate.backend.dto.response.InquiryResponse;
 import com.realestate.backend.dto.response.PropertyResponse;
 import com.realestate.backend.entity.AgencyMemberEntity;
+import com.realestate.backend.entity.InquiryEntity;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.exception.ForbiddenException;
 import com.realestate.backend.exception.ResourceNotFoundException;
+import com.realestate.backend.mapper.InquiryMapper;
 import com.realestate.backend.mapper.PropertyMapper;
 import com.realestate.backend.mapper.UserMapper;
 import com.realestate.backend.repository.AgencyMemberRepository;
+import com.realestate.backend.repository.InquiryRepository;
 import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.UserRepository;
+import com.realestate.backend.repository.specification.InquirySpecification;
 import com.realestate.backend.repository.specification.PropertySpecification;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.AgentService;
@@ -45,6 +51,8 @@ public class AgentServiceImpl implements AgentService {
     private final AgencyMemberRepository agencyMemberRepository;
 
     private final RefreshTokenServiceImpl refreshTokenService;
+    private final InquiryRepository inquiryRepository;
+    private final InquiryMapper inquiryMapper;
 
 
     @Override
@@ -128,9 +136,25 @@ public class AgentServiceImpl implements AgentService {
 
     }
 
+    @Override
+    public Page<InquiryResponse> getOwnInquiries(
+            CustomUserDetails currentUser,
+            InquiryFilterRequest filter,
+            Pageable pageable
+    ) {
+
+        Specification<InquiryEntity> specification = InquirySpecification.withAgentFilter(
+                currentUser.getId(),
+                filter
+        );
+
+        return inquiryRepository.findAll(specification, pageable)
+                .map(inquiryMapper::toResponse);
+
+    }
 
 
-//    HELPER METHODS
+    //    HELPER METHODS
     private void ensureCanRemoveAgent(UUID agencyId, CustomUserDetails currentUser) {
         boolean isSuperAdmin = currentUser.getAuthorities().stream()
                 .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_SUPER_ADMIN"));

@@ -7,6 +7,7 @@ import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.security.CustomUserDetailsService;
 import com.realestate.backend.security.JwtService;
+import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.AdminPropertyService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,6 +46,9 @@ class AdminPropertyControllerTest {
 
     @MockitoBean
     private JwtService jwtService;
+
+    @MockitoBean
+    private RateLimitFilter rateLimitFilter;
 
     @MockitoBean
     private CustomUserDetailsService customUserDetailsService;
