@@ -1,6 +1,7 @@
 package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
+import com.realestate.backend.dto.request.PublicReviewFilterRequest;
 import com.realestate.backend.dto.request.ReviewRequest;
 import com.realestate.backend.dto.response.ReviewResponse;
 import com.realestate.backend.security.CustomUserDetails;
@@ -46,11 +47,12 @@ public class ReviewController {
     @Operation(summary = "Get property reviews.")
     public ResponseEntity<ApiResponse<Page<ReviewResponse>>> getPropertyReviews(
             @PathVariable UUID propertyId,
+            @ModelAttribute PublicReviewFilterRequest filter,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
 
-        Page<ReviewResponse> response = reviewService.getPropertyReviews(propertyId, pageable);
+        Page<ReviewResponse> response = reviewService.getPropertyReviews(propertyId, filter, pageable);
 
         return ResponseEntity.ok(
                 ApiResponse.success("Property review list fetched successfully", response)
@@ -79,11 +81,12 @@ public class ReviewController {
     @Operation(summary = "Get agency reviews.")
     public ResponseEntity<ApiResponse<Page<ReviewResponse>>> getAgencyReviews(
             @PathVariable UUID agencyId,
+            @ModelAttribute PublicReviewFilterRequest filter,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
 
-        Page<ReviewResponse> response = reviewService.getAgencyReviews(agencyId, pageable);
+        Page<ReviewResponse> response = reviewService.getAgencyReviews(agencyId, filter, pageable);
 
         return ResponseEntity.ok(
                 ApiResponse.success("Agency review list fetched successfully", response)

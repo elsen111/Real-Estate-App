@@ -1,5 +1,6 @@
 package com.realestate.backend.service.impl;
 
+import com.realestate.backend.dto.request.PublicReviewFilterRequest;
 import com.realestate.backend.dto.request.ReviewRequest;
 import com.realestate.backend.dto.response.ReviewResponse;
 import com.realestate.backend.entity.AgencyEntity;
@@ -15,12 +16,14 @@ import com.realestate.backend.repository.AgencyRepository;
 import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.ReviewRepository;
 import com.realestate.backend.repository.UserRepository;
+import com.realestate.backend.repository.specification.ReviewSpecification;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,13 +86,15 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Page<ReviewResponse> getPropertyReviews(UUID propertyId, Pageable pageable) {
+    public Page<ReviewResponse> getPropertyReviews(UUID propertyId, PublicReviewFilterRequest filterRequest, Pageable pageable) {
 
         if(!propertyRepository.existsById(propertyId)) {
             throw new ResourceNotFoundException("Property with id " + propertyId + " not found");
         }
 
-        return reviewRepository.findAllByPropertyIdAndStatusIs(propertyId, pageable, ReviewStatus.APPROVED).map(reviewMapper::toResponse);
+        Specification<ReviewEntity> specification = ReviewSpecification.withPublicFilter(null, propertyId, filterRequest);
+
+        return reviewRepository.findAll(specification, pageable).map(reviewMapper::toResponse);
 
     }
 
@@ -134,13 +139,15 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Page<ReviewResponse> getAgencyReviews(UUID agencyId, Pageable pageable) {
+    public Page<ReviewResponse> getAgencyReviews(UUID agencyId, PublicReviewFilterRequest filterRequest, Pageable pageable) {
 
         if(!agencyRepository.existsById(agencyId)) {
             throw new ResourceNotFoundException("Agency with id " + agencyId + " not found");
         }
 
-        return reviewRepository.findAllByAgencyIdAndStatusIs(agencyId, pageable, ReviewStatus.APPROVED).map(reviewMapper::toResponse);
+        Specification<ReviewEntity> specification = ReviewSpecification.withPublicFilter(agencyId, null, filterRequest);
+
+        return reviewRepository.findAll(specification, pageable).map(reviewMapper::toResponse);
 
     }
 
