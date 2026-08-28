@@ -60,6 +60,8 @@ dependencies {
 
     implementation 'io.minio:minio:8.5.17'
 
+    implementation 'com.bucket4j:bucket4j-core:8.10.1'
+
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
