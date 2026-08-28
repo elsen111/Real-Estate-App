@@ -12,6 +12,7 @@ import com.realestate.backend.dto.request.UserRegisterRequest;
 import com.realestate.backend.dto.response.AuthResponse;
 import com.realestate.backend.dto.response.RefreshTokenResponse;
 import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.impl.AuthServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,9 @@ class AuthControllerTest {
 
     @Mock
     private AuthServiceImpl authService;
+
+    @Mock
+    private RateLimitFilter rateLimitFilter;
 
     @InjectMocks
     private AuthController controller;

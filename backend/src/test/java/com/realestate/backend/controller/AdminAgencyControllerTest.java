@@ -14,6 +14,7 @@ import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.security.CustomUserDetailsService;
 import com.realestate.backend.security.JwtService;
+import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.AdminAgencyService;
 import com.realestate.backend.service.InquiryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,6 +51,9 @@ class AdminAgencyControllerTest {
     private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @MockitoBean
+    private RateLimitFilter rateLimitFilter;
 
     @MockitoBean
     private AdminAgencyService adminAgencyService; // (or CategoryService for the other test)

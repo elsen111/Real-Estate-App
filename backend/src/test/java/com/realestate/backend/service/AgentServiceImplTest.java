@@ -1,17 +1,28 @@
 package com.realestate.backend.service;
 
+import com.realestate.backend.dto.request.InquiryFilterRequest;
 import com.realestate.backend.dto.request.PropertyFilterRequest;
+import com.realestate.backend.dto.response.InquiryResponse;
 import com.realestate.backend.dto.response.PropertyResponse;
-import com.realestate.backend.entity.*;
+import com.realestate.backend.entity.AgencyEntity;
+import com.realestate.backend.entity.AgencyMemberEntity;
+import com.realestate.backend.entity.InquiryEntity;
+import com.realestate.backend.entity.PropertyEntity;
+import com.realestate.backend.entity.RoleEntity;
+import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.exception.ForbiddenException;
 import com.realestate.backend.exception.ResourceNotFoundException;
+import com.realestate.backend.mapper.InquiryMapper;
 import com.realestate.backend.mapper.PropertyMapper;
+import com.realestate.backend.mapper.UserMapper;
 import com.realestate.backend.repository.AgencyMemberRepository;
+import com.realestate.backend.repository.InquiryRepository;
 import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.UserRepository;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.impl.AgentServiceImpl;
+import com.realestate.backend.service.impl.RefreshTokenServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,23 +42,62 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AgentServiceImplTest {
 
-    @Mock private UserRepository userRepository;
-    @Mock private AgencyMemberRepository agencyMemberRepository;
-    @Mock private PropertyRepository propertyRepository;
-    @Mock private PropertyMapper propertyMapper;
+    @Mock
+    private UserRepository userRepository;
 
-    @InjectMocks private AgentServiceImpl service;
+    @Mock
+    private UserMapper userMapper;
+
+    @Mock
+    private AgencyMemberRepository agencyMemberRepository;
+
+    @Mock
+    private PropertyRepository propertyRepository;
+
+    @Mock
+    private PropertyMapper propertyMapper;
+
+    @Mock
+    private RefreshTokenServiceImpl refreshTokenService;
+
+    @Mock
+    private InquiryRepository inquiryRepository;
+
+    @Mock
+    private InquiryMapper inquiryMapper;
+
+    @InjectMocks
+    private AgentServiceImpl service;
+
+    private InquiryFilterRequest emptyInquiryFilter() {
+        return new InquiryFilterRequest(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+    }
 
     @Test
     void getAgentByUserId_throws_whenAgentNotFound() {
         UUID userId = UUID.randomUUID();
-        when(userRepository.findAgentMemberByUserId(userId)).thenReturn(Optional.empty());
+
+        when(userRepository.findAgentMemberByUserId(userId))
+                .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.getAgentByUserId(userId))
                 .isInstanceOf(ResourceNotFoundException.class);
@@ -104,21 +154,38 @@ class AgentServiceImplTest {
     @Test
     void deleteAgentFromAgency_throws_whenActiveMembershipNotFound() {
         UUID agentId = UUID.randomUUID();
-        when(agencyMemberRepository.findByUser_IdAndActiveTrue(agentId)).thenReturn(Optional.empty());
-        CustomUserDetails currentUser = CustomUserDetails.from(UserEntity.builder().id(UUID.randomUUID()).roles(Set.of()).build());
 
-        assertThatThrownBy(() -> service.deleteAgentFromAgency(agentId, currentUser))
-                .isInstanceOf(ResourceNotFoundException.class);
+        when(agencyMemberRepository.findByUser_IdAndActiveTrue(agentId))
+                .thenReturn(Optional.empty());
+
+        CustomUserDetails currentUser = CustomUserDetails.from(
+                UserEntity.builder()
+                        .id(UUID.randomUUID())
+                        .roles(Set.of())
+                        .build()
+        );
+
+        assertThatThrownBy(() ->
+                service.deleteAgentFromAgency(agentId, currentUser)
+        ).isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
     void getOwnAssignedProperties_returnsMappedPage_forCurrentAgent() {
         CustomUserDetails currentUser = CustomUserDetails.from(
-                UserEntity.builder().id(UUID.randomUUID()).roles(Set.of(
-                        RoleEntity.builder().roleName(Role.AGENT).build())).build());
+                UserEntity.builder()
+                        .id(UUID.randomUUID())
+                        .roles(Set.of(
+                                RoleEntity.builder()
+                                        .roleName(Role.AGENT)
+                                        .build()
+                        ))
+                        .build()
+        );
 
         PropertyFilterRequest filter = new PropertyFilterRequest();
         filter.setCity("Baku");
+
         Pageable pageable = Pageable.ofSize(10);
 
         PropertyEntity entity = PropertyEntity.builder()
@@ -126,7 +193,9 @@ class AgentServiceImplTest {
                 .title("Assigned to me")
                 .city("Baku")
                 .build();
-        Page<PropertyEntity> entityPage = new PageImpl<>(List.of(entity));
+
+        Page<PropertyEntity> entityPage =
+                new PageImpl<>(List.of(entity));
 
         PropertyResponse mappedResponse = PropertyResponse.builder()
                 .id(entity.getId())
@@ -134,23 +203,38 @@ class AgentServiceImplTest {
                 .city(entity.getCity())
                 .build();
 
-        when(propertyRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(entityPage);
-        when(propertyMapper.toAdminPropertyResponse(entity)).thenReturn(mappedResponse);
+        when(propertyRepository.findAll(any(Specification.class), eq(pageable)))
+                .thenReturn(entityPage);
 
-        Page<PropertyResponse> result = service.getOwnAssignedProperties(currentUser, filter, pageable);
+        when(propertyMapper.toAdminPropertyResponse(entity))
+                .thenReturn(mappedResponse);
+
+        Page<PropertyResponse> result =
+                service.getOwnAssignedProperties(currentUser, filter, pageable);
 
         assertThat(result.getContent()).hasSize(1);
-        assertThat(result.getContent().get(0)).isEqualTo(mappedResponse);
+        assertThat(result.getContent().getFirst())
+                .isEqualTo(mappedResponse);
 
-        verify(propertyRepository).findAll(any(Specification.class), eq(pageable));
-        verify(propertyMapper).toAdminPropertyResponse(entity);
+        verify(propertyRepository)
+                .findAll(any(Specification.class), eq(pageable));
+
+        verify(propertyMapper)
+                .toAdminPropertyResponse(entity);
     }
 
     @Test
     void getOwnAssignedProperties_returnsEmptyPage_whenAgentHasNoAssignedProperties() {
         CustomUserDetails currentUser = CustomUserDetails.from(
-                UserEntity.builder().id(UUID.randomUUID()).roles(Set.of(
-                        RoleEntity.builder().roleName(Role.AGENT).build())).build());
+                UserEntity.builder()
+                        .id(UUID.randomUUID())
+                        .roles(Set.of(
+                                RoleEntity.builder()
+                                        .roleName(Role.AGENT)
+                                        .build()
+                        ))
+                        .build()
+        );
 
         PropertyFilterRequest filter = new PropertyFilterRequest();
         Pageable pageable = Pageable.ofSize(10);
@@ -158,20 +242,32 @@ class AgentServiceImplTest {
         when(propertyRepository.findAll(any(Specification.class), eq(pageable)))
                 .thenReturn(new PageImpl<>(List.of()));
 
-        Page<PropertyResponse> result = service.getOwnAssignedProperties(currentUser, filter, pageable);
+        Page<PropertyResponse> result =
+                service.getOwnAssignedProperties(currentUser, filter, pageable);
 
         assertThat(result.getContent()).isEmpty();
 
-        verify(propertyRepository).findAll(any(Specification.class), eq(pageable));
-        verify(propertyMapper, org.mockito.Mockito.never()).toAdminPropertyResponse(any());
+        verify(propertyRepository)
+                .findAll(any(Specification.class), eq(pageable));
+
+        verify(propertyMapper, never())
+                .toAdminPropertyResponse(any());
     }
 
     @Test
     void getOwnAssignedProperties_queriesByCurrentUsersId_notAnArbitraryUser() {
         UUID currentUserId = UUID.randomUUID();
+
         CustomUserDetails currentUser = CustomUserDetails.from(
-                UserEntity.builder().id(currentUserId).roles(Set.of(
-                        RoleEntity.builder().roleName(Role.AGENT).build())).build());
+                UserEntity.builder()
+                        .id(currentUserId)
+                        .roles(Set.of(
+                                RoleEntity.builder()
+                                        .roleName(Role.AGENT)
+                                        .build()
+                        ))
+                        .build()
+        );
 
         PropertyFilterRequest filter = new PropertyFilterRequest();
         Pageable pageable = Pageable.ofSize(10);
@@ -181,6 +277,119 @@ class AgentServiceImplTest {
 
         service.getOwnAssignedProperties(currentUser, filter, pageable);
 
-        verify(propertyRepository).findAll(any(Specification.class), eq(pageable));
+        verify(propertyRepository)
+                .findAll(any(Specification.class), eq(pageable));
     }
+
+// ----- New method: getOwnInquiries -----
+
+    @Test
+    void getOwnInquiries_returnsMappedPage_forCurrentAgent() {
+        CustomUserDetails currentUser = CustomUserDetails.from(
+                UserEntity.builder()
+                        .id(UUID.randomUUID())
+                        .roles(Set.of(
+                                RoleEntity.builder()
+                                        .roleName(Role.AGENT)
+                                        .build()
+                        ))
+                        .build()
+        );
+
+        InquiryFilterRequest filter = emptyInquiryFilter();
+        Pageable pageable = Pageable.ofSize(10);
+
+        InquiryEntity inquiryEntity = InquiryEntity.builder()
+                .id(UUID.randomUUID())
+                .message("I am interested in this property")
+                .build();
+
+        Page<InquiryEntity> inquiryPage =
+                new PageImpl<>(List.of(inquiryEntity));
+
+        InquiryResponse inquiryResponse = InquiryResponse.builder()
+                .id(inquiryEntity.getId())
+                .message(inquiryEntity.getMessage())
+                .build();
+
+        when(inquiryRepository.findAll(any(Specification.class), eq(pageable)))
+                .thenReturn(inquiryPage);
+
+        when(inquiryMapper.toResponse(inquiryEntity))
+                .thenReturn(inquiryResponse);
+
+        Page<InquiryResponse> result =
+                service.getOwnInquiries(currentUser, filter, pageable);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().getFirst())
+                .isEqualTo(inquiryResponse);
+
+        verify(inquiryRepository)
+                .findAll(any(Specification.class), eq(pageable));
+
+        verify(inquiryMapper)
+                .toResponse(inquiryEntity);
+    }
+
+    @Test
+    void getOwnInquiries_returnsEmptyPage_whenAgentHasNoInquiries() {
+        CustomUserDetails currentUser = CustomUserDetails.from(
+                UserEntity.builder()
+                        .id(UUID.randomUUID())
+                        .roles(Set.of(
+                                RoleEntity.builder()
+                                        .roleName(Role.AGENT)
+                                        .build()
+                        ))
+                        .build()
+        );
+
+        InquiryFilterRequest filter = emptyInquiryFilter();
+        Pageable pageable = Pageable.ofSize(10);
+
+        when(inquiryRepository.findAll(any(Specification.class), eq(pageable)))
+                .thenReturn(new PageImpl<>(List.of()));
+
+        Page<InquiryResponse> result =
+                service.getOwnInquiries(currentUser, filter, pageable);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).isEmpty();
+
+        verify(inquiryRepository)
+                .findAll(any(Specification.class), eq(pageable));
+
+        verify(inquiryMapper, never())
+                .toResponse(any());
+    }
+
+    @Test
+    void getOwnInquiries_queriesRepositoryUsingCurrentAgent() {
+        UUID currentUserId = UUID.randomUUID();
+
+        CustomUserDetails currentUser = CustomUserDetails.from(
+                UserEntity.builder()
+                        .id(currentUserId)
+                        .roles(Set.of(
+                                RoleEntity.builder()
+                                        .roleName(Role.AGENT)
+                                        .build()
+                        ))
+                        .build()
+        );
+
+        InquiryFilterRequest filter = emptyInquiryFilter();
+        Pageable pageable = Pageable.ofSize(10);
+
+        when(inquiryRepository.findAll(any(Specification.class), eq(pageable)))
+                .thenReturn(new PageImpl<>(List.of()));
+
+        service.getOwnInquiries(currentUser, filter, pageable);
+
+        verify(inquiryRepository)
+                .findAll(any(Specification.class), eq(pageable));
+    }
+
 }

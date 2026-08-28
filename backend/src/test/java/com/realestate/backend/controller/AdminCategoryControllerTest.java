@@ -7,6 +7,7 @@ import com.realestate.backend.dto.response.CategoryResponse;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.security.CustomUserDetailsService;
 import com.realestate.backend.security.JwtService;
+import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,9 @@ class AdminCategoryControllerTest {
 
     @MockitoBean
     private JwtService jwtService;
+
+    @MockitoBean
+    private RateLimitFilter rateLimitFilter;
 
     @MockitoBean
     private CustomUserDetailsService customUserDetailsService;

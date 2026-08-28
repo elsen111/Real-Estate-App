@@ -6,6 +6,7 @@ import com.realestate.backend.dto.request.UpdateAppointmentStatusRequest;
 import com.realestate.backend.dto.response.AppointmentResponse;
 import com.realestate.backend.enums.AppointmentStatus;
 import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.AppointmentService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +35,9 @@ class AppointmentControllerTest {
 
     @Mock
     private AppointmentService appointmentService;
+
+    @Mock
+    private RateLimitFilter rateLimitFilter;
 
     @InjectMocks
     private AppointmentController controller;

@@ -2,6 +2,7 @@ package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.response.SubscriptionPlanResponse;
+import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.SubscriptionPlanService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +26,9 @@ class SubscriptionPlanControllerTest {
 
     @Mock
     private SubscriptionPlanService subscriptionPlanService;
+
+    @Mock
+    private RateLimitFilter rateLimitFilter;
 
     @InjectMocks
     private SubscriptionPlanController controller;

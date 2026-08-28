@@ -20,6 +20,7 @@ import com.realestate.backend.enums.InquiryType;
 import com.realestate.backend.enums.ListingType;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.AppointmentService;
 import com.realestate.backend.service.InquiryService;
 import com.realestate.backend.service.PropertyService;
@@ -58,6 +59,9 @@ class PropertyControllerTest {
 
     @Mock
     private AppointmentService appointmentService;
+
+    @Mock
+    private RateLimitFilter rateLimitFilter;
 
     @InjectMocks
     private PropertyController controller;

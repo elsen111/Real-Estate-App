@@ -15,6 +15,7 @@ import com.realestate.backend.dto.response.PropertyResponse;
 import com.realestate.backend.dto.response.UserResponse;
 import com.realestate.backend.enums.AgencyStatus;
 import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.AgencyService;
 import com.realestate.backend.service.AppointmentService;
 import com.realestate.backend.service.InquiryService;
@@ -29,6 +30,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -54,6 +56,9 @@ class AgencyControllerTest {
 
     @Mock
     private AppointmentService appointmentService;
+
+    @MockitoBean
+    private RateLimitFilter rateLimitFilter;
 
     @InjectMocks
     private AgencyController controller;

@@ -1,8 +1,10 @@
 package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
+import com.realestate.backend.dto.request.InquiryFilterRequest;
 import com.realestate.backend.dto.response.AgentResponse;
 import com.realestate.backend.dto.request.PropertyFilterRequest;
+import com.realestate.backend.dto.response.InquiryResponse;
 import com.realestate.backend.dto.response.PropertyResponse;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.AgentService;
@@ -86,6 +88,25 @@ public class AgentController {
 
         ApiResponse<Page<PropertyResponse>> apiResponse =
                 ApiResponse.success("Properties fetched successfully", response);
+
+        return ResponseEntity.ok(apiResponse);
+
+    }
+
+    @PreAuthorize("hasRole('AGENT')")
+    @GetMapping("/me/inquiries")
+    @Operation(summary = "Get agent's inquiries of assigned properties")
+    public ResponseEntity<ApiResponse<Page<InquiryResponse>>> getMyInquiries(
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            @ModelAttribute InquiryFilterRequest filter,
+            @PageableDefault(sort = "createdAt")
+            Pageable pageable
+    ) {
+
+        Page<InquiryResponse> response = agentService.getOwnInquiries(currentUser, filter, pageable);
+
+        ApiResponse<Page<InquiryResponse>> apiResponse =
+                ApiResponse.success("Inquiry list fetched successfully", response);
 
         return ResponseEntity.ok(apiResponse);
 

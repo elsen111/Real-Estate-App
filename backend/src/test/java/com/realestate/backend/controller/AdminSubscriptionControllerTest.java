@@ -4,6 +4,7 @@ import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.request.AdminSubscriptionPlanFilterRequest;
 import com.realestate.backend.dto.request.SubscriptionPlanRequest;
 import com.realestate.backend.dto.response.AdminSubscriptionPlanResponse;
+import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.AdminSubscriptionPlanService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -31,6 +33,9 @@ class AdminSubscriptionControllerTest {
 
     @InjectMocks
     private AdminSubscriptionController controller;
+
+    @MockitoBean
+    private RateLimitFilter rateLimitFilter;
 
     private SubscriptionPlanRequest buildValidRequest() {
         return SubscriptionPlanRequest.builder()

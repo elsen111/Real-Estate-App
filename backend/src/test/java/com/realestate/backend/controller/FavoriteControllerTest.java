@@ -4,6 +4,7 @@ import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.response.FavoriteResponse;
 import com.realestate.backend.dto.response.PropertyResponse;
 import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.FavoriteService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +31,9 @@ class FavoriteControllerTest {
 
     @Mock
     private FavoriteService favoriteService;
+
+    @Mock
+    private RateLimitFilter rateLimitFilter;
 
     @InjectMocks
     private FavoriteController controller;

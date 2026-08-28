@@ -4,6 +4,7 @@ import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.request.AdminUserFilterRequest;
 import com.realestate.backend.dto.response.UserResponse;
 import com.realestate.backend.enums.Role;
+import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.impl.AdminUserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.exception.ResourceNotFoundException;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.List;
 import java.util.Set;
@@ -40,6 +42,9 @@ class AdminUserControllerTest {
 
     @InjectMocks
     private AdminUserController controller;
+
+    @MockitoBean
+    private RateLimitFilter rateLimitFilter;
 
     private UserResponse buildUser(UUID id) {
         return UserResponse.builder()
