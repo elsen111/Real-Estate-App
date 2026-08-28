@@ -35,7 +35,7 @@ public class AgencyResponse {
     private String website;
     private String city;
     private String address;
-    private long totalAgents;
+    private Long totalAgents;
     private AgencyStatus status;
 
 }
