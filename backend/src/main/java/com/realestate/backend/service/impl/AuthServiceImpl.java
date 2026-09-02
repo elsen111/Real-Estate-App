@@ -87,11 +87,12 @@ public class AuthServiceImpl implements AuthService {
                         servletRequest.getHeader("User-Agent")
                 );
 
-        log.info(
-                "User registered successfully: email={}, role={}",
-                user.getEmail(),
-                role
-        );
+        log.atInfo()
+                .setMessage("User registered successfully")
+                .addKeyValue("userId", user.getId())
+                .addKeyValue("userEmail", user.getEmail())
+                .addKeyValue("role", role)
+                .log();
 
         return buildAuthResponse(user, refreshToken.rawToken(), null);
     }
@@ -134,11 +135,13 @@ public class AuthServiceImpl implements AuthService {
                         servletRequest.getHeader("User-Agent")
                 );
 
-        log.info(
-                "Agency '{}' registered successfully with owner {}",
-                agency.getName(),
-                owner.getEmail()
-        );
+        log.atInfo()
+                .setMessage("Agency created successfully")
+                .addKeyValue("agencyId", agency.getId())
+                .addKeyValue("agencyName", agency.getName())
+                .addKeyValue("ownerId", owner.getId())
+                .addKeyValue("ownerName", owner.getFullName())
+                .log();
 
         return buildAuthResponse(owner, refreshToken.rawToken(), agency);
     }
@@ -183,10 +186,13 @@ public class AuthServiceImpl implements AuthService {
                         servletRequest.getHeader("User-Agent")
                 );
 
-        log.info(
-                "User '{}' logged in successfully",
-                user.getEmail()
-        );
+        log.atInfo()
+                .setMessage("Login successful.")
+                .addKeyValue("userId", user.getId())
+                .addKeyValue("userEmail", user.getEmail())
+                .addKeyValue("username", user.getFullName())
+                .addKeyValue("role", user.getRoles().stream().map(RoleEntity::getRoleName).toList())
+                .log();
 
         return buildAuthResponse(user, refreshToken.rawToken(), agency);
     }
@@ -206,10 +212,11 @@ public class AuthServiceImpl implements AuthService {
 
         UserEntity user = rotatedToken.entity().getUser();
 
-        log.info(
-                "Refresh token rotated for user '{}'",
-                user.getEmail()
-        );
+        log.atInfo()
+                .setMessage("Refresh token rotated.")
+                .addKeyValue("userId", user.getId())
+                .addKeyValue("userEmail", user.getEmail())
+                .log();
 
         return RefreshTokenResponse.builder()
                 .accessToken(jwtService.generateAccessToken(user))
@@ -224,7 +231,9 @@ public class AuthServiceImpl implements AuthService {
     public void logout(LogoutRequest request) {
         refreshTokenService.revokeRefreshToken(request.getRefreshToken());
 
-        log.info("User logged out successfully");
+        log.atInfo()
+                .setMessage("Log out successful.")
+                .log();
     }
 
     @Transactional(readOnly = true)
@@ -275,10 +284,11 @@ public class AuthServiceImpl implements AuthService {
 
         refreshTokenService.revokeAllUserRefreshTokens(currentUser.getId());
 
-        log.info(
-                "Password changed successfully for user '{}'",
-                user.getEmail()
-        );
+        log.atInfo()
+                .setMessage("Password changed")
+                .addKeyValue("userId", user.getId())
+                .addKeyValue("userEmail", user.getEmail())
+                .log();
 
     }
 
@@ -289,10 +299,10 @@ public class AuthServiceImpl implements AuthService {
         userRepository.findByEmailIgnoreCase(request.getEmail())
                 .ifPresent(otpService::generateAndSendOtp);
 
-        log.info(
-                "Password reset requested for email '{}'",
-                request.getEmail()
-        );
+        log.atInfo()
+                .setMessage("Password reset requested")
+                .addKeyValue("email", request.getEmail())
+                .log();
 
     }
 
@@ -332,10 +342,11 @@ public class AuthServiceImpl implements AuthService {
 
         refreshTokenRepository.deleteAllByUser(user);
 
-        log.info(
-                "Password reset completed for user '{}'",
-                user.getEmail()
-        );
+        log.atInfo()
+                .setMessage("Password reset completed")
+                .addKeyValue("userId", user.getId())
+                .addKeyValue("userEmail", user.getEmail())
+                .log();
 
     }
 

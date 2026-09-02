@@ -97,12 +97,11 @@ public class AgencyServiceImpl implements AgencyService {
 
         AgencyEntity agency = updateAgency(user.getAgency().getId(), request);
 
-        log.info(
-                "Agency '{}' ({}) updated by user {}",
-                agency.getName(),
-                agency.getId(),
-                currentUser.getId()
-        );
+        log.atInfo()
+                .setMessage("Agency updated.")
+                .addKeyValue("agencyId", agency.getId())
+                .addKeyValue("agencyName", agency.getName())
+                .log();
 
         return agencyMapper.toAgencyOwnerResponse(agency);
 
@@ -260,11 +259,11 @@ public class AgencyServiceImpl implements AgencyService {
         Optional<AgencyMediaEntity> existingLogo =
                 agencyMediaRepository.findByAgencyId(agency.getId());
 
-        log.info(
-                "Uploading logo for agency '{}' ({})",
-                agency.getName(),
-                agency.getId()
-        );
+        log.atInfo()
+                .setMessage("Uploading logo for agency.")
+                .addKeyValue("agencyId", agency.getId())
+                .addKeyValue("agencyName", agency.getName())
+                .log();
 
         MediaFileEntity uploadedMedia =
                 mediaService.upload(file, MediaFolder.AGENCY_LOGO);
@@ -277,11 +276,11 @@ public class AgencyServiceImpl implements AgencyService {
 
             mediaService.delete(agencyMedia.getMedia());
 
-            log.info(
-                    "Replacing existing logo for agency '{}' ({})",
-                    agency.getName(),
-                    agency.getId()
-            );
+            log.atInfo()
+                    .setMessage("Replacing existing logo for agency.")
+                    .addKeyValue("agencyId", agency.getId())
+                    .addKeyValue("agencyName", agency.getName())
+                    .log();
 
         }
 
@@ -292,11 +291,11 @@ public class AgencyServiceImpl implements AgencyService {
 
         agencyMediaRepository.save(agencyMedia);
 
-        log.info(
-                "Logo uploaded successfully for agency '{}' ({})",
-                agency.getName(),
-                agency.getId()
-        );
+        log.atInfo()
+                .setMessage("Agency logo uploaded.")
+                .addKeyValue("agencyId", agency.getId())
+                .addKeyValue("agencyName", agency.getName())
+                .log();
 
         return AgencyLogoUploadResponse.builder()
                 .logoUrl(uploadedMedia.getFileUrl())

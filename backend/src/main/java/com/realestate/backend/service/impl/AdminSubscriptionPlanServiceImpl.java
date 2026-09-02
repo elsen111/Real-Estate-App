@@ -44,11 +44,11 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
 
         subscriptionPlanRepository.saveAndFlush(subscriptionPlanEntity);
 
-        log.info(
-                "Subscription plan '{}' ({}) created",
-                subscriptionPlanEntity.getName(),
-                subscriptionPlanEntity.getId()
-        );
+        log.atInfo()
+                .setMessage("Subscription plan created")
+                .addKeyValue("subscriptionId", subscriptionPlanEntity.getId())
+                .addKeyValue("subscriptionTitle", subscriptionPlanEntity.getName())
+                .log();
 
         return  subscriptionPlanMapper.toAdminSubscriptionPlanResponse(subscriptionPlanEntity);
 
@@ -96,11 +96,11 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
 
         SubscriptionPlanEntity updatedSubscriptionPlan = subscriptionPlanRepository.save(subscriptionPlan);
 
-        log.info(
-                "Subscription plan '{}' ({}) updated",
-                subscriptionPlan.getName(),
-                subscriptionPlan.getId()
-        );
+        log.atInfo()
+                .setMessage("Subscription plan updated")
+                .addKeyValue("subscriptionId", subscriptionPlan.getId())
+                .addKeyValue("subscriptionTitle", subscriptionPlan.getName())
+                .log();
 
         return subscriptionPlanMapper.toAdminSubscriptionPlanResponse(updatedSubscriptionPlan);
 
@@ -119,12 +119,11 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
         subscriptionPlan.setActive(newStatus);
         subscriptionPlanRepository.save(subscriptionPlan);
 
-        log.info(
-                "Subscription plan '{}' ({}) {}",
-                subscriptionPlan.getName(),
-                subscriptionPlan.getId(),
-                newStatus ? "activated" : "deactivated"
-        );
+        log.atInfo()
+                .setMessage("Subscription plan status changed")
+                .addKeyValue("subscriptionId", subscriptionPlan.getId())
+                .addKeyValue("subscriptionTitle", subscriptionPlan.getName())
+                .log();
     }
 
     @Override
@@ -138,16 +137,20 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
 
         validatePlanUsage(id);
 
+        UUID subscriptionPlanId = subscriptionPlan.getId();
+        String subscriptionPlanTitle = subscriptionPlan.getName();
+
         subscriptionPlan.setDeleted(true);
         subscriptionPlan.setActive(false);
 
         subscriptionPlanRepository.save(subscriptionPlan);
 
-        log.info(
-                "Subscription plan '{}' ({}) soft deleted",
-                subscriptionPlan.getName(),
-                subscriptionPlan.getId()
-        );
+
+        log.atInfo()
+                .setMessage("Subscription plan deleted.")
+                .addKeyValue("subscriptionId", subscriptionPlanId)
+                .addKeyValue("subscriptionTitle", subscriptionPlanTitle)
+                .log();
 
         return subscriptionPlan.getName() + " plan deleted successfully";
 
@@ -168,6 +171,11 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
         }
 
         if (nameExists) {
+            log.atWarn()
+                    .setMessage("Duplicate subscription plan name.")
+                    .addKeyValue("planId", planId)
+                    .log();
+
             throw new BadRequestException(
                     "Subscription plan with this name already exists."
             );
@@ -179,6 +187,11 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
         boolean usedByAnyAgency = agencySubscriptionRepository.existsByPlanIdAndStatus(planId, SubscriptionStatus.ACTIVE);
 
         if(usedByAnyAgency) {
+            log.atWarn()
+                    .setMessage("Plan already in use by agency(ies).")
+                    .addKeyValue("planId", planId)
+                    .log();
+
             throw new BadRequestException("Plan already in use by agency or agencies");
         }
 

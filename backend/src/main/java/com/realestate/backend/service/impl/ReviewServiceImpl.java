@@ -74,12 +74,12 @@ public class ReviewServiceImpl implements ReviewService {
 
         ReviewEntity savedReview = reviewRepository.saveAndFlush(createdReview);
 
-        log.info(
-                "User {} created a review {} for property {}",
-                user.getId(),
-                savedReview.getId(),
-                propertyId
-        );
+        log.atInfo()
+                .setMessage("Review created by user for property")
+                .addKeyValue("userId", user.getId())
+                .addKeyValue("reviewId", savedReview.getId())
+                .addKeyValue("propertyId", propertyId)
+                .log();
 
         return reviewMapper.toResponse(savedReview);
 
@@ -127,12 +127,12 @@ public class ReviewServiceImpl implements ReviewService {
 
         ReviewEntity savedReview = reviewRepository.saveAndFlush(createdReview);
 
-        log.info(
-                "User {} created a review {} for agency {}",
-                user.getId(),
-                savedReview.getId(),
-                agencyId
-        );
+        log.atInfo()
+                .setMessage("Review created by user for agency")
+                .addKeyValue("userId", user.getId())
+                .addKeyValue("reviewId", savedReview.getId())
+                .addKeyValue("agencyId", agencyId)
+                .log();
 
         return  reviewMapper.toResponse(savedReview);
 
@@ -172,11 +172,11 @@ public class ReviewServiceImpl implements ReviewService {
 
         ReviewEntity  savedReview = reviewRepository.saveAndFlush(review);
 
-        log.info(
-                "User {} updated review {}",
-                currentUser.getId(),
-                reviewId
-        );
+        log.atInfo()
+                .setMessage("Review updated by user")
+                .addKeyValue("userId", currentUser.getId())
+                .addKeyValue("reviewId", reviewId)
+                .log();
 
         return  reviewMapper.toResponse(savedReview);
 
@@ -193,11 +193,11 @@ public class ReviewServiceImpl implements ReviewService {
 
         reviewRepository.delete(review);
 
-        log.info(
-                "User {} deleted review {}",
-                currentUser.getId(),
-                reviewId
-        );
+        log.atInfo()
+                .setMessage("Review deleted by user")
+                .addKeyValue("userId", currentUser.getId())
+                .addKeyValue("reviewId", reviewId)
+                .log();
 
     }
 

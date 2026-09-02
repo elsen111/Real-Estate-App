@@ -13,14 +13,27 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void notifyAgencyOfNewInquiry(InquiryEntity inquiry) {
 
-        log.info("New inquiry {} received for property {} — notifying agency {}",
-                inquiry.getId(), inquiry.getProperty().getId(), inquiry.getAgency().getId());
+        log.atInfo()
+                .setMessage("Notifying agency for the new inquiry")
+                .addKeyValue("inquiryId", inquiry.getId())
+                .addKeyValue("propertyId", inquiry.getProperty().getId())
+                .addKeyValue("agencyId",  inquiry.getAgency().getId())
+                .addKeyValue("agencyName", inquiry.getAgency().getName())
+                .addKeyValue("clientId", inquiry.getClient().getId())
+                .log();
 
     }
 
     @Override
     public void notifyAgencyOfNewAppointment(AppointmentEntity appointment) {
-        log.info("New appointment {} received for property {} — notifying agency {}",
-                appointment.getId(), appointment.getProperty().getId(), appointment.getAgency().getId());
+
+        log.atInfo()
+                .setMessage("Notifying agency for the new appointment")
+                .addKeyValue("appointmentId", appointment.getId())
+                .addKeyValue("propertyId", appointment.getProperty().getId())
+                .addKeyValue("agencyId",  appointment.getAgency().getId())
+                .addKeyValue("agencyName", appointment.getAgency().getName())
+                .addKeyValue("clientId", appointment.getClient().getId())
+                .log();
     }
 }

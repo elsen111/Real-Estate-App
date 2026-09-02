@@ -99,14 +99,14 @@ public class AgencyMemberServiceImpl implements AgencyMemberService {
 
         AgencyMemberEntity savedMember = agencyMemberRepository.save(member);
 
-        log.info(
-                "User '{}' ({}) assigned to agency '{}' ({}) as {}",
-                targetUser.getEmail(),
-                targetUser.getId(),
-                agency.getName(),
-                agency.getId(),
-                role
-        );
+        log.atInfo()
+                .setMessage("User assigned to the agency")
+                .addKeyValue("userId", targetUser.getId())
+                .addKeyValue("userEmail", targetUser.getEmail())
+                .addKeyValue("agencyId", agency.getId())
+                .addKeyValue("agencyName", agency.getName())
+                .addKeyValue("assignedRole", role)
+                .log();
 
         return agencyMemberMapper.toResponse(savedMember);
     }

@@ -99,11 +99,11 @@ public class CategoryServiceImpl implements CategoryService {
 
         CategoryEntity savedCategory = categoryRepository.saveAndFlush(newCategory);
 
-        log.info(
-                "Category '{}' ({}) created",
-                savedCategory.getName(),
-                savedCategory.getId()
-        );
+        log.atInfo()
+                .setMessage("Category created")
+                .addKeyValue("categoryId", savedCategory.getId())
+                .addKeyValue("categoryName", savedCategory.getName())
+                .log();
 
         return categoryMapper.toAdminResponse(savedCategory);
 
@@ -130,12 +130,12 @@ public class CategoryServiceImpl implements CategoryService {
 
         updatedCategory.setSlug(generateSlug(request.getName().trim()));
 
-        log.info(
-                "Category '{}' ({}) updated to '{}'",
-                oldName,
-                categoryId,
-                updatedCategory.getName()
-        );
+        log.atInfo()
+                .setMessage("Category updated")
+                .addKeyValue("categoryId", categoryId)
+                .addKeyValue("oldName", oldName)
+                .addKeyValue("newName", updatedCategory.getName())
+                .log();
 
         return categoryMapper.toAdminResponse(updatedCategory);
 
@@ -160,12 +160,13 @@ public class CategoryServiceImpl implements CategoryService {
         category.setActive(newStatus);
         categoryRepository.save(category);
 
-        log.info(
-                "Category '{}' ({}) {}",
-                category.getName(),
-                categoryId,
-                newStatus ? "activated" : "deactivated"
-        );
+        log.atInfo()
+                .setMessage("Category status changed")
+                .addKeyValue("categoryId", categoryId)
+                .addKeyValue("categoryName", category.getName())
+                .addKeyValue("oldStatus", newStatus ? "deactivated" : "activated")
+                .addKeyValue("newStatus", newStatus ? "activated" : "deactivated")
+                .log();
 
         return newStatus ? "Category is activated" : "Category is deactivated";
 
@@ -186,16 +187,18 @@ public class CategoryServiceImpl implements CategoryService {
             throw new BusinessException("Cannot delete a category as it is already assigned to an existing property");
         }
 
+        String categoryName = category.getName();
+
         category.setActive(false);
         category.setDeleted(true);
 
         categoryRepository.save(category);
 
-        log.info(
-                "Category '{}' ({}) soft deleted",
-                category.getName(),
-                categoryId
-        );
+        log.atInfo()
+                .setMessage("Category deleted")
+                .addKeyValue("categoryId", category.getId())
+                .addKeyValue("categoryName", categoryName)
+                .log();
 
     }
 

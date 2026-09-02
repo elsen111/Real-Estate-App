@@ -41,17 +41,20 @@ public class RateLimitService {
                 : TimeUnit.NANOSECONDS.toSeconds(probe.getNanosToWaitForRefill()) + 1;
 
         if (probe.isConsumed()) {
-            log.debug(
-                    "Rate limit check passed: policy={}, remainingTokens={}",
-                    policy,
-                    probe.getRemainingTokens()
-            );
+
+            log.atDebug()
+                    .setMessage("Rate limit check passed")
+                    .addKeyValue("policy", policy)
+                    .addKeyValue("remainingTokens", probe.getRemainingTokens())
+                    .log();
+
         } else {
-            log.warn(
-                    "Rate limit exceeded: policy={}, retryAfterSeconds={}",
-                    policy,
-                    retryAfterSeconds
-            );
+
+            log.atWarn()
+                    .setMessage("Rate limit exceeded.")
+                    .addKeyValue("policy", policy)
+                    .addKeyValue("retryAfterSeconds", retryAfterSeconds)
+                    .log();
         }
 
         return new RateLimitResult(probe.isConsumed(), probe.getRemainingTokens(), retryAfterSeconds);
@@ -79,12 +82,12 @@ public class RateLimitService {
             JsonNode emailNode = root.get(EMAIL_FIELD);
             return (emailNode != null && emailNode.isTextual()) ? emailNode.asText() : null;
         } catch (IOException ex) {
-            log.debug(
-                    "Unable to extract rate-limit identity from request body: method={}, path={}",
-                    request.getMethod(),
-                    request.getServletPath(),
-                    ex
-            );
+
+            log.atDebug()
+                    .setMessage("Unable to extract rate-limit identity from request body.")
+                    .addKeyValue("method", request.getMethod())
+                    .addKeyValue("path", request.getServletPath())
+                    .log();
 
             return null;
         }

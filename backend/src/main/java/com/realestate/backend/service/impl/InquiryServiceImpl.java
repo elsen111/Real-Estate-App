@@ -89,12 +89,17 @@ public class InquiryServiceImpl implements InquiryService {
 
         InquiryEntity savedInquiry = inquiryRepository.saveAndFlush(newInquiry);
 
-        log.info(
-                "Inquiry {} created by user {} for property {}",
-                savedInquiry.getId(),
-                client.getId(),
-                propertyId
-        );
+        log.atInfo()
+                .setMessage("Inquiry created for the property")
+                .addKeyValue("inquiryId", savedInquiry.getId())
+                .addKeyValue("propertyId", propertyId)
+                .addKeyValue("propertyTitle", property.getTitle())
+                .addKeyValue("clientId", client.getId())
+                .addKeyValue("agencyId", savedInquiry.getAgency().getId())
+                .addKeyValue("agencyName", savedInquiry.getAgency().getName())
+                .addKeyValue("agentId", savedInquiry.getAssignedAgent() != null ? savedInquiry.getAssignedAgent().getId() : null)
+                .addKeyValue("agentEmail", savedInquiry.getAssignedAgent() != null ? savedInquiry.getAssignedAgent().getEmail() : null)
+                .log();
 
         return inquiryMapper.toResponse(savedInquiry);
 
@@ -172,12 +177,14 @@ public class InquiryServiceImpl implements InquiryService {
         inquiry.setStatus(request.getStatus());
         InquiryEntity updatedInquiry = inquiryRepository.saveAndFlush(inquiry);
 
-        log.info(
-                "Inquiry {} status changed from {} to {}",
-                inquiryId,
-                previousStatus,
-                updatedInquiry.getStatus()
-        );
+        log.atInfo()
+                .setMessage("Inquiry status changed")
+                .addKeyValue("inquiryId", inquiryId)
+                .addKeyValue("oldStatus", previousStatus)
+                .addKeyValue("newStatus", updatedInquiry.getStatus())
+                .addKeyValue("propertyId", inquiry.getProperty().getId())
+                .addKeyValue("clientId", inquiry.getClient().getId())
+                .log();
 
         return inquiryMapper.toResponse(updatedInquiry);
 

@@ -87,34 +87,40 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
                 );
 
         PropertyStatus currentStatus = property.getStatus();
-        validateStatusTransition(currentStatus, newStatus);
+        validateStatusTransition(property, currentStatus, newStatus);
 
         property.setStatus(newStatus);
 
         propertyRepository.save(property);
 
-        log.info(
-                "Property status changed successfully: propertyId={}, title='{}', oldStatus={}, newStatus={}",
-                property.getId(),
-                property.getTitle(),
-                currentStatus,
-                newStatus
-        );
+        log.atInfo()
+                .setMessage("Property status changed")
+                .addKeyValue("propertyId", property.getId())
+                .addKeyValue("title", property.getTitle())
+                .addKeyValue("oldStatus", currentStatus)
+                .addKeyValue("newStatus", newStatus)
+                .log();
+
 
         return "'" + property.getTitle() + "'s status changed to " + newStatus.toString();
     }
 
 //    HELPER METHODS
     private void validateStatusTransition(
+            PropertyEntity property,
             PropertyStatus currentStatus,
             PropertyStatus newStatus
     ) {
 
         if(currentStatus == newStatus) {
-            log.warn(
-                    "Property status change rejected: property already has status={}",
-                    currentStatus
-            );
+
+            log.atWarn()
+                    .setMessage("Property status change rejected: property already has this status" + currentStatus)
+                    .addKeyValue("propertyId", property.getId())
+                    .addKeyValue("title", property.getTitle())
+                    .addKeyValue("oldStatus", currentStatus)
+                    .addKeyValue("newStatus", newStatus)
+                    .log();
 
             throw new BadRequestException(
                     "Property is already in status: " + currentStatus
@@ -125,11 +131,14 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
                 .getOrDefault(currentStatus, Set.of());
 
         if(!allowedStatuses.contains(newStatus)) {
-            log.warn(
-                    "Invalid property status transition attempted: currentStatus={}, requestedStatus={}",
-                    currentStatus,
-                    newStatus
-            );
+
+            log.atWarn()
+                    .setMessage("Invalid property status transition attempted.")
+                    .addKeyValue("propertyId", property.getId())
+                    .addKeyValue("title", property.getTitle())
+                    .addKeyValue("oldStatus", currentStatus)
+                    .addKeyValue("newStatus", newStatus)
+                    .log();
 
             throw new BadRequestException(
                     "Cannot change property status from "

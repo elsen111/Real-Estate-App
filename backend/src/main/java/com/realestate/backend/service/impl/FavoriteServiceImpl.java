@@ -72,11 +72,12 @@ public class FavoriteServiceImpl implements FavoriteService {
 
         FavoriteEntity savedFavorite = favoriteRepository.saveAndFlush(addedFavorite);
 
-        log.info(
-                "User {} added property {} to favorites",
-                user.getId(),
-                propertyId
-        );
+        log.atInfo()
+                .setMessage("Property added to favorites")
+                .addKeyValue("propertyId", propertyId)
+                .addKeyValue("propertyTitle", property.getTitle())
+                .addKeyValue("authenticatedUserUUID", user.getId())
+                .log();
 
         return favoriteMapper.toCreateFavoriteResponse(savedFavorite);
 
@@ -99,11 +100,11 @@ public class FavoriteServiceImpl implements FavoriteService {
 
         favoriteRepository.deleteByUser_IdAndProperty_Id(user.getId(), propertyId);
 
-        log.info(
-                "User {} removed property {} from favorites",
-                user.getId(),
-                propertyId
-        );
+        log.atInfo()
+                .setMessage("Property removed from favorites")
+                .addKeyValue("propertyId", propertyId)
+                .addKeyValue("authenticatedUserUUID", user.getId())
+                .log();
 
     }
 

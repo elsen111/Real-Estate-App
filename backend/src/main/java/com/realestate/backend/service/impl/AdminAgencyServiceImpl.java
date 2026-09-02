@@ -53,7 +53,10 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
     private final AgencyService agencyService;
 
     @Override
-    public Page<AdminAgencyResponse> getAllAgencies(AdminAgencyFilterRequest filter, Pageable pageable) {
+    public Page<AdminAgencyResponse> getAllAgencies(
+            AdminAgencyFilterRequest filter,
+            Pageable pageable
+    ) {
         Specification<AgencyEntity> specification = AgencySpecification
                 .withFilter(filter);
 
@@ -63,14 +66,25 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
 
     @Override
     public AdminAgencyResponse getAgencyById(UUID id) {
-        AgencyEntity  agency = agencyRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Agency not found with id " + id));
+        AgencyEntity agency = agencyRepository.findById(id)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                "Agency not found with id " + id
+                        )
+                );
 
         AgencyMemberEntity agencyOwner = agencyMemberRepository.findOwner(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Agency member not found with id " + id));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                "Agency member not found with id " + id
+                        )
+                );
 
         AgencySubscriptionEntity subscription = agencySubscriptionRepository
-                .findFirstByAgencyIdOrderByEndDateDesc(id, SubscriptionStatus.ACTIVE)
+                .findFirstByAgencyIdOrderByEndDateDesc(
+                        id,
+                        SubscriptionStatus.ACTIVE
+                )
                 .orElse(null);
 
         UserEntity owner = agencyOwner.getUser();
@@ -79,12 +93,11 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         AgencySubscriptionResponse subscriptionResponse =
                 subscriptionMapper.toAdminResponse(subscription);
 
-//        '-1' is for Agency Owner
+        // '-1' is for Agency Owner
         long totalAgents =
                 agencyMemberRepository.countByAgencyIdAndActiveTrue(id) - 1;
 
         long totalProperties =
-                propertyRepository.countByAgencyId(id);
                 propertyRepository.countByAgencyId(id);
 
         long activeListings =
@@ -92,7 +105,6 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
                         id,
                         List.of(
                                 PropertyStatus.ACTIVE
-
                         )
                 );
 
@@ -117,7 +129,6 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         response.setStatistics(statistics);
 
         return response;
-
     }
 
     @Transactional
@@ -126,22 +137,26 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
 
         AgencyEntity agency = agencyRepository.findById(id)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Agency not found with id " + id)
+                        () -> new ResourceNotFoundException(
+                                "Agency not found with id " + id
+                        )
                 );
+
+        AgencyStatus previousStatus = agency.getStatus();
 
         agency.setStatus(status);
 
         agencyRepository.save(agency);
 
-        log.info(
-                "Agency '{}' ({}) status changed to {}",
-                agency.getName(),
-                agency.getId(),
-                status
-        );
+        log.atInfo()
+                .setMessage("agency_status_changed")
+                .addKeyValue("agencyId", agency.getId())
+                .addKeyValue("agencyName", agency.getName())
+                .addKeyValue("previousStatus", previousStatus)
+                .addKeyValue("newStatus", status)
+                .log();
 
         return agency.getName() + "'s status changed to " + status.toString();
-
     }
 
     @Transactional
@@ -153,14 +168,13 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
 
         AgencyEntity agency = agencyService.updateAgency(agencyId, request);
 
-        log.info(
-                "Agency '{}' ({}) updated by Super Admin/ Admin",
-                agency.getName(),
-                agency.getId()
-        );
+        log.atInfo()
+                .setMessage("Agency updated")
+                .addKeyValue("agencyId", agency.getId())
+                .addKeyValue("agencyName", agency.getName())
+                .log();
 
         return agencyMapper.toAdminResponse(agency);
-
     }
 
     @Override
@@ -169,59 +183,93 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
 
         AgencyEntity agency = agencyRepository.findById(id)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Agency not found with id " + id)
+                        () -> new ResourceNotFoundException(
+                                "Agency not found with id " + id
+                        )
                 );
 
         agency.setIsDeleted(true);
 
         agencyRepository.save(agency);
 
-        log.info(
-                "Agency '{}' ({}) soft deleted",
-                agency.getName(),
-                agency.getId()
-        );
+        log.atInfo()
+                .setMessage("agency_soft_deleted")
+                .addKeyValue("agencyId", agency.getId())
+                .addKeyValue("agencyName", agency.getName())
+                .log();
 
         return agency.getName() + "has been deleted successfully";
-
     }
 
     @Override
     @Transactional
-    public AgencySubscriptionResponse createAgencySubscription(UUID agencyId, UUID subscriptionId) {
+    public AgencySubscriptionResponse createAgencySubscription(
+            UUID agencyId,
+            UUID subscriptionId
+    ) {
 
         AgencyEntity agency = agencyRepository.findById(agencyId)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Agency not found with id " + agencyId)
+                        () -> new ResourceNotFoundException(
+                                "Agency not found with id " + agencyId
+                        )
                 );
 
-        SubscriptionPlanEntity subscriptionPlan = subscriptionPlanRepository.findById(subscriptionId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Subscription plan not found with id " + subscriptionId)
+        SubscriptionPlanEntity subscriptionPlan =
+                subscriptionPlanRepository.findById(subscriptionId)
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException(
+                                        "Subscription plan not found with id " + subscriptionId
+                                )
+                        );
+
+        boolean isPlanActive =
+                subscriptionPlanRepository.existsByIdAndActiveTrue(
+                        subscriptionPlan.getId()
                 );
 
-        boolean isPlanActive = subscriptionPlanRepository.existsByIdAndActiveTrue(subscriptionPlan.getId());
         boolean isAgencyDeleted = agency.getIsDeleted();
-        boolean isAgencyApproved = agency.getStatus().equals(AgencyStatus.APPROVED);
-        boolean hasActiveSubscription = agencySubscriptionRepository.existsByAgencyIdAndStatus(agencyId, SubscriptionStatus.ACTIVE);
 
-        if(!isPlanActive) {
-            throw new BadRequestException("Subscription plan is not active.");
-        } else if (isAgencyDeleted) {
-            throw new  BadRequestException("Agency has been deleted.");
-        } else if(!isAgencyApproved)  {
-            log.warn(
-                    "Attempt to create subscription for unapproved agency {}",
-                    agencyId
+        boolean isAgencyApproved =
+                agency.getStatus().equals(AgencyStatus.APPROVED);
+
+        boolean hasActiveSubscription =
+                agencySubscriptionRepository.existsByAgencyIdAndStatus(
+                        agencyId,
+                        SubscriptionStatus.ACTIVE
+                );
+
+        if (!isPlanActive) {
+            throw new BadRequestException(
+                    "Subscription plan is not active."
             );
 
-            throw new  BadRequestException("Agency has not been approved.Only approved agencies are allowed to get subscriptions.");
-        } else  if(hasActiveSubscription) {
-             throw new  BadRequestException("Agency has already an active subscription.");
+        } else if (isAgencyDeleted) {
+            throw new BadRequestException(
+                    "Agency has been deleted."
+            );
+
+        } else if (!isAgencyApproved) {
+            log.atWarn()
+                    .setMessage("subscription_creation_rejected")
+                    .addKeyValue("agencyId", agencyId)
+                    .addKeyValue("agencyName", agency.getName())
+                    .addKeyValue("reason", "agency_not_approved")
+                    .log();
+
+            throw new BadRequestException(
+                    "Agency has not been approved.Only approved agencies are allowed to get subscriptions."
+            );
+
+        } else if (hasActiveSubscription) {
+            throw new BadRequestException(
+                    "Agency has already an active subscription."
+            );
         }
 
         LocalDateTime startDate = LocalDateTime.now();
-        LocalDateTime endDate = startDate.plusDays(subscriptionPlan.getDurationDays());
+        LocalDateTime endDate =
+                startDate.plusDays(subscriptionPlan.getDurationDays());
 
         AgencySubscriptionEntity agencySubscription =
                 AgencySubscriptionEntity.builder()
@@ -232,18 +280,23 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
                         .status(SubscriptionStatus.ACTIVE)
                         .build();
 
-        AgencySubscriptionEntity createdAgencySubscription = agencySubscriptionRepository.saveAndFlush(agencySubscription);
+        AgencySubscriptionEntity createdAgencySubscription =
+                agencySubscriptionRepository.saveAndFlush(
+                        agencySubscription
+                );
 
-        log.info(
-                "Subscription '{}' assigned to agency '{}' ({}) until {}",
-                subscriptionPlan.getName(),
-                agency.getName(),
-                agency.getId(),
-                createdAgencySubscription.getEndDate()
+        log.atInfo()
+                .setMessage("agency_subscription_created")
+                .addKeyValue("agencyId", agency.getId())
+                .addKeyValue("agencyName", agency.getName())
+                .addKeyValue("subscriptionPlanId", subscriptionPlan.getId())
+                .addKeyValue("subscriptionPlanName", subscriptionPlan.getName())
+                .addKeyValue("subscriptionEndDate", createdAgencySubscription.getEndDate())
+                .log();
+
+        return subscriptionMapper.toAdminResponse(
+                createdAgencySubscription
         );
-
-        return subscriptionMapper.toAdminResponse(createdAgencySubscription);
-
     }
 
     @Override
@@ -251,19 +304,26 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
 
         AgencyEntity agency = agencyRepository.findById(agencyId)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Agency not found with id " + agencyId)
+                        () -> new ResourceNotFoundException(
+                                "Agency not found with id " + agencyId
+                        )
                 );
 
-        AgencySubscriptionEntity agencySubscription = agencySubscriptionRepository
-                .findFirstByAgencyIdAndStatusOrderByEndDateDesc(
-                    agencyId,
-                    SubscriptionStatus.ACTIVE
-        ).orElseThrow(
-                () -> new ResourceNotFoundException("This agency does not have any active subscription currently")
-        );
+        AgencySubscriptionEntity agencySubscription =
+                agencySubscriptionRepository
+                        .findFirstByAgencyIdAndStatusOrderByEndDateDesc(
+                                agencyId,
+                                SubscriptionStatus.ACTIVE
+                        )
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException(
+                                        "This agency does not have any active subscription currently"
+                                )
+                        );
 
-//        -1 is for Agency Owner
-        long usedAgents = agencyMemberRepository.countByAgencyIdAndActiveTrue(agencyId) - 1;
+        // -1 is for Agency Owner
+        long usedAgents =
+                agencyMemberRepository.countByAgencyIdAndActiveTrue(agencyId) - 1;
 
         long usedListings =
                 propertyRepository.countByAgencyIdAndStatusIn(
@@ -277,19 +337,20 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         AgencySubscriptionResponse response =
                 subscriptionMapper.toAdminResponse(agencySubscription);
 
-        System.out.println("Id: " + agencyId );
-
         int maxAgents = agencySubscription.getPlan().getMaxAgents();
         int maxListings = agencySubscription.getPlan().getMaxListings();
 
         response.setUsedAgents((int) usedAgents);
-        response.setRemainingAgents(Math.max(0, maxAgents - (int) usedAgents));
+        response.setRemainingAgents(
+                Math.max(0, maxAgents - (int) usedAgents)
+        );
 
         response.setUsedListings((int) usedListings);
-        response.setRemainingListings(Math.max(0, maxListings - (int) usedListings));
+        response.setRemainingListings(
+                Math.max(0, maxListings - (int) usedListings)
+        );
 
         return response;
-
     }
 
     @Transactional
@@ -300,52 +361,69 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
                 .findById(agencyId)
                 .filter(a -> !a.getIsDeleted())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Agency not found with id " + agencyId)
+                        () -> new ResourceNotFoundException(
+                                "Agency not found with id " + agencyId
+                        )
                 );
 
-        if(!AgencyStatus.PENDING.equals(agency.getStatus())) {
-            throw new BusinessException("Only pending agencies can be approved.");
+        if (!AgencyStatus.PENDING.equals(agency.getStatus())) {
+
+            log.atWarn()
+                    .setMessage("agency_approval_rejected")
+                    .addKeyValue("agencyId", agencyId)
+                    .addKeyValue("agencyName", agency.getName())
+                    .addKeyValue("currentStatus", agency.getStatus())
+                    .log();
+
+            throw new BusinessException(
+                    "Only pending agencies can be approved."
+            );
         }
 
         agency.setStatus(AgencyStatus.APPROVED);
         agencyRepository.save(agency);
 
-        log.info(
-                "Agency {} (with id {}) is approved by admin/super_admin at {}",
-                agency.getName(),
-                agency.getId(),
-                LocalDateTime.now()
-        );
+        log.atInfo()
+                .setMessage("agency_approved")
+                .addKeyValue("agencyId", agency.getId())
+                .addKeyValue("agencyName", agency.getName())
+                .addKeyValue("previousStatus", AgencyStatus.PENDING)
+                .addKeyValue("newStatus", AgencyStatus.APPROVED)
+                .log();
 
         return "Agency " + agency.getName() + " is approved successfully.";
-
     }
 
     @Transactional
     @Override
     public String rejectAgency(UUID agencyId) {
+
         AgencyEntity agency = agencyRepository
                 .findById(agencyId)
                 .filter(a -> !a.getIsDeleted())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Agency not found with id " + agencyId)
+                        () -> new ResourceNotFoundException(
+                                "Agency not found with id " + agencyId
+                        )
                 );
 
-        if(!AgencyStatus.PENDING.equals(agency.getStatus())) {
-            throw new BusinessException("Only pending agencies can be rejected.");
+        if (!AgencyStatus.PENDING.equals(agency.getStatus())) {
+            throw new BusinessException(
+                    "Only pending agencies can be rejected."
+            );
         }
 
         agency.setStatus(AgencyStatus.REJECTED);
         agencyRepository.save(agency);
 
-        log.info(
-                "Agency {} (with id {}) is rejected by admin/super_admin at {}",
-                agency.getName(),
-                agency.getId(),
-                LocalDateTime.now()
-        );
+        log.atInfo()
+                .setMessage("agency_rejected")
+                .addKeyValue("agencyId", agency.getId())
+                .addKeyValue("agencyName", agency.getName())
+                .addKeyValue("previousStatus", AgencyStatus.PENDING)
+                .addKeyValue("newStatus", AgencyStatus.REJECTED)
+                .log();
 
         return "Agency " + agency.getName() + " is rejected successfully.";
     }
-
 }
