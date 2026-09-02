@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
@@ -16,6 +17,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RateLimitFilter extends OncePerRequestFilter {
@@ -38,23 +42,39 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
         HttpServletRequest effectiveRequest = wrapIfHasBody(request);
 
-        RateLimitResult result = rateLimitService.checkLimit(effectiveRequest);
+        RateLimitResult result =
+                rateLimitService.checkLimit(effectiveRequest);
 
-        response.setHeader("X-RateLimit-Remaining", String.valueOf(result.remainingTokens()));
+        response.setHeader(
+                "X-RateLimit-Remaining",
+                String.valueOf(result.remainingTokens())
+        );
 
         if (result.allowed()) {
             filterChain.doFilter(effectiveRequest, response);
             return;
         }
 
-        response.setHeader("Retry-After", String.valueOf(result.retryAfterSeconds()));
-        writeTooManyRequests(effectiveRequest, response, result.retryAfterSeconds());
+        response.setHeader(
+                "Retry-After",
+                String.valueOf(result.retryAfterSeconds())
+        );
+
+        writeTooManyRequests(
+                effectiveRequest,
+                response,
+                result.retryAfterSeconds()
+        );
     }
 
-    private HttpServletRequest wrapIfHasBody(HttpServletRequest request) throws IOException {
+    private HttpServletRequest wrapIfHasBody(
+            HttpServletRequest request
+    ) throws IOException {
+
         if ("POST".equalsIgnoreCase(request.getMethod())) {
             return new CachedBodyHttpServletRequest(request);
         }
+
         return request;
     }
 
@@ -64,15 +84,29 @@ public class RateLimitFilter extends OncePerRequestFilter {
             long waitSeconds
     ) throws IOException {
 
-        response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        log.warn(
+                "rate_limit_exceeded",
+                kv("retryAfterSeconds", waitSeconds)
+        );
+
+        response.setStatus(
+                HttpStatus.TOO_MANY_REQUESTS.value()
+        );
+
+        response.setContentType(
+                MediaType.APPLICATION_JSON_VALUE
+        );
 
         ErrorResponse errorResponse = ErrorResponse.of(
-                "Too many requests. Please try again in " + waitSeconds + " seconds.",
+                "Too many requests. Please try again in "
+                        + waitSeconds
+                        + " seconds.",
                 HttpStatus.TOO_MANY_REQUESTS.value(),
                 request.getRequestURI()
         );
 
-        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+        response.getWriter().write(
+                objectMapper.writeValueAsString(errorResponse)
+        );
     }
 }

@@ -1,5 +1,7 @@
 package com.realestate.backend.security;
 
+import com.realestate.backend.common.logging.MdcLoggingFilter;
+import com.realestate.backend.common.logging.RequestLoggingFilter;
 import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -29,7 +31,22 @@ public class SecurityConfig {
     private final RestAccessDeniedHandler accessDeniedHandler;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, RateLimitFilter rateLimitFilter) throws Exception {
+    public MdcLoggingFilter mdcLoggingFilter() {
+        return new MdcLoggingFilter();
+    }
+
+    @Bean
+    public RequestLoggingFilter requestLoggingFilter() {
+        return new RequestLoggingFilter();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            RateLimitFilter rateLimitFilter,
+            MdcLoggingFilter mdcLoggingFilter,
+            RequestLoggingFilter requestLoggingFilter
+    ) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
@@ -62,23 +79,36 @@ public class SecurityConfig {
 
 
                         .requestMatchers(
-                                "/v3/api-docs/**",
+                                "/api-docs/**",
                                 "/swagger-ui/**",
-                                "/api/swagger-ui.html"
+                                "/swagger-ui.html"
                         ).permitAll()
 
                         .requestMatchers("/admin/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
 
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(
-                        rateLimitFilter,
-                        UsernamePasswordAuthenticationFilter.class
-
-                )
+//                .addFilterBefore(
+//                        rateLimitFilter,
+//                        UsernamePasswordAuthenticationFilter.class
+//
+//                )
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
+                )
+                .addFilterAfter(
+                        mdcLoggingFilter,
+                        JwtAuthenticationFilter.class
+                )
+                .addFilterAfter(
+                        rateLimitFilter,
+                        MdcLoggingFilter.class
+                )
+
+                .addFilterAfter(
+                        requestLoggingFilter,
+                        RateLimitFilter.class
                 )
                 .build();
     }

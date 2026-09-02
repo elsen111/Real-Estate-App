@@ -1,6 +1,6 @@
 spring:
   application:
-    name: backend
+    name: estate_flow-backend
 
   datasource:
     url: jdbc:postgresql://localhost:5432/real_estate_db
@@ -92,6 +92,9 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
+    config-url: /api/api-docs/swagger-config
+    disable-swagger-default-url: true
+    url: /api/api-docs
   packages-to-scan: com.realestate.backend.controller
 
 logging:
