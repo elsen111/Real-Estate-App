@@ -168,11 +168,11 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
 
         AgencyEntity agency = agencyService.updateAgency(agencyId, request);
 
-        log.info(
-                "Agency updated: agencyId={}, agencyName={}",
-                agency.getId(),
-                agency.getName()
-        );
+        log.atInfo()
+                .setMessage("Agency updated")
+                .addKeyValue("agencyId", agency.getId())
+                .addKeyValue("agencyName", agency.getName())
+                .log();
 
         return agencyMapper.toAdminResponse(agency);
     }

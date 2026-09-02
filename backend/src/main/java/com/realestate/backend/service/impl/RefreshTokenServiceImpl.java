@@ -51,10 +51,11 @@ public class RefreshTokenServiceImpl {
 
         refreshTokenRepository.save(entity);
 
-        log.info(
-                "Refresh token created for user {}",
-                user.getEmail()
-        );
+        log.atInfo()
+                .setMessage("Refresh token created for user")
+                .addKeyValue("userId", user.getId())
+                .addKeyValue("userEmail", user.getEmail())
+                .log();
 
         return new CreatedRefreshToken(rawToken, entity);
     }
@@ -84,10 +85,10 @@ public class RefreshTokenServiceImpl {
         refreshTokenRepository.save(oldToken);
         refreshTokenRepository.save(newToken);
 
-        log.info(
-                "Refresh token rotated for user {}",
-                oldToken.getUser().getId()
-        );
+        log.atInfo()
+                .setMessage("Refresh token rotated for user")
+                .addKeyValue("userId", oldToken.getUser().getId())
+                .log();
 
         return new CreatedRefreshToken(newRawToken, newToken);
     }
@@ -119,10 +120,10 @@ public class RefreshTokenServiceImpl {
                     token.revoke(null);
                     refreshTokenRepository.save(token);
 
-                    log.info(
-                            "Refresh token revoked for user {}",
-                            token.getUser().getId()
-                    );
+                    log.atInfo()
+                            .setMessage("Refresh token revoked for user")
+                            .addKeyValue("userId", token.getUser().getId())
+                            .log();
                 });
     }
 
@@ -135,11 +136,11 @@ public class RefreshTokenServiceImpl {
                     refreshTokenRepository.save(token);
                 });
 
-        log.info(
-                "Revoked {} refresh token(s) for user {}",
-                tokens.size(),
-                userId
-        );
+        log.atInfo()
+                .setMessage("Refresh tokens revoked for user")
+                .addKeyValue("userId", userId)
+                .addKeyValue("revokedTokenCount", tokens.size())
+                .log();
 
     }
 

@@ -76,12 +76,13 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         userRepository.save(user);
 
-        log.info(
-                "User '{}' ({}) has been {}",
-                user.getEmail(),
-                user.getId(),
-                newStatus ? "enabled" : "disabled"
-        );
+        log.atInfo()
+                .setMessage("User status changed")
+                .addKeyValue("userId", user.getId())
+                .addKeyValue("userEmail", user.getEmail())
+                .addKeyValue("oldStatus", newStatus ? "disabled" : "enabled")
+                .addKeyValue("newStatus", newStatus ? "enabled" : "disabled")
+                .log();
 
         return newStatus
                 ? "User has been enabled successfully"
@@ -112,11 +113,11 @@ public class AdminUserServiceImpl implements AdminUserService {
         user.getRoles().add(adminRoleEntity);
         userRepository.save(user);
 
-        log.info(
-                "Admin role assigned to user '{}' ({})",
-                user.getEmail(),
-                user.getId()
-        );
+        log.atInfo()
+                .setMessage("Admin role assigned to the user")
+                .addKeyValue("userId", user.getId())
+                .addKeyValue("userEmail", user.getEmail())
+                .log();
 
         return "Admin role successfully assigned to user: " + userId;
     }

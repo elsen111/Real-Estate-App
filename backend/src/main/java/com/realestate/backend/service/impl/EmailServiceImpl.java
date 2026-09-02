@@ -54,11 +54,17 @@ public class EmailServiceImpl implements EmailService {
 
             helper.setText(html, true);
 
-            log.info("Sending password reset OTP email to {}", toEmail);
+            log.atInfo()
+                    .setMessage("Sending password reset OTP to the email address")
+                    .addKeyValue("email", toEmail)
+                    .log();
 
             mailSender.send(message);
 
-            log.info("Password reset OTP email sent successfully to {}", toEmail);
+            log.atInfo()
+                    .setMessage("Password reset OTP sent to the email address")
+                    .addKeyValue("email", toEmail)
+                    .log();
 
         } catch (Exception e) {
             throw new BusinessException("Failed to send password reset OTP email");

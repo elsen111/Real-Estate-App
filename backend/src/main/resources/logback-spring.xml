@@ -29,6 +29,8 @@
                     <fieldName>message</fieldName>
                 </message>
 
+                <keyValuePairs/>
+
                 <pattern>
                     <pattern>{"service":"${SERVICE_NAME}"}</pattern>
                 </pattern>
@@ -40,8 +42,6 @@
                     <includeMdcKeyName>path</includeMdcKeyName>
                     <includeMdcKeyName>method</includeMdcKeyName>
                 </mdc>
-
-                <arguments/>
 
                 <stackTrace>
                     <fieldName>stackTrace</fieldName>
@@ -96,6 +96,8 @@
                     <fieldName>message</fieldName>
                 </message>
 
+                <keyValuePairs/>
+
                 <pattern>
                     <pattern>{"service":"${SERVICE_NAME}"}</pattern>
                 </pattern>
@@ -107,8 +109,6 @@
                     <includeMdcKeyName>path</includeMdcKeyName>
                     <includeMdcKeyName>method</includeMdcKeyName>
                 </mdc>
-
-                <arguments/>
 
                 <stackTrace>
                     <fieldName>stackTrace</fieldName>

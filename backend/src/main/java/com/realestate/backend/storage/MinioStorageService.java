@@ -44,12 +44,12 @@ public class MinioStorageService implements StorageService {
                             .build()
             );
 
-            log.info(
-                    "File uploaded successfully: storageKey='{}', folder='{}', size={} bytes",
-                    storageKey,
-                    folder,
-                    file.getSize()
-            );
+            log.atInfo()
+                    .setMessage("File uploaded successfully.")
+                    .addKeyValue("storageKey", storageKey)
+                    .addKeyValue("folder", folder)
+                    .addKeyValue("sizeInBytes", file.getSize())
+                    .log();
 
             return new UploadedFile(
                     storageKey,
@@ -61,12 +61,12 @@ public class MinioStorageService implements StorageService {
 
         } catch (Exception e) {
 
-            log.error(
-                    "Failed to upload file '{}' to folder '{}'",
-                    file.getOriginalFilename(),
-                    folder,
-                    e
-            );
+            log.atError()
+                    .setMessage("File upload failed.")
+                    .addKeyValue("originalFileName", file.getOriginalFilename())
+                    .addKeyValue("folder", folder)
+                    .setCause(e)
+                    .log();
 
             throw new StorageException(
                     "Failed to upload file to storage.",
@@ -89,18 +89,18 @@ public class MinioStorageService implements StorageService {
                             .build()
             );
 
-            log.info(
-                    "File deleted successfully: storageKey='{}'",
-                    storageKey
-            );
+            log.atInfo()
+                    .setMessage("File deleted successfully.")
+                    .addKeyValue("storageKey", storageKey)
+                    .log();
 
         } catch (Exception e) {
 
-            log.error(
-                    "Failed to delete file: storageKey='{}'",
-                    storageKey,
-                    e
-            );
+            log.atError()
+                    .setMessage("File deletion failed.")
+                    .addKeyValue("storageKey", storageKey)
+                    .setCause(e)
+                    .log();
 
             throw new StorageException(
                     "Failed to delete file from storage.",
@@ -130,21 +130,27 @@ public class MinioStorageService implements StorageService {
                                 .build()
                 );
 
-                log.info("Created MinIO bucket '{}'", properties.getBucket());
+                log.atInfo()
+                        .setMessage("MinIO bucket created.")
+                        .addKeyValue("bucket", properties.getBucket())
+                        .log();
 
             } else {
 
-                log.info("MinIO bucket '{}' already exists", properties.getBucket());
+                log.atInfo()
+                        .setMessage("MinIO bucket already exists.")
+                        .addKeyValue("bucket", properties.getBucket())
+                        .log();
 
             }
 
         } catch (Exception e) {
 
-            log.error(
-                    "Failed to initialize MinIO bucket '{}'",
-                    properties.getBucket(),
-                    e
-            );
+            log.atInfo()
+                    .setMessage("MinIO bucket initialization failed.")
+                    .addKeyValue("bucketName", properties.getBucket())
+                    .setCause(e)
+                    .log();
 
             throw new StorageException(
                     "Failed to initialize MinIO bucket.",

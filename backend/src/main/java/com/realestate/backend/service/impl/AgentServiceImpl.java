@@ -6,10 +6,7 @@ import com.realestate.backend.dto.response.AgentResponse;
 import com.realestate.backend.dto.request.PropertyFilterRequest;
 import com.realestate.backend.dto.response.InquiryResponse;
 import com.realestate.backend.dto.response.PropertyResponse;
-import com.realestate.backend.entity.AgencyMemberEntity;
-import com.realestate.backend.entity.InquiryEntity;
-import com.realestate.backend.entity.PropertyEntity;
-import com.realestate.backend.entity.UserEntity;
+import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.exception.ForbiddenException;
@@ -122,17 +119,19 @@ public class AgentServiceImpl implements AgentService {
         membership.setActive(false);
         agencyMemberRepository.save(membership);
 
+        AgencyEntity agency = membership.getAgency();
+
         agent.setAgency(null);
         agent.getRoles().removeIf(role -> role.getRoleName() == Role.AGENT);
         userRepository.save(agent);
 
-        log.info(
-                "User '{}' removed agent '{}' ({}) from agency '{}'",
-                currentUser.getUsername(),
-                agent.getEmail(),
-                agent.getId(),
-                membership.getAgency().getId()
-        );
+        log.atInfo()
+                .setMessage("Agent has been removed from agency.")
+                .addKeyValue("agentId", agent.getId())
+                .addKeyValue("agentEmail", agent.getEmail())
+                .addKeyValue("agencyId",agency.getId())
+                .addKeyValue("agencyName", agency.getName())
+                .log();
 
     }
 

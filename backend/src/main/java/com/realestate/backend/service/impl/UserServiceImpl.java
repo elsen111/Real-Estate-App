@@ -60,11 +60,11 @@ public class UserServiceImpl implements UserService {
 
         user = userRepository.save(user);
 
-        log.info(
-                "User '{}' ({}) updated profile",
-                user.getEmail(),
-                user.getId()
-        );
+        log.atInfo()
+                .setMessage("User profile updated")
+                .addKeyValue("userId", user.getId())
+                .addKeyValue("userEmail", user.getEmail())
+                .log();
 
         return userMapper.toSummary(user);
 
@@ -94,11 +94,10 @@ public class UserServiceImpl implements UserService {
 
         refreshTokenRepository.deleteAllByUser(user);
 
-        log.info(
-                "User '{}' ({}) deleted their account",
-                user.getEmail(),
-                user.getId()
-        );
+        log.atInfo()
+                .setMessage("User account deleted")
+                .addKeyValue("userId", user.getId())
+                .log();
 
     }
 
@@ -137,11 +136,10 @@ public class UserServiceImpl implements UserService {
 
         userMediaRepository.save(userMedia);
 
-        log.info(
-                "Profile photo uploaded for user '{}' ({})",
-                user.getEmail(),
-                user.getId()
-        );
+        log.atInfo()
+                .setMessage("Profile photo uploaded for user")
+                .addKeyValue("userId", user.getId())
+                .log();
 
         return UserProfilePhotoResponse.builder()
                 .photoUrl(uploadedMedia.getFileUrl())
@@ -164,11 +162,10 @@ public class UserServiceImpl implements UserService {
 
         mediaService.delete(userMedia.getMedia());
 
-        log.info(
-                "Profile photo removed for user '{}' ({})",
-                currentUser.getEmail(),
-                currentUser.getId()
-        );
+        log.atInfo()
+                .setMessage("Profile photo removed for user")
+                .addKeyValue("userId", currentUser.getId())
+                .log();
 
     }
 

@@ -1,7 +1,6 @@
 package com.realestate.backend.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.common.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -319,5 +319,13 @@ public class GlobalExceptionHandler {
         }
 
         return error(message, HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ErrorResponse> handleMissingRequestPart(
+            MissingServletRequestPartException e,
+            HttpServletRequest request
+    ) {
+        return error(e.getMessage(), HttpStatus.BAD_REQUEST, request);
     }
 }

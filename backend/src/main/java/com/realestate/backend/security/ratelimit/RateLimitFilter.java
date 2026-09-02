@@ -71,7 +71,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
             HttpServletRequest request
     ) throws IOException {
 
-        if ("POST".equalsIgnoreCase(request.getMethod())) {
+        boolean isMultipart = request.getContentType() != null
+                && request.getContentType().toLowerCase().startsWith("multipart/");
+
+        if ("POST".equalsIgnoreCase(request.getMethod()) && !isMultipart) {
             return new CachedBodyHttpServletRequest(request);
         }
 

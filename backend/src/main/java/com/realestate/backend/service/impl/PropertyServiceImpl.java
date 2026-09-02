@@ -111,12 +111,13 @@ public class PropertyServiceImpl implements PropertyService {
 
         propertyRepository.saveAndFlush(newProperty);
 
-        log.info(
-                "Property '{}' ({}) created for agency '{}'",
-                newProperty.getTitle(),
-                newProperty.getId(),
-                agency.getName()
-        );
+        log.atInfo()
+                .setMessage("Property created")
+                .addKeyValue("propertyId", newProperty.getId())
+                .addKeyValue("propertyTitle", newProperty.getTitle())
+                .addKeyValue("agencyId", agency.getId())
+                .addKeyValue("agencyEmail", agency.getEmail())
+                .log();
 
         return propertyMapper.toCreateResponse(newProperty);
     }
@@ -181,11 +182,12 @@ public class PropertyServiceImpl implements PropertyService {
 
         PropertyEntity updatedProperty = propertyRepository.saveAndFlush(property);
 
-        log.info(
-                "Property '{}' ({}) updated",
-                updatedProperty.getTitle(),
-                updatedProperty.getId()
-        );
+        log.atInfo()
+                .setMessage("Property updated")
+                .addKeyValue("propertyId", updatedProperty.getId())
+                .addKeyValue("agencyId", agency.getId())
+                .addKeyValue("agencyEmail", agency.getEmail())
+                .log();
 
         return propertyMapper.toCreateResponse(updatedProperty);
     }
@@ -217,12 +219,14 @@ public class PropertyServiceImpl implements PropertyService {
         property.setStatus(request.getStatus());
         propertyRepository.saveAndFlush(property);
 
-        log.info(
-                "Property {} status changed from {} to {}",
-                property.getId(),
-                previousStatus,
-                request.getStatus()
-        );
+        log.atInfo()
+                .setMessage("Property status changed")
+                .addKeyValue("propertyId", property.getId())
+                .addKeyValue("oldStatus", previousStatus)
+                .addKeyValue("newStatus", property.getStatus())
+                .addKeyValue("agencyId", agency.getId())
+                .addKeyValue("agencyEmail", agency.getEmail())
+                .log();
 
     }
 
@@ -253,11 +257,13 @@ public class PropertyServiceImpl implements PropertyService {
         property.setFeatured(!property.getFeatured());
         propertyRepository.saveAndFlush(property);
 
-        log.info(
-                "Property {} featured status changed to {}",
-                property.getId(),
-                property.getFeatured()
-        );
+        log.atInfo()
+                .setMessage("Property featured characteristic changed")
+                .addKeyValue("propertyId", property.getId())
+                .addKeyValue("isFeatured", property.getFeatured())
+                .addKeyValue("agencyId", agency.getId())
+                .addKeyValue("agencyEmail", agency.getEmail())
+                .log();
 
         return propertyMapper.toCreateResponse(property);
 
@@ -290,11 +296,12 @@ public class PropertyServiceImpl implements PropertyService {
         property.setStatus(PropertyStatus.DELETED);
         propertyRepository.saveAndFlush(property);
 
-        log.info(
-                "Property '{}' ({}) marked as deleted",
-                property.getTitle(),
-                property.getId()
-        );
+        log.atInfo()
+                .setMessage("Property deleted")
+                .addKeyValue("propertyId", property.getId())
+                .addKeyValue("agencyId", agency.getId())
+                .addKeyValue("agencyEmail", agency.getEmail())
+                .log();
 
     }
 
@@ -433,11 +440,11 @@ public class PropertyServiceImpl implements PropertyService {
 
         }
 
-        log.info(
-                "Primary image changed for property {} to media {}",
-                propertyId,
-                propertyMediaId
-        );
+        log.atInfo()
+                .setMessage("Property's primary image updated")
+                .addKeyValue("propertyMediaId", propertyMediaId)
+                .addKeyValue("propertyId", propertyId)
+                .log();
 
         return mediaFiles.stream()
                 .map(propertyMapper::toMediaPriorityResponse).toList();
@@ -479,11 +486,10 @@ public class PropertyServiceImpl implements PropertyService {
 
         mediaService.delete(propertyMedia.getMedia());
 
-        log.info(
-                "Media {} removed from property {}",
-                propertyMediaId,
-                property.getId()
-        );
+        log.atInfo()
+                .setMessage("Property media removed.")
+                .addKeyValue("propertyId", property.getId())
+                .log();
 
         if (wasPrimary) {
 
@@ -512,32 +518,24 @@ public class PropertyServiceImpl implements PropertyService {
         UUID ownerId = currentUser.getId();
         UUID agentId = request.getAgentId();
 
-        log.info(
-                "Assigning property {} to agent {} by agency owner {}",
-                propertyId,
-                agentId,
-                ownerId
-        );
+        log.atInfo()
+                .setMessage("Agent assigned to property")
+                .addKeyValue("propertyId", propertyId)
+                .addKeyValue("agentId", agentId)
+                .addKeyValue("ownerId", ownerId)
+                .log();
 
         UserEntity owner = userRepository.findById(ownerId)
-                .orElseThrow(() -> {
-                    log.warn(
-                            "Agency owner not found while assigning property {}. Owner: {}",
-                            propertyId,
-                            ownerId
-                    );
-
-                    return new ResourceNotFoundException(
-                            "Agency owner not found with id: " + ownerId
-                    );
-                });
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Agency owner not found with id: " + ownerId
+                ));
 
         if (owner.getAgency() == null) {
-            log.warn(
-                    "Agency owner {} has no associated agency. Property: {}",
-                    ownerId,
-                    propertyId
-            );
+
+            log.atWarn()
+                    .setMessage("Agency owner has no associated agency")
+                    .addKeyValue("ownerId", ownerId)
+                    .log();
 
             throw new BusinessException(
                     "Agency owner is not associated with an agency."
@@ -545,29 +543,20 @@ public class PropertyServiceImpl implements PropertyService {
         }
 
         PropertyEntity property = propertyRepository.findById(propertyId)
-                .orElseThrow(() -> {
-                    log.warn(
-                            "Property {} not found. Assignment requested by owner {}",
-                            propertyId,
-                            ownerId
-                    );
-
-                    return new ResourceNotFoundException(
-                            "Property not found with id: " + propertyId
-                    );
-                });
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Property not found with id: " + propertyId
+                ));
 
         UUID agencyId = owner.getAgency().getId();
 
         if (!agencyId.equals(property.getAgency().getId())) {
-            log.warn(
-                    "Property assignment denied. Property {} belongs to agency {}, " +
-                            "but owner {} belongs to agency {}",
-                    propertyId,
-                    property.getAgency().getId(),
-                    ownerId,
-                    agencyId
-            );
+            log.atWarn()
+                    .setMessage("Property assignment rejection due to agency ownership mismatch")
+                    .addKeyValue("propertyId", propertyId)
+                    .addKeyValue("propertyAgencyId", property.getAgency().getId())
+                    .addKeyValue("ownerId", ownerId)
+                    .addKeyValue("ownerAgencyId", agencyId)
+                    .log();
 
             throw new ForbiddenException(
                     "You cannot assign a property from another agency."
@@ -575,11 +564,11 @@ public class PropertyServiceImpl implements PropertyService {
         }
 
         if (!PropertyStatus.ACTIVE.equals(property.getStatus())) {
-            log.warn(
-                    "Property assignment rejected. Property {} has status {}",
-                    propertyId,
-                    property.getStatus()
-            );
+            log.atWarn()
+                    .setMessage("Property assignment rejected due to invalid property status")
+                    .addKeyValue("propertyId", propertyId)
+                    .addKeyValue("propertyStatus", property.getStatus())
+                    .log();
 
             throw new BusinessException(
                     "Agents can only be assigned to active properties."
@@ -587,11 +576,11 @@ public class PropertyServiceImpl implements PropertyService {
         }
 
         if (property.getAssignedAgent() != null && property.getAssignedAgent().getId().equals(agentId)) {
-            log.warn(
-                    "Property {} is already assigned to agent {}",
-                    propertyId,
-                    property.getAssignedAgent().getId()
-            );
+            log.atWarn()
+                    .setMessage("Property is already assigned to an agent")
+                    .addKeyValue("propertyId", propertyId)
+                    .addKeyValue("agentId", property.getAssignedAgent().getId())
+                    .log();
 
             throw new ConflictException(
                     "This property is already assigned to this agent."
@@ -604,11 +593,11 @@ public class PropertyServiceImpl implements PropertyService {
                                 Boolean.FALSE.equals(user.getDeleted())
                 )
                 .orElseThrow(() -> {
-                    log.warn(
-                            "Active agent {} not found while assigning property {}",
-                            agentId,
-                            propertyId
-                    );
+                    log.atWarn()
+                            .setMessage("Property assignment failed because active agent was not found")
+                            .addKeyValue("agentId", agentId)
+                            .addKeyValue("propertyId", propertyId)
+                            .log();
 
                     return new ResourceNotFoundException(
                             "Agent not found with id: " + agentId
@@ -618,14 +607,13 @@ public class PropertyServiceImpl implements PropertyService {
         if (agent.getAgency() == null ||
                 !agencyId.equals(agent.getAgency().getId())) {
 
-            log.warn(
-                    "Agent assignment denied. Agent {} does not belong to agency {}. " +
-                            "Property: {}, Owner: {}",
-                    agentId,
-                    agencyId,
-                    propertyId,
-                    ownerId
-            );
+            log.atWarn()
+                    .setMessage("Agent assignment denied due to agency ownership mismatch")
+                    .addKeyValue("agentId", agentId)
+                    .addKeyValue("agencyId", agencyId)
+                    .addKeyValue("propertyId", propertyId)
+                    .addKeyValue("ownerId", ownerId)
+                    .log();
 
             throw new BadRequestException(
                     "Agent does not belong to this agency."
@@ -636,11 +624,11 @@ public class PropertyServiceImpl implements PropertyService {
                 role -> role.getRoleName() == Role.AGENT
         )) {
 
-            log.warn(
-                    "User {} cannot be assigned to property {} because they are not an agent",
-                    agentId,
-                    propertyId
-            );
+            log.atWarn()
+                    .setMessage("Property assignment denied because user is not an agent")
+                    .addKeyValue("userId", agentId)
+                    .addKeyValue("propertyId", propertyId)
+                    .log();
 
             throw new BadRequestException(
                     "Selected user is not an agent."
@@ -649,12 +637,12 @@ public class PropertyServiceImpl implements PropertyService {
 
         property.setAssignedAgent(agent);
 
-        log.info(
-                "Property {} successfully assigned to agent {} by agency owner {}",
-                propertyId,
-                agentId,
-                ownerId
-        );
+        log.atInfo()
+                .setMessage("Property successfully assigned to agent.")
+                .addKeyValue("propertyId", propertyId)
+                .addKeyValue("agentId", agentId)
+                .addKeyValue("ownerId", ownerId)
+                .log();
     }
 
     @Override
@@ -705,11 +693,11 @@ public class PropertyServiceImpl implements PropertyService {
             hasMainImage = true;
         }
 
-        log.info(
-                "{} media file(s) uploaded for property {}",
-                responses.size(),
-                propertyId
-        );
+        log.atInfo()
+                .setMessage("Property media files uploaded successfully")
+                .addKeyValue("propertyId", propertyId)
+                .addKeyValue("mediaFileCount", responses.size())
+                .log();
 
         return responses;
     }

@@ -46,10 +46,11 @@ public class OtpServiceImpl implements OtpService {
                 otp
         );
 
-        log.info(
-                "Password reset OTP generated and sent to user '{}'",
-                user.getEmail()
-        );
+        log.atInfo()
+                .setMessage("Password reset OTP has been generated and sent")
+                .addKeyValue("email", user.getEmail())
+                .log();
+
     }
 
     @Override
@@ -70,10 +71,10 @@ public class OtpServiceImpl implements OtpService {
 
         passwordResetOtpRepository.save(entity);
 
-        log.info(
-                "Password reset OTP verified successfully for user '{}'",
-                user.getEmail()
-        );
+        log.atInfo()
+                .setMessage("Password reset OTP verified successfully or user.")
+                .addKeyValue("email", user.getEmail())
+                .log();
 
     }
     

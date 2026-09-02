@@ -36,7 +36,11 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
                 request.getRequestURI()
         );
 
-        log.warn("Unauthenticated request to {}: {}", request.getRequestURI(), authException.getMessage());
+        log.atWarn()
+                .setMessage("Unauthenticated request.")
+                .addKeyValue("requestUrl", request.getRequestURI())
+                .addKeyValue("exceptionMessage", authException.getMessage())
+                .log();
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

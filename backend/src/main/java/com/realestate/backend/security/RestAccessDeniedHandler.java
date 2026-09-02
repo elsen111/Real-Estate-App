@@ -43,12 +43,12 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
                 ? authentication.getName()
                 : "anonymous";
 
-        log.warn(
-                "Access denied for user '{}' on {} {}",
-                username,
-                request.getMethod(),
-                request.getRequestURI()
-        );
+        log.atWarn()
+                .setMessage("Access denied for user.")
+                .addKeyValue("username", username)
+                .addKeyValue("method", request.getMethod())
+                .addKeyValue("requestUrl", request.getRequestURI())
+                .log();
 
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

@@ -60,13 +60,16 @@ public class AdminReviewServiceImpl implements AdminReviewService {
             throw new BusinessException("Cannot revert an already rejected review.");
         }
 
+        ReviewStatus oldStatus = review.getStatus();
+
         review.setStatus(request.getStatus());
 
-        log.info(
-                "Review ({}) status changed to {}",
-                review.getId(),
-                review.getStatus()
-        );
+        log.atInfo()
+                .setMessage("Review status changed")
+                .addKeyValue("reviewId", review.getId())
+                .addKeyValue("oldStatus", oldStatus)
+                .addKeyValue("newStatus", review.getStatus())
+                .log();
 
     }
 

@@ -88,11 +88,6 @@ public class SecurityConfig {
 
                         .anyRequest().authenticated()
                 )
-//                .addFilterBefore(
-//                        rateLimitFilter,
-//                        UsernamePasswordAuthenticationFilter.class
-//
-//                )
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class

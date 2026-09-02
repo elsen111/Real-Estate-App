@@ -84,12 +84,18 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         AppointmentEntity savedAppointment = appointmentRepository.saveAndFlush(newAppointment);
 
-        log.info(
-                "Appointment {} created for property {} by client {}",
-                savedAppointment.getId(),
-                propertyId,
-                client.getId()
-        );
+        log.atInfo()
+                .setMessage("Appointment created for the property.")
+                .addKeyValue("appointmentId", savedAppointment.getId())
+                .addKeyValue("appointmentType", savedAppointment.getAppointmentType())
+                .addKeyValue("propertyId", property.getId())
+                .addKeyValue("propertyTitle", property.getTitle())
+                .addKeyValue("agencyId", savedAppointment.getAgency().getId())
+                .addKeyValue("agencyName", savedAppointment.getAgency().getName())
+                .addKeyValue("agentId", savedAppointment.getAgent() != null ? savedAppointment.getAgent().getId() : null)
+                .addKeyValue("agentEmail", savedAppointment.getAgent() != null ? savedAppointment.getAgent().getEmail() : null)
+                .log();
+
 
         return appointmentMapper.toResponse(savedAppointment);
 
@@ -175,11 +181,18 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setStatus(AppointmentStatus.CANCELLED);
         appointmentRepository.saveAndFlush(appointment);
 
-        log.info(
-                "Appointment {} cancelled by client {}",
-                appointment.getId(),
-                currentUser.getId()
-        );
+
+        log.atInfo()
+                .setMessage("Appointment cancelled.")
+                .addKeyValue("appointmentId", appointment.getId())
+                .addKeyValue("appointmentType", appointment.getAppointmentType())
+                .addKeyValue("propertyId", appointment.getProperty().getId())
+                .addKeyValue("propertyTitle", appointment.getProperty().getTitle())
+                .addKeyValue("agencyId", appointment.getAgency().getId())
+                .addKeyValue("agencyName", appointment.getAgency().getName())
+                .addKeyValue("agentId", appointment.getAgent() != null ? appointment.getAgent().getId() : null)
+                .addKeyValue("agentEmail", appointment.getAgent() != null ? appointment.getAgent().getEmail() : null)
+                .log();
 
     }
 
@@ -228,17 +241,28 @@ public class AppointmentServiceImpl implements AppointmentService {
             appointment.setConfirmedDateTime(LocalDateTime.now());
         }
 
+        AppointmentStatus oldStatus = appointment.getStatus();
+
         appointment.setStatus(request.getStatus());
         appointment.setResponseNote(request.getResponseNote());
 
         AppointmentEntity updatedAppointment = appointmentRepository.saveAndFlush(appointment);
 
-        log.info(
-                "Appointment {} status changed to {} by user {}",
-                appointment.getId(),
-                updatedAppointment.getStatus(),
-                currentUser.getId()
-        );
+        log.atInfo()
+                .setMessage("Appointment status changed.")
+                .addKeyValue("appointmentId", appointment.getId())
+                .addKeyValue("appointmentType", appointment.getAppointmentType())
+                .addKeyValue("oldStatus", oldStatus)
+                .addKeyValue("newStatus", appointment.getStatus())
+                .addKeyValue("propertyId", appointment.getProperty().getId())
+                .addKeyValue("propertyTitle", appointment.getProperty().getTitle())
+                .addKeyValue("agencyId", appointment.getAgency().getId())
+                .addKeyValue("agencyName", appointment.getAgency().getName())
+                .addKeyValue("agentId", appointment.getAgent() != null ? appointment.getAgent().getId() : null)
+                .addKeyValue("agentEmail", appointment.getAgent() != null ? appointment.getAgent().getEmail() : null)
+                .addKeyValue("clientId", appointment.getClient().getId())
+                .addKeyValue("clientEmail", appointment.getClient().getEmail())
+                .log();
 
 
         return appointmentMapper.toResponse(updatedAppointment);

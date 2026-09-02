@@ -33,20 +33,20 @@ public class MediaServiceImpl implements MediaService {
         UploadedFile uploadedFile =
                 storageService.upload(file, folder);
 
-        log.info(
-                "File uploaded to storage. Folder: {}, Storage key: {}",
-                folder,
-                uploadedFile.storageKey()
-        );
+        log.atInfo()
+                .setMessage("File uploaded to storage")
+                .addKeyValue("folder", folder)
+                .addKeyValue("storageKey", uploadedFile.storageKey())
+                .log();
 
         MediaFileEntity media =
                 mediaMapper.toEntity(uploadedFile);
 
-        log.info(
-                "Media record {} created for storage key {}",
-                media.getId(),
-                media.getStorageKey()
-        );
+        log.atInfo()
+                .setMessage("Media record created")
+                .addKeyValue("mediaId", media.getId())
+                .addKeyValue("storageKey", media.getStorageKey())
+                .log();
 
         return mediaRepository.save(media);
 
@@ -60,10 +60,10 @@ public class MediaServiceImpl implements MediaService {
 
         mediaRepository.delete(media);
 
-        log.info(
-                "Media {} deleted successfully",
-                media.getId()
-        );
+        log.atInfo()
+                .setMessage("Media deleted")
+                .addKeyValue("mediaId", media.getId() != null ? media.getId() : null)
+                .log();
 
     }
 }
