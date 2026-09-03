@@ -75,7 +75,7 @@ class AgencyControllerTest {
                 .website("https://primerealty.com")
                 .city("Baku")
                 .address("Nizami St. 10")
-                .totalAgents(5)
+                .totalAgents(5L)
                 .status(AgencyStatus.APPROVED)
                 .build();
     }

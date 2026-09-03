@@ -103,18 +103,21 @@ public class AuthServiceImpl implements AuthService {
             AgencyOwnerRegisterRequest request,
             HttpServletRequest servletRequest
     ) {
-        String ownerEmail = normalizeEmail(request.getEmail());
+
+        String ownerEmail = normalizeEmail(request.owner().getEmail());
+        String agencyEmail = normalizeEmail(request.agency().getAgencyBusinessEmail());
 
         ensureUserEmailIsFree(ownerEmail);
+        ensureAgencyEmailIsFree(agencyEmail);
 
         RoleEntity agencyAdminRole = getRole(Role.AGENCY_OWNER);
 
-        UserEntity owner = authMapper.toAgencyOwnerUser(request);
-        AgencyEntity agency = authMapper.toAgencyEntity(request);
+        UserEntity owner = authMapper.toUserEntity(request.owner());
+        AgencyEntity agency = authMapper.toAgencyEntity(request.agency());
+
         agency = agencyRepository.saveAndFlush(agency);
 
-        owner.setEmail(ownerEmail);
-        owner.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        owner.setPasswordHash(passwordEncoder.encode(request.owner().getPassword()));
         owner.getRoles().add(agencyAdminRole);
         owner.setAgency(agency);
 
@@ -375,6 +378,12 @@ public class AuthServiceImpl implements AuthService {
     private void ensureUserEmailIsFree(String email) {
         if (userRepository.existsByEmail(email)) {
             throw new ConflictException("User already exists with this email");
+        }
+    }
+
+    private void ensureAgencyEmailIsFree(String email) {
+        if (agencyRepository.existsByEmail(email)) {
+            throw new ConflictException("Agency already exists with this email");
         }
     }
 

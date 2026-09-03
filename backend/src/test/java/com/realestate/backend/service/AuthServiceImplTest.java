@@ -1,6 +1,7 @@
 package com.realestate.backend.service;
 
 import com.realestate.backend.dto.request.*;
+import com.realestate.backend.dto.response.AuthResponse;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.exception.BadRequestException;
@@ -37,120 +38,447 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AuthServiceImplTest {
 
-    @Mock private AuthenticationManager authenticationManager;
-    @Mock private PasswordEncoder passwordEncoder;
-    @Mock private RefreshTokenServiceImpl refreshTokenService;
-    @Mock private UserRepository userRepository;
-    @Mock private RoleRepository roleRepository;
-    @Mock private AgencyMemberRepository agencyMemberRepository;
-    @Mock private AuthMapper authMapper;
-    @Mock private PasswordResetOtpRepository passwordResetOtpRepository;
-    @Mock private HttpServletRequest servletRequest;
-    @Mock private JwtService jwtService;
-    @Mock private UserMapper userMapper;
-    @Mock private AgencyRepository agencyRepository;
-    @Mock private AgencyMapper agencyMapper;
+    @Mock
+    private AuthenticationManager authenticationManager;
 
-    @InjectMocks private AuthServiceImpl service;
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private RefreshTokenServiceImpl refreshTokenService;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private RoleRepository roleRepository;
+
+    @Mock
+    private AgencyMemberRepository agencyMemberRepository;
+
+    @Mock
+    private AuthMapper authMapper;
+
+    @Mock
+    private PasswordResetOtpRepository passwordResetOtpRepository;
+
+    @Mock
+    private HttpServletRequest servletRequest;
+
+    @Mock
+    private JwtService jwtService;
+
+    @Mock
+    private UserMapper userMapper;
+
+    @Mock
+    private AgencyRepository agencyRepository;
+
+    @Mock
+    private AgencyMapper agencyMapper;
+
+    @InjectMocks
+    private AuthServiceImpl service;
 
     @BeforeEach
     void setUp() {
-        lenient().when(servletRequest.getHeader("User-Agent")).thenReturn("JUnit-Agent");
-        lenient().when(servletRequest.getRemoteAddr()).thenReturn("127.0.0.1");
+        lenient()
+                .when(servletRequest.getHeader("User-Agent"))
+                .thenReturn("JUnit-Agent");
+
+        lenient()
+                .when(servletRequest.getRemoteAddr())
+                .thenReturn("127.0.0.1");
     }
 
     @Test
     void registerUser_throws_whenEmailAlreadyExists() {
+
         UserRegisterRequest request = new UserRegisterRequest();
         request.setEmail("Existing@Test.com");
-        when(userRepository.existsByEmail("existing@test.com")).thenReturn(true);
 
-        assertThatThrownBy(() -> service.registerUser(request, "client", servletRequest))
+        when(userRepository.existsByEmail("existing@test.com"))
+                .thenReturn(true);
+
+        assertThatThrownBy(() ->
+                service.registerUser(
+                        request,
+                        "client",
+                        servletRequest
+                )
+        )
                 .isInstanceOf(ConflictException.class);
     }
 
     @Test
     void registerUser_succeeds_whenEmailIsFree() {
+
         UserRegisterRequest request = new UserRegisterRequest();
         request.setEmail("new@test.com");
         request.setPassword("Password1!");
-        UserEntity mappedUser = UserEntity.builder().roles(new HashSet<>()).build();
-        RoleEntity clientRole = RoleEntity.builder().roleName(Role.CLIENT).build();
-        UserEntity savedUser = UserEntity.builder().id(UUID.randomUUID()).email("new@test.com")
-                .roles(new HashSet<>()).build();
 
-        when(userRepository.existsByEmail("new@test.com")).thenReturn(false);
-        when(roleRepository.findByRoleName(Role.CLIENT)).thenReturn(Optional.of(clientRole));
-        when(authMapper.toUserEntity(request)).thenReturn(mappedUser);
-        when(passwordEncoder.encode("Password1!")).thenReturn("hashed");
-        when(userRepository.saveAndFlush(mappedUser)).thenReturn(savedUser);
+        UserEntity mappedUser = UserEntity.builder()
+                .roles(new HashSet<>())
+                .build();
+
+        RoleEntity clientRole = RoleEntity.builder()
+                .roleName(Role.CLIENT)
+                .build();
+
+        UserEntity savedUser = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .email("new@test.com")
+                .roles(new HashSet<>())
+                .build();
+
+        when(userRepository.existsByEmail("new@test.com"))
+                .thenReturn(false);
+
+        when(roleRepository.findByRoleName(Role.CLIENT))
+                .thenReturn(Optional.of(clientRole));
+
+        when(authMapper.toUserEntity(request))
+                .thenReturn(mappedUser);
+
+        when(passwordEncoder.encode("Password1!"))
+                .thenReturn("hashed");
+
+        when(userRepository.saveAndFlush(mappedUser))
+                .thenReturn(savedUser);
+
         when(refreshTokenService.createRefreshToken(any(), any(), any()))
-                .thenReturn(new RefreshTokenServiceImpl.CreatedRefreshToken("raw-token",
-                        RefreshTokenEntity.builder().build()));
-        when(jwtService.generateAccessToken(savedUser)).thenReturn("access-token");
-        when(jwtService.accessTokenExpiresInSeconds()).thenReturn(3600L);
-        when(userMapper.toSummary(savedUser)).thenReturn(com.realestate.backend.dto.response.AuthUserResponse.builder().build());
-        when(agencyMapper.toAgencyOwnerResponse(null)).thenReturn(null);
+                .thenReturn(
+                        new RefreshTokenServiceImpl.CreatedRefreshToken(
+                                "raw-token",
+                                RefreshTokenEntity.builder().build()
+                        )
+                );
 
-        service.registerUser(request, "client", servletRequest);
+        when(jwtService.generateAccessToken(savedUser))
+                .thenReturn("access-token");
+
+        when(jwtService.accessTokenExpiresInSeconds())
+                .thenReturn(3600L);
+
+        when(userMapper.toSummary(savedUser))
+                .thenReturn(
+                        com.realestate.backend.dto.response.AuthUserResponse
+                                .builder()
+                                .build()
+                );
+
+        when(agencyMapper.toAgencyOwnerResponse(null))
+                .thenReturn(null);
+
+        service.registerUser(
+                request,
+                "client",
+                servletRequest
+        );
 
         verify(userRepository).saveAndFlush(mappedUser);
     }
+
+    @Test
+    void registerAgencyOwner_throws_whenOwnerEmailAlreadyExists() {
+
+        UserRegisterRequest ownerRequest = UserRegisterRequest.builder()
+                .fullName("Owner Name")
+                .email("owner@example.com")
+                .password("Password1!")
+                .build();
+
+        AgencyRegisterRequest agencyRequest = AgencyRegisterRequest.builder()
+                .agencyName("Prime Realty")
+                .agencyBusinessEmail("info@prime.com")
+                .agencyBusinessPhone("+994501112233")
+                .agencyCity("Baku")
+                .agencyAddress("Nizami St. 10")
+                .build();
+
+        AgencyOwnerRegisterRequest request =
+                new AgencyOwnerRegisterRequest(
+                        ownerRequest,
+                        agencyRequest
+                );
+
+        when(userRepository.existsByEmail("owner@example.com"))
+                .thenReturn(true);
+
+        assertThatThrownBy(() ->
+                service.registerAgencyOwner(
+                        request,
+                        servletRequest
+                )
+        )
+                .isInstanceOf(ConflictException.class);
+
+        verify(userRepository)
+                .existsByEmail("owner@example.com");
+
+        verifyNoInteractions(agencyRepository);
+        verifyNoInteractions(authMapper);
+    }
+
+    @Test
+    void registerAgencyOwner_throws_whenAgencyEmailAlreadyExists() {
+
+        UserRegisterRequest ownerRequest = UserRegisterRequest.builder()
+                .fullName("Owner Name")
+                .email("owner@example.com")
+                .password("Password1!")
+                .build();
+
+        AgencyRegisterRequest agencyRequest = AgencyRegisterRequest.builder()
+                .agencyName("Prime Realty")
+                .agencyBusinessEmail("info@prime.com")
+                .agencyBusinessPhone("+994501112233")
+                .agencyCity("Baku")
+                .agencyAddress("Nizami St. 10")
+                .build();
+
+        AgencyOwnerRegisterRequest request =
+                new AgencyOwnerRegisterRequest(
+                        ownerRequest,
+                        agencyRequest
+                );
+
+        when(userRepository.existsByEmail("owner@example.com"))
+                .thenReturn(false);
+
+        when(agencyRepository.existsByEmail("info@prime.com"))
+                .thenReturn(true);
+
+        assertThatThrownBy(() ->
+                service.registerAgencyOwner(
+                        request,
+                        servletRequest
+                )
+        )
+                .isInstanceOf(ConflictException.class);
+
+        verify(userRepository)
+                .existsByEmail("owner@example.com");
+
+        verify(agencyRepository)
+                .existsByEmail("info@prime.com");
+
+        verifyNoInteractions(authMapper);
+    }
+
+    @Test
+    void registerAgencyOwner_succeeds_whenOwnerAndAgencyEmailsAreFree() {
+
+        UserRegisterRequest ownerRequest = UserRegisterRequest.builder()
+                .fullName("Owner Name")
+                .email("owner@example.com")
+                .password("Password1!")
+                .phoneNumber("+994501112233")
+                .build();
+
+        AgencyRegisterRequest agencyRequest = AgencyRegisterRequest.builder()
+                .agencyName("Prime Realty")
+                .agencyBusinessEmail("info@prime.com")
+                .agencyBusinessPhone("+994125551122")
+                .agencyCity("Baku")
+                .agencyAddress("Nizami St. 10")
+                .build();
+
+        AgencyOwnerRegisterRequest request =
+                new AgencyOwnerRegisterRequest(
+                        ownerRequest,
+                        agencyRequest
+                );
+
+        UserEntity mappedOwner = UserEntity.builder()
+                .roles(new HashSet<>())
+                .build();
+
+        AgencyEntity mappedAgency = AgencyEntity.builder()
+                .name("Prime Realty")
+                .email("info@prime.com")
+                .build();
+
+        AgencyEntity savedAgency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .name("Prime Realty")
+                .email("info@prime.com")
+                .build();
+
+        RoleEntity ownerRole = RoleEntity.builder()
+                .roleName(Role.AGENCY_OWNER)
+                .build();
+
+        UserEntity savedOwner = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .fullName("Owner Name")
+                .email("owner@example.com")
+                .roles(new HashSet<>())
+                .build();
+
+        when(userRepository.existsByEmail("owner@example.com"))
+                .thenReturn(false);
+
+        when(agencyRepository.existsByEmail("info@prime.com"))
+                .thenReturn(false);
+
+        when(roleRepository.findByRoleName(Role.AGENCY_OWNER))
+                .thenReturn(Optional.of(ownerRole));
+
+        when(authMapper.toUserEntity(ownerRequest))
+                .thenReturn(mappedOwner);
+
+        when(authMapper.toAgencyEntity(agencyRequest))
+                .thenReturn(mappedAgency);
+
+        when(agencyRepository.saveAndFlush(mappedAgency))
+                .thenReturn(savedAgency);
+
+        when(passwordEncoder.encode("Password1!"))
+                .thenReturn("hashed-password");
+
+        when(userRepository.saveAndFlush(mappedOwner))
+                .thenReturn(savedOwner);
+
+        when(refreshTokenService.createRefreshToken(any(), any(), any()))
+                .thenReturn(
+                        new RefreshTokenServiceImpl.CreatedRefreshToken(
+                                "raw-refresh-token",
+                                RefreshTokenEntity.builder().build()
+                        )
+                );
+
+        when(jwtService.generateAccessToken(savedOwner))
+                .thenReturn("access-token");
+
+        when(jwtService.accessTokenExpiresInSeconds())
+                .thenReturn(3600L);
+
+        when(userMapper.toSummary(savedOwner))
+                .thenReturn(
+                        com.realestate.backend.dto.response.AuthUserResponse
+                                .builder()
+                                .build()
+                );
+
+        when(agencyMapper.toAgencyOwnerResponse(savedAgency))
+                .thenReturn(null);
+
+        AuthResponse response =
+                service.registerAgencyOwner(
+                        request,
+                        servletRequest
+                );
+
+        verify(authMapper).toUserEntity(ownerRequest);
+        verify(authMapper).toAgencyEntity(agencyRequest);
+
+        verify(agencyRepository)
+                .saveAndFlush(mappedAgency);
+
+        verify(passwordEncoder)
+                .encode("Password1!");
+
+        verify(userRepository)
+                .saveAndFlush(mappedOwner);
+
+        verify(agencyMemberRepository)
+                .save(any(AgencyMemberEntity.class));
+
+        verify(refreshTokenService)
+                .createRefreshToken(
+                        savedOwner,
+                        "127.0.0.1",
+                        "JUnit-Agent"
+                );
+
+        verify(jwtService)
+                .generateAccessToken(savedOwner);
+    }
+
     @Test
     void login_throws_whenAccountDisabled() {
+
         LoginRequest request = new LoginRequest();
         request.setEmail("user@test.com");
         request.setPassword("wrong");
 
-        when(authenticationManager.authenticate(any())).thenThrow(new DisabledException("disabled"));
+        when(authenticationManager.authenticate(any()))
+                .thenThrow(new DisabledException("disabled"));
 
-        assertThatThrownBy(() -> service.login(request, servletRequest))
+        assertThatThrownBy(() ->
+                service.login(request, servletRequest)
+        )
                 .isInstanceOf(UnauthorizedException.class)
                 .hasMessageContaining("not active");
     }
 
     @Test
     void login_throws_whenCredentialsAreBad() {
+
         LoginRequest request = new LoginRequest();
         request.setEmail("user@test.com");
         request.setPassword("wrong");
 
-        when(authenticationManager.authenticate(any())).thenThrow(new BadCredentialsException("bad"));
+        when(authenticationManager.authenticate(any()))
+                .thenThrow(new BadCredentialsException("bad"));
 
-        assertThatThrownBy(() -> service.login(request, servletRequest))
+        assertThatThrownBy(() ->
+                service.login(request, servletRequest)
+        )
                 .isInstanceOf(UnauthorizedException.class)
                 .hasMessageContaining("Invalid email or password");
     }
 
     @Test
     void login_throws_whenUserAccountIsDisabled() {
+
         LoginRequest request = new LoginRequest();
         request.setEmail("user@test.com");
         request.setPassword("correct");
-        UserEntity user = UserEntity.builder().email("user@test.com").enabled(false).build();
 
-        when(authenticationManager.authenticate(any())).thenReturn(null);
-        when(userRepository.findByEmail("user@test.com")).thenReturn(Optional.of(user));
+        UserEntity user = UserEntity.builder()
+                .email("user@test.com")
+                .enabled(false)
+                .build();
 
-        assertThatThrownBy(() -> service.login(request, servletRequest))
+        when(authenticationManager.authenticate(any()))
+                .thenReturn(null);
+
+        when(userRepository.findByEmail("user@test.com"))
+                .thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() ->
+                service.login(request, servletRequest)
+        )
                 .isInstanceOf(UnauthorizedException.class)
                 .hasMessageContaining("disabled");
     }
 
     @Test
     void changePassword_throws_whenNewPasswordsDontMatch() {
+
         UUID userId = UUID.randomUUID();
-        UserEntity user = UserEntity.builder().id(userId).roles(new HashSet<>()).build();
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        UserEntity user = UserEntity.builder()
+                .id(userId)
+                .roles(new HashSet<>())
+                .build();
+
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
 
         ChangePasswordRequest request = new ChangePasswordRequest();
         request.setNewPassword("New1!");
         request.setConfirmNewPassword("Different1!");
-        CustomUserDetails currentUser = CustomUserDetails.from(user);
 
-        assertThatThrownBy(() -> service.changePassword(request, currentUser))
+        CustomUserDetails currentUser =
+                CustomUserDetails.from(user);
+
+        assertThatThrownBy(() ->
+                service.changePassword(request, currentUser)
+        )
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("don't match");
     }
-
 }
