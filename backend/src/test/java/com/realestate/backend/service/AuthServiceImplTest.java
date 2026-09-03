@@ -445,7 +445,7 @@ class AuthServiceImplTest {
         when(authenticationManager.authenticate(any()))
                 .thenReturn(null);
 
-        when(userRepository.findByEmail("user@test.com"))
+        when(userRepository.findByEmailAndDeletedFalse("user@test.com"))
                 .thenReturn(Optional.of(user));
 
         assertThatThrownBy(() ->
@@ -453,6 +453,26 @@ class AuthServiceImplTest {
         )
                 .isInstanceOf(UnauthorizedException.class)
                 .hasMessageContaining("disabled");
+    }
+
+    @Test
+    void login_throws_whenUserNotFoundAfterAuthentication() {
+
+        LoginRequest request = new LoginRequest();
+        request.setEmail("user@test.com");
+        request.setPassword("correct");
+
+        when(authenticationManager.authenticate(any()))
+                .thenReturn(null);
+
+        when(userRepository.findByEmailAndDeletedFalse("user@test.com"))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() ->
+                service.login(request, servletRequest)
+        )
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessageContaining("Invalid email or password");
     }
 
     @Test

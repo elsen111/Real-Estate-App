@@ -2,6 +2,7 @@ package com.realestate.backend.service;
 
 import com.realestate.backend.dto.response.AgencySubscriptionResponse;
 import com.realestate.backend.entity.*;
+import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.repository.*;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -76,7 +78,10 @@ class AgencyServiceImplTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(agencySubscriptionRepository.findByAgencyAndStatus(agency, SubscriptionStatus.ACTIVE))
                 .thenReturn(Optional.of(subscription));
-        when(propertyRepository.countByAgencyId(agency.getId())).thenReturn(3L);
+        when(propertyRepository.countByAgencyIdAndStatusIn(
+                agency.getId(),
+                List.of(PropertyStatus.PENDING, PropertyStatus.ACTIVE)
+        )).thenReturn(3L);
         when(userRepository.countByAgency(agency)).thenReturn(2L);
 
         AgencySubscriptionResponse response = service.getMySubscription(currentUser(userId));

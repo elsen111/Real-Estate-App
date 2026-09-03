@@ -6,7 +6,6 @@ import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.exception.ConflictException;
-import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.repository.FavoriteRepository;
 import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.UserRepository;
@@ -23,6 +22,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,7 +73,6 @@ class FavoriteServiceImplTest {
     void deleteFavorite_throws_whenFavoriteDoesNotExist() {
         UUID userId = UUID.randomUUID();
         UUID propertyId = UUID.randomUUID();
-        when(userRepository.findById(userId)).thenReturn(Optional.of(UserEntity.builder().id(userId).build()));
         when(favoriteRepository.existsByUser_IdAndProperty_Id(userId, propertyId)).thenReturn(false);
 
         assertThatThrownBy(() -> service.deleteFavorite(propertyId, user(userId)))
@@ -81,11 +80,13 @@ class FavoriteServiceImplTest {
     }
 
     @Test
-    void deleteFavorite_throws_whenUserNotFound() {
+    void deleteFavorite_succeeds_whenFavoriteExists() {
         UUID userId = UUID.randomUUID();
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        UUID propertyId = UUID.randomUUID();
+        when(favoriteRepository.existsByUser_IdAndProperty_Id(userId, propertyId)).thenReturn(true);
 
-        assertThatThrownBy(() -> service.deleteFavorite(UUID.randomUUID(), user(userId)))
-                .isInstanceOf(ResourceNotFoundException.class);
+        service.deleteFavorite(propertyId, user(userId));
+
+        verify(favoriteRepository).deleteByUser_IdAndProperty_Id(userId, propertyId);
     }
 }
