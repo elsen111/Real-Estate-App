@@ -170,7 +170,7 @@ public class AuthServiceImpl implements AuthService {
             throw new UnauthorizedException("Invalid email or password");
         }
 
-        UserEntity user = userRepository.findByEmail(email)
+        UserEntity user = userRepository.findByEmailAndDeletedFalse(email)
                 .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
 
         if (!user.getEnabled()) {

@@ -3,7 +3,7 @@ package com.realestate.backend.controller;
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.request.AdminUserFilterRequest;
 import com.realestate.backend.dto.response.UserResponse;
-import com.realestate.backend.service.impl.AdminUserServiceImpl;
+import com.realestate.backend.service.AdminUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AdminUserController {
 
-    private final AdminUserServiceImpl adminUserService;
+    private final AdminUserService adminUserService;
 
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
     @GetMapping

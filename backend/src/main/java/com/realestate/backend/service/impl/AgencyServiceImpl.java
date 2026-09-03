@@ -174,10 +174,10 @@ public class AgencyServiceImpl implements AgencyService {
                         () -> new ResourceNotFoundException("User not found with id " + currentUser.getId())
                 );
 
-        AgencyEntity agency = agencyRepository.findById(user.getAgency().getId())
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Agency not found with id " + user.getAgency().getId())
-                );
+//        AgencyEntity agency = agencyRepository.findById(user.getAgency().getId())
+//                .orElseThrow(
+//                        () -> new ResourceNotFoundException("Agency not found with id " + user.getAgency().getId())
+//                );
 
 
 
