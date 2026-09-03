@@ -87,23 +87,25 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Transactional
     public void deleteFavorite(UUID propertyId, CustomUserDetails currentUser) {
 
-        UserEntity user = userRepository.findById(currentUser.getId())
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with id " +  currentUser.getId())
-                );
+//        UserEntity user = userRepository.findById(currentUser.getId())
+//                .orElseThrow(
+//                        () -> new ResourceNotFoundException("User not found with id " +  currentUser.getId())
+//                );
 
-        boolean isFavorite = favoriteRepository.existsByUser_IdAndProperty_Id(user.getId(), propertyId);
+//        boolean isFavorite = favoriteRepository.existsByUser_IdAndProperty_Id(user.getId(), propertyId);
+
+        boolean isFavorite = favoriteRepository.existsByUser_IdAndProperty_Id(currentUser.getId(), propertyId);
 
         if(!isFavorite) {
             throw new BadRequestException("Favorite does not exist in your list.");
         }
 
-        favoriteRepository.deleteByUser_IdAndProperty_Id(user.getId(), propertyId);
+        favoriteRepository.deleteByUser_IdAndProperty_Id(currentUser.getId(), propertyId);
 
         log.atInfo()
                 .setMessage("Property removed from favorites")
                 .addKeyValue("propertyId", propertyId)
-                .addKeyValue("authenticatedUserUUID", user.getId())
+                .addKeyValue("authenticatedUserUUID", currentUser.getId())
                 .log();
 
     }

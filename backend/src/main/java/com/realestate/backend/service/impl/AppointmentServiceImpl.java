@@ -124,7 +124,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         boolean canViewAppointment = false;
 
-        if (hasRole(Role.SUPER_ADMIN, currentUser)) {
+        if (hasRole(currentUser, Role.SUPER_ADMIN)) {
             canViewAppointment = true;
         }
 
@@ -138,7 +138,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             canViewAppointment = true;
         }
 
-        else if (hasRole(Role.AGENCY_OWNER, currentUser)) {
+        else if (hasRole(currentUser, Role.AGENCY_OWNER)) {
 
             UserEntity authenticatedUser = userRepository.findById(currentUser.getId())
                     .orElseThrow(() ->
@@ -204,7 +204,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             UUID propertyId,
             Pageable pageable) {
 
-        if (hasRole(currentUser, "AGENCY_OWNER") || hasRole(currentUser, "AGENT")) {
+        if (hasRole(currentUser, Role.AGENCY_OWNER) || hasRole(currentUser, Role.AGENT)) {
 
             AgencyMemberEntity agencyMember = agencyMemberRepository.findByUser_IdAndActiveTrue(currentUser.getId())
                     .orElseThrow(() -> new ResourceNotFoundException("You are not an active member of any agency"));
@@ -280,25 +280,23 @@ public class AppointmentServiceImpl implements AppointmentService {
 
 
     //    HELPER METHODS
-    private boolean hasRole(CustomUserDetails user, String roleName) {
-        String target = SecurityConstants.ROLE_PREFIX + roleName;
-        return user.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .anyMatch(target::equals);
-    }
-
     private boolean canManageAppointment(AppointmentEntity appointment, CustomUserDetails currentUser) {
-        if (hasRole(currentUser, "SUPER_ADMIN")) {
+        if (hasRole(currentUser, Role.SUPER_ADMIN)) {
             return true;
         }
 
-        return (hasRole(currentUser, "AGENCY_OWNER") || hasRole(currentUser, "AGENT"))
+        UserEntity authenticatedUser = userRepository.findById(currentUser.getId()).orElseThrow(
+                () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
+        );
+
+        return (hasRole(currentUser, Role.AGENCY_OWNER) || hasRole(currentUser, Role.AGENT))
                 && appointment.getAgency() != null
                 && agencyMemberRepository.existsByAgencyIdAndUserIdAndActiveTrue(
-                appointment.getAgency().getId(), currentUser.getId());
+                appointment.getAgency().getId(), currentUser.getId())
+                && appointment.getAgency().getId().equals(authenticatedUser.getAgency().getId());
     }
 
-    public boolean hasRole(Role role, CustomUserDetails currentUser) {
+    public boolean hasRole(CustomUserDetails currentUser, Role role) {
         return currentUser.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(authority -> authority.equals("ROLE_" + role.name()));

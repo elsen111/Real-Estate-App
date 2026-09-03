@@ -35,4 +35,6 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID>, JpaSpec
     Optional<UserEntity> findByEmailIgnoreCase(String email);
 
     boolean existsByIdAndAgencyId(UUID userId, UUID agencyId);
+
+    Optional<UserEntity> findByEmailAndDeletedFalse(String email);
 }

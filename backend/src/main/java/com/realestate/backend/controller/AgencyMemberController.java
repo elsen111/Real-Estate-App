@@ -3,7 +3,7 @@ package com.realestate.backend.controller;
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.response.AgencyMemberResponse;
 import com.realestate.backend.security.CustomUserDetails;
-import com.realestate.backend.service.impl.AgencyMemberServiceImpl;
+import com.realestate.backend.service.AgencyMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AgencyMemberController {
 
-    private final AgencyMemberServiceImpl agencyMemberService;
+    private final AgencyMemberService agencyMemberService;
 
     @PostMapping("/agents/{userId}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'AGENCY_OWNER')")

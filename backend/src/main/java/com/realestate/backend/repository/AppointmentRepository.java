@@ -48,4 +48,5 @@ public interface AppointmentRepository extends JpaRepository<AppointmentEntity, 
             @Param("propertyId") UUID propertyId,
             Pageable pageable);
 
+    boolean existsByIdAndAgencyId(UUID appointmentId, UUID agencyId);
 }
