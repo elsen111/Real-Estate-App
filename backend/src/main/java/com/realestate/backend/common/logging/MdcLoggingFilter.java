@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class MdcLoggingFilter extends OncePerRequestFilter {
 
     public static final String CORRELATION_ID = "correlationId";
-    public static final String ACTOR_ID = "actorId";
+    public static final String ACTOR_EMAIL = "actorEmail";
     public static final String ACTOR_ROLE = "actorRole";
     public static final String PATH = "path";
     public static final String METHOD = "method";
@@ -75,7 +75,7 @@ public class MdcLoggingFilter extends OncePerRequestFilter {
             return;
         }
 
-        MDC.put(ACTOR_ID, authentication.getName());
+        MDC.put(ACTOR_EMAIL, authentication.getName());
 
         String role = authentication.getAuthorities()
                 .stream()

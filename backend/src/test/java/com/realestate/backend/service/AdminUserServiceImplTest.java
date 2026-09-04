@@ -1,5 +1,6 @@
 package com.realestate.backend.service;
 
+import com.realestate.backend.dto.request.UserStatusRequest;
 import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.RoleEntity;
 import com.realestate.backend.entity.UserEntity;
@@ -36,24 +37,64 @@ class AdminUserServiceImplTest {
     @InjectMocks private AdminUserServiceImpl service;
 
     @Test
-    void toggleUserStatus_enablesDisabledUser() {
+    void changeUserStatus_enablesDisabledUser() {
         UUID userId = UUID.randomUUID();
-        UserEntity user = UserEntity.builder().id(userId).email("a@b.com").enabled(false).build();
+
+        UserEntity user = UserEntity.builder()
+                .id(userId)
+                .email("a@b.com")
+                .enabled(false)
+                .build();
+
+        UserStatusRequest request = new UserStatusRequest(true);
+
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        String result = service.toggleUserStatus(userId);
+        String result = service.changeUserStatus(userId, request);
 
         assertThat(user.getEnabled()).isTrue();
         assertThat(result).contains("enabled");
+
+        verify(userRepository).findById(userId);
+        verify(userRepository).save(user);
     }
 
     @Test
-    void toggleUserStatus_throws_whenUserNotFound() {
+    void changeUserStatus_throws_whenUserNotFound() {
         UUID userId = UUID.randomUUID();
+        UserStatusRequest request = new UserStatusRequest(true);
+
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.toggleUserStatus(userId))
+        assertThatThrownBy(() ->
+                service.changeUserStatus(userId, request)
+        )
                 .isInstanceOf(ResourceNotFoundException.class);
+
+        verify(userRepository).findById(userId);
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void changeUserStatus_disablesEnabledUser() {
+        UUID userId = UUID.randomUUID();
+
+        UserEntity user = UserEntity.builder()
+                .id(userId)
+                .email("a@b.com")
+                .enabled(true)
+                .build();
+
+        UserStatusRequest request = new UserStatusRequest(false);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        String result = service.changeUserStatus(userId, request);
+
+        assertThat(user.getEnabled()).isFalse();
+        assertThat(result).contains("disabled");
+
+        verify(userRepository).save(user);
     }
 
     @Test

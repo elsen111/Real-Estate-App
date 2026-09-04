@@ -1,6 +1,7 @@
 package com.realestate.backend.service.impl;
 
 import com.realestate.backend.dto.request.AdminUserFilterRequest;
+import com.realestate.backend.dto.request.UserStatusRequest;
 import com.realestate.backend.dto.response.UserResponse;
 import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.RoleEntity;
@@ -62,17 +63,20 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     @Transactional
-    public String toggleUserStatus(UUID userId) {
+    public String changeUserStatus(UUID userId, UserStatusRequest request) {
 
         UserEntity user = userRepository.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException(
-                        "User not found with id" + userId
+                        "User not found with id " + userId
                 )
         );
 
-        boolean newStatus = !user.getEnabled();
+        if(user.getDeleted()) {
+            throw new BusinessException("Cannot update the status of a deleted user " + userId);
+        }
 
-        user.setEnabled(newStatus);
+        user.setEnabled(request.enabled());
+        Boolean isEnabled = user.getEnabled();
 
         userRepository.save(user);
 
@@ -80,11 +84,10 @@ public class AdminUserServiceImpl implements AdminUserService {
                 .setMessage("User status changed")
                 .addKeyValue("userId", user.getId())
                 .addKeyValue("userEmail", user.getEmail())
-                .addKeyValue("oldStatus", newStatus ? "disabled" : "enabled")
-                .addKeyValue("newStatus", newStatus ? "enabled" : "disabled")
+                .addKeyValue("isEnabled", isEnabled)
                 .log();
 
-        return newStatus
+        return isEnabled
                 ? "User has been enabled successfully"
                 : "User has been disabled successfully";
 
