@@ -37,7 +37,7 @@
 
                 <mdc>
                     <includeMdcKeyName>correlationId</includeMdcKeyName>
-                    <includeMdcKeyName>actorId</includeMdcKeyName>
+                    <includeMdcKeyName>actorEmail</includeMdcKeyName>
                     <includeMdcKeyName>actorRole</includeMdcKeyName>
                     <includeMdcKeyName>path</includeMdcKeyName>
                     <includeMdcKeyName>method</includeMdcKeyName>
@@ -104,7 +104,7 @@
 
                 <mdc>
                     <includeMdcKeyName>correlationId</includeMdcKeyName>
-                    <includeMdcKeyName>actorId</includeMdcKeyName>
+                    <includeMdcKeyName>actorEmail</includeMdcKeyName>
                     <includeMdcKeyName>actorRole</includeMdcKeyName>
                     <includeMdcKeyName>path</includeMdcKeyName>
                     <includeMdcKeyName>method</includeMdcKeyName>

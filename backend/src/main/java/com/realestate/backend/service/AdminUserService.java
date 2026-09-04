@@ -1,6 +1,7 @@
 package com.realestate.backend.service;
 
 import com.realestate.backend.dto.request.AdminUserFilterRequest;
+import com.realestate.backend.dto.request.UserStatusRequest;
 import com.realestate.backend.dto.response.UserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +17,7 @@ public interface AdminUserService {
 
     UserResponse getUserById(UUID userId);
 
-    String toggleUserStatus(UUID userId);
+    String changeUserStatus(UUID userId, UserStatusRequest request);
 
     String assignAdminRoleToUser(UUID userId);
 

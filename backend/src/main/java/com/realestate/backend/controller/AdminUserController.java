@@ -2,10 +2,12 @@ package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.request.AdminUserFilterRequest;
+import com.realestate.backend.dto.request.UserStatusRequest;
 import com.realestate.backend.dto.response.UserResponse;
 import com.realestate.backend.service.AdminUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,11 +61,12 @@ public class AdminUserController {
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
     @Transactional
     @PatchMapping("/{userId}/status")
-    @Operation(summary = "Toggle user status")
-    public ResponseEntity<ApiResponse<Void>> toggleUserStatus(
-            @PathVariable UUID userId
-    ) {
-        String message = adminUserService.toggleUserStatus(userId);
+    @Operation(summary = "Change user activation (status)")
+    public ResponseEntity<ApiResponse<Void>> changeUserStatus(
+            @PathVariable UUID userId,
+            @Valid @RequestBody UserStatusRequest request
+            ) {
+        String message = adminUserService.changeUserStatus(userId, request);
 
         return ResponseEntity.ok(
                 ApiResponse.success(message, null)

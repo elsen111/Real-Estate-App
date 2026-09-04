@@ -2,6 +2,7 @@ package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.request.AdminUserFilterRequest;
+import com.realestate.backend.dto.request.UserStatusRequest;
 import com.realestate.backend.dto.response.UserResponse;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.security.ratelimit.RateLimitFilter;
@@ -118,14 +119,16 @@ class AdminUserControllerTest {
     }
 
     @Test
-    void toggleUserStatus_returnsOk_withServiceMessage() {
+    void changeUserStatus_returnsOk_withServiceMessage() {
         UUID userId = UUID.randomUUID();
-        String message = "User disabled successfully";
+        UserStatusRequest request = new UserStatusRequest(true);
+        String message = "User enabled successfully";
 
-        when(adminUserService.toggleUserStatus(userId)).thenReturn(message);
+        when(adminUserService.changeUserStatus(userId, request))
+                .thenReturn(message);
 
         ResponseEntity<ApiResponse<Void>> response =
-                controller.toggleUserStatus(userId);
+                controller.changeUserStatus(userId, request);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
@@ -133,7 +136,7 @@ class AdminUserControllerTest {
         assertThat(response.getBody().getMessage()).isEqualTo(message);
         assertThat(response.getBody().getData()).isNull();
 
-        verify(adminUserService).toggleUserStatus(userId);
+        verify(adminUserService).changeUserStatus(userId, request);
         verifyNoMoreInteractions(adminUserService);
     }
 
