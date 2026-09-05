@@ -11,7 +11,6 @@ import com.realestate.backend.dto.response.AgencyResponse;
 import com.realestate.backend.dto.response.AgencySubscriptionResponse;
 import com.realestate.backend.dto.response.UserResponse;
 import com.realestate.backend.entity.*;
-import com.realestate.backend.enums.MediaFolder;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.BadRequestException;
@@ -27,6 +26,7 @@ import com.realestate.backend.repository.specification.PropertySpecification;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.AgencyService;
 import com.realestate.backend.service.MediaService;
+import com.realestate.backend.storage.MediaUploadPolicy;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -266,7 +266,7 @@ public class AgencyServiceImpl implements AgencyService {
                 .log();
 
         MediaFileEntity uploadedMedia =
-                mediaService.upload(file, MediaFolder.AGENCY_LOGO);
+                mediaService.upload(file, MediaUploadPolicy.AGENCY_LOGO);
 
         if (existingLogo.isPresent()) {
 

@@ -59,6 +59,7 @@ public class MediaMapperTest {
                 "https://cdn.test/file",
                 "photo.png",
                 null,
+                null,
                 100L
         );
 
@@ -78,6 +79,7 @@ public class MediaMapperTest {
                 "https://cdn.test/file.pdf",
                 "document.pdf",
                 "application/pdf",
+                "pdf",
                 100L
         );
 
@@ -114,6 +116,7 @@ public class MediaMapperTest {
                 "https://cdn.test/image.png",
                 "image.png",
                 "image/png",
+                "png",
                 100L
         );
     }
@@ -125,6 +128,7 @@ public class MediaMapperTest {
                 "https://cdn.test/video.mp4",
                 "video.mp4",
                 "video/mp4",
+                "mp4",
                 100L
         );
     }

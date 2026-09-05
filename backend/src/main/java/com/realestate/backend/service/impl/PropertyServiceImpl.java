@@ -3,7 +3,6 @@ package com.realestate.backend.service.impl;
 import com.realestate.backend.dto.request.*;
 import com.realestate.backend.dto.response.*;
 import com.realestate.backend.entity.*;
-import com.realestate.backend.enums.MediaFolder;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.enums.SubscriptionStatus;
@@ -15,6 +14,7 @@ import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.security.SecurityConstants;
 import com.realestate.backend.service.MediaService;
 import com.realestate.backend.service.PropertyService;
+import com.realestate.backend.storage.MediaUploadPolicy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -653,56 +653,87 @@ public class PropertyServiceImpl implements PropertyService {
             CustomUserDetails currentUser
     ) {
 
-        UserEntity user = userRepository.findById(currentUser.getId())
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with id " + currentUser.getId())
+        UserEntity user =
+                userRepository.findById(
+                        currentUser.getId()
+                ).orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                "User not found with id "
+                                        + currentUser.getId()
+                        )
                 );
 
-        PropertyEntity property = getManagedProperty(propertyId, currentUser, user.getAgency());
+        PropertyEntity property =
+                getManagedProperty(
+                        propertyId,
+                        currentUser,
+                        user.getAgency()
+                );
 
-        validateFiles(files);
+        validatePropertyMediaRequest(files);
 
-        validatePropertyMediaLimit(property, files.size());
+        validatePropertyMediaLimit(
+                property,
+                files.size()
+        );
 
-        int nextSortOrder = getNextSortOrder(property);
+        int nextSortOrder =
+                getNextSortOrder(property);
 
-        List<PropertyMediaResponse> responses = new ArrayList<>();
+        List<PropertyMediaResponse> responses =
+                new ArrayList<>();
 
-        boolean hasMainImage = propertyMediaRepository
-                .existsByPropertyIdAndIsPrimaryTrue(property.getId());
+        boolean hasMainImage =
+                propertyMediaRepository
+                        .existsByPropertyIdAndIsPrimaryTrue(
+                                property.getId()
+                        );
 
         for (MultipartFile file : files) {
 
-            MediaFolder folder = resolveFolder(file);
+            MediaFileEntity media =
+                    mediaService.upload(
+                            file,
+                            MediaUploadPolicy.PROPERTY_MEDIA
+                    );
 
-            MediaFileEntity media = mediaService.upload(file, folder);
+            PropertyMediaEntity propertyMedia =
+                    PropertyMediaEntity.builder()
+                            .property(property)
+                            .media(media)
+                            .isPrimary(!hasMainImage)
+                            .sortOrder(nextSortOrder++)
+                            .build();
 
-            PropertyMediaEntity propertyMedia = PropertyMediaEntity.builder()
-                    .property(property)
-                    .media(media)
-                    .isPrimary(!hasMainImage)
-                    .sortOrder(nextSortOrder++)
-                    .build();
-
-            propertyMediaRepository.save(propertyMedia);
+            propertyMediaRepository.save(
+                    propertyMedia
+            );
 
             responses.add(
-                    propertyMapper.toMediaResponse(propertyMedia)
+                    propertyMapper.toMediaResponse(
+                            propertyMedia
+                    )
             );
 
             hasMainImage = true;
         }
 
         log.atInfo()
-                .setMessage("Property media files uploaded successfully")
-                .addKeyValue("propertyId", propertyId)
-                .addKeyValue("mediaFileCount", responses.size())
+                .setMessage(
+                        "Property media files uploaded successfully"
+                )
+                .addKeyValue(
+                        "propertyId",
+                        propertyId
+                )
+                .addKeyValue(
+                        "mediaFileCount",
+                        responses.size()
+                )
                 .log();
 
         return responses;
     }
-
-
 
 //    HELPER METHODS
     private Map<UUID, String> getMainImagesByPropertyIds(List<UUID> propertyIds) {
@@ -842,49 +873,22 @@ public class PropertyServiceImpl implements PropertyService {
         return property;
     }
 
-    private void validateFiles(List<MultipartFile> files) {
+    private void validatePropertyMediaRequest(
+            List<MultipartFile> files
+    ) {
 
         if (files == null || files.isEmpty()) {
+
             throw new FileStorageException(
                     "At least one file is required."
             );
         }
 
         if (files.size() > 20) {
+
             throw new FileStorageException(
                     "Maximum 20 files can be uploaded at once."
             );
-        }
-
-        for (MultipartFile file : files) {
-
-            if (file.isEmpty()) {
-                throw new FileStorageException(
-                        "One of the uploaded files is empty."
-                );
-            }
-
-            if (file.getSize() > 10 * 1024 * 1024) {
-                throw new FileStorageException(
-                        "Each file must not exceed 10 MB."
-                );
-            }
-
-            String contentType = file.getContentType();
-
-            if (contentType == null) {
-                throw new FileStorageException(
-                        "Unknown file type."
-                );
-            }
-
-            if (!(contentType.startsWith("image/")
-                    || contentType.startsWith("video/"))) {
-
-                throw new FileStorageException(
-                        "Only image and video files are allowed."
-                );
-            }
         }
     }
 
@@ -917,25 +921,6 @@ public class PropertyServiceImpl implements PropertyService {
         return max == null
                 ? 0
                 : max + 1;
-
-    }
-
-    private MediaFolder resolveFolder(MultipartFile file) {
-
-        String type = file.getContentType();
-
-        assert type != null;
-        if (type.startsWith("image/")) {
-            return MediaFolder.PROPERTY_IMAGE;
-        }
-
-        if (type.startsWith("video/")) {
-            return MediaFolder.PROPERTY_VIDEO;
-        }
-
-        throw new FileStorageException(
-                "Unsupported media type."
-        );
 
     }
 

@@ -81,6 +81,26 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+    @ExceptionHandler(
+            MissingServletRequestPartException.class
+    )
+    public ResponseEntity<ErrorResponse> handleMissingFilePart(
+            MissingServletRequestPartException ex,
+            HttpServletRequest request
+    ) {
+        log.warn(
+                "Missing multipart file at {}: {}",
+                request.getRequestURI(),
+                ex.getMessage()
+        );
+
+        return error(
+                "Required file is missing.",
+                HttpStatus.BAD_REQUEST,
+                request
+        );
+    }
+
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(
             AuthorizationDeniedException ex,
@@ -321,11 +341,4 @@ public class GlobalExceptionHandler {
         return error(message, HttpStatus.BAD_REQUEST, request);
     }
 
-    @ExceptionHandler(MissingServletRequestPartException.class)
-    public ResponseEntity<ErrorResponse> handleMissingRequestPart(
-            MissingServletRequestPartException e,
-            HttpServletRequest request
-    ) {
-        return error(e.getMessage(), HttpStatus.BAD_REQUEST, request);
-    }
 }

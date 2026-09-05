@@ -9,6 +9,7 @@ public record UploadedFile(
         String fileUrl,
         String originalName,
         String mimeType,
+        String extension,
         Long fileSize
 
 ) {

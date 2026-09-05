@@ -7,7 +7,6 @@ import com.realestate.backend.dto.response.UserProfilePhotoResponse;
 import com.realestate.backend.entity.MediaFileEntity;
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.entity.UserMediaEntity;
-import com.realestate.backend.enums.MediaFolder;
 import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.exception.UnauthorizedException;
@@ -18,6 +17,7 @@ import com.realestate.backend.repository.UserRepository;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.MediaService;
 import com.realestate.backend.service.UserService;
+import com.realestate.backend.storage.MediaUploadPolicy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
                 userMediaRepository.findByUserId(user.getId());
 
         MediaFileEntity uploadedMedia =
-                mediaService.upload(file, MediaFolder.USER_PROFILE);
+                mediaService.upload(file, MediaUploadPolicy.USER_PROFILE);
 
         if (existingPhoto.isPresent()) {
 
