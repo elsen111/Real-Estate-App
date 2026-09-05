@@ -16,26 +16,31 @@ public interface MediaMapper {
     @Mapping(target = "updatedAt", ignore = true)
     MediaFileEntity toEntity(UploadedFile uploadedFile);
 
-
-
-//    HELPER METHOD
     default MediaType resolveMediaType(String mimeType) {
 
         if (mimeType == null) {
-            throw new StorageException("Media type is missing.");
+
+            throw new StorageException(
+                    "Media type is missing."
+            );
         }
 
-        if (mimeType.startsWith("image/")) {
-            return MediaType.IMAGE;
-        }
+        return switch (mimeType) {
 
-        if (mimeType.startsWith("video/")) {
-            return MediaType.VIDEO;
-        }
+            case "image/jpeg",
+                 "image/png",
+                 "image/webp" ->
+                    MediaType.IMAGE;
 
-        throw new StorageException(
-                "Unsupported media type: " + mimeType
-        );
+            case "video/mp4",
+                 "video/webm" ->
+                    MediaType.VIDEO;
+
+            default ->
+                    throw new StorageException(
+                            "Unsupported media type: "
+                                    + mimeType
+                    );
+        };
     }
-
 }
