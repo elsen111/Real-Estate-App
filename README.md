@@ -1,15 +1,6 @@
 # EstateFlow — Real Estate CRM & Marketplace
 
-<p align="left">
-  <img src="https://komarev.com/ghpvc/?username=estateflow&label=Profile%20Views&color=0e75b6&style=flat" alt="views" />
-  <img src="https://img.shields.io/github/stars/your-username/EstateFlow?style=flat&color=yellow" alt="stars" />
-  <img src="https://img.shields.io/github/forks/your-username/EstateFlow?style=flat&color=blue" alt="forks" />
-  <img src="https://img.shields.io/github/issues/your-username/EstateFlow?style=flat&color=red" alt="issues" />
-  <img src="https://img.shields.io/github/last-commit/your-username/EstateFlow?style=flat&color=green" alt="last commit" />
-  <img src="https://img.shields.io/github/license/your-username/EstateFlow?style=flat&color=lightgrey" alt="license" />
-</p>
-
-This is a full-stack real estate platform for agencies, agents, property owners, buyers, and renters. It combines property listings, map-based search, agency management, inquiries, viewing requests, dashboards, and basic subscription logic in one system.
+This is a real estate platform for agencies, agents, property owners, buyers, and renters. It combines property listings, map-based search, agency management, inquiries, viewing requests, dashboards, and basic subscription logic in one system.
 
 ---
 
