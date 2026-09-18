@@ -146,8 +146,6 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
 
         agency.setStatus(status);
 
-        agencyRepository.save(agency);
-
         log.atInfo()
                 .setMessage("agency_status_changed")
                 .addKeyValue("agencyId", agency.getId())
@@ -189,8 +187,6 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
                 );
 
         agency.setIsDeleted(true);
-
-        agencyRepository.save(agency);
 
         log.atInfo()
                 .setMessage("agency_soft_deleted")
@@ -381,7 +377,6 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         }
 
         agency.setStatus(AgencyStatus.APPROVED);
-        agencyRepository.save(agency);
 
         log.atInfo()
                 .setMessage("agency_approved")
@@ -414,7 +409,6 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         }
 
         agency.setStatus(AgencyStatus.REJECTED);
-        agencyRepository.save(agency);
 
         log.atInfo()
                 .setMessage("agency_rejected")

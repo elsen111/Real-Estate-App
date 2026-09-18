@@ -56,7 +56,6 @@ class AdminUserServiceImplTest {
         assertThat(result).contains("enabled");
 
         verify(userRepository).findById(userId);
-        verify(userRepository).save(user);
     }
 
     @Test
@@ -94,7 +93,7 @@ class AdminUserServiceImplTest {
         assertThat(user.getEnabled()).isFalse();
         assertThat(result).contains("disabled");
 
-        verify(userRepository).save(user);
+        verify(userRepository).findById(userId);
     }
 
     @Test
@@ -209,8 +208,15 @@ class AdminUserServiceImplTest {
         UUID userId = UUID.randomUUID();
         UUID agencyId = UUID.randomUUID();
 
-        AgencyEntity agency = AgencyEntity.builder().id(agencyId).isDeleted(false).build();
-        RoleEntity ownerRole = RoleEntity.builder().roleName(Role.AGENCY_OWNER).build();
+        AgencyEntity agency = AgencyEntity.builder()
+                .id(agencyId)
+                .isDeleted(false)
+                .build();
+
+        RoleEntity ownerRole = RoleEntity.builder()
+                .roleName(Role.AGENCY_OWNER)
+                .build();
+
         UserEntity user = UserEntity.builder()
                 .id(userId)
                 .fullName("Jane Owner")
@@ -221,13 +227,14 @@ class AdminUserServiceImplTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
-        when(propertyRepository.existsByAgencyIdAndStatus(agencyId, PropertyStatus.ACTIVE))
-                .thenReturn(false);
+        when(propertyRepository.existsByAgencyIdAndStatus(
+                agencyId,
+                PropertyStatus.ACTIVE
+        )).thenReturn(false);
 
         service.softDeleteUser(userId);
 
         assertThat(agency.getIsDeleted()).isTrue();
-        verify(agencyRepository).save(agency);
 
         assertThat(user.getEnabled()).isFalse();
         assertThat(user.getDeleted()).isTrue();
@@ -235,14 +242,19 @@ class AdminUserServiceImplTest {
         assertThat(user.getPhoneNumber()).isNull();
         assertThat(user.getProfilePhotoUrl()).isNull();
 
+        verify(userRepository).findById(userId);
+        verify(agencyRepository).findById(agencyId);
         verify(refreshTokenRepository).deleteAllByUser(user);
-        verify(userRepository).save(user);
     }
 
     @Test
     void softDeleteUser_softDeletesUser_whenRegularUser() {
         UUID userId = UUID.randomUUID();
-        RoleEntity clientRole = RoleEntity.builder().roleName(Role.CLIENT).build();
+
+        RoleEntity clientRole = RoleEntity.builder()
+                .roleName(Role.CLIENT)
+                .build();
+
         UserEntity user = UserEntity.builder()
                 .id(userId)
                 .fullName("Regular Client")
@@ -250,7 +262,8 @@ class AdminUserServiceImplTest {
                 .roles(new HashSet<>(Set.of(clientRole)))
                 .build();
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
 
         service.softDeleteUser(userId);
 
@@ -259,10 +272,12 @@ class AdminUserServiceImplTest {
         assertThat(user.getFullName()).isEqualTo("Deleted user");
         assertThat(user.getPhoneNumber()).isNull();
 
+        verify(userRepository).findById(userId);
         verify(refreshTokenRepository).deleteAllByUser(user);
-        verify(userRepository).save(user);
+
         verify(agencyRepository, never()).findById(any());
-        verify(propertyRepository, never()).existsByAgencyIdAndStatus(any(), any());
+        verify(propertyRepository, never())
+                .existsByAgencyIdAndStatus(any(), any());
     }
 
 }

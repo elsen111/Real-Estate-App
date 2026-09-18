@@ -37,7 +37,6 @@ class AdminPropertyServiceImplTest {
 
         assertThat(property.getStatus()).isEqualTo(PropertyStatus.SOLD);
         assertThat(result).contains("Sea View Villa").contains("SOLD");
-        verify(propertyRepository).save(property);
     }
 
     @Test

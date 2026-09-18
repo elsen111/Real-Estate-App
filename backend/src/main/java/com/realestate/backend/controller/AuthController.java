@@ -24,6 +24,7 @@ public class AuthController {
     private final AuthServiceImpl authService;
 
     @PostMapping("/register/user")
+    @Operation(summary = "Register a new user.")
     public ResponseEntity<ApiResponse<AuthResponse>> registerUser(
             @Valid @RequestBody UserRegisterRequest request,
             @RequestParam(required = false, name = "registrationType", defaultValue = "buyer") String type,
@@ -37,6 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/register/agency-owner")
+    @Operation(summary = "Register a new agency owner (also agency itself).")
     public ResponseEntity<ApiResponse<AuthResponse>> registerAgencyOwner(
             @Valid @RequestBody AgencyOwnerRegisterRequest request,
             HttpServletRequest servletRequest
@@ -49,6 +51,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Login to account.")
     public ResponseEntity<ApiResponse<AuthResponse>> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletRequest servletRequest
@@ -61,6 +64,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
+    @Operation(summary = "Refresh the token.")
     public ResponseEntity<ApiResponse<RefreshTokenResponse>> refreshToken(
             @Valid @RequestBody RefreshTokenRequest request,
             HttpServletRequest servletRequest
@@ -74,6 +78,7 @@ public class AuthController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/logout")
+    @Operation(summary = "Log out from the account.")
     public ResponseEntity<ApiResponse<Void>> logout(
             @Valid @RequestBody LogoutRequest request
     ) {
@@ -86,6 +91,7 @@ public class AuthController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
+    @Operation(summary = "Get the current user.")
     public ResponseEntity<ApiResponse<AuthResponse>> me(
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
@@ -98,6 +104,7 @@ public class AuthController {
 
     @PreAuthorize("isAuthenticated()")
     @PatchMapping("/change-password")
+    @Operation(summary = "Change the password.")
     public ResponseEntity<ApiResponse<Void>> changePassword(
             @AuthenticationPrincipal CustomUserDetails currentUser,
             @Valid @RequestBody ChangePasswordRequest request

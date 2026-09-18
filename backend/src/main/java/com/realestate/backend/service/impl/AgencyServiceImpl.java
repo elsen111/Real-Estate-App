@@ -347,8 +347,6 @@ public class AgencyServiceImpl implements AgencyService {
         agency.setCity(request.getCity());
         agency.setAddress(request.getAddress());
 
-        agencyRepository.save(agency);
-
         return agency;
 
     }

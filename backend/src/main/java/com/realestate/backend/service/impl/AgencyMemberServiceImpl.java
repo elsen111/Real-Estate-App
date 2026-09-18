@@ -89,7 +89,6 @@ public class AgencyMemberServiceImpl implements AgencyMemberService {
 
         targetUser.getRoles().add(roleEntity);
         targetUser.setAgency(agency);
-        userRepository.save(targetUser);
 
         AgencyMemberEntity member = AgencyMemberEntity.builder()
                 .agency(agency)

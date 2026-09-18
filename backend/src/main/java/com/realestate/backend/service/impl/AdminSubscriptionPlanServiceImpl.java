@@ -117,7 +117,6 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
         boolean newStatus = !subscriptionPlan.isActive();
 
         subscriptionPlan.setActive(newStatus);
-        subscriptionPlanRepository.save(subscriptionPlan);
 
         log.atInfo()
                 .setMessage("Subscription plan status changed")
@@ -142,9 +141,6 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
 
         subscriptionPlan.setDeleted(true);
         subscriptionPlan.setActive(false);
-
-        subscriptionPlanRepository.save(subscriptionPlan);
-
 
         log.atInfo()
                 .setMessage("Subscription plan deleted.")

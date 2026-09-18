@@ -217,7 +217,6 @@ public class PropertyServiceImpl implements PropertyService {
         PropertyStatus previousStatus = property.getStatus();
 
         property.setStatus(request.getStatus());
-        propertyRepository.saveAndFlush(property);
 
         log.atInfo()
                 .setMessage("Property status changed")
@@ -255,7 +254,6 @@ public class PropertyServiceImpl implements PropertyService {
         }
 
         property.setFeatured(!property.getFeatured());
-        propertyRepository.saveAndFlush(property);
 
         log.atInfo()
                 .setMessage("Property featured characteristic changed")
@@ -294,7 +292,6 @@ public class PropertyServiceImpl implements PropertyService {
         }
 
         property.setStatus(PropertyStatus.DELETED);
-        propertyRepository.saveAndFlush(property);
 
         log.atInfo()
                 .setMessage("Property deleted")

@@ -4,6 +4,7 @@ import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.response.AgencyMemberResponse;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.AgencyMemberService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ public class AgencyMemberController {
 
     @PostMapping("/agents/{userId}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'AGENCY_OWNER')")
+    @Operation(summary = "Assign agent to agency.")
     public ResponseEntity<ApiResponse<AgencyMemberResponse>> assignAgent(
             @PathVariable UUID agencyId,
             @PathVariable UUID userId,
