@@ -179,8 +179,6 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         appointment.setStatus(AppointmentStatus.CANCELLED);
-        appointmentRepository.saveAndFlush(appointment);
-
 
         log.atInfo()
                 .setMessage("Appointment cancelled.")

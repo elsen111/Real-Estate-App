@@ -46,7 +46,7 @@ public class AdminPropertyController {
 
     @PutMapping("/{propertyId}/status")
     @Operation(summary = "Change the status of a property")
-    public ResponseEntity<ApiResponse<Void>> changeAgencyStatus(
+    public ResponseEntity<ApiResponse<Void>> changePropertyStatus(
             @PathVariable @NotNull UUID propertyId,
             @Valid @RequestBody PropertyStatusRequest request
     ) {

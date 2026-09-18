@@ -58,8 +58,6 @@ public class UserServiceImpl implements UserService {
         updateEmail(user, request);
         updatePhoneNumber(user, request);
 
-        user = userRepository.save(user);
-
         log.atInfo()
                 .setMessage("User profile updated")
                 .addKeyValue("userId", user.getId())
@@ -89,8 +87,6 @@ public class UserServiceImpl implements UserService {
 
         user.setEnabled(false);
         user.setDeleted(true);
-
-        userRepository.save(user);
 
         refreshTokenRepository.deleteAllByUser(user);
 

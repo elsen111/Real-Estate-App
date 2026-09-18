@@ -91,8 +91,6 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
 
         property.setStatus(newStatus);
 
-        propertyRepository.save(property);
-
         log.atInfo()
                 .setMessage("Property status changed")
                 .addKeyValue("propertyId", property.getId())

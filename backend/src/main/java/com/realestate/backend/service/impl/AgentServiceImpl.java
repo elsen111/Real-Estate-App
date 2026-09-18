@@ -117,13 +117,11 @@ public class AgentServiceImpl implements AgentService {
         refreshTokenService.revokeAllUserRefreshTokens(agent.getId());
 
         membership.setActive(false);
-        agencyMemberRepository.save(membership);
 
         AgencyEntity agency = membership.getAgency();
 
         agent.setAgency(null);
         agent.getRoles().removeIf(role -> role.getRoleName() == Role.AGENT);
-        userRepository.save(agent);
 
         log.atInfo()
                 .setMessage("Agent has been removed from agency.")

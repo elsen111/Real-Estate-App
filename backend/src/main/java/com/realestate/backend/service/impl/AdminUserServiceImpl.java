@@ -78,8 +78,6 @@ public class AdminUserServiceImpl implements AdminUserService {
         user.setEnabled(request.enabled());
         Boolean isEnabled = user.getEnabled();
 
-        userRepository.save(user);
-
         log.atInfo()
                 .setMessage("User status changed")
                 .addKeyValue("userId", user.getId())
@@ -114,7 +112,6 @@ public class AdminUserServiceImpl implements AdminUserService {
                 ));
 
         user.getRoles().add(adminRoleEntity);
-        userRepository.save(user);
 
         log.atInfo()
                 .setMessage("Admin role assigned to the user")
@@ -163,8 +160,6 @@ public class AdminUserServiceImpl implements AdminUserService {
 
             agency.setIsDeleted(true);
 
-            agencyRepository.save(agency);
-
         }
 
         refreshTokenRepository.deleteAllByUser(user);
@@ -175,8 +170,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         user.setPhoneNumber(null);
         user.setProfilePhotoUrl(null);
 
-        userRepository.save(user);
-
+        log.info("User deleted");
     }
 
 }

@@ -192,8 +192,6 @@ public class CategoryServiceImpl implements CategoryService {
         category.setActive(false);
         category.setDeleted(true);
 
-        categoryRepository.save(category);
-
         log.atInfo()
                 .setMessage("Category deleted")
                 .addKeyValue("categoryId", category.getId())

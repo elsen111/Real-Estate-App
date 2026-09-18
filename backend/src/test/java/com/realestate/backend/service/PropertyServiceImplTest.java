@@ -332,19 +332,46 @@ class PropertyServiceImplTest {
         UUID ownerId = UUID.randomUUID();
         UUID propertyId = UUID.randomUUID();
         UUID agentId = UUID.randomUUID();
-        AgencyEntity agency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        UserEntity owner = UserEntity.builder().id(ownerId).agency(agency).build();
-        UserEntity agent = buildAgentUser(agentId, agency, true, false);
-        PropertyEntity property = PropertyEntity.builder().id(propertyId)
-                .agency(agency).status(PropertyStatus.ACTIVE).assignedAgent(agent).build();
+
+        AgencyEntity agency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        UserEntity owner = UserEntity.builder()
+                .id(ownerId)
+                .agency(agency)
+                .build();
+
+        UserEntity agent = buildAgentUser(
+                agentId,
+                agency,
+                true,
+                false
+        );
+
+        PropertyEntity property = PropertyEntity.builder()
+                .id(propertyId)
+                .agency(agency)
+                .status(PropertyStatus.ACTIVE)
+                .assignedAgent(agent)
+                .build();
+
         AssignAgentToPropertyRequest request = new AssignAgentToPropertyRequest();
         request.setAgentId(agentId);
 
-        when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
-        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
-        when(userRepository.findById(agentId)).thenReturn(Optional.of(agent));
+        when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
 
-        assertThatThrownBy(() -> service.assignAgentToProperty(propertyId, request, agencyUser(ownerId)))
+        when(propertyRepository.findById(propertyId))
+                .thenReturn(Optional.of(property));
+
+        assertThatThrownBy(() ->
+                service.assignAgentToProperty(
+                        propertyId,
+                        request,
+                        agencyUser(ownerId)
+                )
+        )
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("already assigned");
     }

@@ -59,7 +59,7 @@ class AdminAgencyServiceImplTest {
 
         assertThat(agency.getStatus()).isEqualTo(AgencyStatus.APPROVED);
         assertThat(result).contains("Acme Realty").contains("APPROVED");
-        verify(agencyRepository).save(agency);
+        assertThat(agency.getStatus()).isEqualTo(AgencyStatus.APPROVED);
     }
 
     @Test
@@ -77,7 +77,7 @@ class AdminAgencyServiceImplTest {
         service.softDeleteAgency(agencyId);
 
         assertThat(agency.getIsDeleted()).isTrue();
-        verify(agencyRepository).save(agency);
+        verify(agencyRepository).findById(agencyId);
     }
 
     @Test
@@ -227,7 +227,7 @@ class AdminAgencyServiceImplTest {
 
         assertThat(agency.getStatus()).isEqualTo(AgencyStatus.APPROVED);
         assertThat(result).contains("Acme Realty").contains("approved successfully");
-        verify(agencyRepository).save(agency);
+        verify(agencyRepository).findById(agencyId);
     }
 
     @Test
@@ -273,7 +273,8 @@ class AdminAgencyServiceImplTest {
 
         assertThat(agency.getStatus()).isEqualTo(AgencyStatus.REJECTED);
         assertThat(result).contains("Acme Realty").contains("rejected successfully");
-        verify(agencyRepository).save(agency);
+
+        verify(agencyRepository).findById(agencyId);
     }
 
     @Test

@@ -69,7 +69,7 @@ public class AdminAgencyController {
     @PutMapping("/{agencyId}/status")
     @Operation(summary = "Change agency status")
     public ResponseEntity<ApiResponse<Void>> changeAgencyStatus(
-            @PathVariable @NotNull UUID agencyId,
+            @PathVariable UUID agencyId,
             @Valid @RequestBody AgencyStatusRequest request
     ) {
 
