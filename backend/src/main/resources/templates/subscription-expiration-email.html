@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>EstateFlow Subscription Notification</title>
+</head>
+
+<body style="
+    margin: 0;
+    padding: 0;
+    background-color: #f5f7fa;
+    font-family: Arial, sans-serif;
+">
+
+<div style="
+    max-width: 600px;
+    margin: 40px auto;
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 32px;
+">
+
+    <h2 style="margin-top: 0;">
+        EstateFlow Subscription
+    </h2>
+
+    <p>
+        Hello
+        <strong th:text="${agencyName}">
+            Agency
+        </strong>,
+    </p>
+
+    <div th:switch="${notificationType}">
+
+        <div th:case="'EXPIRING_7_DAYS'">
+
+            <p>
+                Your EstateFlow subscription is
+                <strong>expiring in 7 days</strong>.
+            </p>
+
+        </div>
+
+        <div th:case="'EXPIRING_1_DAY'">
+
+            <p>
+                Your EstateFlow subscription is
+                <strong>expiring tomorrow</strong>.
+            </p>
+
+        </div>
+
+        <div th:case="'EXPIRED'">
+
+            <p>
+                Your EstateFlow subscription
+                <strong>has expired</strong>.
+            </p>
+
+        </div>
+
+    </div>
+
+    <p>
+        <strong>Plan:</strong>
+        <span th:text="${planName}">
+            Plan
+        </span>
+    </p>
+
+    <p>
+        <strong>End date:</strong>
+        <span th:text="${endDate}">
+            30 September 2026
+        </span>
+    </p>
+
+    <p>
+        Please visit EstateFlow to manage your subscription.
+    </p>
+
+    <hr style="
+        border: none;
+        border-top: 1px solid #eeeeee;
+        margin: 24px 0;
+    ">
+
+    <p style="
+        color: #777777;
+        font-size: 12px;
+    ">
+        This is an automated email from EstateFlow.
+        Please do not reply to this email.
+    </p>
+
+</div>
+
+</body>
+
+</html>

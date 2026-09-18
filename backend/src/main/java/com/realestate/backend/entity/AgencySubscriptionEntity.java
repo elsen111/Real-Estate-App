@@ -14,10 +14,26 @@ import java.util.UUID;
 @Table(
         name = "agency_subscriptions",
         indexes = {
-                @Index(name = "idx_agency_subscriptions_agency_id", columnList = "agency_id"),
-                @Index(name = "idx_agency_subscriptions_plan_id", columnList = "plan_id"),
-                @Index(name = "idx_agency_subscriptions_status", columnList = "status"),
-                @Index(name = "idx_agency_subscriptions_end_date", columnList = "end_date")
+                @Index(
+                        name = "idx_agency_subscriptions_agency_id",
+                        columnList = "agency_id"
+                ),
+                @Index(
+                        name = "idx_agency_subscriptions_plan_id",
+                        columnList = "plan_id"
+                ),
+                @Index(
+                        name = "idx_agency_subscriptions_status",
+                        columnList = "status"
+                ),
+                @Index(
+                        name = "idx_agency_subscriptions_end_date",
+                        columnList = "end_date"
+                ),
+                @Index(
+                        name = "idx_agency_subscriptions_status_end_date",
+                        columnList = "status, end_date"
+                )
         }
 )
 @Getter
@@ -36,7 +52,9 @@ public class AgencySubscriptionEntity {
     @JoinColumn(
             name = "agency_id",
             nullable = false,
-            foreignKey = @ForeignKey(name = "fk_agency_subscriptions_agency_id")
+            foreignKey = @ForeignKey(
+                    name = "fk_agency_subscriptions_agency_id"
+            )
     )
     private AgencyEntity agency;
 
@@ -44,10 +62,11 @@ public class AgencySubscriptionEntity {
     @JoinColumn(
             name = "plan_id",
             nullable = false,
-            foreignKey = @ForeignKey(name = "fk_agency_subscriptions_plan_id")
+            foreignKey = @ForeignKey(
+                    name = "fk_agency_subscriptions_plan_id"
+            )
     )
     private SubscriptionPlanEntity plan;
-
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
@@ -67,5 +86,4 @@ public class AgencySubscriptionEntity {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
 }

@@ -64,6 +64,12 @@ app:
     from: ${MAIL_USERNAME}
     from-name: EstateFlow
 
+subscription:
+  scheduler:
+    time-zone: "Asia/Baku"
+    expiration-cron: "0 5 * * * *"
+    email-cron: "0 * * * * *"
+
 rate-limit:
   enabled: true
   auth:
@@ -89,6 +95,7 @@ springdoc:
     disable-swagger-default-url: true
     url: /api/api-docs
   packages-to-scan: com.realestate.backend.controller
+  default-flat-param-object: true
 
 logging:
   level:
