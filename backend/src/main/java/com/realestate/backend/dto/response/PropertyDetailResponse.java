@@ -22,6 +22,7 @@ import java.util.UUID;
         "description",
         "price",
         "currency",
+        "viewCount",
         "listingType",
         "propertyType",
         "featured",
@@ -50,6 +51,7 @@ public class PropertyDetailResponse {
     private String description;
     private BigDecimal price;
     private Currency currency;
+    private Long viewCount;
     private ListingType listingType;
     private String propertyType;
     private Boolean featured;

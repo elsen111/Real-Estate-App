@@ -14,14 +14,12 @@ import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.security.SecurityConstants;
 import com.realestate.backend.service.MediaService;
 import com.realestate.backend.service.PropertyService;
+import com.realestate.backend.service.PropertyViewService;
 import com.realestate.backend.storage.MediaUploadPolicy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -30,6 +28,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,6 +49,9 @@ public class PropertyServiceImpl implements PropertyService {
     private final AgencySubscriptionRepository agencySubscriptionRepository;
 
     private final MediaService mediaService;
+
+    private final PropertyViewService propertyViewService;
+    private final PropertyViewRepository propertyViewRepository;
 
     private final PropertyMediaRepository propertyMediaRepository;
 
@@ -151,6 +153,8 @@ public class PropertyServiceImpl implements PropertyService {
 
         propertyDetails.setImages(images);
 
+        propertyViewService.recordView(property, currentUser);
+
         return propertyDetails;
 
     }
@@ -245,12 +249,23 @@ public class PropertyServiceImpl implements PropertyService {
 
         }
 
+        AgencySubscriptionEntity agencySubscription = agencySubscriptionRepository.findByAgencyAndStatus(
+                agency,
+                SubscriptionStatus.ACTIVE
+        ).orElseThrow(
+                () -> new ResourceNotFoundException("Agency subscription not found with agency: " + agency.getId())
+        );
+
         havePermissionOverProperty(property, agency, currentUser);
 
         if(property.getAssignedAgent() != null && property.getAssignedAgent().getId().equals(currentUser.getId())) {
             throw new UnauthorizedException(
                     "Only agency owners are allowed to change the property's featured characteristics."
             );
+        }
+
+        if(!agencySubscription.getPlan().isFeaturedListingsAllowed()) {
+            throw new BusinessException("Your agency subscription doesn't support featured listings.");
         }
 
         property.setFeatured(!property.getFeatured());
@@ -640,6 +655,22 @@ public class PropertyServiceImpl implements PropertyService {
                 .addKeyValue("agentId", agentId)
                 .addKeyValue("ownerId", ownerId)
                 .log();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PropertyResponse> getPopularProperties(Pageable pageable) {
+
+        LocalDateTime from = LocalDateTime.now().minusDays(7);
+
+        Page<PropertyEntity> properties =
+                propertyViewRepository.findPopularProperties(
+                        from,
+                        PropertyStatus.ACTIVE,
+                        pageable
+                );
+
+        return properties.map(propertyMapper::toPublicClientResponse);
     }
 
     @Override

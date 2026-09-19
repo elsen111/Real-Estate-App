@@ -176,6 +176,21 @@ public class PropertyController {
 
     }
 
+    @GetMapping("/popular")
+    @Operation(summary = "Get popular (most viewed) properties.")
+    public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getPopularProperties(
+            @PageableDefault(size = 3) Pageable pageable
+    ){
+
+        Page<PropertyResponse> response = propertyService.getPopularProperties(pageable);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Popular properties fetched successfully", response)
+        );
+
+    }
+
+
     @GetMapping("/{propertyId}/similar")
     @Operation(summary = "Get similar properties.")
     public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getSimilarProperties(

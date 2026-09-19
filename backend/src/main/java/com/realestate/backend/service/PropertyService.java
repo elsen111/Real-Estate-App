@@ -62,4 +62,6 @@ public interface PropertyService {
 
     void assignAgentToProperty(UUID propertyId, AssignAgentToPropertyRequest request, CustomUserDetails currentUser);
 
+    Page<PropertyResponse> getPopularProperties(Pageable pageable);
+
 }
