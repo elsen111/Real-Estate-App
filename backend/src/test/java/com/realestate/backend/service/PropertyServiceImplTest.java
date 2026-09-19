@@ -3,6 +3,7 @@ package com.realestate.backend.service;
 import com.realestate.backend.dto.request.AssignAgentToPropertyRequest;
 import com.realestate.backend.dto.request.PropertyRequest;
 import com.realestate.backend.dto.request.PropertyStatusRequest;
+import com.realestate.backend.dto.response.PropertyResponse;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.Role;
@@ -12,6 +13,7 @@ import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ForbiddenException;
 import com.realestate.backend.exception.ResourceNotFoundException;
+import com.realestate.backend.mapper.PropertyMapper;
 import com.realestate.backend.repository.*;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.impl.PropertyServiceImpl;
@@ -20,14 +22,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,6 +54,12 @@ class PropertyServiceImplTest {
 
     @Mock
     private PropertyViewService propertyViewService;
+
+    @Mock
+    private PropertyMapper propertyMapper;
+
+    @Mock
+    private PropertyViewRepository propertyViewRepository;
 
     @InjectMocks
     private PropertyServiceImpl service;
@@ -841,5 +857,74 @@ class PropertyServiceImplTest {
         )
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("not an agent");
+    }
+
+    @Test
+    void getPopularProperties_returnsActivePropertiesMappedToResponses() {
+        Pageable pageable = Pageable.ofSize(10);
+
+        UUID propertyId1 = UUID.randomUUID();
+        UUID propertyId2 = UUID.randomUUID();
+
+        PropertyEntity property1 = PropertyEntity.builder()
+                .id(propertyId1)
+                .status(PropertyStatus.ACTIVE)
+                .build();
+
+        PropertyEntity property2 = PropertyEntity.builder()
+                .id(propertyId2)
+                .status(PropertyStatus.ACTIVE)
+                .build();
+
+        PropertyResponse response1 = PropertyResponse.builder()
+                .id(propertyId1)
+                .title("Luxury Apartment")
+                .status(PropertyStatus.ACTIVE)
+                .build();
+
+        PropertyResponse response2 = PropertyResponse.builder()
+                .id(propertyId2)
+                .title("Modern Villa")
+                .status(PropertyStatus.ACTIVE)
+                .build();
+
+        Page<PropertyEntity> propertyPage =
+                new PageImpl<>(
+                        List.of(property1, property2),
+                        pageable,
+                        2
+                );
+
+        when(propertyViewRepository.findPopularProperties(
+                any(LocalDateTime.class),
+                eq(PropertyStatus.ACTIVE),
+                eq(pageable)
+        )).thenReturn(propertyPage);
+
+        when(propertyMapper.toPublicClientResponse(property1))
+                .thenReturn(response1);
+
+        when(propertyMapper.toPublicClientResponse(property2))
+                .thenReturn(response2);
+
+        Page<PropertyResponse> result =
+                service.getPopularProperties(pageable);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).containsExactly(
+                response1,
+                response2
+        );
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        assertThat(result.getSize()).isEqualTo(10);
+
+        verify(propertyViewRepository).findPopularProperties(
+                any(LocalDateTime.class),
+                eq(PropertyStatus.ACTIVE),
+                eq(pageable)
+        );
+
+        verify(propertyMapper).toPublicClientResponse(property1);
+        verify(propertyMapper).toPublicClientResponse(property2);
     }
 }

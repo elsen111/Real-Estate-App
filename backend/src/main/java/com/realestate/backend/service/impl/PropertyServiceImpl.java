@@ -19,10 +19,7 @@ import com.realestate.backend.storage.MediaUploadPolicy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -31,6 +28,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,6 +51,7 @@ public class PropertyServiceImpl implements PropertyService {
     private final MediaService mediaService;
 
     private final PropertyViewService propertyViewService;
+    private final PropertyViewRepository propertyViewRepository;
 
     private final PropertyMediaRepository propertyMediaRepository;
 
@@ -656,6 +655,22 @@ public class PropertyServiceImpl implements PropertyService {
                 .addKeyValue("agentId", agentId)
                 .addKeyValue("ownerId", ownerId)
                 .log();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PropertyResponse> getPopularProperties(Pageable pageable) {
+
+        LocalDateTime from = LocalDateTime.now().minusDays(7);
+
+        Page<PropertyEntity> properties =
+                propertyViewRepository.findPopularProperties(
+                        from,
+                        PropertyStatus.ACTIVE,
+                        pageable
+                );
+
+        return properties.map(propertyMapper::toPublicClientResponse);
     }
 
     @Override

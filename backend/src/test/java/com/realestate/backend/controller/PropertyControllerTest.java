@@ -271,6 +271,32 @@ class PropertyControllerTest {
     }
 
     @Test
+    void getPopularProperties_returnsOk_withPopularPropertyPage() {
+        Pageable pageable = Pageable.ofSize(3);
+
+        Page<PropertyResponse> page = new PageImpl<>(List.of(
+                buildPropertyResponse(UUID.randomUUID()),
+                buildPropertyResponse(UUID.randomUUID()),
+                buildPropertyResponse(UUID.randomUUID())
+        ));
+
+        when(propertyService.getPopularProperties(pageable)).thenReturn(page);
+
+        ResponseEntity<ApiResponse<Page<PropertyResponse>>> response =
+                controller.getPopularProperties(pageable);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().isSuccess()).isTrue();
+        assertThat(response.getBody().getMessage())
+                .isEqualTo("Popular properties fetched successfully");
+        assertThat(response.getBody().getData()).isEqualTo(page);
+        assertThat(response.getBody().getData().getContent()).hasSize(3);
+
+        verify(propertyService).getPopularProperties(pageable);
+    }
+
+    @Test
     void getSimilarProperties_returnsOk_withSimilarPropertyPage() {
         UUID propertyId = UUID.randomUUID();
         Pageable pageable = Pageable.ofSize(10);
