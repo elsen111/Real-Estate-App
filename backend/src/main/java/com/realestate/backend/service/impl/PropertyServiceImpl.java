@@ -14,6 +14,7 @@ import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.security.SecurityConstants;
 import com.realestate.backend.service.MediaService;
 import com.realestate.backend.service.PropertyService;
+import com.realestate.backend.service.PropertyViewService;
 import com.realestate.backend.storage.MediaUploadPolicy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +51,8 @@ public class PropertyServiceImpl implements PropertyService {
     private final AgencySubscriptionRepository agencySubscriptionRepository;
 
     private final MediaService mediaService;
+
+    private final PropertyViewService propertyViewService;
 
     private final PropertyMediaRepository propertyMediaRepository;
 
@@ -150,6 +153,8 @@ public class PropertyServiceImpl implements PropertyService {
                 .map(propertyMapper::toMediaResponse).toList();
 
         propertyDetails.setImages(images);
+
+        propertyViewService.recordView(property, currentUser);
 
         return propertyDetails;
 

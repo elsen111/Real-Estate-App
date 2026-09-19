@@ -33,24 +33,52 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PropertyServiceImplTest {
 
-    @Mock private PropertyRepository propertyRepository;
-    @Mock private UserRepository userRepository;
-    @Mock private AgencySubscriptionRepository agencySubscriptionRepository;
+    @Mock
+    private PropertyRepository propertyRepository;
 
-    @InjectMocks private PropertyServiceImpl service;
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private AgencySubscriptionRepository agencySubscriptionRepository;
+
+    @Mock
+    private PropertyViewService propertyViewService;
+
+    @InjectMocks
+    private PropertyServiceImpl service;
 
     private CustomUserDetails agencyUser(UUID id) {
-        return CustomUserDetails.from(UserEntity.builder().id(id)
-                .roles(Set.of(RoleEntity.builder().roleName(Role.AGENCY_OWNER).build())).build());
+        return CustomUserDetails.from(
+                UserEntity.builder()
+                        .id(id)
+                        .roles(Set.of(
+                                RoleEntity.builder()
+                                        .roleName(Role.AGENCY_OWNER)
+                                        .build()
+                        ))
+                        .build()
+        );
     }
 
     @Test
     void createProperty_throws_whenUserHasNoAgency() {
         UUID userId = UUID.randomUUID();
-        UserEntity user = UserEntity.builder().id(userId).agency(null).build();
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        assertThatThrownBy(() -> service.createProperty(new PropertyRequest(), agencyUser(userId)))
+        UserEntity user = UserEntity.builder()
+                .id(userId)
+                .agency(null)
+                .build();
+
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() ->
+                service.createProperty(
+                        new PropertyRequest(),
+                        agencyUser(userId)
+                )
+        )
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("must belong to an agency");
     }
@@ -58,14 +86,32 @@ class PropertyServiceImplTest {
     @Test
     void createProperty_throws_whenNoActiveSubscription() {
         UUID userId = UUID.randomUUID();
-        AgencyEntity agency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        UserEntity user = UserEntity.builder().id(userId).agency(agency).build();
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(agencySubscriptionRepository.findFirstByAgency_IdAndStatusOrderByEndDateDesc(agency.getId(), SubscriptionStatus.ACTIVE))
+        AgencyEntity agency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        UserEntity user = UserEntity.builder()
+                .id(userId)
+                .agency(agency)
+                .build();
+
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
+        when(agencySubscriptionRepository
+                .findFirstByAgency_IdAndStatusOrderByEndDateDesc(
+                        agency.getId(),
+                        SubscriptionStatus.ACTIVE
+                ))
                 .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.createProperty(new PropertyRequest(), agencyUser(userId)))
+        assertThatThrownBy(() ->
+                service.createProperty(
+                        new PropertyRequest(),
+                        agencyUser(userId)
+                )
+        )
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("doesn't have an active subscription");
     }
@@ -73,17 +119,43 @@ class PropertyServiceImplTest {
     @Test
     void createProperty_throws_whenSubscriptionExpired() {
         UUID userId = UUID.randomUUID();
-        AgencyEntity agency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        UserEntity user = UserEntity.builder().id(userId).agency(agency).build();
-        SubscriptionPlanEntity plan = SubscriptionPlanEntity.builder().maxListings(10).build();
-        AgencySubscriptionEntity subscription = AgencySubscriptionEntity.builder()
-                .agency(agency).plan(plan).endDate(LocalDate.now().minusDays(1)).build();
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(agencySubscriptionRepository.findFirstByAgency_IdAndStatusOrderByEndDateDesc(agency.getId(), SubscriptionStatus.ACTIVE))
+        AgencyEntity agency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        UserEntity user = UserEntity.builder()
+                .id(userId)
+                .agency(agency)
+                .build();
+
+        SubscriptionPlanEntity plan = SubscriptionPlanEntity.builder()
+                .maxListings(10)
+                .build();
+
+        AgencySubscriptionEntity subscription =
+                AgencySubscriptionEntity.builder()
+                        .agency(agency)
+                        .plan(plan)
+                        .endDate(LocalDate.now().minusDays(1))
+                        .build();
+
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
+        when(agencySubscriptionRepository
+                .findFirstByAgency_IdAndStatusOrderByEndDateDesc(
+                        agency.getId(),
+                        SubscriptionStatus.ACTIVE
+                ))
                 .thenReturn(Optional.of(subscription));
 
-        assertThatThrownBy(() -> service.createProperty(new PropertyRequest(), agencyUser(userId)))
+        assertThatThrownBy(() ->
+                service.createProperty(
+                        new PropertyRequest(),
+                        agencyUser(userId)
+                )
+        )
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("expired");
     }
@@ -91,18 +163,46 @@ class PropertyServiceImplTest {
     @Test
     void createProperty_throws_whenListingLimitReached() {
         UUID userId = UUID.randomUUID();
-        AgencyEntity agency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        UserEntity user = UserEntity.builder().id(userId).agency(agency).build();
-        SubscriptionPlanEntity plan = SubscriptionPlanEntity.builder().maxListings(5).build();
-        AgencySubscriptionEntity subscription = AgencySubscriptionEntity.builder()
-                .agency(agency).plan(plan).endDate(LocalDate.now().plusDays(10)).build();
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(agencySubscriptionRepository.findFirstByAgency_IdAndStatusOrderByEndDateDesc(agency.getId(), SubscriptionStatus.ACTIVE))
+        AgencyEntity agency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        UserEntity user = UserEntity.builder()
+                .id(userId)
+                .agency(agency)
+                .build();
+
+        SubscriptionPlanEntity plan = SubscriptionPlanEntity.builder()
+                .maxListings(5)
+                .build();
+
+        AgencySubscriptionEntity subscription =
+                AgencySubscriptionEntity.builder()
+                        .agency(agency)
+                        .plan(plan)
+                        .endDate(LocalDate.now().plusDays(10))
+                        .build();
+
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
+        when(agencySubscriptionRepository
+                .findFirstByAgency_IdAndStatusOrderByEndDateDesc(
+                        agency.getId(),
+                        SubscriptionStatus.ACTIVE
+                ))
                 .thenReturn(Optional.of(subscription));
-        when(propertyRepository.countByAgencyId(agency.getId())).thenReturn(5L);
 
-        assertThatThrownBy(() -> service.createProperty(new PropertyRequest(), agencyUser(userId)))
+        when(propertyRepository.countByAgencyId(agency.getId()))
+                .thenReturn(5L);
+
+        assertThatThrownBy(() ->
+                service.createProperty(
+                        new PropertyRequest(),
+                        agencyUser(userId)
+                )
+        )
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("Listing limit reached");
     }
@@ -111,15 +211,38 @@ class PropertyServiceImplTest {
     void updateProperty_throws_whenPropertyBelongsToAnotherAgency() {
         UUID userId = UUID.randomUUID();
         UUID propertyId = UUID.randomUUID();
-        AgencyEntity myAgency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        AgencyEntity otherAgency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        UserEntity user = UserEntity.builder().id(userId).agency(myAgency).build();
-        PropertyEntity property = PropertyEntity.builder().id(propertyId).agency(otherAgency).build();
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
+        AgencyEntity myAgency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
 
-        assertThatThrownBy(() -> service.updateProperty(propertyId, new PropertyRequest(), agencyUser(userId)))
+        AgencyEntity otherAgency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        UserEntity user = UserEntity.builder()
+                .id(userId)
+                .agency(myAgency)
+                .build();
+
+        PropertyEntity property = PropertyEntity.builder()
+                .id(propertyId)
+                .agency(otherAgency)
+                .build();
+
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
+        when(propertyRepository.findById(propertyId))
+                .thenReturn(Optional.of(property));
+
+        assertThatThrownBy(() ->
+                service.updateProperty(
+                        propertyId,
+                        new PropertyRequest(),
+                        agencyUser(userId)
+                )
+        )
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("another agency");
     }
@@ -128,17 +251,37 @@ class PropertyServiceImplTest {
     void updateStatus_throws_whenStatusNotAllowedForAgencies() {
         UUID userId = UUID.randomUUID();
         UUID propertyId = UUID.randomUUID();
-        AgencyEntity agency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        UserEntity user = UserEntity.builder().id(userId).agency(agency).build();
-        PropertyEntity property = PropertyEntity.builder().id(propertyId).agency(agency).build();
+
+        AgencyEntity agency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        UserEntity user = UserEntity.builder()
+                .id(userId)
+                .agency(agency)
+                .build();
+
+        PropertyEntity property = PropertyEntity.builder()
+                .id(propertyId)
+                .agency(agency)
+                .build();
 
         PropertyStatusRequest request = new PropertyStatusRequest();
         request.setStatus(PropertyStatus.ACTIVE);
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
 
-        assertThatThrownBy(() -> service.updateStatus(propertyId, request, agencyUser(userId)))
+        when(propertyRepository.findById(propertyId))
+                .thenReturn(Optional.of(property));
+
+        assertThatThrownBy(() ->
+                service.updateStatus(
+                        propertyId,
+                        request,
+                        agencyUser(userId)
+                )
+        )
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("SOLD, RENTED");
     }
@@ -146,33 +289,59 @@ class PropertyServiceImplTest {
     @Test
     void softDeleteProperty_throws_whenPropertyNotFound() {
         UUID propertyId = UUID.randomUUID();
-        when(propertyRepository.findById(propertyId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.softDeleteProperty(propertyId, agencyUser(UUID.randomUUID())))
+        when(propertyRepository.findById(propertyId))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() ->
+                service.softDeleteProperty(
+                        propertyId,
+                        agencyUser(UUID.randomUUID())
+                )
+        )
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
     void getPropertyDetailsById_throws_whenPropertyHiddenFromPublic() {
         UUID propertyId = UUID.randomUUID();
-        AgencyEntity agency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        PropertyEntity property = PropertyEntity.builder().id(propertyId)
-                .agency(agency).status(PropertyStatus.REJECTED).build();
 
-        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
+        AgencyEntity agency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
 
-        assertThatThrownBy(() -> service.getPropertyDetailsById(propertyId, null))
+        PropertyEntity property = PropertyEntity.builder()
+                .id(propertyId)
+                .agency(agency)
+                .status(PropertyStatus.REJECTED)
+                .build();
+
+        when(propertyRepository.findById(propertyId))
+                .thenReturn(Optional.of(property));
+
+        assertThatThrownBy(() ->
+                service.getPropertyDetailsById(propertyId, null)
+        )
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
-    private UserEntity buildAgentUser(UUID id, AgencyEntity agency, boolean enabled, boolean deleted) {
+    private UserEntity buildAgentUser(
+            UUID id,
+            AgencyEntity agency,
+            boolean enabled,
+            boolean deleted
+    ) {
         return UserEntity.builder()
                 .id(id)
                 .fullName("Jane Agent")
                 .agency(agency)
                 .enabled(enabled)
                 .deleted(deleted)
-                .roles(Set.of(RoleEntity.builder().roleName(Role.AGENT).build()))
+                .roles(Set.of(
+                        RoleEntity.builder()
+                                .roleName(Role.AGENT)
+                                .build()
+                ))
                 .build();
     }
 
@@ -181,34 +350,73 @@ class PropertyServiceImplTest {
         UUID ownerId = UUID.randomUUID();
         UUID propertyId = UUID.randomUUID();
         UUID agentId = UUID.randomUUID();
-        AgencyEntity agency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        UserEntity owner = UserEntity.builder().id(ownerId).agency(agency).build();
-        PropertyEntity property = PropertyEntity.builder().id(propertyId)
-                .agency(agency).status(PropertyStatus.ACTIVE).build();
-        UserEntity agent = buildAgentUser(agentId, agency, true, false);
 
-        AssignAgentToPropertyRequest request = new AssignAgentToPropertyRequest();
+        AgencyEntity agency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        UserEntity owner = UserEntity.builder()
+                .id(ownerId)
+                .agency(agency)
+                .build();
+
+        PropertyEntity property = PropertyEntity.builder()
+                .id(propertyId)
+                .agency(agency)
+                .status(PropertyStatus.ACTIVE)
+                .build();
+
+        UserEntity agent = buildAgentUser(
+                agentId,
+                agency,
+                true,
+                false
+        );
+
+        AssignAgentToPropertyRequest request =
+                new AssignAgentToPropertyRequest();
+
         request.setAgentId(agentId);
 
-        when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
-        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
-        when(userRepository.findById(agentId)).thenReturn(Optional.of(agent));
+        when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
 
-        service.assignAgentToProperty(propertyId, request, agencyUser(ownerId));
+        when(propertyRepository.findById(propertyId))
+                .thenReturn(Optional.of(property));
 
-        assertThat(property.getAssignedAgent()).isEqualTo(agent);
+        when(userRepository.findById(agentId))
+                .thenReturn(Optional.of(agent));
+
+        service.assignAgentToProperty(
+                propertyId,
+                request,
+                agencyUser(ownerId)
+        );
+
+        assertThat(property.getAssignedAgent())
+                .isEqualTo(agent);
     }
 
     @Test
     void assignAgentToProperty_throws_whenOwnerNotFound() {
         UUID ownerId = UUID.randomUUID();
         UUID propertyId = UUID.randomUUID();
-        AssignAgentToPropertyRequest request = new AssignAgentToPropertyRequest();
+
+        AssignAgentToPropertyRequest request =
+                new AssignAgentToPropertyRequest();
+
         request.setAgentId(UUID.randomUUID());
 
-        when(userRepository.findById(ownerId)).thenReturn(Optional.empty());
+        when(userRepository.findById(ownerId))
+                .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.assignAgentToProperty(propertyId, request, agencyUser(ownerId)))
+        assertThatThrownBy(() ->
+                service.assignAgentToProperty(
+                        propertyId,
+                        request,
+                        agencyUser(ownerId)
+                )
+        )
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Agency owner not found");
     }
@@ -217,13 +425,27 @@ class PropertyServiceImplTest {
     void assignAgentToProperty_throws_whenOwnerHasNoAgency() {
         UUID ownerId = UUID.randomUUID();
         UUID propertyId = UUID.randomUUID();
-        UserEntity owner = UserEntity.builder().id(ownerId).agency(null).build();
-        AssignAgentToPropertyRequest request = new AssignAgentToPropertyRequest();
+
+        UserEntity owner = UserEntity.builder()
+                .id(ownerId)
+                .agency(null)
+                .build();
+
+        AssignAgentToPropertyRequest request =
+                new AssignAgentToPropertyRequest();
+
         request.setAgentId(UUID.randomUUID());
 
-        when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
+        when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
 
-        assertThatThrownBy(() -> service.assignAgentToProperty(propertyId, request, agencyUser(ownerId)))
+        assertThatThrownBy(() ->
+                service.assignAgentToProperty(
+                        propertyId,
+                        request,
+                        agencyUser(ownerId)
+                )
+        )
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("not associated with an agency");
     }
@@ -232,15 +454,34 @@ class PropertyServiceImplTest {
     void assignAgentToProperty_throws_whenPropertyNotFound() {
         UUID ownerId = UUID.randomUUID();
         UUID propertyId = UUID.randomUUID();
-        AgencyEntity agency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        UserEntity owner = UserEntity.builder().id(ownerId).agency(agency).build();
-        AssignAgentToPropertyRequest request = new AssignAgentToPropertyRequest();
+
+        AgencyEntity agency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        UserEntity owner = UserEntity.builder()
+                .id(ownerId)
+                .agency(agency)
+                .build();
+
+        AssignAgentToPropertyRequest request =
+                new AssignAgentToPropertyRequest();
+
         request.setAgentId(UUID.randomUUID());
 
-        when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
-        when(propertyRepository.findById(propertyId)).thenReturn(Optional.empty());
+        when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
 
-        assertThatThrownBy(() -> service.assignAgentToProperty(propertyId, request, agencyUser(ownerId)))
+        when(propertyRepository.findById(propertyId))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() ->
+                service.assignAgentToProperty(
+                        propertyId,
+                        request,
+                        agencyUser(ownerId)
+                )
+        )
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Property not found");
     }
@@ -249,18 +490,44 @@ class PropertyServiceImplTest {
     void assignAgentToProperty_throws_whenPropertyBelongsToAnotherAgency() {
         UUID ownerId = UUID.randomUUID();
         UUID propertyId = UUID.randomUUID();
-        AgencyEntity myAgency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        AgencyEntity otherAgency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        UserEntity owner = UserEntity.builder().id(ownerId).agency(myAgency).build();
-        PropertyEntity property = PropertyEntity.builder().id(propertyId)
-                .agency(otherAgency).status(PropertyStatus.ACTIVE).build();
-        AssignAgentToPropertyRequest request = new AssignAgentToPropertyRequest();
+
+        AgencyEntity myAgency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        AgencyEntity otherAgency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        UserEntity owner = UserEntity.builder()
+                .id(ownerId)
+                .agency(myAgency)
+                .build();
+
+        PropertyEntity property = PropertyEntity.builder()
+                .id(propertyId)
+                .agency(otherAgency)
+                .status(PropertyStatus.ACTIVE)
+                .build();
+
+        AssignAgentToPropertyRequest request =
+                new AssignAgentToPropertyRequest();
+
         request.setAgentId(UUID.randomUUID());
 
-        when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
-        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
+        when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
 
-        assertThatThrownBy(() -> service.assignAgentToProperty(propertyId, request, agencyUser(ownerId)))
+        when(propertyRepository.findById(propertyId))
+                .thenReturn(Optional.of(property));
+
+        assertThatThrownBy(() ->
+                service.assignAgentToProperty(
+                        propertyId,
+                        request,
+                        agencyUser(ownerId)
+                )
+        )
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessageContaining("another agency");
     }
@@ -269,19 +536,44 @@ class PropertyServiceImplTest {
     void assignAgentToProperty_throws_whenPropertyIsNotActive() {
         UUID ownerId = UUID.randomUUID();
         UUID propertyId = UUID.randomUUID();
-        AgencyEntity agency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        UserEntity owner = UserEntity.builder().id(ownerId).agency(agency).build();
-        PropertyEntity property = PropertyEntity.builder().id(propertyId)
-                .agency(agency).status(PropertyStatus.PENDING).build();
-        AssignAgentToPropertyRequest request = new AssignAgentToPropertyRequest();
+
+        AgencyEntity agency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        UserEntity owner = UserEntity.builder()
+                .id(ownerId)
+                .agency(agency)
+                .build();
+
+        PropertyEntity property = PropertyEntity.builder()
+                .id(propertyId)
+                .agency(agency)
+                .status(PropertyStatus.PENDING)
+                .build();
+
+        AssignAgentToPropertyRequest request =
+                new AssignAgentToPropertyRequest();
+
         request.setAgentId(UUID.randomUUID());
 
-        when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
-        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
+        when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
 
-        assertThatThrownBy(() -> service.assignAgentToProperty(propertyId, request, agencyUser(ownerId)))
+        when(propertyRepository.findById(propertyId))
+                .thenReturn(Optional.of(property));
+
+        assertThatThrownBy(() ->
+                service.assignAgentToProperty(
+                        propertyId,
+                        request,
+                        agencyUser(ownerId)
+                )
+        )
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("only be assigned to active properties");
+                .hasMessageContaining(
+                        "only be assigned to active properties"
+                );
     }
 
     @Test
@@ -289,18 +581,43 @@ class PropertyServiceImplTest {
         UUID ownerId = UUID.randomUUID();
         UUID propertyId = UUID.randomUUID();
         UUID agentId = UUID.randomUUID();
-        AgencyEntity agency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        UserEntity owner = UserEntity.builder().id(ownerId).agency(agency).build();
-        PropertyEntity property = PropertyEntity.builder().id(propertyId)
-                .agency(agency).status(PropertyStatus.ACTIVE).build();
-        AssignAgentToPropertyRequest request = new AssignAgentToPropertyRequest();
+
+        AgencyEntity agency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        UserEntity owner = UserEntity.builder()
+                .id(ownerId)
+                .agency(agency)
+                .build();
+
+        PropertyEntity property = PropertyEntity.builder()
+                .id(propertyId)
+                .agency(agency)
+                .status(PropertyStatus.ACTIVE)
+                .build();
+
+        AssignAgentToPropertyRequest request =
+                new AssignAgentToPropertyRequest();
+
         request.setAgentId(agentId);
 
-        when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
-        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
-        when(userRepository.findById(agentId)).thenReturn(Optional.empty());
+        when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
 
-        assertThatThrownBy(() -> service.assignAgentToProperty(propertyId, request, agencyUser(ownerId)))
+        when(propertyRepository.findById(propertyId))
+                .thenReturn(Optional.of(property));
+
+        when(userRepository.findById(agentId))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() ->
+                service.assignAgentToProperty(
+                        propertyId,
+                        request,
+                        agencyUser(ownerId)
+                )
+        )
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Agent not found");
     }
@@ -310,19 +627,50 @@ class PropertyServiceImplTest {
         UUID ownerId = UUID.randomUUID();
         UUID propertyId = UUID.randomUUID();
         UUID agentId = UUID.randomUUID();
-        AgencyEntity agency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        UserEntity owner = UserEntity.builder().id(ownerId).agency(agency).build();
-        PropertyEntity property = PropertyEntity.builder().id(propertyId)
-                .agency(agency).status(PropertyStatus.ACTIVE).build();
-        UserEntity disabledAgent = buildAgentUser(agentId, agency, false, false);
-        AssignAgentToPropertyRequest request = new AssignAgentToPropertyRequest();
+
+        AgencyEntity agency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        UserEntity owner = UserEntity.builder()
+                .id(ownerId)
+                .agency(agency)
+                .build();
+
+        PropertyEntity property = PropertyEntity.builder()
+                .id(propertyId)
+                .agency(agency)
+                .status(PropertyStatus.ACTIVE)
+                .build();
+
+        UserEntity disabledAgent = buildAgentUser(
+                agentId,
+                agency,
+                false,
+                false
+        );
+
+        AssignAgentToPropertyRequest request =
+                new AssignAgentToPropertyRequest();
+
         request.setAgentId(agentId);
 
-        when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
-        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
-        when(userRepository.findById(agentId)).thenReturn(Optional.of(disabledAgent));
+        when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
 
-        assertThatThrownBy(() -> service.assignAgentToProperty(propertyId, request, agencyUser(ownerId)))
+        when(propertyRepository.findById(propertyId))
+                .thenReturn(Optional.of(property));
+
+        when(userRepository.findById(agentId))
+                .thenReturn(Optional.of(disabledAgent));
+
+        assertThatThrownBy(() ->
+                service.assignAgentToProperty(
+                        propertyId,
+                        request,
+                        agencyUser(ownerId)
+                )
+        )
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Agent not found");
     }
@@ -356,7 +704,9 @@ class PropertyServiceImplTest {
                 .assignedAgent(agent)
                 .build();
 
-        AssignAgentToPropertyRequest request = new AssignAgentToPropertyRequest();
+        AssignAgentToPropertyRequest request =
+                new AssignAgentToPropertyRequest();
+
         request.setAgentId(agentId);
 
         when(userRepository.findById(ownerId))
@@ -381,22 +731,58 @@ class PropertyServiceImplTest {
         UUID ownerId = UUID.randomUUID();
         UUID propertyId = UUID.randomUUID();
         UUID agentId = UUID.randomUUID();
-        AgencyEntity myAgency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        AgencyEntity otherAgency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        UserEntity owner = UserEntity.builder().id(ownerId).agency(myAgency).build();
-        PropertyEntity property = PropertyEntity.builder().id(propertyId)
-                .agency(myAgency).status(PropertyStatus.ACTIVE).build();
-        UserEntity agent = buildAgentUser(agentId, otherAgency, true, false);
-        AssignAgentToPropertyRequest request = new AssignAgentToPropertyRequest();
+
+        AgencyEntity myAgency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        AgencyEntity otherAgency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        UserEntity owner = UserEntity.builder()
+                .id(ownerId)
+                .agency(myAgency)
+                .build();
+
+        PropertyEntity property = PropertyEntity.builder()
+                .id(propertyId)
+                .agency(myAgency)
+                .status(PropertyStatus.ACTIVE)
+                .build();
+
+        UserEntity agent = buildAgentUser(
+                agentId,
+                otherAgency,
+                true,
+                false
+        );
+
+        AssignAgentToPropertyRequest request =
+                new AssignAgentToPropertyRequest();
+
         request.setAgentId(agentId);
 
-        when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
-        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
-        when(userRepository.findById(agentId)).thenReturn(Optional.of(agent));
+        when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
 
-        assertThatThrownBy(() -> service.assignAgentToProperty(propertyId, request, agencyUser(ownerId)))
+        when(propertyRepository.findById(propertyId))
+                .thenReturn(Optional.of(property));
+
+        when(userRepository.findById(agentId))
+                .thenReturn(Optional.of(agent));
+
+        assertThatThrownBy(() ->
+                service.assignAgentToProperty(
+                        propertyId,
+                        request,
+                        agencyUser(ownerId)
+                )
+        )
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("does not belong to this agency");
+                .hasMessageContaining(
+                        "does not belong to this agency"
+                );
     }
 
     @Test
@@ -404,25 +790,55 @@ class PropertyServiceImplTest {
         UUID ownerId = UUID.randomUUID();
         UUID propertyId = UUID.randomUUID();
         UUID nonAgentId = UUID.randomUUID();
-        AgencyEntity agency = AgencyEntity.builder().id(UUID.randomUUID()).build();
-        UserEntity owner = UserEntity.builder().id(ownerId).agency(agency).build();
-        PropertyEntity property = PropertyEntity.builder().id(propertyId)
-                .agency(agency).status(PropertyStatus.ACTIVE).build();
+
+        AgencyEntity agency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        UserEntity owner = UserEntity.builder()
+                .id(ownerId)
+                .agency(agency)
+                .build();
+
+        PropertyEntity property = PropertyEntity.builder()
+                .id(propertyId)
+                .agency(agency)
+                .status(PropertyStatus.ACTIVE)
+                .build();
+
         UserEntity nonAgentUser = UserEntity.builder()
                 .id(nonAgentId)
                 .agency(agency)
                 .enabled(true)
                 .deleted(false)
-                .roles(Set.of(RoleEntity.builder().roleName(Role.AGENCY_OWNER).build()))
+                .roles(Set.of(
+                        RoleEntity.builder()
+                                .roleName(Role.AGENCY_OWNER)
+                                .build()
+                ))
                 .build();
-        AssignAgentToPropertyRequest request = new AssignAgentToPropertyRequest();
+
+        AssignAgentToPropertyRequest request =
+                new AssignAgentToPropertyRequest();
+
         request.setAgentId(nonAgentId);
 
-        when(userRepository.findById(ownerId)).thenReturn(Optional.of(owner));
-        when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
-        when(userRepository.findById(nonAgentId)).thenReturn(Optional.of(nonAgentUser));
+        when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
 
-        assertThatThrownBy(() -> service.assignAgentToProperty(propertyId, request, agencyUser(ownerId)))
+        when(propertyRepository.findById(propertyId))
+                .thenReturn(Optional.of(property));
+
+        when(userRepository.findById(nonAgentId))
+                .thenReturn(Optional.of(nonAgentUser));
+
+        assertThatThrownBy(() ->
+                service.assignAgentToProperty(
+                        propertyId,
+                        request,
+                        agencyUser(ownerId)
+                )
+        )
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("not an agent");
     }
