@@ -245,12 +245,23 @@ public class PropertyServiceImpl implements PropertyService {
 
         }
 
+        AgencySubscriptionEntity agencySubscription = agencySubscriptionRepository.findByAgencyAndStatus(
+                agency,
+                SubscriptionStatus.ACTIVE
+        ).orElseThrow(
+                () -> new ResourceNotFoundException("Agency subscription not found with agency: " + agency.getId())
+        );
+
         havePermissionOverProperty(property, agency, currentUser);
 
         if(property.getAssignedAgent() != null && property.getAssignedAgent().getId().equals(currentUser.getId())) {
             throw new UnauthorizedException(
                     "Only agency owners are allowed to change the property's featured characteristics."
             );
+        }
+
+        if(!agencySubscription.getPlan().isFeaturedListingsAllowed()) {
+            throw new BusinessException("Your agency subscription doesn't support featured listings.");
         }
 
         property.setFeatured(!property.getFeatured());
