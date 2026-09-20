@@ -18,6 +18,7 @@ import com.realestate.backend.security.JwtService;
 import com.realestate.backend.security.SecurityConstants;
 import com.realestate.backend.service.AuthService;
 import com.realestate.backend.service.OtpService;
+import com.realestate.backend.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,7 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenServiceImpl refreshTokenService;
 
+    private final UserService userService;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
@@ -174,7 +176,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
 
         if (!user.getEnabled()) {
-            throw new UnauthorizedException("User account is disabled");
+            throw new UnauthorizedException("User account is disabled. Re-activate it at first.");
         }
 
         AgencyMemberEntity membership = agencyMemberRepository
@@ -353,6 +355,53 @@ public class AuthServiceImpl implements AuthService {
 
     }
 
+    @Transactional
+    @Override
+    public AuthResponse reactivateAccount(
+            AccountReactivationRequest request,
+            HttpServletRequest servletRequest
+    ) {
+
+        UserEntity user = userService.enableAccount(request);
+
+        AgencyMemberEntity membership =
+                agencyMemberRepository
+                        .findByUserAndActiveTrue(user)
+                        .orElse(null);
+
+        AgencyEntity agency =
+                membership != null
+                        ? membership.getAgency()
+                        : null;
+
+        RefreshTokenServiceImpl.CreatedRefreshToken refreshToken =
+                refreshTokenService.createRefreshToken(
+                        user,
+                        extractIpAddress(servletRequest),
+                        servletRequest.getHeader("User-Agent")
+                );
+
+        log.atInfo()
+                .setMessage("Account reactivation successful")
+                .addKeyValue("userId", user.getId())
+                .addKeyValue("userEmail", user.getEmail())
+                .log();
+
+        return buildAuthResponse(
+                user,
+                refreshToken.rawToken(),
+                agency
+        );
+    }
+
+    @Override
+    public void deactivateAccount(AccountPasswordRequest request, CustomUserDetails currentUser) {
+
+        UserEntity user = userService.disableAccount(request, currentUser);
+
+        refreshTokenRepository.deleteAllByUser(user);
+
+    }
 
     //    HELPER METHODS
     private AuthResponse buildAuthResponse(

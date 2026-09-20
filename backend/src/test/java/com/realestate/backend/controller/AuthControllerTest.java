@@ -50,15 +50,13 @@ class AuthControllerTest {
     @Test
     void registerUser_returnsCreated_withDefaultBuyerType() {
 
-        UserRegisterRequest request =
-                new UserRegisterRequest();
+        UserRegisterRequest request = new UserRegisterRequest();
 
         request.setFullName("Jane Doe");
         request.setEmail("jane.doe@example.com");
         request.setPassword("password123");
 
-        AuthResponse expected =
-                buildAuthResponse();
+        AuthResponse expected = buildAuthResponse();
 
         when(authService.registerUser(
                 request,
@@ -103,15 +101,13 @@ class AuthControllerTest {
     @Test
     void registerUser_returnsCreated_withCustomRegistrationType() {
 
-        UserRegisterRequest request =
-                new UserRegisterRequest();
+        UserRegisterRequest request = new UserRegisterRequest();
 
         request.setFullName("John Smith");
         request.setEmail("john.smith@example.com");
         request.setPassword("password123");
 
-        AuthResponse expected =
-                buildAuthResponse();
+        AuthResponse expected = buildAuthResponse();
 
         when(authService.registerUser(
                 request,
@@ -129,10 +125,16 @@ class AuthControllerTest {
         assertThat(response.getStatusCode())
                 .isEqualTo(HttpStatus.CREATED);
 
+        assertThat(response.getBody())
+                .isNotNull();
+
         assertThat(response.getBody().getMessage())
                 .isEqualTo(
                         "User registered successfully as a landlord"
                 );
+
+        assertThat(response.getBody().getData())
+                .isEqualTo(expected);
 
         verify(authService)
                 .registerUser(
@@ -170,8 +172,7 @@ class AuthControllerTest {
                         agency
                 );
 
-        AuthResponse expected =
-                buildAuthResponse();
+        AuthResponse expected = buildAuthResponse();
 
         when(authService.registerAgencyOwner(
                 request,
@@ -213,14 +214,12 @@ class AuthControllerTest {
     @Test
     void login_returnsOk_withAuthResponse() {
 
-        LoginRequest request =
-                new LoginRequest();
+        LoginRequest request = new LoginRequest();
 
         request.setEmail("jane.doe@example.com");
         request.setPassword("password123");
 
-        AuthResponse expected =
-                buildAuthResponse();
+        AuthResponse expected = buildAuthResponse();
 
         when(authService.login(
                 request,
@@ -311,8 +310,7 @@ class AuthControllerTest {
     @Test
     void logout_returnsOk_withNoData() {
 
-        LogoutRequest request =
-                new LogoutRequest();
+        LogoutRequest request = new LogoutRequest();
 
         request.setRefreshToken("refresh-token");
 
@@ -343,8 +341,7 @@ class AuthControllerTest {
     @Test
     void me_returnsOk_withCurrentUser() {
 
-        AuthResponse expected =
-                buildAuthResponse();
+        AuthResponse expected = buildAuthResponse();
 
         when(authService.currentUser(currentUser))
                 .thenReturn(expected);
@@ -436,17 +433,15 @@ class AuthControllerTest {
                         currentUser
                 );
 
-        try {
-            controller.changePassword(
-                    currentUser,
-                    request
-            );
-        } catch (RuntimeException ex) {
-            assertThat(ex.getMessage())
-                    .isEqualTo(
-                            "Current password is incorrect"
-                    );
-        }
+        assertThat(
+                org.assertj.core.api.Assertions.catchThrowable(() ->
+                        controller.changePassword(
+                                currentUser,
+                                request
+                        )
+                )
+        )
+                .hasMessage("Current password is incorrect");
 
         verify(authService)
                 .changePassword(
@@ -545,14 +540,102 @@ class AuthControllerTest {
                 .when(authService)
                 .resetPassword(request);
 
-        try {
-            controller.resetPassword(request);
-        } catch (RuntimeException ex) {
-            assertThat(ex.getMessage())
-                    .isEqualTo("Invalid or expired OTP");
-        }
+        assertThat(
+                org.assertj.core.api.Assertions.catchThrowable(() ->
+                        controller.resetPassword(request)
+                )
+        )
+                .hasMessage("Invalid or expired OTP");
 
         verify(authService)
                 .resetPassword(request);
+    }
+
+    @Test
+    void reactivateAccount_returnsOk_withAuthResponse() {
+
+        AccountReactivationRequest request =
+                new AccountReactivationRequest();
+
+        request.setEmail("disabled@example.com");
+        request.setPassword("password123");
+
+        AuthResponse expected = buildAuthResponse();
+
+        when(authService.reactivateAccount(
+                request,
+                servletRequest
+        )).thenReturn(expected);
+
+        ResponseEntity<ApiResponse<AuthResponse>> response =
+                controller.reactivateAccount(
+                        request,
+                        servletRequest
+                );
+
+        assertThat(response.getStatusCode())
+                .isEqualTo(HttpStatus.OK);
+
+        assertThat(response.getBody())
+                .isNotNull();
+
+        assertThat(response.getBody().isSuccess())
+                .isTrue();
+
+        assertThat(response.getBody().getMessage())
+                .isEqualTo(
+                        "Account successfully re-activated and logged in."
+                );
+
+        assertThat(response.getBody().getData())
+                .isEqualTo(expected);
+
+        verify(authService)
+                .reactivateAccount(
+                        request,
+                        servletRequest
+                );
+
+        verifyNoMoreInteractions(authService);
+    }
+
+    @Test
+    void deactivateAccount_returnsOk_withNoData() {
+
+        AccountPasswordRequest request =
+                new AccountPasswordRequest();
+
+        request.setPassword("password123");
+
+        ResponseEntity<ApiResponse<Void>> response =
+                controller.deactivateAccount(
+                        request,
+                        currentUser
+                );
+
+        assertThat(response.getStatusCode())
+                .isEqualTo(HttpStatus.OK);
+
+        assertThat(response.getBody())
+                .isNotNull();
+
+        assertThat(response.getBody().isSuccess())
+                .isTrue();
+
+        assertThat(response.getBody().getMessage())
+                .isEqualTo(
+                        "Account successfully deactivated."
+                );
+
+        assertThat(response.getBody().getData())
+                .isNull();
+
+        verify(authService)
+                .deactivateAccount(
+                        request,
+                        currentUser
+                );
+
+        verifyNoMoreInteractions(authService);
     }
 }

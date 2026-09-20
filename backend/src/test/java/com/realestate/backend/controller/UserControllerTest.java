@@ -1,7 +1,7 @@
 package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
-import com.realestate.backend.dto.request.DeleteAccountRequest;
+import com.realestate.backend.dto.request.AccountPasswordRequest;
 import com.realestate.backend.dto.request.UpdateProfileRequest;
 import com.realestate.backend.dto.response.AuthUserResponse;
 import com.realestate.backend.dto.response.UserProfilePhotoResponse;
@@ -96,7 +96,7 @@ class UserControllerTest {
 
     @Test
     void deleteAccount_returnsOk_withNoData() {
-        DeleteAccountRequest request = new DeleteAccountRequest();
+        AccountPasswordRequest request = new AccountPasswordRequest();
         request.setPassword("currentPassword123");
 
         ResponseEntity<ApiResponse<Void>> response =
@@ -114,7 +114,7 @@ class UserControllerTest {
 
     @Test
     void deleteAccount_propagatesException_whenPasswordIncorrect() {
-        DeleteAccountRequest request = new DeleteAccountRequest();
+        AccountPasswordRequest request = new AccountPasswordRequest();
         request.setPassword("wrongPassword");
 
         org.mockito.Mockito.doThrow(new RuntimeException("Incorrect password"))

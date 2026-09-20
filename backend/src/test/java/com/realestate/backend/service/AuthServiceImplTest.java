@@ -2,10 +2,12 @@ package com.realestate.backend.service;
 
 import com.realestate.backend.dto.request.*;
 import com.realestate.backend.dto.response.AuthResponse;
+import com.realestate.backend.dto.response.RefreshTokenResponse;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.ConflictException;
+import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.exception.UnauthorizedException;
 import com.realestate.backend.mapper.AgencyMapper;
 import com.realestate.backend.mapper.AuthMapper;
@@ -13,6 +15,7 @@ import com.realestate.backend.mapper.UserMapper;
 import com.realestate.backend.repository.*;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.security.JwtService;
+import com.realestate.backend.security.SecurityConstants;
 import com.realestate.backend.service.impl.AuthServiceImpl;
 import com.realestate.backend.service.impl.RefreshTokenServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,6 +34,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -45,13 +49,31 @@ class AuthServiceImplTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
+    private JwtService jwtService;
+
+    @Mock
+    private RefreshTokenRepository refreshTokenRepository;
+
+    @Mock
     private RefreshTokenServiceImpl refreshTokenService;
+
+    @Mock
+    private UserService userService;
 
     @Mock
     private UserRepository userRepository;
 
     @Mock
+    private UserMapper userMapper;
+
+    @Mock
     private RoleRepository roleRepository;
+
+    @Mock
+    private AgencyRepository agencyRepository;
+
+    @Mock
+    private AgencyMapper agencyMapper;
 
     @Mock
     private AgencyMemberRepository agencyMemberRepository;
@@ -63,25 +85,17 @@ class AuthServiceImplTest {
     private PasswordResetOtpRepository passwordResetOtpRepository;
 
     @Mock
+    private OtpService otpService;
+
+    @Mock
     private HttpServletRequest servletRequest;
-
-    @Mock
-    private JwtService jwtService;
-
-    @Mock
-    private UserMapper userMapper;
-
-    @Mock
-    private AgencyRepository agencyRepository;
-
-    @Mock
-    private AgencyMapper agencyMapper;
 
     @InjectMocks
     private AuthServiceImpl service;
 
     @BeforeEach
     void setUp() {
+
         lenient()
                 .when(servletRequest.getHeader("User-Agent"))
                 .thenReturn("JUnit-Agent");
@@ -176,7 +190,8 @@ class AuthServiceImplTest {
                 servletRequest
         );
 
-        verify(userRepository).saveAndFlush(mappedUser);
+        verify(userRepository)
+                .saveAndFlush(mappedUser);
     }
 
     @Test
@@ -364,11 +379,10 @@ class AuthServiceImplTest {
         when(agencyMapper.toAgencyOwnerResponse(savedAgency))
                 .thenReturn(null);
 
-        AuthResponse response =
-                service.registerAgencyOwner(
-                        request,
-                        servletRequest
-                );
+        service.registerAgencyOwner(
+                request,
+                servletRequest
+        );
 
         verify(authMapper).toUserEntity(ownerRequest);
         verify(authMapper).toAgencyEntity(agencyRequest);
@@ -397,7 +411,7 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void login_throws_whenAccountDisabled() {
+    void login_throws_whenAccountDisabledByAuthenticationManager() {
 
         LoginRequest request = new LoginRequest();
         request.setEmail("user@test.com");
@@ -476,6 +490,204 @@ class AuthServiceImplTest {
     }
 
     @Test
+    void reactivateAccount_enablesUserAndCreatesNewLoginSession() {
+
+        AccountReactivationRequest request =
+                new AccountReactivationRequest();
+
+        request.setEmail("disabled@test.com");
+        request.setPassword("Password1!");
+
+        UserEntity user = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .email("disabled@test.com")
+                .enabled(true)
+                .roles(new HashSet<>())
+                .build();
+
+        RefreshTokenEntity refreshTokenEntity =
+                RefreshTokenEntity.builder()
+                        .build();
+
+        RefreshTokenServiceImpl.CreatedRefreshToken createdRefreshToken =
+                new RefreshTokenServiceImpl.CreatedRefreshToken(
+                        "new-refresh-token",
+                        refreshTokenEntity
+                );
+
+        when(userService.enableAccount(request))
+                .thenReturn(user);
+
+        when(agencyMemberRepository.findByUserAndActiveTrue(user))
+                .thenReturn(Optional.empty());
+
+        when(refreshTokenService.createRefreshToken(
+                user,
+                "127.0.0.1",
+                "JUnit-Agent"
+        )).thenReturn(createdRefreshToken);
+
+        when(jwtService.generateAccessToken(user))
+                .thenReturn("new-access-token");
+
+        when(jwtService.accessTokenExpiresInSeconds())
+                .thenReturn(3600L);
+
+        AuthResponse response =
+                service.reactivateAccount(
+                        request,
+                        servletRequest
+                );
+
+        assertThat(response)
+                .isNotNull();
+
+        assertThat(response.getAccessToken())
+                .isEqualTo("new-access-token");
+
+        assertThat(response.getRefreshToken())
+                .isEqualTo("new-refresh-token");
+
+        assertThat(response.getTokenType())
+                .isEqualTo(
+                        SecurityConstants.TOKEN_PREFIX.trim()
+                );
+
+        assertThat(response.getExpiresInSeconds())
+                .isEqualTo(3600L);
+
+        verify(userService)
+                .enableAccount(request);
+
+        verify(refreshTokenService)
+                .createRefreshToken(
+                        user,
+                        "127.0.0.1",
+                        "JUnit-Agent"
+                );
+
+        verify(jwtService)
+                .generateAccessToken(user);
+
+        verify(userMapper)
+                .toSummary(user);
+
+        verify(agencyMapper)
+                .toAgencyOwnerResponse(null);
+    }
+
+    @Test
+    void reactivateAccount_usesAgencyWhenUserHasActiveMembership() {
+
+        AccountReactivationRequest request =
+                new AccountReactivationRequest();
+
+        request.setEmail("owner@test.com");
+        request.setPassword("Password1!");
+
+        AgencyEntity agency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .name("Prime Realty")
+                .build();
+
+        UserEntity user = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .email("owner@test.com")
+                .enabled(true)
+                .roles(new HashSet<>())
+                .build();
+
+        AgencyMemberEntity membership =
+                AgencyMemberEntity.builder()
+                        .user(user)
+                        .agency(agency)
+                        .active(true)
+                        .build();
+
+        when(userService.enableAccount(request))
+                .thenReturn(user);
+
+        when(agencyMemberRepository.findByUserAndActiveTrue(user))
+                .thenReturn(Optional.of(membership));
+
+        when(refreshTokenService.createRefreshToken(
+                user,
+                "127.0.0.1",
+                "JUnit-Agent"
+        )).thenReturn(
+                new RefreshTokenServiceImpl.CreatedRefreshToken(
+                        "refresh-token",
+                        RefreshTokenEntity.builder().build()
+                )
+        );
+
+        when(jwtService.generateAccessToken(user))
+                .thenReturn("access-token");
+
+        when(jwtService.accessTokenExpiresInSeconds())
+                .thenReturn(3600L);
+
+        service.reactivateAccount(
+                request,
+                servletRequest
+        );
+
+        verify(agencyMapper)
+                .toAgencyOwnerResponse(agency);
+
+        verify(refreshTokenService)
+                .createRefreshToken(
+                        user,
+                        "127.0.0.1",
+                        "JUnit-Agent"
+                );
+
+        verify(jwtService)
+                .generateAccessToken(user);
+    }
+
+    @Test
+    void deactivateAccount_disablesUserAndRevokesAllRefreshTokens() {
+
+        AccountPasswordRequest request =
+                new AccountPasswordRequest();
+
+        request.setPassword("Password1!");
+
+        UUID userId = UUID.randomUUID();
+
+        UserEntity user = UserEntity.builder()
+                .id(userId)
+                .email("user@test.com")
+                .enabled(true)
+                .build();
+
+        CustomUserDetails currentUser =
+                mock(CustomUserDetails.class);
+
+        when(userService.disableAccount(
+                request,
+                currentUser
+        )).thenReturn(user);
+
+        service.deactivateAccount(
+                request,
+                currentUser
+        );
+
+        verify(userService)
+                .disableAccount(
+                        request,
+                        currentUser
+                );
+
+        verify(refreshTokenRepository)
+                .deleteAllByUser(user);
+
+        verifyNoMoreInteractions(refreshTokenRepository);
+    }
+
+    @Test
     void changePassword_throws_whenNewPasswordsDontMatch() {
 
         UUID userId = UUID.randomUUID();
@@ -488,7 +700,9 @@ class AuthServiceImplTest {
         when(userRepository.findById(userId))
                 .thenReturn(Optional.of(user));
 
-        ChangePasswordRequest request = new ChangePasswordRequest();
+        ChangePasswordRequest request =
+                new ChangePasswordRequest();
+
         request.setNewPassword("New1!");
         request.setConfirmNewPassword("Different1!");
 
@@ -496,7 +710,10 @@ class AuthServiceImplTest {
                 CustomUserDetails.from(user);
 
         assertThatThrownBy(() ->
-                service.changePassword(request, currentUser)
+                service.changePassword(
+                        request,
+                        currentUser
+                )
         )
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("don't match");
