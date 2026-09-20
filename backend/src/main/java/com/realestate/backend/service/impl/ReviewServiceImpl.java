@@ -4,6 +4,7 @@ import com.realestate.backend.dto.request.PublicReviewFilterRequest;
 import com.realestate.backend.dto.request.ReviewRequest;
 import com.realestate.backend.dto.response.ReviewResponse;
 import com.realestate.backend.entity.AgencyEntity;
+import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.entity.ReviewEntity;
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.ReviewStatus;
@@ -27,6 +28,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -69,10 +72,44 @@ public class ReviewServiceImpl implements ReviewService {
             throw new BusinessException("You already have a review for this property.");
         }
 
-        ReviewEntity createdReview = reviewMapper.toEntity(request, propertyId, user, null);
+        PropertyEntity property = propertyRepository.findById(propertyId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Property with id " + propertyId + " not found"
+                        ));
+
+        ReviewEntity createdReview = reviewMapper.toEntity(
+                request,
+                property,
+                user,
+                null
+        );
+
         createdReview.setTarget(ReviewTargetType.PROPERTY);
 
         ReviewEntity savedReview = reviewRepository.saveAndFlush(createdReview);
+
+        if (savedReview.getStatus() == ReviewStatus.APPROVED) {
+            ReviewStatus status = ReviewStatus.APPROVED;
+
+            int currentReviewCount = reviewRepository.countByPropertyIdAndStatus(propertyId, status);
+            savedReview.getProperty().setReviewCount(currentReviewCount);
+
+            BigDecimal totalPoints = reviewRepository.sumRatingByPropertyIdAndStatus(propertyId, status);
+
+            if (currentReviewCount > 0) {
+                BigDecimal currentAvgRating = totalPoints.divide(
+                        BigDecimal.valueOf(currentReviewCount),
+                        2,
+                        RoundingMode.HALF_UP
+                );
+                savedReview.getProperty().setAverageRating(currentAvgRating);
+            } else {
+                savedReview.getProperty().setAverageRating(BigDecimal.ZERO);
+            }
+
+        }
+
 
         log.atInfo()
                 .setMessage("Review created by user for property")
@@ -172,6 +209,29 @@ public class ReviewServiceImpl implements ReviewService {
 
         ReviewEntity  savedReview = reviewRepository.saveAndFlush(review);
 
+        if (savedReview.getTarget() == ReviewTargetType.PROPERTY && savedReview.getProperty() != null) {
+            UUID propertyId = savedReview.getProperty().getId();
+            ReviewStatus status = ReviewStatus.APPROVED;
+
+            if (savedReview.getStatus() == status) {
+                int currentReviewCount = reviewRepository.countByPropertyIdAndStatus(propertyId, status);
+                BigDecimal totalPoints = reviewRepository.sumRatingByPropertyIdAndStatus(propertyId, status);
+
+                savedReview.getProperty().setReviewCount(currentReviewCount);
+
+                if (currentReviewCount > 0) {
+                    BigDecimal currentAvgRating = totalPoints.divide(
+                            BigDecimal.valueOf(currentReviewCount),
+                            2,
+                            RoundingMode.HALF_UP
+                    );
+                    savedReview.getProperty().setAverageRating(currentAvgRating);
+                } else {
+                    savedReview.getProperty().setAverageRating(BigDecimal.ZERO);
+                }
+            }
+        }
+
         log.atInfo()
                 .setMessage("Review updated by user")
                 .addKeyValue("userId", currentUser.getId())
@@ -191,7 +251,33 @@ public class ReviewServiceImpl implements ReviewService {
                         () -> new ResourceNotFoundException("Review with id " + reviewId + " not found")
                 );
 
+        ReviewTargetType target = review.getTarget();
+        ReviewStatus status = review.getStatus();
+        var property = review.getProperty();
+
         reviewRepository.delete(review);
+        reviewRepository.flush();
+
+        if (target == ReviewTargetType.PROPERTY && property != null && status == ReviewStatus.APPROVED) {
+            UUID propertyId = property.getId();
+            ReviewStatus approvedStatus = ReviewStatus.APPROVED;
+
+            int currentReviewCount = reviewRepository.countByPropertyIdAndStatus(propertyId, approvedStatus);
+            BigDecimal totalPoints = reviewRepository.sumRatingByPropertyIdAndStatus(propertyId, approvedStatus);
+
+            property.setReviewCount(currentReviewCount);
+
+            if (currentReviewCount > 0) {
+                BigDecimal currentAvgRating = totalPoints.divide(
+                        BigDecimal.valueOf(currentReviewCount),
+                        2,
+                        RoundingMode.HALF_UP
+                );
+                property.setAverageRating(currentAvgRating);
+            } else {
+                property.setAverageRating(BigDecimal.ZERO);
+            }
+        }
 
         log.atInfo()
                 .setMessage("Review deleted by user")

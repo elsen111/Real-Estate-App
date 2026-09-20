@@ -8,6 +8,7 @@ import com.realestate.backend.dto.response.ReviewResponse;
 import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.ReviewEntity;
 import com.realestate.backend.enums.ReviewStatus;
+import com.realestate.backend.enums.ReviewTargetType;
 import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.ReviewMapper;
@@ -23,6 +24,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.UUID;
 
 @Slf4j
@@ -61,8 +64,35 @@ public class AdminReviewServiceImpl implements AdminReviewService {
         }
 
         ReviewStatus oldStatus = review.getStatus();
+        ReviewStatus newStatus = request.getStatus();
 
-        review.setStatus(request.getStatus());
+        review.setStatus(newStatus);
+
+        reviewRepository.saveAndFlush(review);
+
+        if (review.getTarget() == ReviewTargetType.PROPERTY && review.getProperty() != null) {
+
+            if (newStatus == ReviewStatus.APPROVED || oldStatus == ReviewStatus.APPROVED) {
+                UUID propertyId = review.getProperty().getId();
+                ReviewStatus approvedStatus = ReviewStatus.APPROVED;
+
+                int currentReviewCount = reviewRepository.countByPropertyIdAndStatus(propertyId, approvedStatus);
+                BigDecimal totalPoints = reviewRepository.sumRatingByPropertyIdAndStatus(propertyId, approvedStatus);
+
+                review.getProperty().setReviewCount(currentReviewCount);
+
+                if (currentReviewCount > 0) {
+                    BigDecimal currentAvgRating = totalPoints.divide(
+                            BigDecimal.valueOf(currentReviewCount),
+                            2,
+                            RoundingMode.HALF_UP
+                    );
+                    review.getProperty().setAverageRating(currentAvgRating);
+                } else {
+                    review.getProperty().setAverageRating(BigDecimal.ZERO);
+                }
+            }
+        }
 
         log.atInfo()
                 .setMessage("Review status changed")
