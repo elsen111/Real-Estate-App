@@ -1,6 +1,6 @@
 package com.realestate.backend.service;
 
-import com.realestate.backend.dto.request.DeleteAccountRequest;
+import com.realestate.backend.dto.request.AccountPasswordRequest;
 import com.realestate.backend.dto.request.UpdateProfileRequest;
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.exception.ConflictException;
@@ -54,7 +54,7 @@ class UserServiceImplTest {
     @Test
     void deleteAccount_throws_whenPasswordIncorrect() {
         UserEntity user = UserEntity.builder().email("user@test.com").passwordHash("hashed").build();
-        DeleteAccountRequest request = new DeleteAccountRequest();
+        AccountPasswordRequest request = new AccountPasswordRequest();
         request.setPassword("wrong-password");
 
         when(userRepository.findByEmail("user@test.com")).thenReturn(Optional.of(user));

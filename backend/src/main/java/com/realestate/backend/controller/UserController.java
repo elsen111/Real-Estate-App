@@ -2,7 +2,7 @@ package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.response.AuthUserResponse;
-import com.realestate.backend.dto.request.DeleteAccountRequest;
+import com.realestate.backend.dto.request.AccountPasswordRequest;
 import com.realestate.backend.dto.request.UpdateProfileRequest;
 import com.realestate.backend.dto.response.UserProfilePhotoResponse;
 import com.realestate.backend.security.CustomUserDetails;
@@ -47,7 +47,7 @@ public class UserController {
     @DeleteMapping("/account")
     @Operation(summary = "Delete own profile")
     public ResponseEntity<ApiResponse<Void>> deleteAccount(
-            @Valid @RequestBody DeleteAccountRequest request,
+            @Valid @RequestBody AccountPasswordRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
 

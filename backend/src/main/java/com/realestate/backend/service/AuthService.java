@@ -42,4 +42,14 @@ public interface AuthService {
 
     void resetPassword(ResetPasswordRequest request);
 
+    AuthResponse reactivateAccount(
+            AccountReactivationRequest request,
+            HttpServletRequest servletRequest
+    );
+
+    void deactivateAccount(
+            AccountPasswordRequest request,
+            CustomUserDetails currentUser
+    );
+
 }

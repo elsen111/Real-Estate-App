@@ -150,6 +150,20 @@ public class GlobalExceptionHandler {
 
     }
 
+    @ExceptionHandler(AccountStateException.class)
+    public ResponseEntity<ErrorResponse> handleAccountStateException(
+            AccountStateException ex,
+            HttpServletRequest request
+    ) {
+        log.warn(
+                "Account state exception at {}: {}",
+                request.getRequestURI(),
+                ex.getMessage()
+        );
+
+        return error(ex.getMessage(), HttpStatus.CONFLICT, request);
+    }
+
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(
             BusinessException ex,

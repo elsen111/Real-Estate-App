@@ -143,4 +143,32 @@ public class AuthController {
         );
     }
 
+    @PostMapping("/me/reactivate")
+    @Operation(summary = "Re-activate the own account.")
+    public ResponseEntity<ApiResponse<AuthResponse>> reactivateAccount(
+            @Valid @RequestBody AccountReactivationRequest request,
+            HttpServletRequest servletRequest
+    ) {
+
+        AuthResponse response = authService.reactivateAccount(request, servletRequest);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Account successfully re-activated and logged in.", response)
+        );
+    }
+
+    @PostMapping("/me/deactivate")
+    @Operation(summary = "Deactivate the own account.")
+    public ResponseEntity<ApiResponse<Void>> deactivateAccount(
+            @Valid @RequestBody AccountPasswordRequest request,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+
+        authService.deactivateAccount(request, currentUser);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Account successfully deactivated.", null)
+        );
+    }
+
 }

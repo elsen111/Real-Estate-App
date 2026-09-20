@@ -1,12 +1,15 @@
 package com.realestate.backend.service.impl;
 
+import com.realestate.backend.dto.request.AccountReactivationRequest;
+import com.realestate.backend.dto.response.AuthResponse;
 import com.realestate.backend.dto.response.AuthUserResponse;
-import com.realestate.backend.dto.request.DeleteAccountRequest;
+import com.realestate.backend.dto.request.AccountPasswordRequest;
 import com.realestate.backend.dto.request.UpdateProfileRequest;
 import com.realestate.backend.dto.response.UserProfilePhotoResponse;
 import com.realestate.backend.entity.MediaFileEntity;
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.entity.UserMediaEntity;
+import com.realestate.backend.exception.AccountStateException;
 import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.exception.UnauthorizedException;
@@ -18,6 +21,7 @@ import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.MediaService;
 import com.realestate.backend.service.UserService;
 import com.realestate.backend.storage.MediaUploadPolicy;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -70,7 +74,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deleteAccount(DeleteAccountRequest request, CustomUserDetails currentUser) {
+    public void deleteAccount(AccountPasswordRequest request, CustomUserDetails currentUser) {
 
         UserEntity user = userRepository.findByEmail(
                 currentUser.getEmail()
@@ -95,6 +99,73 @@ public class UserServiceImpl implements UserService {
                 .addKeyValue("userId", user.getId())
                 .log();
 
+    }
+
+    @Override
+    @Transactional
+    public UserEntity disableAccount(AccountPasswordRequest request, CustomUserDetails currentUser) {
+
+        UserEntity user = userRepository.findByEmail(
+                currentUser.getEmail()
+        ).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if(!passwordEncoder.matches(
+                request.getPassword(),
+                user.getPasswordHash()
+        )) {
+            throw new UnauthorizedException(
+                    "Incorrect password provided"
+            );
+        }
+
+        if(!user.getEnabled()) {
+            throw new AccountStateException("Account is already disabled");
+        }
+
+        user.setEnabled(false);
+
+        refreshTokenRepository.deleteAllByUser(user);
+
+        log.atInfo()
+                .setMessage("User account disabled")
+                .addKeyValue("userId", user.getId())
+                .log();
+
+        return user;
+
+    }
+
+    @Transactional
+    @Override
+    public UserEntity enableAccount(AccountReactivationRequest request) {
+
+        String email = request.getEmail() == null ? null : request.getEmail().trim().toLowerCase();;
+
+        UserEntity user = userRepository
+                .findByEmailAndDeletedFalse(email)
+                .orElseThrow(() ->
+                        new UnauthorizedException("Invalid email or password"));
+
+        if (user.getEnabled()) {
+            throw new AccountStateException("Account is already enabled");
+        }
+
+        if (!passwordEncoder.matches(
+                request.getPassword(),
+                user.getPasswordHash()
+        )) {
+            throw new UnauthorizedException("Invalid email or password");
+        }
+
+        user.setEnabled(true);
+
+        log.atInfo()
+                .setMessage("User account reactivated")
+                .addKeyValue("userId", user.getId())
+                .addKeyValue("userEmail", user.getEmail())
+                .log();
+
+        return user;
     }
 
     @Override
