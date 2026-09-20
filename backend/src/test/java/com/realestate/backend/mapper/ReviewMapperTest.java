@@ -26,21 +26,25 @@ class ReviewMapperTest {
     void shouldMapToEntity() {
 
         ReviewRequest request = createReviewRequest();
-        UUID propertyId = UUID.randomUUID();
+
+        PropertyEntity property = new PropertyEntity();
+        property.setId(UUID.randomUUID());
+
         UserEntity reviewer = createReviewer();
         AgencyEntity agency = createAgency();
 
         ReviewEntity entity =
-                reviewMapper.toEntity(request, propertyId, reviewer, agency);
+                reviewMapper.toEntity(request, property, reviewer, agency);
 
         assertNotNull(entity);
 
         assertEquals(request.getRating(), entity.getRating());
         assertEquals(request.getComment(), entity.getComment());
 
-        assertEquals(ReviewStatus.APPROVED, entity.getStatus());        assertNull(entity.getTarget());
+        assertEquals(ReviewStatus.APPROVED, entity.getStatus());
+        assertNull(entity.getTarget());
 
-        assertEquals(propertyId, entity.getProperty().getId());
+        assertSame(property, entity.getProperty());
 
         assertEquals(reviewer, entity.getReviewer());
         assertEquals(agency, entity.getAgency());
@@ -132,6 +136,7 @@ class ReviewMapperTest {
     }
 
     // Helpers
+
     private ReviewEntity createReviewEntity() {
 
         PropertyEntity property = new PropertyEntity();

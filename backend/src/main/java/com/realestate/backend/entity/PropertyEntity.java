@@ -124,6 +124,14 @@ public class PropertyEntity {
     @Column(name = "view_count", nullable = false)
     private long viewCount = 0L;
 
+    @Builder.Default
+    @Column(name = "average_rating", precision = 3, scale = 2, nullable = false)
+    private BigDecimal averageRating = BigDecimal.ZERO;
+
+    @Builder.Default
+    @Column(name = "review_count", nullable = false)
+    private Integer reviewCount = 0;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

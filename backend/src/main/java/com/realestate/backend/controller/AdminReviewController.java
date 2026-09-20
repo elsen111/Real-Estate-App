@@ -4,7 +4,6 @@ import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.request.AdminReviewFilterRequest;
 import com.realestate.backend.dto.request.ReviewStatusRequest;
 import com.realestate.backend.dto.response.ReviewResponse;
-import com.realestate.backend.enums.ReviewStatus;
 import com.realestate.backend.service.AdminReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;

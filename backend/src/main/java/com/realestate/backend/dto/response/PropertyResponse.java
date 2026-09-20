@@ -39,6 +39,8 @@ import java.util.UUID;
         "images",
         "mainImageUrl",
         "viewCount",
+        "reviewCount",
+        "averageRating",
         "agencyId",
         "agencyName",
         "assignedAgentId",
@@ -68,6 +70,8 @@ public class PropertyResponse {
     private String categoryName;
     private String mainImageUrl;
     private Long viewCount;
+    private Integer reviewCount;
+    private BigDecimal averageRating;
     private UUID agencyId;
     private String agencyName;
     private UUID assignedAgentId;

@@ -35,6 +35,8 @@ import java.util.UUID;
         "floor",
         "totalFloors",
         "viewCount",
+        "reviewCount",
+        "averageRating",
         "categoryId",
         "categoryName",
         "createdAt"
@@ -58,6 +60,8 @@ public class AdminAgencyPropertyResponse {
     private Integer floor;
     private Integer totalFloors;
     private Long viewCount;
+    private Integer reviewCount;
+    private BigDecimal averageRating;
     private UUID categoryId;
     private String categoryName;
     private LocalDateTime createdAt;
