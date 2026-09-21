@@ -3,9 +3,7 @@ package com.realestate.backend.service;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.PropertyStatus;
-import com.realestate.backend.exception.BadRequestException;
-import com.realestate.backend.exception.BusinessException;
-import com.realestate.backend.exception.ConflictException;
+import com.realestate.backend.exception.*;
 import com.realestate.backend.repository.FavoriteRepository;
 import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.UserRepository;
@@ -41,7 +39,7 @@ class FavoriteServiceImplTest {
     @Test
     void addFavorite_throws_whenNotLoggedIn() {
         assertThatThrownBy(() -> service.addFavorite(UUID.randomUUID(), null))
-                .isInstanceOf(BusinessException.class);
+                .isInstanceOf(UnauthorizedException.class);
     }
 
     @Test
@@ -66,7 +64,7 @@ class FavoriteServiceImplTest {
         when(propertyRepository.getReferenceById(propertyId)).thenReturn(property);
 
         assertThatThrownBy(() -> service.addFavorite(propertyId, user(userId)))
-                .isInstanceOf(BadRequestException.class);
+                .isInstanceOf(BusinessException.class);
     }
 
     @Test
@@ -76,7 +74,7 @@ class FavoriteServiceImplTest {
         when(favoriteRepository.existsByUser_IdAndProperty_Id(userId, propertyId)).thenReturn(false);
 
         assertThatThrownBy(() -> service.deleteFavorite(propertyId, user(userId)))
-                .isInstanceOf(BadRequestException.class);
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test

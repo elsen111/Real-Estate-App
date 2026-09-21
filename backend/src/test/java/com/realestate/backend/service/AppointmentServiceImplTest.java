@@ -93,7 +93,7 @@ class AppointmentServiceImplTest {
                         new CreateAppointmentRequest(),
                         clientUser(userId)
                 )
-        ).isInstanceOf(ResourceNotFoundException.class);
+        ).isInstanceOf(BusinessException.class);
     }
 
     @Test
@@ -236,7 +236,7 @@ class AppointmentServiceImplTest {
                         request
                 )
         ).isInstanceOf(
-                com.realestate.backend.exception.BadRequestException.class
+                com.realestate.backend.exception.BusinessException.class
         );
     }
 

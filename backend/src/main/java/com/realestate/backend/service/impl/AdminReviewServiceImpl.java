@@ -1,11 +1,8 @@
 package com.realestate.backend.service.impl;
 
 import com.realestate.backend.dto.request.AdminReviewFilterRequest;
-import com.realestate.backend.dto.request.AgencyFilterRequest;
 import com.realestate.backend.dto.request.ReviewStatusRequest;
-import com.realestate.backend.dto.response.AgencyResponse;
 import com.realestate.backend.dto.response.ReviewResponse;
-import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.ReviewEntity;
 import com.realestate.backend.enums.ReviewStatus;
 import com.realestate.backend.enums.ReviewTargetType;
@@ -13,7 +10,6 @@ import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.ReviewMapper;
 import com.realestate.backend.repository.ReviewRepository;
-import com.realestate.backend.repository.specification.AgencySpecification;
 import com.realestate.backend.repository.specification.ReviewSpecification;
 import com.realestate.backend.service.AdminReviewService;
 import lombok.RequiredArgsConstructor;

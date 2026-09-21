@@ -16,7 +16,6 @@ import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.UserRepository;
 import com.realestate.backend.repository.specification.AppointmentSpecification;
 import com.realestate.backend.security.CustomUserDetails;
-import com.realestate.backend.security.SecurityConstants;
 import com.realestate.backend.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +59,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 );
 
         if(property.getStatus() != PropertyStatus.ACTIVE){
-            throw new ResourceNotFoundException("Active property not found with id: " + propertyId);
+            throw new BusinessException("Property status should be active for this procedure. ID: " + propertyId);
         }
 
         boolean hasPendingAppointment = appointmentRepository.existsByPropertyIdAndClientIdAndStatus(
@@ -70,7 +69,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         );
 
         if (hasPendingAppointment){
-            throw new DuplicateAppointmentException("Pending appointment already exists with id: " + propertyId);
+            throw new DuplicateAppointmentException("Pending appointment already exists for the property with id: "
+                    + propertyId);
         };
 
         AppointmentEntity newAppointment = AppointmentEntity.builder()
@@ -205,7 +205,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (hasRole(currentUser, Role.AGENCY_OWNER) || hasRole(currentUser, Role.AGENT)) {
 
             AgencyMemberEntity agencyMember = agencyMemberRepository.findByUser_IdAndActiveTrue(currentUser.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("You are not an active member of any agency"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Agency not found associated with your profile: "
+                            + currentUser.getId()));
 
             UUID agencyId = agencyMember.getAgency().getId();
 
@@ -215,7 +216,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             return appointments.map(appointmentMapper::toResponse);
         }
 
-        throw new ForbiddenException("You do not have permission to view agency appointments");
+        throw new ForbiddenException("Your don't have permission to view agency appointments");
     }
 
     @Override
@@ -228,11 +229,12 @@ public class AppointmentServiceImpl implements AppointmentService {
                 );
 
         if(!canManageAppointment(appointment, currentUser)){
-            throw new ForbiddenException("You do not have permission to update this appointment");
+            throw new ResourceNotFoundException("Appointment not found in your list. Appointment ID: "
+                    + appointment.getId());
         }
 
         if(request.getStatus() == AppointmentStatus.PENDING){
-            throw new BadRequestException("Status cannot be changed to PENDING");
+            throw new BusinessException("Status cannot be changed to PENDING again.");
         }
 
         if(request.getStatus() == AppointmentStatus.APPROVED){

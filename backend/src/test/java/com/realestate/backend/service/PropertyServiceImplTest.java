@@ -95,9 +95,8 @@ class PropertyServiceImplTest {
                         agencyUser(userId)
                 )
         )
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("must belong to an agency");
-    }
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Agency not found associated with your profile.");    }
 
     @Test
     void createProperty_throws_whenNoActiveSubscription() {
@@ -128,7 +127,7 @@ class PropertyServiceImplTest {
                         agencyUser(userId)
                 )
         )
-                .isInstanceOf(ConflictException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("doesn't have an active subscription");
     }
 
@@ -172,7 +171,7 @@ class PropertyServiceImplTest {
                         agencyUser(userId)
                 )
         )
-                .isInstanceOf(ConflictException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("expired");
     }
 
@@ -219,7 +218,7 @@ class PropertyServiceImplTest {
                         agencyUser(userId)
                 )
         )
-                .isInstanceOf(ConflictException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("Listing limit reached");
     }
 
@@ -259,7 +258,7 @@ class PropertyServiceImplTest {
                         agencyUser(userId)
                 )
         )
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(ForbiddenException.class)
                 .hasMessageContaining("another agency");
     }
 
@@ -434,7 +433,7 @@ class PropertyServiceImplTest {
                 )
         )
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Agency owner not found");
+                .hasMessageContaining("Owner not found with id: " + ownerId);
     }
 
     @Test
@@ -462,8 +461,8 @@ class PropertyServiceImplTest {
                         agencyUser(ownerId)
                 )
         )
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("not associated with an agency");
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("Agency not found associated with the user: " + ownerId);
     }
 
     @Test
@@ -795,10 +794,8 @@ class PropertyServiceImplTest {
                         agencyUser(ownerId)
                 )
         )
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining(
-                        "does not belong to this agency"
-                );
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Agent not found with id: " + agentId);
     }
 
     @Test
@@ -855,8 +852,8 @@ class PropertyServiceImplTest {
                         agencyUser(ownerId)
                 )
         )
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("not an agent");
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Agent not found with id: " + nonAgentId);
     }
 
     @Test

@@ -1,7 +1,6 @@
 package com.realestate.backend.service.impl;
 
 import com.realestate.backend.dto.request.AccountReactivationRequest;
-import com.realestate.backend.dto.response.AuthResponse;
 import com.realestate.backend.dto.response.AuthUserResponse;
 import com.realestate.backend.dto.request.AccountPasswordRequest;
 import com.realestate.backend.dto.request.UpdateProfileRequest;
@@ -21,7 +20,6 @@ import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.MediaService;
 import com.realestate.backend.service.UserService;
 import com.realestate.backend.storage.MediaUploadPolicy;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -56,7 +54,7 @@ public class UserServiceImpl implements UserService {
 
         UserEntity user = userRepository.findByEmail(currentUser.getEmail())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found with this email"));
+                        new ResourceNotFoundException("User not found."));
 
         updateFullName(user, request);
         updateEmail(user, request);
@@ -85,7 +83,7 @@ public class UserServiceImpl implements UserService {
                 user.getPasswordHash()
         )) {
             throw new UnauthorizedException(
-                    "Incorrect password provided"
+                    "Invalid password."
             );
         }
 
@@ -114,12 +112,12 @@ public class UserServiceImpl implements UserService {
                 user.getPasswordHash()
         )) {
             throw new UnauthorizedException(
-                    "Incorrect password provided"
+                    "Invalid password."
             );
         }
 
         if(!user.getEnabled()) {
-            throw new AccountStateException("Account is already disabled");
+            throw new AccountStateException("Account is already disabled.");
         }
 
         user.setEnabled(false);
@@ -177,7 +175,7 @@ public class UserServiceImpl implements UserService {
 
         UserEntity user = userRepository.findById(currentUser.getId())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with this id")
+                        () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
                 );
 
         Optional<UserMediaEntity> existingPhoto =
@@ -222,7 +220,7 @@ public class UserServiceImpl implements UserService {
                 .findByUserId(currentUser.getId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Profile photo not found."
+                                "Profile image not found for user: " + currentUser.getId()
                         ));
 
         userMediaRepository.delete(userMedia);
@@ -269,7 +267,7 @@ public class UserServiceImpl implements UserService {
 
         if(userRepository.existsByEmail(email)) {
             throw new ConflictException(
-                    "User already exists with this email"
+                    "User already exists with the email: " + email
             );
         }
 

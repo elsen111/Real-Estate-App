@@ -105,7 +105,7 @@ class AdminAgencyServiceImplTest {
         when(subscriptionPlanRepository.existsByIdAndActiveTrue(planId)).thenReturn(true);
 
         assertThatThrownBy(() -> service.createAgencySubscription(agencyId, planId))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("not been approved");
     }
 

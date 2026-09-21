@@ -2,7 +2,7 @@ package com.realestate.backend.service.impl;
 
 import com.realestate.backend.entity.AgencySubscriptionEntity;
 import com.realestate.backend.enums.SubscriptionNotificationType;
-import com.realestate.backend.exception.BusinessException;
+import com.realestate.backend.exception.EmailSendingException;
 import com.realestate.backend.service.EmailService;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -73,7 +73,7 @@ public class EmailServiceImpl implements EmailService {
                     .log();
 
         } catch (Exception e) {
-            throw new BusinessException("Failed to send password reset OTP email");
+            throw new EmailSendingException("Failed to send password reset OTP email");
         }
     }
 
@@ -175,8 +175,7 @@ public class EmailServiceImpl implements EmailService {
                     .log();
 
         } catch (Exception e) {
-
-            throw new BusinessException(
+            throw new EmailSendingException(
                     "Failed to send subscription expiration email"
             );
         }

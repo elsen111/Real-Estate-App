@@ -5,6 +5,8 @@ import com.realestate.backend.dto.response.AdminSubscriptionPlanResponse;
 import com.realestate.backend.entity.SubscriptionPlanEntity;
 import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.BadRequestException;
+import com.realestate.backend.exception.BusinessException;
+import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.SubscriptionPlanMapper;
 import com.realestate.backend.repository.AgencySubscriptionRepository;
@@ -39,7 +41,7 @@ class AdminSubscriptionPlanServiceImplTest {
         when(subscriptionPlanRepository.existsByNameIgnoreCase("Gold Plan")).thenReturn(true);
 
         assertThatThrownBy(() -> service.createSubscriptionPlan(request))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("already exists");
     }
 
@@ -68,7 +70,7 @@ class AdminSubscriptionPlanServiceImplTest {
         when(agencySubscriptionRepository.existsByPlanIdAndStatus(id, SubscriptionStatus.ACTIVE)).thenReturn(true);
 
         assertThatThrownBy(() -> service.softDeleteSubscriptionPlan(id))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("already in use");
     }
 

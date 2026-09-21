@@ -9,7 +9,7 @@ import com.realestate.backend.entity.ReviewEntity;
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.ReviewStatus;
 import com.realestate.backend.enums.ReviewTargetType;
-import com.realestate.backend.exception.BusinessException;
+import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ForbiddenException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.ReviewMapper;
@@ -60,22 +60,22 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         if(!propertyRepository.existsById(propertyId)) {
-            throw new ResourceNotFoundException("Property with id " + propertyId + " not found");
+            throw new ResourceNotFoundException("Property not found with id: " + propertyId);
         }
 
         UserEntity user = userRepository.findById(currentUser.getId())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("User with id " + currentUser.getId() + " not found")
+                        () -> new ResourceNotFoundException("User not found with id " + currentUser.getId())
                 );
 
         if(reviewRepository.existsByReviewerIdAndPropertyId(user.getId(), propertyId)) {
-            throw new BusinessException("You already have a review for this property.");
+            throw new ConflictException("You already have a review for this property.");
         }
 
         PropertyEntity property = propertyRepository.findById(propertyId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Property with id " + propertyId + " not found"
+                                "Property not found with id: " + propertyId
                         ));
 
         ReviewEntity createdReview = reviewMapper.toEntity(
@@ -126,7 +126,7 @@ public class ReviewServiceImpl implements ReviewService {
     public Page<ReviewResponse> getPropertyReviews(UUID propertyId, PublicReviewFilterRequest filterRequest, Pageable pageable) {
 
         if(!propertyRepository.existsById(propertyId)) {
-            throw new ResourceNotFoundException("Property with id " + propertyId + " not found");
+            throw new ResourceNotFoundException("Property not found with id: " + propertyId);
         }
 
         Specification<ReviewEntity> specification = ReviewSpecification.withPublicFilter(null, propertyId, filterRequest);
@@ -146,17 +146,18 @@ public class ReviewServiceImpl implements ReviewService {
             throw new ForbiddenException("Only client users are allowed to create reviews");
         }
 
-        AgencyEntity agency = agencyRepository.findById(agencyId).orElseThrow(
-                () -> new ResourceNotFoundException("Agency with id " + agencyId + " not found")
+        AgencyEntity agency = agencyRepository.findById(agencyId)
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Agency not found with id: " + agencyId)
         );
 
         UserEntity user = userRepository.findById(currentUser.getId())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("User with id " + currentUser.getId() + " not found")
+                        () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
                 );
 
         if(reviewRepository.existsByReviewerIdAndAgencyId(user.getId(), agencyId)) {
-            throw new BusinessException("You already have a review for this agency.");
+            throw new ConflictException("You already have a review for this agency.");
         }
 
         ReviewEntity createdReview = reviewMapper.toEntity(request, null, user, agency);
@@ -179,7 +180,7 @@ public class ReviewServiceImpl implements ReviewService {
     public Page<ReviewResponse> getAgencyReviews(UUID agencyId, PublicReviewFilterRequest filterRequest, Pageable pageable) {
 
         if(!agencyRepository.existsById(agencyId)) {
-            throw new ResourceNotFoundException("Agency with id " + agencyId + " not found");
+            throw new ResourceNotFoundException("Agency not found with id: " + agencyId);
         }
 
         Specification<ReviewEntity> specification = ReviewSpecification.withPublicFilter(agencyId, null, filterRequest);
@@ -193,16 +194,17 @@ public class ReviewServiceImpl implements ReviewService {
     public ReviewResponse updateOwnReview(UUID reviewId, ReviewRequest request, CustomUserDetails currentUser) {
 
         if(!reviewRepository.existsByIdAndReviewerId(reviewId, currentUser.getId())) {
-            throw new ResourceNotFoundException("Review with id " + reviewId + " not found");
+            throw new ResourceNotFoundException("Review not found with id: " + reviewId);
         }
 
         UserEntity user = userRepository.findById(currentUser.getId())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("User with id " + currentUser.getId() + " not found")
+                        () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
                 );
 
-        ReviewEntity review = reviewRepository.findById(reviewId).orElseThrow(
-                () -> new ResourceNotFoundException("Review with id " + reviewId + " not found")
+        ReviewEntity review = reviewRepository.findById(reviewId)
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Review not found with id " + reviewId)
         );
 
         reviewMapper.toEntity(request, user, review);
@@ -248,7 +250,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         ReviewEntity review = reviewRepository.findByIdAndReviewerId(reviewId, currentUser.getId())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Review with id " + reviewId + " not found")
+                        () -> new ResourceNotFoundException("Review not found with id: " + reviewId)
                 );
 
         ReviewTargetType target = review.getTarget();

@@ -4,7 +4,8 @@ import com.realestate.backend.dto.request.PropertyFilterRequest;
 import com.realestate.backend.dto.response.PropertyResponse;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.enums.PropertyStatus;
-import com.realestate.backend.exception.BadRequestException;
+import com.realestate.backend.exception.BusinessException;
+import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.PropertyMapper;
 import com.realestate.backend.repository.PropertyRepository;
@@ -120,7 +121,7 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
                     .addKeyValue("newStatus", newStatus)
                     .log();
 
-            throw new BadRequestException(
+            throw new ConflictException(
                     "Property is already in status: " + currentStatus
             );
         }
@@ -138,7 +139,7 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
                     .addKeyValue("newStatus", newStatus)
                     .log();
 
-            throw new BadRequestException(
+            throw new BusinessException(
                     "Cannot change property status from "
                     + currentStatus
                     + " to "

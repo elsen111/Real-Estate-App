@@ -52,11 +52,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponse getActiveCategoryById(UUID categoryId) {
 
-        CategoryEntity category = categoryRepository.findByIdAndActiveTrue(categoryId);
-
-        if(category == null){
-            throw new ResourceNotFoundException("Category not found with id " + categoryId);
-        }
+        CategoryEntity category = categoryRepository.findByIdAndActiveTrue(categoryId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Active category not found with id: " + categoryId)
+                );
 
         return categoryMapper.toPublicResponse(category);
 
@@ -78,7 +77,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         CategoryEntity category = categoryRepository.findById(categoryId)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Category not found with id " + categoryId)
+                        () -> new ResourceNotFoundException("Category not found with id: " + categoryId)
                 );
 
         return categoryMapper.toAdminResponse(category);
@@ -89,7 +88,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse createCategory(CreateCategoryRequest request) {
 
         if(categoryRepository.existsByNameIgnoreCaseAndDeletedFalse(request.getName())) {
-            throw new ConflictException("Category with name " + request.getName() + " already exists");
+            throw new ConflictException("Category already exists with name: " + request.getName());
         }
 
         CategoryEntity newCategory = categoryMapper.toCreatedEntity(request);
@@ -115,11 +114,11 @@ public class CategoryServiceImpl implements CategoryService {
 
         CategoryEntity oldCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Category not found with id " + categoryId)
+                        () -> new ResourceNotFoundException("Category not found with id: " + categoryId)
                 );
 
         if(categoryRepository.existsByNameIgnoreCaseAndIdNotAndDeletedFalse(request.getName(), categoryId)) {
-            throw new ConflictException("Category with name " + request.getName() + " already exists");
+            throw new ConflictException("Another category already exists with name: " + request.getName());
         }
 
         String oldName = oldCategory.getName();
@@ -146,13 +145,14 @@ public class CategoryServiceImpl implements CategoryService {
 
         CategoryEntity category = categoryRepository.findById(categoryId)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Category not found with id " + categoryId)
+                        () -> new ResourceNotFoundException("Category not found with id: " + categoryId)
                 );
 
         boolean isCategoryAssignedToProperty = propertyRepository.existsByCategoryIdAndStatus(categoryId, PropertyStatus.ACTIVE);
 
         if(isCategoryAssignedToProperty) {
-            throw new BusinessException("Cannot deactivate a category that is already assigned to an existing property");
+            throw new BusinessException("Cannot deactivate a category that is already assigned to an existing property. Category ID: "
+                    + category.getId());
         }
 
         boolean newStatus = !category.getActive();
@@ -178,13 +178,14 @@ public class CategoryServiceImpl implements CategoryService {
 
         CategoryEntity category = categoryRepository.findById(categoryId)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Category not found with id " + categoryId)
+                        () -> new ResourceNotFoundException("Category not found with id: " + categoryId)
                 );
 
         boolean isCategoryAssignedToProperty = propertyRepository.existsByCategoryIdAndStatus(categoryId, PropertyStatus.ACTIVE);
 
         if(isCategoryAssignedToProperty) {
-            throw new BusinessException("Cannot delete a category as it is already assigned to an existing property");
+            throw new BusinessException("Cannot delete a category that is already assigned to an existing property. Category ID: "
+                    + categoryId);
         }
 
         String categoryName = category.getName();

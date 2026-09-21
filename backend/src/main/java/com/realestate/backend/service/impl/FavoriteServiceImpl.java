@@ -6,10 +6,7 @@ import com.realestate.backend.entity.FavoriteEntity;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.PropertyStatus;
-import com.realestate.backend.exception.BadRequestException;
-import com.realestate.backend.exception.BusinessException;
-import com.realestate.backend.exception.ConflictException;
-import com.realestate.backend.exception.ResourceNotFoundException;
+import com.realestate.backend.exception.*;
 import com.realestate.backend.mapper.FavoriteMapper;
 import com.realestate.backend.mapper.PropertyMapper;
 import com.realestate.backend.repository.FavoriteRepository;
@@ -45,7 +42,7 @@ public class FavoriteServiceImpl implements FavoriteService {
     public FavoriteResponse addFavorite(UUID propertyId, CustomUserDetails currentUser) {
 
         if(currentUser == null) {
-            throw new BusinessException("You need to be logged in");
+            throw new UnauthorizedException("You should log in to add favorites.");
         }
 
         UserEntity user = userRepository.findById(currentUser.getId())
@@ -56,13 +53,13 @@ public class FavoriteServiceImpl implements FavoriteService {
         boolean IsAlreadyFavorite = favoriteRepository.existsByUser_IdAndProperty_Id(user.getId(), propertyId);
 
         if(IsAlreadyFavorite) {
-            throw new ConflictException("Property already exists in favorites list.");
+            throw new ConflictException("This property is already added to your favorites.");
         }
 
         PropertyEntity property = propertyRepository.getReferenceById(propertyId);
 
         if(property.getStatus() != PropertyStatus.ACTIVE) {
-            throw  new BadRequestException("Property is not active.");
+            throw  new BusinessException("Property is not active. Property ID: " + propertyId);
         }
 
         FavoriteEntity addedFavorite = FavoriteEntity.builder()
@@ -87,17 +84,10 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Transactional
     public void deleteFavorite(UUID propertyId, CustomUserDetails currentUser) {
 
-//        UserEntity user = userRepository.findById(currentUser.getId())
-//                .orElseThrow(
-//                        () -> new ResourceNotFoundException("User not found with id " +  currentUser.getId())
-//                );
-
-//        boolean isFavorite = favoriteRepository.existsByUser_IdAndProperty_Id(user.getId(), propertyId);
-
         boolean isFavorite = favoriteRepository.existsByUser_IdAndProperty_Id(currentUser.getId(), propertyId);
 
         if(!isFavorite) {
-            throw new BadRequestException("Favorite does not exist in your list.");
+            throw new ResourceNotFoundException("Property not found in your list. Property ID: " + propertyId);
         }
 
         favoriteRepository.deleteByUser_IdAndProperty_Id(currentUser.getId(), propertyId);

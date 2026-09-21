@@ -8,6 +8,7 @@ import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.exception.BusinessException;
+import com.realestate.backend.exception.ForbiddenException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.UserMapper;
 import com.realestate.backend.repository.AgencyMemberRepository;
@@ -127,8 +128,8 @@ class AdminUserServiceImplTest {
         assertThatThrownBy(() ->
                 service.changeUserStatus(userId, request)
         )
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("deleted user");
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("User not found");
 
         assertThat(user.getEnabled()).isFalse();
 
@@ -340,7 +341,7 @@ class AdminUserServiceImplTest {
         assertThatThrownBy(() ->
                 service.softDeleteUser(userId, currentUser)
         )
-                .isInstanceOf(BusinessException.class)
+                .isInstanceOf(ForbiddenException.class)
                 .hasMessage("Cannot delete super admin.");
 
         verify(currentUser).getId();

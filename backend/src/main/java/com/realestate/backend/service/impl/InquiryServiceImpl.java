@@ -7,14 +7,10 @@ import com.realestate.backend.dto.response.InquiryResponse;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.InquiryStatus;
 import com.realestate.backend.enums.PropertyStatus;
-import com.realestate.backend.exception.BadRequestException;
-import com.realestate.backend.exception.DuplicateInquiryException;
-import com.realestate.backend.exception.ForbiddenException;
-import com.realestate.backend.exception.ResourceNotFoundException;
+import com.realestate.backend.exception.*;
 import com.realestate.backend.mapper.InquiryMapper;
 import com.realestate.backend.repository.*;
 import com.realestate.backend.repository.specification.InquirySpecification;
-import com.realestate.backend.repository.specification.UserSpecification;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.security.SecurityConstants;
 import com.realestate.backend.service.InquiryService;
@@ -65,7 +61,7 @@ public class InquiryServiceImpl implements InquiryService {
                 );
 
         if(property.getStatus() != PropertyStatus.ACTIVE){
-            throw new ResourceNotFoundException("Active property not found with id: " + propertyId);
+            throw new BusinessException("Property status should be active for this procedure. ID: " + propertyId);
         }
 
         boolean hasOpenInquiry = inquiryRepository.existsByPropertyIdAndClientIdAndStatusNot(
@@ -128,7 +124,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         AgencyMemberEntity agencyMember = agencyMemberRepository.findByUser_IdAndActiveTrue(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "You are not an active member of any agency"));
+                        "Agency not found associated with your profile."));
 
         UUID agencyId = agencyMember.getAgency().getId();
 
@@ -165,7 +161,7 @@ public class InquiryServiceImpl implements InquiryService {
                 );
 
         if(!canManageInquiry(inquiry, currentUser)){
-            throw new ForbiddenException("You do not have permission to update this inquiry");
+            throw new ResourceNotFoundException("Inquiry not found with id: " + inquiryId);
         }
 
         if(!ALLOWED_STATUSES_FOR_UPDATE.contains(request.getStatus())){

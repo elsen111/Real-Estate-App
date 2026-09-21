@@ -194,6 +194,21 @@ public class GlobalExceptionHandler {
         return error(ex.getMessage(), HttpStatus.CONFLICT, request);
     }
 
+    @ExceptionHandler(EmailSendingException.class)
+    public ResponseEntity<ErrorResponse> handleEmailSendingException(
+            EmailSendingException ex,
+            HttpServletRequest request
+    ) {
+
+        log.warn(
+                "Failure at {}: {}",
+                request.getRequestURI(),
+                ex.getMessage()
+        );
+
+        return error(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
+
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ErrorResponse> handleForbiddenException(
             ForbiddenException ex,

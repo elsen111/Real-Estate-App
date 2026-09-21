@@ -8,10 +8,7 @@ import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.InquiryStatus;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.Role;
-import com.realestate.backend.exception.BadRequestException;
-import com.realestate.backend.exception.DuplicateInquiryException;
-import com.realestate.backend.exception.ForbiddenException;
-import com.realestate.backend.exception.ResourceNotFoundException;
+import com.realestate.backend.exception.*;
 import com.realestate.backend.mapper.InquiryMapper;
 import com.realestate.backend.repository.AgencyMemberRepository;
 import com.realestate.backend.repository.AgencyRepository;
@@ -70,7 +67,7 @@ class InquiryServiceImplTest {
         when(propertyRepository.findById(propertyId)).thenReturn(Optional.of(property));
 
         assertThatThrownBy(() -> service.createInquiry(propertyId, new CreateInquiryRequest(), clientUser(userId)))
-                .isInstanceOf(ResourceNotFoundException.class);
+                .isInstanceOf(BusinessException.class);
     }
 
     @Test
@@ -129,10 +126,8 @@ class InquiryServiceImplTest {
         request.setStatus(InquiryStatus.CONTACTED);
 
         assertThatThrownBy(() -> service.updateStatus(otherClient, inquiryId, request))
-                .isInstanceOf(ForbiddenException.class);
+                .isInstanceOf(ResourceNotFoundException.class);
     }
-
-    // ----- New method: getAgencyInquiriesById -----
 
     @Test
     void getAgencyInquiriesById_throws_whenAgencyDoesNotExist() {

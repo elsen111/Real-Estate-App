@@ -66,11 +66,12 @@ public class AgencyMemberServiceImpl implements AgencyMemberService {
             String defaultPosition
     ) {
         AgencyEntity agency = agencyRepository.findById(agencyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Agency not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Agency not found with id: " + agencyId));
 
         UserEntity targetUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "User not found. Ask the user to register first, then assign them to the agency."
+                        "User not found with id - " + userId
+                                + " .Ask the user to register first, then assign them to the agency."
                 ));
 
         if (targetUser.getAgency() != null) {
