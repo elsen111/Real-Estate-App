@@ -1,8 +1,10 @@
 package com.realestate.backend.mapper;
 
 import com.realestate.backend.dto.response.AgencyMemberResponse;
+import com.realestate.backend.dto.response.UserSummaryResponse;
 import com.realestate.backend.entity.AgencyMemberEntity;
 import com.realestate.backend.entity.RoleEntity;
+import com.realestate.backend.entity.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -20,6 +22,8 @@ public interface AgencyMemberMapper {
     @Mapping(target = "userEmail", source = "user.email")
     @Mapping(target = "position", source = "user.roles", qualifiedByName = "mapRolesToPosition")
     AgencyMemberResponse toResponse(AgencyMemberEntity agencyMember);
+
+    UserSummaryResponse toUserSummary(UserEntity user);
 
     @Named("mapRolesToPosition")
     default String mapRolesToPosition(Set<RoleEntity> roles) {

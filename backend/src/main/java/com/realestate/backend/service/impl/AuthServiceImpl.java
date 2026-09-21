@@ -128,6 +128,7 @@ public class AuthServiceImpl implements AuthService {
         AgencyMemberEntity ownerMembership = AgencyMemberEntity.builder()
                 .agency(agency)
                 .user(owner)
+                .role(Role.AGENCY_OWNER)
                 .active(true)
                 .build();
 

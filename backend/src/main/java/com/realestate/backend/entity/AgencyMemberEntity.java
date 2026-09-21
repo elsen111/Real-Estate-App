@@ -1,5 +1,6 @@
 package com.realestate.backend.entity;
 
+import com.realestate.backend.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -52,6 +53,24 @@ public class AgencyMemberEntity {
         @Builder.Default
         @Column(name = "active", nullable = false)
         private boolean active = true;
+
+        @Enumerated(EnumType.STRING)
+        @Column(nullable = false, length = 30)
+        private Role role;
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(
+                name = "added_by",
+                foreignKey = @ForeignKey(name = "fk_agency_members_added_by")
+        )
+        private UserEntity addedBy;
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(
+                name = "removed_by",
+                foreignKey = @ForeignKey(name = "fk_agency_members_removed_by")
+        )
+        private UserEntity removedBy;
 
         @CreationTimestamp
         @Column(name = "created_at", nullable = false, updatable = false)

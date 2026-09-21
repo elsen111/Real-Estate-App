@@ -4,6 +4,7 @@ import com.realestate.backend.dto.request.AdminUserFilterRequest;
 import com.realestate.backend.dto.request.UserStatusRequest;
 import com.realestate.backend.dto.response.UserResponse;
 import com.realestate.backend.entity.AgencyEntity;
+import com.realestate.backend.entity.AgencyMemberEntity;
 import com.realestate.backend.entity.RoleEntity;
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.PropertyStatus;
@@ -13,6 +14,7 @@ import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.UserMapper;
 import com.realestate.backend.repository.*;
 import com.realestate.backend.repository.specification.UserSpecification;
+import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.AdminUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +37,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     private final AgencyRepository agencyRepository;
     private final PropertyRepository propertyRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final AgencyMemberRepository agencyMemberRepository;
 
 
     @Override
@@ -124,11 +127,20 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     @Transactional
-    public void softDeleteUser(UUID userId) {
+    public void softDeleteUser(UUID userId, CustomUserDetails currentUser) {
 
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("User not found with id" + userId)
+                );
+
+        UUID assignerId = currentUser.getId();
+
+        UserEntity assigner = userRepository.findById(assignerId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                "User not found with id " + assignerId
+                        )
                 );
 
         boolean isUserSuperAdmin = user.getRoles()
@@ -157,6 +169,14 @@ public class AdminUserServiceImpl implements AdminUserService {
             if(hasActiveListings) {
                 throw new BusinessException("Cannot delete the user (agency owner) whose agency has active listings.");
             }
+
+            AgencyMemberEntity membership = agencyMemberRepository.findByUserAndActiveTrue(user)
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException("Agency member not found with id " + user.getId())
+                    );
+
+            membership.setActive(false);
+            membership.setRemovedBy(assigner);
 
             agency.setIsDeleted(true);
 

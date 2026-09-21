@@ -15,6 +15,7 @@ public interface AgencyMemberService {
     );
 
     AgencyMemberResponse assignMember(
+            UUID assignerId,
             UUID agencyId,
             UUID userId,
             Role role,

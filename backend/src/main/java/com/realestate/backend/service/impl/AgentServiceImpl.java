@@ -110,6 +110,11 @@ public class AgentServiceImpl implements AgentService {
 
         ensureCanRemoveAgent(membership.getAgency().getId(), currentUser);
 
+        UserEntity authenticatedUser = userRepository.findById(currentUser.getId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
+                );
+
         UserEntity agent = membership.getUser();
 
         propertyRepository.unassignAgentFromAllProperties(agent.getId());
@@ -117,6 +122,7 @@ public class AgentServiceImpl implements AgentService {
         refreshTokenService.revokeAllUserRefreshTokens(agent.getId());
 
         membership.setActive(false);
+        membership.setRemovedBy(authenticatedUser);
 
         AgencyEntity agency = membership.getAgency();
 
