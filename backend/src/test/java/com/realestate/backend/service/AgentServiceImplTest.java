@@ -98,10 +98,6 @@ class AgentServiceImplTest {
         );
     }
 
-    // -------------------------------------------------------------------------
-    // getAgentByUserId
-    // -------------------------------------------------------------------------
-
     @Test
     void getAgentByUserId_returnsMappedAgent_whenAgentExists() {
         UUID userId = UUID.randomUUID();
@@ -152,10 +148,6 @@ class AgentServiceImplTest {
 
         verifyNoInteractions(userMapper);
     }
-
-    // -------------------------------------------------------------------------
-    // getPublicAgentProperties
-    // -------------------------------------------------------------------------
 
     @Test
     void getPublicAgentProperties_returnsMappedPage_whenAgentExists() {
@@ -307,10 +299,6 @@ class AgentServiceImplTest {
                 .toPublicAgencyPropertyResponse(any());
     }
 
-    // -------------------------------------------------------------------------
-    // deleteAgentFromAgency - authorization
-    // -------------------------------------------------------------------------
-
     @Test
     void deleteAgentFromAgency_throws_whenCallerNotOwnerOrSuperAdmin() {
         UUID agentId = UUID.randomUUID();
@@ -369,7 +357,7 @@ class AgentServiceImplTest {
         )
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage(
-                        "Only the agency's owner or a super admin can remove this agent"
+                        "You don't have permission to perform this procedure."
                 );
 
         verify(propertyRepository, never())
@@ -403,7 +391,7 @@ class AgentServiceImplTest {
         )
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage(
-                        "Active agent not found with id: " + agentId
+                        "Active agent not found with user id: " + agentId
                 );
 
         verifyNoInteractions(userRepository);
@@ -493,10 +481,6 @@ class AgentServiceImplTest {
         verify(refreshTokenService)
                 .revokeAllUserRefreshTokens(agentId);
     }
-
-    // -------------------------------------------------------------------------
-    // deleteAgentFromAgency - successful agency owner removal
-    // -------------------------------------------------------------------------
 
     @Test
     void deleteAgentFromAgency_succeeds_whenCallerIsAgencyOwner() {
@@ -632,10 +616,6 @@ class AgentServiceImplTest {
         verify(refreshTokenService)
                 .revokeAllUserRefreshTokens(agentId);
     }
-
-    // -------------------------------------------------------------------------
-    // getOwnAssignedProperties
-    // -------------------------------------------------------------------------
 
     @Test
     void getOwnAssignedProperties_returnsMappedPage_forCurrentAgent() {
@@ -797,10 +777,6 @@ class AgentServiceImplTest {
                         eq(pageable)
                 );
     }
-
-    // -------------------------------------------------------------------------
-    // getOwnInquiries
-    // -------------------------------------------------------------------------
 
     @Test
     void getOwnInquiries_returnsMappedPage_forCurrentAgent() {

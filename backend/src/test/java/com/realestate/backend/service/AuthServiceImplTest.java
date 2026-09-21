@@ -124,7 +124,7 @@ class AuthServiceImplTest {
                 )
         )
                 .isInstanceOf(ConflictException.class)
-                .hasMessage("User already exists with this email");
+                .hasMessage("User already exists with email: " + request.getEmail().toLowerCase());
 
         verify(userRepository)
                 .existsByEmail("existing@test.com");
@@ -334,7 +334,7 @@ class AuthServiceImplTest {
                 )
         )
                 .isInstanceOf(ConflictException.class)
-                .hasMessage("User already exists with this email");
+                .hasMessage("User already exists with email: " + ownerRequest.getEmail());
 
         verify(userRepository)
                 .existsByEmail("owner@example.com");
@@ -378,7 +378,7 @@ class AuthServiceImplTest {
                 )
         )
                 .isInstanceOf(ConflictException.class)
-                .hasMessage("Agency already exists with this email");
+                .hasMessage("Agency already exists with email: " + agencyRequest.getAgencyBusinessEmail());
 
         verify(userRepository)
                 .existsByEmail("owner@example.com");
@@ -907,7 +907,7 @@ class AuthServiceImplTest {
                 service.currentUser(currentUser)
         )
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("User not found");
+                .hasMessage("User not found.");
 
         verifyNoInteractions(agencyMemberRepository);
     }

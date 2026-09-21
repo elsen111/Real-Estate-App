@@ -82,7 +82,6 @@ public class RefreshTokenServiceImpl {
                 .userAgent(userAgent)
                 .build();
 
-        refreshTokenRepository.save(oldToken);
         refreshTokenRepository.save(newToken);
 
         log.atInfo()

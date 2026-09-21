@@ -13,7 +13,7 @@ import com.realestate.backend.dto.response.UserResponse;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.SubscriptionStatus;
-import com.realestate.backend.exception.BadRequestException;
+import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.AgencyMapper;
 import com.realestate.backend.mapper.PropertyMapper;
@@ -65,7 +65,7 @@ public class AgencyServiceImpl implements AgencyService {
 
         UserEntity user = userRepository.findById(currentUser.getId())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with id " + currentUser.getId())
+                        () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
                 );
 
         AgencyEntity currentAgency = user.getAgency();
@@ -87,13 +87,8 @@ public class AgencyServiceImpl implements AgencyService {
 
         UserEntity user = userRepository.findById(currentUser.getId())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with id " + currentUser.getId())
+                        () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
                 );
-
-//        AgencyEntity agency = agencyRepository.findById(user.getAgency().getId())
-//                .orElseThrow(
-//                        () -> new ResourceNotFoundException("Agency not found with id " + user.getAgency().getId())
-//                );
 
         AgencyEntity agency = updateAgency(user.getAgency().getId(), request);
 
@@ -114,13 +109,13 @@ public class AgencyServiceImpl implements AgencyService {
 
         UserEntity user = userRepository.findById(currentUser.getId())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with id " + currentUser.getId())
+                        () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
                 );
 
         AgencyEntity agency = user.getAgency();
 
         if(agency == null) {
-            throw new ResourceNotFoundException("The user doesn't belong to any agency: " + currentUser.getId());
+            throw new ResourceNotFoundException("Agency not found associated with the user: " + currentUser.getId());
         }
 
         AgencySubscriptionEntity agencySubscription = agencySubscriptionRepository
@@ -129,7 +124,7 @@ public class AgencyServiceImpl implements AgencyService {
                         SubscriptionStatus.ACTIVE
                 )
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Agency currently doesn't have active subscription. Id: " + agency.getId())
+                        () -> new ResourceNotFoundException("Active subscription not found for agency: " + agency.getId())
                 );
 
         long usedListings = propertyRepository.countByAgencyIdAndStatusIn(
@@ -171,15 +166,8 @@ public class AgencyServiceImpl implements AgencyService {
 
         UserEntity user = userRepository.findById(currentUser.getId())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with id " + currentUser.getId())
+                        () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
                 );
-
-//        AgencyEntity agency = agencyRepository.findById(user.getAgency().getId())
-//                .orElseThrow(
-//                        () -> new ResourceNotFoundException("Agency not found with id " + user.getAgency().getId())
-//                );
-
-
 
         Specification<PropertyEntity> specification = AgencyPropertySpecification
                 .withFilter(filter);
@@ -205,7 +193,7 @@ public class AgencyServiceImpl implements AgencyService {
 
         AgencyEntity agency = agencyRepository.findById(agencyId)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Agency not found with id " + agencyId)
+                        () -> new ResourceNotFoundException("Agency not found with id: " + agencyId)
                 );
 
         long totalAgents = userRepository.countByAgency(agency) - 1;
@@ -247,13 +235,13 @@ public class AgencyServiceImpl implements AgencyService {
 
          UserEntity user = userRepository.findById(currentUser.getId())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with this id")
+                        () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
                 );
 
          AgencyEntity agency = user.getAgency();
 
          if(agency == null) {
-             throw new ResourceNotFoundException("This user doesn't belong to any agency: " + currentUser.getId());
+             throw new ResourceNotFoundException("Agency not found associated with the user: " + user.getId());
          }
 
         Optional<AgencyMediaEntity> existingLogo =
@@ -309,14 +297,14 @@ public class AgencyServiceImpl implements AgencyService {
 
         UserEntity user = userRepository.findById(currentUser.getId())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with id " + currentUser.getId())
+                        () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
                 );
 
         AgencyMediaEntity agencyMedia = agencyMediaRepository
                 .findByAgencyId(user.getAgency().getId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Logo not found."
+                                "Logo not found for agency: " + user.getAgency().getId()
                         ));
 
         agencyMediaRepository.delete(agencyMedia);
@@ -336,7 +324,7 @@ public class AgencyServiceImpl implements AgencyService {
                 );
 
         if(agencyRepository.existsByEmail(request.getEmail()) && !agency.getEmail().equals(request.getEmail())) {
-            throw new BadRequestException("Email already exists for another agency.");
+            throw new ConflictException("Email already exists for another agency.");
         }
 
         agency.setName(request.getName());

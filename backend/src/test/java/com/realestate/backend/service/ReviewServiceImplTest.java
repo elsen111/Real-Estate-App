@@ -8,6 +8,7 @@ import com.realestate.backend.enums.Role;
 import com.realestate.backend.enums.ReviewStatus;
 import com.realestate.backend.enums.ReviewTargetType;
 import com.realestate.backend.exception.BusinessException;
+import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ForbiddenException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.ReviewMapper;
@@ -183,7 +184,7 @@ class ReviewServiceImplTest {
                         new ReviewRequest(),
                         clientUser(userId)
                 )
-        ).isInstanceOf(BusinessException.class);
+        ).isInstanceOf(ConflictException.class);
 
         verify(propertyRepository).existsById(propertyId);
 

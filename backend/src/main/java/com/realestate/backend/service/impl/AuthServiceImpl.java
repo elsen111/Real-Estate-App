@@ -246,7 +246,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse currentUser(CustomUserDetails currentUser) {
         UserEntity user = userRepository.findByEmail(currentUser.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
 
         AgencyMemberEntity membership = agencyMemberRepository
                 .findByUserAndActiveTrue(user)
@@ -268,7 +268,7 @@ public class AuthServiceImpl implements AuthService {
 
         UserEntity user = userRepository.findById(currentUser.getId())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with this id")
+                        () -> new ResourceNotFoundException("User not found. ")
                 );
 
         if(!request.getNewPassword().equals(request.getConfirmNewPassword())) {
@@ -427,13 +427,13 @@ public class AuthServiceImpl implements AuthService {
 
     private void ensureUserEmailIsFree(String email) {
         if (userRepository.existsByEmail(email)) {
-            throw new ConflictException("User already exists with this email");
+            throw new ConflictException("User already exists with email: " + email);
         }
     }
 
     private void ensureAgencyEmailIsFree(String email) {
         if (agencyRepository.existsByEmail(email)) {
-            throw new ConflictException("Agency already exists with this email");
+            throw new ConflictException("Agency already exists with email: " + email);
         }
     }
 

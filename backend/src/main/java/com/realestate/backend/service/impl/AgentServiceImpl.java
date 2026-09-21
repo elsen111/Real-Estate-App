@@ -106,9 +106,9 @@ public class AgentServiceImpl implements AgentService {
         AgencyMemberEntity membership = agencyMemberRepository
                 .findByUser_IdAndActiveTrue(agentId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Active agent not found with id: " + agentId));
+                        "Active agent not found with user id: " + agentId));
 
-        ensureCanRemoveAgent(membership.getAgency().getId(), currentUser);
+        ensureCanRemoveAgent(membership, currentUser);
 
         UserEntity authenticatedUser = userRepository.findById(currentUser.getId())
                 .orElseThrow(
@@ -158,7 +158,7 @@ public class AgentServiceImpl implements AgentService {
 
 
     //    HELPER METHODS
-    private void ensureCanRemoveAgent(UUID agencyId, CustomUserDetails currentUser) {
+    private void ensureCanRemoveAgent(AgencyMemberEntity membership, CustomUserDetails currentUser) {
         boolean isSuperAdmin = currentUser.getAuthorities().stream()
                 .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_SUPER_ADMIN"));
 
@@ -172,17 +172,17 @@ public class AgentServiceImpl implements AgentService {
                 );
 
         if (user.getAgency() == null ||
-                !user.getAgency().getId().equals(agencyId)) {
-            throw new ForbiddenException(
-                    "You don't have permission to remove the agent belonging to another agency."
+                !user.getAgency().getId().equals(membership.getAgency().getId())) {
+            throw new ResourceNotFoundException(
+                    "Agent not found with user id: " + membership.getUser().getId()
             );
         }
 
         agencyMemberRepository
-                .findByAgency_IdAndUser_IdAndActiveTrue(agencyId, currentUser.getId())
+                .findByAgency_IdAndUser_IdAndActiveTrue(membership.getAgency().getId(), currentUser.getId())
                 .filter(member -> member.getUser().getRoles().stream()
                         .anyMatch(r -> r.getRoleName() == Role.AGENCY_OWNER))
                 .orElseThrow(() -> new ForbiddenException(
-                        "Only the agency's owner or a super admin can remove this agent"));
+                        "You don't have permission to perform this procedure."));
     }
 }

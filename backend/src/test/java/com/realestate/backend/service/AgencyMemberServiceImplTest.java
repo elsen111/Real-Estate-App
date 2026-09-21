@@ -246,7 +246,7 @@ class AgencyMemberServiceImplTest {
                 )
         )
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Agency not found");
+                .hasMessage("Agency not found with id: " + agencyId);
 
         verifyNoInteractions(userRepository);
     }
@@ -279,7 +279,8 @@ class AgencyMemberServiceImplTest {
         )
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage(
-                        "User not found. Ask the user to register first, then assign them to the agency."
+                        "User not found with id - " + userId +
+                                " .Ask the user to register first, then assign them to the agency."
                 );
     }
 

@@ -240,7 +240,7 @@ class UserServiceImplTest {
                 )
         )
                 .isInstanceOf(AccountStateException.class)
-                .hasMessage("Account is already disabled");
+                .hasMessage("Account is already disabled.");
 
         verify(refreshTokenRepository, never())
                 .deleteAllByUser(user);

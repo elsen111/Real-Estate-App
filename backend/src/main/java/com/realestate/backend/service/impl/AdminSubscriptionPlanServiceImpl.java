@@ -5,7 +5,8 @@ import com.realestate.backend.dto.request.SubscriptionPlanRequest;
 import com.realestate.backend.dto.response.AdminSubscriptionPlanResponse;
 import com.realestate.backend.entity.SubscriptionPlanEntity;
 import com.realestate.backend.enums.SubscriptionStatus;
-import com.realestate.backend.exception.BadRequestException;
+import com.realestate.backend.exception.BusinessException;
+import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.SubscriptionPlanMapper;
 import com.realestate.backend.repository.AgencySubscriptionRepository;
@@ -67,7 +68,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
     public AdminSubscriptionPlanResponse getSubscriptionPlanById(UUID id) {
         SubscriptionPlanEntity subscriptionPlan = subscriptionPlanRepository.findById(id)
                 .orElseThrow(() ->
-                    new ResourceNotFoundException("Subscription plan not found with id " + id)
+                    new ResourceNotFoundException("Subscription plan not found with id: " + id)
                 );
 
         return subscriptionPlanMapper.toAdminSubscriptionPlanResponse(subscriptionPlan);
@@ -79,7 +80,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
 
         SubscriptionPlanEntity subscriptionPlan = subscriptionPlanRepository.findById(id)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Subscription plan not found with id " + id)
+                        () -> new ResourceNotFoundException("Subscription plan not found with id: " + id)
                 );
 
         validatePlanName(request.getName(), id);
@@ -111,7 +112,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
     public void toggleSubscriptionPlanStatus(UUID id) {
         SubscriptionPlanEntity subscriptionPlan = subscriptionPlanRepository.findById(id)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Subscription plan not found with id " + id)
+                        () -> new ResourceNotFoundException("Subscription plan not found with id: " + id)
                 );
 
         boolean newStatus = !subscriptionPlan.isActive();
@@ -131,7 +132,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
 
         SubscriptionPlanEntity subscriptionPlan =  subscriptionPlanRepository.findById(id)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Subscription plan not found with id " + id)
+                        () -> new ResourceNotFoundException("Subscription plan not found with id: " + id)
                 );
 
         validatePlanUsage(id);
@@ -172,7 +173,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
                     .addKeyValue("planId", planId)
                     .log();
 
-            throw new BadRequestException(
+            throw new ConflictException(
                     "Subscription plan with this name already exists."
             );
         }
@@ -188,7 +189,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
                     .addKeyValue("planId", planId)
                     .log();
 
-            throw new BadRequestException("Plan already in use by agency or agencies");
+            throw new BusinessException("Plan already in use by agency or agencies");
         }
 
     }

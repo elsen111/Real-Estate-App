@@ -1,6 +1,6 @@
 package com.realestate.backend.service;
 
-import com.realestate.backend.exception.BusinessException;
+import com.realestate.backend.exception.EmailSendingException;
 import com.realestate.backend.service.impl.EmailServiceImpl;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +47,7 @@ class EmailServiceImplTest {
         when(mailSender.createMimeMessage()).thenThrow(new RuntimeException("SMTP down"));
 
         assertThatThrownBy(() -> service.sendPasswordResetOtp("user@test.com", "123456"))
-                .isInstanceOf(BusinessException.class)
+                .isInstanceOf(EmailSendingException.class)
                 .hasMessageContaining("Failed to send");
     }
 }

@@ -77,26 +77,26 @@ public class PropertyServiceImpl implements PropertyService {
 
         AgencyEntity agency = user.getAgency();
         if (agency == null) {
-            throw new BadRequestException("You must belong to an agency to create a new property.");
+            throw new ResourceNotFoundException("Agency not found associated with your profile.");
         }
 
         AgencySubscriptionEntity subscription = agencySubscriptionRepository
                 .findFirstByAgency_IdAndStatusOrderByEndDateDesc(agency.getId(), SubscriptionStatus.ACTIVE)
                 .orElseThrow(
-                        () -> new ConflictException(
+                        () -> new BusinessException(
                                 "Your agency doesn't have an active subscription."
                         )
                 );
 
         if(subscription.getEndDate().isBefore(LocalDate.now())) {
-            throw new ConflictException("Your agency's subscription has expired.");
+            throw new BusinessException("Your agency's subscription has expired.");
         }
 
         long currentListings = propertyRepository.countByAgencyId(agency.getId());
         int maxListings = subscription.getPlan().getMaxListings();
 
         if(currentListings >= maxListings) {
-            throw new ConflictException(
+            throw new BusinessException(
                     "Listing limit reached (" + maxListings + "). Upgrade your subscription plan to add more properties."
             );
         }
@@ -138,7 +138,7 @@ public class PropertyServiceImpl implements PropertyService {
         PropertyEntity property = getPropertyEntity(propertyId);
 
         if(!canView(property, currentUser)) {
-            throw new ResourceNotFoundException("Active property not found with id: " + propertyId);
+            throw new ResourceNotFoundException("Property not found with id: " + propertyId);
         }
 
         PropertyDetailResponse propertyDetails =
@@ -168,7 +168,7 @@ public class PropertyServiceImpl implements PropertyService {
         AgencyEntity agency = user.getAgency();
 
         if (agency == null) {
-            throw new BadRequestException("You must belong to an agency to update a property.");
+            throw new ResourceNotFoundException("Agency not found associated with your profile.");
         }
 
         PropertyEntity property = getPropertyEntity(propertyId);
@@ -208,7 +208,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         if(!isSuperAdmin(currentUser)) {
             if (agency == null) {
-                throw new BadRequestException("You must belong to an agency to update a property.");
+                throw new ResourceNotFoundException("Agency not found associated with your profile.");
             }
         }
 
@@ -244,7 +244,7 @@ public class PropertyServiceImpl implements PropertyService {
         AgencyEntity agency = user.getAgency();
         if(!isSuperAdmin(currentUser)) {
             if (agency == null) {
-                throw new BadRequestException("You must belong to an agency to update a property.");
+                throw new ResourceNotFoundException("Agency not found associated with your profile.");
             }
 
         }
@@ -253,14 +253,14 @@ public class PropertyServiceImpl implements PropertyService {
                 agency,
                 SubscriptionStatus.ACTIVE
         ).orElseThrow(
-                () -> new ResourceNotFoundException("Agency subscription not found with agency: " + agency.getId())
+                () -> new ResourceNotFoundException("Subscription not found for agency: " + agency.getId())
         );
 
         havePermissionOverProperty(property, agency, currentUser);
 
         if(property.getAssignedAgent() != null && property.getAssignedAgent().getId().equals(currentUser.getId())) {
-            throw new UnauthorizedException(
-                    "Only agency owners are allowed to change the property's featured characteristics."
+            throw new ForbiddenException(
+                    "You are allowed to change the property's featured attribute."
             );
         }
 
@@ -293,7 +293,7 @@ public class PropertyServiceImpl implements PropertyService {
         AgencyEntity agency = user.getAgency();
         if(!isSuperAdmin(currentUser)) {
             if (agency == null) {
-                throw new BadRequestException("You must belong to an agency to delete this property.");
+                throw new ResourceNotFoundException("Agency not found associated with your profile.");
             }
 
         }
@@ -301,8 +301,8 @@ public class PropertyServiceImpl implements PropertyService {
         havePermissionOverProperty(property, agency, currentUser);
 
         if(property.getAssignedAgent() != null && property.getAssignedAgent().getId().equals(currentUser.getId())) {
-            throw new UnauthorizedException(
-                    "Only agency owners are allowed to change the property's featured characteristics."
+            throw new ForbiddenException(
+                    "You aren't allowed to change any property's featured attribute."
             );
         }
 
@@ -399,7 +399,7 @@ public class PropertyServiceImpl implements PropertyService {
         List<PropertyMediaEntity> mediaFiles = propertyMediaRepository.findByPropertyIdOrderBySortOrderAsc(propertyId);
 
         if(mediaFiles.isEmpty()) {
-            throw new ResourceNotFoundException("This property doesn't have uploaded images");
+            throw new ResourceNotFoundException("No images found for this property.");
         }
 
         return mediaFiles.stream()
@@ -422,11 +422,11 @@ public class PropertyServiceImpl implements PropertyService {
                 );
 
         if(user.getAgency() == null) {
-            throw new ResourceNotFoundException("No agency exists for this user.");
+            throw new ResourceNotFoundException("Agency not found associated for user: " + user.getId());
         }
 
         if(!propertyMediaRepository.existsById(propertyMediaId)) {
-            throw new ResourceNotFoundException("Property media not found with id " + propertyMediaId);
+            throw new ResourceNotFoundException("Media not found with id: " + propertyMediaId);
         }
 
         havePermissionOverProperty(property, user.getAgency(), currentUser);
@@ -439,7 +439,7 @@ public class PropertyServiceImpl implements PropertyService {
         propertyMediaRepository.save(primaryMediaFile);
 
         if(mediaFiles.isEmpty()) {
-            throw new ResourceNotFoundException("This property doesn't have uploaded images");
+            throw new ResourceNotFoundException("No images found for property: " + propertyId);
         }
 
         for (PropertyMediaEntity mediaFile : mediaFiles) {
@@ -473,7 +473,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         if (user.getAgency() == null) {
             throw new ResourceNotFoundException(
-                    "No agency exists for this user."
+                    "Agency not found associated with the user: " + user.getId()
             );
         }
 
@@ -481,7 +481,7 @@ public class PropertyServiceImpl implements PropertyService {
                 propertyMediaRepository.findById(propertyMediaId)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Property media not found."
+                                        "Media not found with id: " + propertyMediaId
                                 ));
 
         PropertyEntity property = propertyMedia.getProperty();
@@ -539,7 +539,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         UserEntity owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Agency owner not found with id: " + ownerId
+                        "Owner not found with id: " + ownerId
                 ));
 
         if (owner.getAgency() == null) {
@@ -549,8 +549,8 @@ public class PropertyServiceImpl implements PropertyService {
                     .addKeyValue("ownerId", ownerId)
                     .log();
 
-            throw new BusinessException(
-                    "Agency owner is not associated with an agency."
+            throw new ResourceNotFoundException(
+                    "Agency not found associated with the user: " + owner.getId()
             );
         }
 
@@ -571,7 +571,7 @@ public class PropertyServiceImpl implements PropertyService {
                     .log();
 
             throw new ForbiddenException(
-                    "You cannot assign a property from another agency."
+                    "Property belongs to another agency."
             );
         }
 
@@ -595,7 +595,7 @@ public class PropertyServiceImpl implements PropertyService {
                     .log();
 
             throw new ConflictException(
-                    "This property is already assigned to this agent."
+                    "This property is already assigned to the same agent."
             );
         }
 
@@ -612,7 +612,7 @@ public class PropertyServiceImpl implements PropertyService {
                             .log();
 
                     return new ResourceNotFoundException(
-                            "Agent not found with id: " + agentId
+                            "Agent not found with user id: " + agentId
                     );
                 });
 
@@ -627,8 +627,8 @@ public class PropertyServiceImpl implements PropertyService {
                     .addKeyValue("ownerId", ownerId)
                     .log();
 
-            throw new BadRequestException(
-                    "Agent does not belong to this agency."
+            throw new ResourceNotFoundException(
+                    "Agent not found with id: " + agent.getId()
             );
         }
 
@@ -642,8 +642,8 @@ public class PropertyServiceImpl implements PropertyService {
                     .addKeyValue("propertyId", propertyId)
                     .log();
 
-            throw new BadRequestException(
-                    "Selected user is not an agent."
+            throw new ResourceNotFoundException(
+                    "Agent not found with id: " + agent.getId()
             );
         }
 
@@ -831,8 +831,9 @@ public class PropertyServiceImpl implements PropertyService {
                 .anyMatch(role -> role.getRoleName() == Role.AGENT);
 
         if (!isActiveMember || !hasAgentRole) {
-            throw new BadRequestException(
-                    "The specified agent does not belong to your agency.");
+            throw new ResourceNotFoundException(
+                    "Agent not found with user id: " + assignedAgent.getId()
+            );
         }
 
         return assignedAgent;
@@ -844,7 +845,7 @@ public class PropertyServiceImpl implements PropertyService {
         }
 
         if (!property.getAgency().getId().equals(agency.getId())) {
-            throw new BadRequestException("You do not have permission to modify a property belonging to another agency.");
+            throw new ForbiddenException("You aren't allowed to modify a property belonging to another agency.");
         }
     }
 
@@ -894,7 +895,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         PropertyEntity property = propertyRepository.findById(propertyId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Property not found."));
+                        new ResourceNotFoundException("Property not found with id: " + propertyId));
 
         havePermissionOverProperty(property, agency, currentUser);
 
@@ -907,14 +908,14 @@ public class PropertyServiceImpl implements PropertyService {
 
         if (files == null || files.isEmpty()) {
 
-            throw new FileStorageException(
+            throw new BadRequestException(
                     "At least one file is required."
             );
         }
 
         if (files.size() > 20) {
 
-            throw new FileStorageException(
+            throw new BadRequestException(
                     "Maximum 20 files can be uploaded at once."
             );
         }
@@ -932,7 +933,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         if (existing + newFiles > 20) {
 
-            throw new FileStorageException(
+            throw new BadRequestException(
                     "A property can contain a maximum of 20 media files."
             );
 

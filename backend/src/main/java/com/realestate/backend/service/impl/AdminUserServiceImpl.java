@@ -10,6 +10,7 @@ import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.exception.BusinessException;
+import com.realestate.backend.exception.ForbiddenException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.UserMapper;
 import com.realestate.backend.repository.*;
@@ -57,7 +58,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     public UserResponse getUserById(UUID userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException(
-                        "User not found with id" + userId
+                        "User not found with id: " + userId
                 )
         );
 
@@ -70,12 +71,12 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         UserEntity user = userRepository.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException(
-                        "User not found with id " + userId
+                        "User not found with id: " + userId
                 )
         );
 
         if(user.getDeleted()) {
-            throw new BusinessException("Cannot update the status of a deleted user " + userId);
+            throw new ResourceNotFoundException("User not found with id: " + userId);
         }
 
         user.setEnabled(request.enabled());
@@ -99,7 +100,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     public String assignAdminRoleToUser(UUID userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException(
-                        "User not found with id " + userId
+                        "User not found with id: " + userId
                 )
         );
 
@@ -111,7 +112,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         RoleEntity adminRoleEntity = roleRepository.findByRoleName(Role.ADMIN)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Role not found with name " + Role.ADMIN.name()
+                        "Role not found with name: " + Role.ADMIN.name()
                 ));
 
         user.getRoles().add(adminRoleEntity);
@@ -131,7 +132,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with id" + userId)
+                        () -> new ResourceNotFoundException("User not found with id: " + userId)
                 );
 
         UUID assignerId = currentUser.getId();
@@ -139,7 +140,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         UserEntity assigner = userRepository.findById(assignerId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException(
-                                "User not found with id " + assignerId
+                                "User not found with id: " + assignerId
                         )
                 );
 
@@ -154,14 +155,14 @@ public class AdminUserServiceImpl implements AdminUserService {
                 .anyMatch(role -> role == Role.AGENCY_OWNER);
 
         if(isUserSuperAdmin){
-            throw new BusinessException("Cannot delete super admin.");
+            throw new ForbiddenException("Cannot delete super admin.");
         }
 
         if(isUserAgencyOwner) {
 
             AgencyEntity agency = agencyRepository.findById(user.getAgency().getId())
                     .orElseThrow(
-                            () -> new ResourceNotFoundException("Agency not found with id " + user.getAgency().getId())
+                            () -> new ResourceNotFoundException("Agency not found with id: " + user.getAgency().getId())
                     );
 
             boolean hasActiveListings = propertyRepository.existsByAgencyIdAndStatus(agency.getId(), PropertyStatus.ACTIVE);
@@ -172,7 +173,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
             AgencyMemberEntity membership = agencyMemberRepository.findByUserAndActiveTrue(user)
                     .orElseThrow(
-                            () -> new ResourceNotFoundException("Agency member not found with id " + user.getId())
+                            () -> new ResourceNotFoundException("Agency member not found with id: " + user.getId())
                     );
 
             membership.setActive(false);

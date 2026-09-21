@@ -9,6 +9,7 @@ import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.BusinessException;
+import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.AgencyMapper;
 import com.realestate.backend.mapper.AgencyOwnerMapper;
@@ -69,14 +70,14 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         AgencyEntity agency = agencyRepository.findById(id)
                 .orElseThrow(
                         () -> new ResourceNotFoundException(
-                                "Agency not found with id " + id
+                                "Agency not found with id: " + id
                         )
                 );
 
         AgencyMemberEntity agencyOwner = agencyMemberRepository.findOwner(id)
                 .orElseThrow(
                         () -> new ResourceNotFoundException(
-                                "Agency member not found with id " + id
+                                "Agency member not found for agency with id: " + id
                         )
                 );
 
@@ -138,7 +139,7 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         AgencyEntity agency = agencyRepository.findById(id)
                 .orElseThrow(
                         () -> new ResourceNotFoundException(
-                                "Agency not found with id " + id
+                                "Agency not found with id: " + id
                         )
                 );
 
@@ -182,7 +183,7 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         AgencyEntity agency = agencyRepository.findById(id)
                 .orElseThrow(
                         () -> new ResourceNotFoundException(
-                                "Agency not found with id " + id
+                                "Agency not found with id: " + id
                         )
                 );
 
@@ -207,7 +208,7 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         AgencyEntity agency = agencyRepository.findById(agencyId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException(
-                                "Agency not found with id " + agencyId
+                                "Agency not found with id: " + agencyId
                         )
                 );
 
@@ -215,7 +216,7 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
                 subscriptionPlanRepository.findById(subscriptionId)
                         .orElseThrow(
                                 () -> new ResourceNotFoundException(
-                                        "Subscription plan not found with id " + subscriptionId
+                                        "Subscription plan not found with id: " + subscriptionId
                                 )
                         );
 
@@ -253,12 +254,12 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
                     .addKeyValue("reason", "agency_not_approved")
                     .log();
 
-            throw new BadRequestException(
+            throw new BusinessException(
                     "Agency has not been approved.Only approved agencies are allowed to get subscriptions."
             );
 
         } else if (hasActiveSubscription) {
-            throw new BadRequestException(
+            throw new ConflictException(
                     "Agency has already an active subscription."
             );
         }
@@ -301,7 +302,7 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
         AgencyEntity agency = agencyRepository.findById(agencyId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException(
-                                "Agency not found with id " + agencyId
+                                "Agency not found with id: " + agencyId
                         )
                 );
 
@@ -358,7 +359,7 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
                 .filter(a -> !a.getIsDeleted())
                 .orElseThrow(
                         () -> new ResourceNotFoundException(
-                                "Agency not found with id " + agencyId
+                                "Agency not found with id: " + agencyId
                         )
                 );
 
@@ -398,7 +399,7 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
                 .filter(a -> !a.getIsDeleted())
                 .orElseThrow(
                         () -> new ResourceNotFoundException(
-                                "Agency not found with id " + agencyId
+                                "Agency not found with id: " + agencyId
                         )
                 );
 
