@@ -3,6 +3,7 @@ package com.realestate.backend.service;
 import com.realestate.backend.dto.request.AdminUserFilterRequest;
 import com.realestate.backend.dto.request.UserStatusRequest;
 import com.realestate.backend.dto.response.UserResponse;
+import com.realestate.backend.security.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -21,6 +22,6 @@ public interface AdminUserService {
 
     String assignAdminRoleToUser(UUID userId);
 
-    void softDeleteUser(UUID userId);
+    void softDeleteUser(UUID userId, CustomUserDetails currentUser);
 
 }

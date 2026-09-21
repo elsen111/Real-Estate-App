@@ -2,6 +2,7 @@ package com.realestate.backend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.realestate.backend.enums.Role;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -29,6 +30,9 @@ public class AgencyMemberResponse {
     private String userFullName;
     private String userEmail;
     private String position;
+    private Role role;
+    private UserSummaryResponse addedBy;
+    private UserSummaryResponse removedBy;
     private boolean active;
 
 }

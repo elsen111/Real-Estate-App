@@ -4,6 +4,7 @@ import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.request.AdminUserFilterRequest;
 import com.realestate.backend.dto.request.UserStatusRequest;
 import com.realestate.backend.dto.response.UserResponse;
+import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.AdminUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -76,6 +78,7 @@ public class AdminUserController {
 
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping("/{userId}/assign-admin")
+    @Operation(summary = "Assign admin role to the user.")
     public ResponseEntity<ApiResponse<Void>> assignAdmin(
             @PathVariable UUID userId
     ) {
@@ -88,11 +91,13 @@ public class AdminUserController {
 
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @DeleteMapping("/{userId}")
+    @Operation(summary = "Soft delete the user")
     public ResponseEntity<ApiResponse<Void>> softDeleteUser(
-            @PathVariable UUID userId
-    ) {
+            @PathVariable UUID userId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+            ) {
 
-        adminUserService.softDeleteUser(userId);
+        adminUserService.softDeleteUser(userId, currentUser);
 
         return ResponseEntity.ok(
                 ApiResponse.success("User deleted successfully.", null)

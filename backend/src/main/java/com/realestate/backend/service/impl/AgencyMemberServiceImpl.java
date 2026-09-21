@@ -48,6 +48,7 @@ public class AgencyMemberServiceImpl implements AgencyMemberService {
         ensureCanAssignAgent(agencyId, currentUser);
 
         return assignMember(
+                currentUser.getId(),
                 agencyId,
                 userId,
                 Role.AGENT,
@@ -58,6 +59,7 @@ public class AgencyMemberServiceImpl implements AgencyMemberService {
     @Override
     @Transactional
     public AgencyMemberResponse assignMember(
+            UUID assignerId,
             UUID agencyId,
             UUID userId,
             Role role,
@@ -84,6 +86,11 @@ public class AgencyMemberServiceImpl implements AgencyMemberService {
             throw new ConflictException("User is already a member of this agency");
         }
 
+        UserEntity assigner = userRepository.findById(assignerId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "User not found with id: " + assignerId
+                ));
+
         RoleEntity roleEntity = roleRepository.findByRoleName(role)
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + role));
 
@@ -93,6 +100,8 @@ public class AgencyMemberServiceImpl implements AgencyMemberService {
         AgencyMemberEntity member = AgencyMemberEntity.builder()
                 .agency(agency)
                 .user(targetUser)
+                .role(role)
+                .addedBy(assigner)
                 .active(true)
                 .build();
 
