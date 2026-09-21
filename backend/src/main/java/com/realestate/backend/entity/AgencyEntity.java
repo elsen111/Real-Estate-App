@@ -7,6 +7,8 @@ import lombok.*;
 import org.hibernate.annotations.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -57,6 +59,12 @@ public class AgencyEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 100)
     private AgencyStatus status = AgencyStatus.PENDING;
+
+    @OneToMany(
+            mappedBy = "agency",
+            fetch = FetchType.LAZY
+    )
+    private List<AgencyMemberEntity> members = new ArrayList<>();
 
     @Builder.Default
     @Column(name = "is_deleted", nullable = false)

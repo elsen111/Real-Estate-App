@@ -1,21 +1,18 @@
 package com.realestate.backend.service.impl;
 
 import com.realestate.backend.dto.request.AgencyAgentFilterRequest;
-import com.realestate.backend.dto.response.AgencyLogoUploadResponse;
+import com.realestate.backend.dto.response.*;
 import com.realestate.backend.dto.request.PropertyFilterRequest;
-import com.realestate.backend.dto.response.PropertyResponse;
 import com.realestate.backend.dto.request.AgencyFilterRequest;
 import com.realestate.backend.dto.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.dto.request.UpdateAgencyRequest;
-import com.realestate.backend.dto.response.AgencyResponse;
-import com.realestate.backend.dto.response.AgencySubscriptionResponse;
-import com.realestate.backend.dto.response.UserResponse;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.AgencyMapper;
+import com.realestate.backend.mapper.AgencyMemberMapper;
 import com.realestate.backend.mapper.PropertyMapper;
 import com.realestate.backend.mapper.UserMapper;
 import com.realestate.backend.repository.*;
@@ -59,6 +56,8 @@ public class AgencyServiceImpl implements AgencyService {
     private final AgencyMediaRepository agencyMediaRepository;
 
     private final MediaService mediaService;
+    private final AgencyMemberMapper agencyMemberMapper;
+    private final AgencyMemberRepository agencyMemberRepository;
 
     @Override
     public AgencyResponse getCurrentAgency(CustomUserDetails currentUser) {
@@ -217,12 +216,12 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
-    public Page<UserResponse> getAgencyAgents(UUID agencyId, AgencyAgentFilterRequest filterRequest, Pageable pageable) {
-        Specification<UserEntity> specification = AgencyAgentSpecification
+    public Page<AgencyMemberResponse> getAgencyAgents(UUID agencyId, AgencyAgentFilterRequest filterRequest, Pageable pageable) {
+        Specification<AgencyMemberEntity> specification = AgencyAgentSpecification
                 .withAgencyAgentFilter(agencyId, filterRequest);
 
-        return userRepository.findAll(specification, pageable)
-                .map(userMapper::toAgentResponse);
+        return agencyMemberRepository.findAll(specification, pageable)
+                .map(agencyMemberMapper::toAgentResponse);
 
     }
 

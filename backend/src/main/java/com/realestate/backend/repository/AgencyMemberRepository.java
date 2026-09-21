@@ -5,15 +5,19 @@ import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.enums.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.nio.channels.FileChannel;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface AgencyMemberRepository extends JpaRepository<AgencyMemberEntity, UUID> {
+public interface AgencyMemberRepository extends JpaRepository<AgencyMemberEntity, UUID>,
+        JpaSpecificationExecutor<AgencyMemberEntity> {
 
     boolean existsByAgency_IdAndUser_Id(UUID agencyId, UUID userId);
 

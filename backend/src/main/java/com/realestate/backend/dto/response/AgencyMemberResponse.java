@@ -18,7 +18,11 @@ import java.util.UUID;
         "userId",
         "userFullName",
         "userEmail",
+        "userPhone",
         "position",
+        "role",
+        "addedBy",
+        "removedBy",
         "active"
 })
 public class AgencyMemberResponse {
@@ -29,6 +33,7 @@ public class AgencyMemberResponse {
     private UUID userId;
     private String userFullName;
     private String userEmail;
+    private String userPhone;
     private String position;
     private Role role;
     private UserSummaryResponse addedBy;

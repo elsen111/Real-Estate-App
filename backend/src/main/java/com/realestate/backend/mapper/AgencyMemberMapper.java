@@ -23,6 +23,15 @@ public interface AgencyMemberMapper {
     @Mapping(target = "position", source = "user.roles", qualifiedByName = "mapRolesToPosition")
     AgencyMemberResponse toResponse(AgencyMemberEntity agencyMember);
 
+    @Mapping(target = "agencyId", source = "agency.id")
+    @Mapping(target = "agencyName", source = "agency.name")
+    @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "userFullName", source = "user.fullName")
+    @Mapping(target = "userEmail", source = "user.email")
+    @Mapping(target = "userPhone", source = "user.phoneNumber")
+    @Mapping(target = "position", source = "user.roles", qualifiedByName = "mapRolesToPosition")
+    AgencyMemberResponse toAgentResponse(AgencyMemberEntity agencyMember);
+
     UserSummaryResponse toUserSummary(UserEntity user);
 
     @Named("mapRolesToPosition")
