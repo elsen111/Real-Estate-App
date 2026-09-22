@@ -168,21 +168,22 @@ public class InquiryServiceImpl implements InquiryService {
             throw new BadRequestException("Allowed statuses:  " + ALLOWED_STATUSES_FOR_UPDATE);
         }
 
+        validateStatusTransition(inquiry.getStatus(), request.getStatus());
+
         InquiryStatus previousStatus = inquiry.getStatus();
 
         inquiry.setStatus(request.getStatus());
-        InquiryEntity updatedInquiry = inquiryRepository.saveAndFlush(inquiry);
 
         log.atInfo()
                 .setMessage("Inquiry status changed")
                 .addKeyValue("inquiryId", inquiryId)
                 .addKeyValue("oldStatus", previousStatus)
-                .addKeyValue("newStatus", updatedInquiry.getStatus())
+                .addKeyValue("newStatus", inquiry.getStatus())
                 .addKeyValue("propertyId", inquiry.getProperty().getId())
                 .addKeyValue("clientId", inquiry.getClient().getId())
                 .log();
 
-        return inquiryMapper.toResponse(updatedInquiry);
+        return inquiryMapper.toResponse(inquiry);
 
     }
 
@@ -235,5 +236,19 @@ public class InquiryServiceImpl implements InquiryService {
                 && inquiry.getAgency() != null
                 && agencyMemberRepository.existsByAgencyIdAndUserIdAndActiveTrue(
                 inquiry.getAgency().getId(), currentUser.getId());
+    }
+
+    private void validateStatusTransition(
+            InquiryStatus currentStatus,
+            InquiryStatus newStatus
+    ) {
+        if (!currentStatus.canTransitionTo(newStatus)) {
+            throw new BusinessException(
+                    "Cannot change inquiry status from "
+                            + currentStatus
+                            + " to "
+                            + newStatus
+            );
+        }
     }
 }
