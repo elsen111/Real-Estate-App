@@ -53,6 +53,7 @@ public class AgentServiceImpl implements AgentService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public AgentResponse getAgentByUserId(UUID userId) {
 
         AgencyMemberEntity member = userRepository.findAgentMemberByUserId(userId)
@@ -63,6 +64,7 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PropertyResponse> getPublicAgentProperties(UUID userId, PropertyFilterRequest filter, Pageable pageable) {
 
         userRepository.findAgentMemberByUserId(userId)
@@ -76,6 +78,7 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PropertyResponse> getOwnAssignedProperties(
             CustomUserDetails currentUser,
             PropertyFilterRequest filter,
@@ -140,6 +143,7 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<InquiryResponse> getOwnInquiries(
             CustomUserDetails currentUser,
             InquiryFilterRequest filter,

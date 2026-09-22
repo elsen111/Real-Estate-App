@@ -101,6 +101,7 @@ public class FavoriteServiceImpl implements FavoriteService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PropertyResponse> getMyFavorites(CustomUserDetails currentUser, Pageable pageable) {
         Page<FavoriteEntity> favorites = favoriteRepository.findByUserIdWithProperty(currentUser.getId(), pageable);
 

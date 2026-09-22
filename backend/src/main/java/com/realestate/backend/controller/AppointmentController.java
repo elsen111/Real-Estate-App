@@ -64,7 +64,7 @@ public class AppointmentController {
 
     @PatchMapping("/{appointmentId}/status")
     @Operation(summary = "Update appointment status")
-    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'LANDLORD')")
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT')")
     public ResponseEntity<ApiResponse<AppointmentResponse>> updateAppointmentStatus(
             @PathVariable UUID appointmentId,
             @Valid @RequestBody UpdateAppointmentStatusRequest request,

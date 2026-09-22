@@ -11,7 +11,7 @@ import com.realestate.backend.mapper.PropertyMapper;
 import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.specification.PropertySpecification;
 import com.realestate.backend.service.AdminPropertyService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -68,6 +68,7 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
             );
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PropertyResponse> getAllProperties(PropertyFilterRequest filter, Pageable pageable) {
 
         Specification<PropertyEntity> specification = PropertySpecification

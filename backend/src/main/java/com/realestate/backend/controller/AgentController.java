@@ -62,7 +62,7 @@ public class AgentController {
 
     @DeleteMapping("/{agentId}")
     @Operation(summary = "Delete an agent from their agency")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'AGENCY_OWNER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'AGENCY_OWNER')")
     public ResponseEntity<ApiResponse<Void>> deleteAgent(
             @PathVariable UUID agentId,
             @AuthenticationPrincipal CustomUserDetails currentUser

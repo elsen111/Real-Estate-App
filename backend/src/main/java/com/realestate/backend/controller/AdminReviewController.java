@@ -20,7 +20,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/admin/reviews")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('SUPER_ADMIN')")
 public class AdminReviewController {
 
     private final AdminReviewService adminReviewService;

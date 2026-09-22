@@ -27,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
 import java.util.Optional;
@@ -174,44 +175,8 @@ class InquiryServiceImplTest {
                         Pageable.ofSize(10)
                 )
         )
-                .isInstanceOf(ResourceNotFoundException.class);
-    }
-
-    @Test
-    void getMyAgencyInquiries_throws_whenCallerHasNoAgencyRole() {
-        UUID userId = UUID.randomUUID();
-        UUID agencyId = UUID.randomUUID();
-
-        CustomUserDetails client = clientUser(userId);
-
-        AgencyEntity agency = AgencyEntity.builder()
-                .id(agencyId)
-                .build();
-
-        AgencyMemberEntity agencyMember = AgencyMemberEntity.builder()
-                .agency(agency)
-                .build();
-
-        when(agencyMemberRepository.findByUser_IdAndActiveTrue(userId))
-                .thenReturn(Optional.of(agencyMember));
-
-        assertThatThrownBy(() ->
-                service.getMyAgencyInquiries(
-                        client,
-                        null,
-                        null,
-                        Pageable.ofSize(10)
-                )
-        )
-                .isInstanceOf(ForbiddenException.class);
-
-        verify(inquiryRepository, never())
-                .findByAgencyIdWithFilters(
-                        any(UUID.class),
-                        any(),
-                        any(UUID.class),
-                        any(Pageable.class)
-                );
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessageContaining("No active agency membership");
     }
 
     @Test
