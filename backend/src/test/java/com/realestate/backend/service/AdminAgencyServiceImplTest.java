@@ -12,6 +12,7 @@ import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.AgencyMapper;
 import com.realestate.backend.mapper.SubscriptionPlanMapper;
 import com.realestate.backend.repository.*;
+import com.realestate.backend.security.SecurityContextService;
 import com.realestate.backend.service.impl.AdminAgencyServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,14 +34,32 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AdminAgencyServiceImplTest {
 
-    @Mock private AgencyRepository agencyRepository;
-    @Mock private AgencyMapper agencyMapper;
-    @Mock private AgencySubscriptionRepository agencySubscriptionRepository;
-    @Mock private SubscriptionPlanMapper subscriptionMapper;
-    @Mock private SubscriptionPlanRepository subscriptionPlanRepository;
-    @Mock private AgencyService agencyService;
+    @Mock
+    private AgencyRepository agencyRepository;
 
-    @InjectMocks private AdminAgencyServiceImpl service;
+    @Mock
+    private AgencyMapper agencyMapper;
+
+    @Mock
+    private AgencySubscriptionRepository agencySubscriptionRepository;
+
+    @Mock
+    private SubscriptionPlanMapper subscriptionMapper;
+
+    @Mock
+    private SubscriptionPlanRepository subscriptionPlanRepository;
+
+    @Mock
+    private AgencyService agencyService;
+
+    @Mock
+    private PropertyRepository propertyRepository;
+
+    @Mock
+    private SecurityContextService securityContextService;
+
+    @InjectMocks
+    private AdminAgencyServiceImpl service;
 
     private AgencyEntity agency;
     private UUID agencyId;
@@ -47,49 +67,123 @@ class AdminAgencyServiceImplTest {
     @BeforeEach
     void setUp() {
         agencyId = UUID.randomUUID();
-        agency = AgencyEntity.builder().id(agencyId).name("Acme Realty")
-                .status(AgencyStatus.PENDING).isDeleted(false).build();
+
+        agency = AgencyEntity.builder()
+                .id(agencyId)
+                .name("Acme Realty")
+                .status(AgencyStatus.PENDING)
+                .isDeleted(false)
+                .members(List.of())
+                .build();
     }
 
     @Test
     void changeAgencyStatus_updatesStatus_whenAgencyExists() {
-        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
+        when(agencyRepository.findById(agencyId))
+                .thenReturn(Optional.of(agency));
 
-        String result = service.changeAgencyStatus(agencyId, AgencyStatus.APPROVED);
+        String result = service.changeAgencyStatus(
+                agencyId,
+                AgencyStatus.APPROVED
+        );
 
-        assertThat(agency.getStatus()).isEqualTo(AgencyStatus.APPROVED);
-        assertThat(result).contains("Acme Realty").contains("APPROVED");
-        assertThat(agency.getStatus()).isEqualTo(AgencyStatus.APPROVED);
+        assertThat(agency.getStatus())
+                .isEqualTo(AgencyStatus.APPROVED);
+
+        assertThat(result)
+                .contains("Acme Realty")
+                .contains("APPROVED");
+
+        assertThat(agency.getStatus())
+                .isEqualTo(AgencyStatus.APPROVED);
     }
 
     @Test
     void changeAgencyStatus_throws_whenAgencyNotFound() {
-        when(agencyRepository.findById(agencyId)).thenReturn(Optional.empty());
+        when(agencyRepository.findById(agencyId))
+                .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.changeAgencyStatus(agencyId, AgencyStatus.APPROVED))
+        assertThatThrownBy(() ->
+                service.changeAgencyStatus(
+                        agencyId,
+                        AgencyStatus.APPROVED
+                )
+        )
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
     void softDeleteAgency_marksAgencyDeleted() {
-        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
+        UserEntity currentUser = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .email("admin@test.com")
+                .build();
 
-        service.softDeleteAgency(agencyId);
+        when(agencyRepository.findById(agencyId))
+                .thenReturn(Optional.of(agency));
 
-        assertThat(agency.getIsDeleted()).isTrue();
-        verify(agencyRepository).findById(agencyId);
+        when(securityContextService.getCurrentUser())
+                .thenReturn(currentUser);
+
+        when(agencySubscriptionRepository.existsByAgencyIdAndStatus(
+                agencyId,
+                SubscriptionStatus.ACTIVE
+        )).thenReturn(false);
+
+        when(propertyRepository.findByAgencyId(agencyId))
+                .thenReturn(List.of());
+
+        String result = service.softDeleteAgency(agencyId);
+
+        assertThat(agency.getIsDeleted())
+                .isTrue();
+
+        assertThat(agency.getStatus())
+                .isEqualTo(AgencyStatus.REMOVED);
+
+        assertThat(result)
+                .contains("Acme Realty");
+
+        verify(agencyRepository)
+                .findById(agencyId);
+
+        verify(securityContextService)
+                .getCurrentUser();
+
+        verify(agencySubscriptionRepository)
+                .existsByAgencyIdAndStatus(
+                        agencyId,
+                        SubscriptionStatus.ACTIVE
+                );
+
+        verify(propertyRepository)
+                .findByAgencyId(agencyId);
     }
 
     @Test
     void createAgencySubscription_throws_whenPlanNotActive() {
         UUID planId = UUID.randomUUID();
-        SubscriptionPlanEntity plan = SubscriptionPlanEntity.builder().id(planId).durationDays(30).build();
 
-        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
-        when(subscriptionPlanRepository.findById(planId)).thenReturn(Optional.of(plan));
-        when(subscriptionPlanRepository.existsByIdAndActiveTrue(planId)).thenReturn(false);
+        SubscriptionPlanEntity plan = SubscriptionPlanEntity.builder()
+                .id(planId)
+                .durationDays(30)
+                .build();
 
-        assertThatThrownBy(() -> service.createAgencySubscription(agencyId, planId))
+        when(agencyRepository.findById(agencyId))
+                .thenReturn(Optional.of(agency));
+
+        when(subscriptionPlanRepository.findById(planId))
+                .thenReturn(Optional.of(plan));
+
+        when(subscriptionPlanRepository.existsByIdAndActiveTrue(planId))
+                .thenReturn(false);
+
+        assertThatThrownBy(() ->
+                service.createAgencySubscription(
+                        agencyId,
+                        planId
+                )
+        )
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("not active");
     }
@@ -97,14 +191,29 @@ class AdminAgencyServiceImplTest {
     @Test
     void createAgencySubscription_throws_whenAgencyNotApproved() {
         UUID planId = UUID.randomUUID();
-        SubscriptionPlanEntity plan = SubscriptionPlanEntity.builder().id(planId).durationDays(30).build();
+
+        SubscriptionPlanEntity plan = SubscriptionPlanEntity.builder()
+                .id(planId)
+                .durationDays(30)
+                .build();
+
         agency.setStatus(AgencyStatus.PENDING);
 
-        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
-        when(subscriptionPlanRepository.findById(planId)).thenReturn(Optional.of(plan));
-        when(subscriptionPlanRepository.existsByIdAndActiveTrue(planId)).thenReturn(true);
+        when(agencyRepository.findById(agencyId))
+                .thenReturn(Optional.of(agency));
 
-        assertThatThrownBy(() -> service.createAgencySubscription(agencyId, planId))
+        when(subscriptionPlanRepository.findById(planId))
+                .thenReturn(Optional.of(plan));
+
+        when(subscriptionPlanRepository.existsByIdAndActiveTrue(planId))
+                .thenReturn(true);
+
+        assertThatThrownBy(() ->
+                service.createAgencySubscription(
+                        agencyId,
+                        planId
+                )
+        )
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("not been approved");
     }
@@ -112,38 +221,81 @@ class AdminAgencyServiceImplTest {
     @Test
     void createAgencySubscription_succeeds_whenAllChecksPass() {
         UUID planId = UUID.randomUUID();
+
         agency.setStatus(AgencyStatus.APPROVED);
-        SubscriptionPlanEntity plan = SubscriptionPlanEntity.builder().id(planId).durationDays(30).build();
-        AgencySubscriptionEntity saved = AgencySubscriptionEntity.builder()
-                .agency(agency).plan(plan).startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(30)).status(SubscriptionStatus.ACTIVE).build();
 
-        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
-        when(subscriptionPlanRepository.findById(planId)).thenReturn(Optional.of(plan));
-        when(subscriptionPlanRepository.existsByIdAndActiveTrue(planId)).thenReturn(true);
-        when(agencySubscriptionRepository.existsByAgencyIdAndStatus(agencyId, SubscriptionStatus.ACTIVE)).thenReturn(false);
-        when(agencySubscriptionRepository.saveAndFlush(any())).thenReturn(saved);
-        when(subscriptionMapper.toAdminResponse(saved)).thenReturn(AgencySubscriptionResponse.builder().build());
+        SubscriptionPlanEntity plan = SubscriptionPlanEntity.builder()
+                .id(planId)
+                .durationDays(30)
+                .build();
 
-        AgencySubscriptionResponse response = service.createAgencySubscription(agencyId, planId);
+        AgencySubscriptionEntity saved =
+                AgencySubscriptionEntity.builder()
+                        .agency(agency)
+                        .plan(plan)
+                        .startDate(LocalDate.now())
+                        .endDate(LocalDate.now().plusDays(30))
+                        .status(SubscriptionStatus.ACTIVE)
+                        .build();
 
-        assertThat(response).isNotNull();
-        verify(agencySubscriptionRepository).saveAndFlush(any());
+        when(agencyRepository.findById(agencyId))
+                .thenReturn(Optional.of(agency));
+
+        when(subscriptionPlanRepository.findById(planId))
+                .thenReturn(Optional.of(plan));
+
+        when(subscriptionPlanRepository.existsByIdAndActiveTrue(planId))
+                .thenReturn(true);
+
+        when(agencySubscriptionRepository.existsByAgencyIdAndStatus(
+                agencyId,
+                SubscriptionStatus.ACTIVE
+        )).thenReturn(false);
+
+        when(agencySubscriptionRepository.saveAndFlush(any()))
+                .thenReturn(saved);
+
+        when(subscriptionMapper.toAdminResponse(saved))
+                .thenReturn(
+                        AgencySubscriptionResponse.builder().build()
+                );
+
+        AgencySubscriptionResponse response =
+                service.createAgencySubscription(
+                        agencyId,
+                        planId
+                );
+
+        assertThat(response)
+                .isNotNull();
+
+        verify(agencySubscriptionRepository)
+                .saveAndFlush(any());
     }
 
     @Test
     void getAgencySubscription_throws_whenNoActiveSubscription() {
-        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
-        when(agencySubscriptionRepository.findFirstByAgencyIdAndStatusOrderByEndDateDesc(agencyId, SubscriptionStatus.ACTIVE))
-                .thenReturn(Optional.empty());
+        when(agencyRepository.findById(agencyId))
+                .thenReturn(Optional.of(agency));
 
-        assertThatThrownBy(() -> service.getAgencySubscription(agencyId))
+        when(
+                agencySubscriptionRepository
+                        .findFirstByAgencyIdAndStatusOrderByEndDateDesc(
+                                agencyId,
+                                SubscriptionStatus.ACTIVE
+                        )
+        ).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() ->
+                service.getAgencySubscription(agencyId)
+        )
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
     void updateAgency_delegatesToAgencyService_andReturnsMappedResponse() {
         UpdateAgencyRequest request = new UpdateAgencyRequest();
+
         request.setName("Acme Realty Updated");
         request.setDescription("An even better leading agency");
         request.setPhoneNumber("+994501234567");
@@ -165,149 +317,268 @@ class AdminAgencyServiceImplTest {
                 .isDeleted(false)
                 .build();
 
-        AdminAgencyResponse expectedResponse = AdminAgencyResponse.builder()
-                .id(agencyId)
-                .name(request.getName())
-                .email(request.getEmail())
-                .status(AgencyStatus.APPROVED)
-                .isDeleted(false)
-                .build();
+        AdminAgencyResponse expectedResponse =
+                AdminAgencyResponse.builder()
+                        .id(agencyId)
+                        .name(request.getName())
+                        .email(request.getEmail())
+                        .status(AgencyStatus.APPROVED)
+                        .isDeleted(false)
+                        .build();
 
-        when(agencyService.updateAgency(agencyId, request)).thenReturn(updatedAgency);
-        when(agencyMapper.toAdminResponse(updatedAgency)).thenReturn(expectedResponse);
+        when(agencyService.updateAgency(
+                agencyId,
+                request
+        )).thenReturn(updatedAgency);
 
-        AdminAgencyResponse result = service.updateAgency(agencyId, request);
+        when(agencyMapper.toAdminResponse(updatedAgency))
+                .thenReturn(expectedResponse);
 
-        assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(agencyId);
-        assertThat(result.getName()).isEqualTo("Acme Realty Updated");
-        assertThat(result.getEmail()).isEqualTo("updated@acme-realty.com");
-        verify(agencyService).updateAgency(agencyId, request);
-        verify(agencyMapper).toAdminResponse(updatedAgency);
+        AdminAgencyResponse result =
+                service.updateAgency(
+                        agencyId,
+                        request
+                );
+
+        assertThat(result)
+                .isNotNull();
+
+        assertThat(result.getId())
+                .isEqualTo(agencyId);
+
+        assertThat(result.getName())
+                .isEqualTo("Acme Realty Updated");
+
+        assertThat(result.getEmail())
+                .isEqualTo("updated@acme-realty.com");
+
+        verify(agencyService)
+                .updateAgency(
+                        agencyId,
+                        request
+                );
+
+        verify(agencyMapper)
+                .toAdminResponse(updatedAgency);
     }
 
     @Test
     void updateAgency_throws_whenAgencyNotFound() {
         UpdateAgencyRequest request = new UpdateAgencyRequest();
+
         request.setName("Acme Realty Updated");
         request.setEmail("updated@acme-realty.com");
 
-        when(agencyService.updateAgency(any(UUID.class), any(UpdateAgencyRequest.class)))
-                .thenThrow(new ResourceNotFoundException("Agency not found with id: " + agencyId));
+        when(
+                agencyService.updateAgency(
+                        any(UUID.class),
+                        any(UpdateAgencyRequest.class)
+                )
+        ).thenThrow(
+                new ResourceNotFoundException(
+                        "Agency not found with id: " + agencyId
+                )
+        );
 
-        assertThatThrownBy(() -> service.updateAgency(agencyId, request))
+        assertThatThrownBy(() ->
+                service.updateAgency(
+                        agencyId,
+                        request
+                )
+        )
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Agency not found");
 
-        verify(agencyMapper, never()).toAdminResponse(any());
+        verify(
+                agencyMapper,
+                never()
+        ).toAdminResponse(any());
     }
 
     @Test
     void updateAgency_throws_whenEmailAlreadyExistsForAnotherAgency() {
         UpdateAgencyRequest request = new UpdateAgencyRequest();
+
         request.setName("Acme Realty Updated");
         request.setEmail("taken@acme-realty.com");
 
-        when(agencyService.updateAgency(any(UUID.class), any(UpdateAgencyRequest.class)))
-                .thenThrow(new BadRequestException("Email already exists for another agency."));
+        when(
+                agencyService.updateAgency(
+                        any(UUID.class),
+                        any(UpdateAgencyRequest.class)
+                )
+        ).thenThrow(
+                new BadRequestException(
+                        "Email already exists for another agency."
+                )
+        );
 
-        assertThatThrownBy(() -> service.updateAgency(agencyId, request))
+        assertThatThrownBy(() ->
+                service.updateAgency(
+                        agencyId,
+                        request
+                )
+        )
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Email already exists");
 
-        verify(agencyMapper, never()).toAdminResponse(any());
+        verify(
+                agencyMapper,
+                never()
+        ).toAdminResponse(any());
     }
 
     @Test
     void approveAgency_updatesStatusToApproved_whenAgencyIsPending() {
         agency.setStatus(AgencyStatus.PENDING);
-        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
 
-        String result = service.approveAgency(agencyId);
+        when(agencyRepository.findById(agencyId))
+                .thenReturn(Optional.of(agency));
 
-        assertThat(agency.getStatus()).isEqualTo(AgencyStatus.APPROVED);
-        assertThat(result).contains("Acme Realty").contains("approved successfully");
-        verify(agencyRepository).findById(agencyId);
+        String result =
+                service.approveAgency(agencyId);
+
+        assertThat(agency.getStatus())
+                .isEqualTo(AgencyStatus.APPROVED);
+
+        assertThat(result)
+                .contains("Acme Realty")
+                .contains("approved successfully");
+
+        verify(agencyRepository)
+                .findById(agencyId);
     }
 
     @Test
     void approveAgency_throws_whenAgencyNotFound() {
-        when(agencyRepository.findById(agencyId)).thenReturn(Optional.empty());
+        when(agencyRepository.findById(agencyId))
+                .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.approveAgency(agencyId))
+        assertThatThrownBy(() ->
+                service.approveAgency(agencyId)
+        )
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Agency not found");
 
-        verify(agencyRepository, never()).save(any());
+        verify(
+                agencyRepository,
+                never()
+        ).save(any());
     }
 
     @Test
     void approveAgency_throws_whenAgencyIsDeleted() {
         agency.setIsDeleted(true);
-        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
 
-        assertThatThrownBy(() -> service.approveAgency(agencyId))
+        when(agencyRepository.findById(agencyId))
+                .thenReturn(Optional.of(agency));
+
+        assertThatThrownBy(() ->
+                service.approveAgency(agencyId)
+        )
                 .isInstanceOf(ResourceNotFoundException.class);
 
-        verify(agencyRepository, never()).save(any());
+        verify(
+                agencyRepository,
+                never()
+        ).save(any());
     }
 
     @Test
     void approveAgency_throws_whenAgencyIsNotPending() {
         agency.setStatus(AgencyStatus.APPROVED);
-        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
 
-        assertThatThrownBy(() -> service.approveAgency(agencyId))
+        when(agencyRepository.findById(agencyId))
+                .thenReturn(Optional.of(agency));
+
+        assertThatThrownBy(() ->
+                service.approveAgency(agencyId)
+        )
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("Only pending agencies can be approved");
+                .hasMessageContaining(
+                        "Only pending agencies can be approved"
+                );
 
-        verify(agencyRepository, never()).save(any());
+        verify(
+                agencyRepository,
+                never()
+        ).save(any());
     }
 
     @Test
     void rejectAgency_updatesStatusToRejected_whenAgencyIsPending() {
         agency.setStatus(AgencyStatus.PENDING);
-        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
 
-        String result = service.rejectAgency(agencyId);
+        when(agencyRepository.findById(agencyId))
+                .thenReturn(Optional.of(agency));
 
-        assertThat(agency.getStatus()).isEqualTo(AgencyStatus.REJECTED);
-        assertThat(result).contains("Acme Realty").contains("rejected successfully");
+        String result =
+                service.rejectAgency(agencyId);
 
-        verify(agencyRepository).findById(agencyId);
+        assertThat(agency.getStatus())
+                .isEqualTo(AgencyStatus.REJECTED);
+
+        assertThat(result)
+                .contains("Acme Realty")
+                .contains("rejected successfully");
+
+        verify(agencyRepository)
+                .findById(agencyId);
     }
 
     @Test
     void rejectAgency_throws_whenAgencyNotFound() {
-        when(agencyRepository.findById(agencyId)).thenReturn(Optional.empty());
+        when(agencyRepository.findById(agencyId))
+                .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.rejectAgency(agencyId))
+        assertThatThrownBy(() ->
+                service.rejectAgency(agencyId)
+        )
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Agency not found");
 
-        verify(agencyRepository, never()).save(any());
+        verify(
+                agencyRepository,
+                never()
+        ).save(any());
     }
 
     @Test
     void rejectAgency_throws_whenAgencyIsDeleted() {
         agency.setIsDeleted(true);
-        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
 
-        assertThatThrownBy(() -> service.rejectAgency(agencyId))
+        when(agencyRepository.findById(agencyId))
+                .thenReturn(Optional.of(agency));
+
+        assertThatThrownBy(() ->
+                service.rejectAgency(agencyId)
+        )
                 .isInstanceOf(ResourceNotFoundException.class);
 
-        verify(agencyRepository, never()).save(any());
+        verify(
+                agencyRepository,
+                never()
+        ).save(any());
     }
 
     @Test
     void rejectAgency_throws_whenAgencyIsNotPending() {
         agency.setStatus(AgencyStatus.APPROVED);
-        when(agencyRepository.findById(agencyId)).thenReturn(Optional.of(agency));
 
-        assertThatThrownBy(() -> service.rejectAgency(agencyId))
+        when(agencyRepository.findById(agencyId))
+                .thenReturn(Optional.of(agency));
+
+        assertThatThrownBy(() ->
+                service.rejectAgency(agencyId)
+        )
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("Only pending agencies can be rejected");
+                .hasMessageContaining(
+                        "Only pending agencies can be rejected"
+                );
 
-        verify(agencyRepository, never()).save(any());
+        verify(
+                agencyRepository,
+                never()
+        ).save(any());
     }
 }

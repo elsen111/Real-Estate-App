@@ -4,9 +4,11 @@ import com.realestate.backend.dto.request.*;
 import com.realestate.backend.dto.response.AuthResponse;
 import com.realestate.backend.dto.response.RefreshTokenResponse;
 import com.realestate.backend.entity.*;
+import com.realestate.backend.enums.AgencyStatus;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.ConflictException;
+import com.realestate.backend.exception.ForbiddenException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.exception.UnauthorizedException;
 import com.realestate.backend.mapper.AgencyMapper;
@@ -35,7 +37,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -124,7 +125,10 @@ class AuthServiceImplTest {
                 )
         )
                 .isInstanceOf(ConflictException.class)
-                .hasMessage("User already exists with email: " + request.getEmail().toLowerCase());
+                .hasMessage(
+                        "User already exists with email: "
+                                + request.getEmail().toLowerCase()
+                );
 
         verify(userRepository)
                 .existsByEmail("existing@test.com");
@@ -334,7 +338,10 @@ class AuthServiceImplTest {
                 )
         )
                 .isInstanceOf(ConflictException.class)
-                .hasMessage("User already exists with email: " + ownerRequest.getEmail());
+                .hasMessage(
+                        "User already exists with email: "
+                                + ownerRequest.getEmail()
+                );
 
         verify(userRepository)
                 .existsByEmail("owner@example.com");
@@ -378,7 +385,10 @@ class AuthServiceImplTest {
                 )
         )
                 .isInstanceOf(ConflictException.class)
-                .hasMessage("Agency already exists with email: " + agencyRequest.getAgencyBusinessEmail());
+                .hasMessage(
+                        "Agency already exists with email: "
+                                + agencyRequest.getAgencyBusinessEmail()
+                );
 
         verify(userRepository)
                 .existsByEmail("owner@example.com");
@@ -736,7 +746,7 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void login_succeeds_withActiveAgencyMembership() {
+    void login_throws_whenAgencyIsPending() {
         LoginRequest request = new LoginRequest();
         request.setEmail("owner@test.com");
         request.setPassword("Password1!");
@@ -744,6 +754,164 @@ class AuthServiceImplTest {
         AgencyEntity agency = AgencyEntity.builder()
                 .id(UUID.randomUUID())
                 .name("Prime Realty")
+                .status(AgencyStatus.PENDING)
+                .build();
+
+        UserEntity user = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .email("owner@test.com")
+                .fullName("Agency Owner")
+                .enabled(true)
+                .roles(new HashSet<>())
+                .build();
+
+        AgencyMemberEntity membership =
+                AgencyMemberEntity.builder()
+                        .id(UUID.randomUUID())
+                        .agency(agency)
+                        .user(user)
+                        .role(Role.AGENCY_OWNER)
+                        .active(true)
+                        .build();
+
+        when(authenticationManager.authenticate(any()))
+                .thenReturn(null);
+
+        when(userRepository.findByEmailAndDeletedFalse("owner@test.com"))
+                .thenReturn(Optional.of(user));
+
+        when(agencyMemberRepository.findByUserAndActiveTrue(user))
+                .thenReturn(Optional.of(membership));
+
+        assertThatThrownBy(() ->
+                service.login(request, servletRequest)
+        )
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessage(
+                        "Your agency is not approved yet. Please try again after approval."
+                );
+
+        verify(agencyMemberRepository)
+                .findByUserAndActiveTrue(user);
+
+        verifyNoInteractions(refreshTokenService);
+        verifyNoInteractions(jwtService);
+    }
+
+    @Test
+    void login_throws_whenAgencyIsRejected() {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("owner@test.com");
+        request.setPassword("Password1!");
+
+        AgencyEntity agency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .name("Prime Realty")
+                .status(AgencyStatus.REJECTED)
+                .build();
+
+        UserEntity user = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .email("owner@test.com")
+                .enabled(true)
+                .roles(new HashSet<>())
+                .build();
+
+        AgencyMemberEntity membership =
+                AgencyMemberEntity.builder()
+                        .agency(agency)
+                        .user(user)
+                        .role(Role.AGENCY_OWNER)
+                        .active(true)
+                        .build();
+
+        when(authenticationManager.authenticate(any()))
+                .thenReturn(null);
+
+        when(userRepository.findByEmailAndDeletedFalse("owner@test.com"))
+                .thenReturn(Optional.of(user));
+
+        when(agencyMemberRepository.findByUserAndActiveTrue(user))
+                .thenReturn(Optional.of(membership));
+
+        assertThatThrownBy(() ->
+                service.login(request, servletRequest)
+        )
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessage(
+                        "Your agency is not approved yet. Please try again after approval."
+                );
+
+        verify(refreshTokenService, never())
+                .createRefreshToken(any(), anyString(), anyString());
+
+        verify(jwtService, never())
+                .generateAccessToken(any());
+    }
+
+    @Test
+    void login_throws_whenAgencyIsRemoved() {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("owner@test.com");
+        request.setPassword("Password1!");
+
+        AgencyEntity agency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .name("Prime Realty")
+                .status(AgencyStatus.REMOVED)
+                .isDeleted(true)
+                .build();
+
+        UserEntity user = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .email("owner@test.com")
+                .enabled(true)
+                .roles(new HashSet<>())
+                .build();
+
+        AgencyMemberEntity membership =
+                AgencyMemberEntity.builder()
+                        .agency(agency)
+                        .user(user)
+                        .role(Role.AGENCY_OWNER)
+                        .active(true)
+                        .build();
+
+        when(authenticationManager.authenticate(any()))
+                .thenReturn(null);
+
+        when(userRepository.findByEmailAndDeletedFalse("owner@test.com"))
+                .thenReturn(Optional.of(user));
+
+        when(agencyMemberRepository.findByUserAndActiveTrue(user))
+                .thenReturn(Optional.of(membership));
+
+        assertThatThrownBy(() ->
+                service.login(request, servletRequest)
+        )
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessage(
+                        "Your agency is not approved yet. Please try again after approval."
+                );
+
+        verify(refreshTokenService, never())
+                .createRefreshToken(any(), anyString(), anyString());
+
+        verify(jwtService, never())
+                .generateAccessToken(any());
+    }
+
+    @Test
+    void login_succeeds_withApprovedAgency() {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("owner@test.com");
+        request.setPassword("Password1!");
+
+        AgencyEntity agency = AgencyEntity.builder()
+                .id(UUID.randomUUID())
+                .name("Prime Realty")
+                .status(AgencyStatus.APPROVED)
+                .isDeleted(false)
                 .build();
 
         UserEntity user = UserEntity.builder()
@@ -805,11 +973,27 @@ class AuthServiceImplTest {
         assertThat(response)
                 .isNotNull();
 
+        assertThat(response.getAccessToken())
+                .isEqualTo("access-token");
+
+        assertThat(response.getRefreshToken())
+                .isEqualTo("refresh-token");
+
         verify(agencyMapper)
                 .toAgencyOwnerResponse(agency);
 
         verify(agencyMemberRepository)
                 .findByUserAndActiveTrue(user);
+
+        verify(refreshTokenService)
+                .createRefreshToken(
+                        user,
+                        "127.0.0.1",
+                        "JUnit-Agent"
+                );
+
+        verify(jwtService)
+                .generateAccessToken(user);
     }
 
     @Test
