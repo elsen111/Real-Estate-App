@@ -44,13 +44,6 @@ public interface UserMapper {
     @Mapping(target = "avatarUrl", source = "profilePhotoUrl.media.fileUrl")
     UserResponse toAdminResponse(UserEntity user);
 
-    @Mapping(target = "phoneNumber", source = "phoneNumber")
-    @Mapping(target = "agency", source = "agency.name")
-    @Mapping(target = "roles", source = "user", qualifiedByName = "toRoleNames")
-    @Mapping(target = "position", source = "user", qualifiedByName = "resolvePosition")
-    @Mapping(target = "avatarUrl", source = "profilePhotoUrl.media.fileUrl")
-    UserResponse toAgentResponse(UserEntity user);
-
     @Mapping(target = "id", source = "user.id")
     @Mapping(target = "phoneNumber", source = "user.phoneNumber")
     @Mapping(target = "agency", source = "agency.name")

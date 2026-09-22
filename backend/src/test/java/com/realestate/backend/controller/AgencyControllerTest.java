@@ -6,13 +6,7 @@ import com.realestate.backend.dto.request.AgencyFilterRequest;
 import com.realestate.backend.dto.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.dto.request.PropertyFilterRequest;
 import com.realestate.backend.dto.request.UpdateAgencyRequest;
-import com.realestate.backend.dto.response.AgencyLogoUploadResponse;
-import com.realestate.backend.dto.response.AgencyResponse;
-import com.realestate.backend.dto.response.AgencySubscriptionResponse;
-import com.realestate.backend.dto.response.AppointmentResponse;
-import com.realestate.backend.dto.response.InquiryResponse;
-import com.realestate.backend.dto.response.PropertyResponse;
-import com.realestate.backend.dto.response.UserResponse;
+import com.realestate.backend.dto.response.*;
 import com.realestate.backend.enums.AgencyStatus;
 import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.security.ratelimit.RateLimitFilter;
@@ -268,13 +262,13 @@ class AgencyControllerTest {
         filter.setEnabled(true);
         Pageable pageable = Pageable.ofSize(10);
 
-        Page<UserResponse> page = new PageImpl<>(List.of(
-                UserResponse.builder().id(UUID.randomUUID()).fullName("Agent Smith").build()
+        Page<AgencyMemberResponse> page = new PageImpl<>(List.of(
+                AgencyMemberResponse.builder().id(UUID.randomUUID()).userFullName("Agent Smith").build()
         ));
 
         when(agencyService.getAgencyAgents(agencyId, filter, pageable)).thenReturn(page);
 
-        ResponseEntity<ApiResponse<Page<UserResponse>>> response =
+        ResponseEntity<ApiResponse<Page<AgencyMemberResponse>>> response =
                 controller.getAgencyAgents(agencyId, filter, pageable);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

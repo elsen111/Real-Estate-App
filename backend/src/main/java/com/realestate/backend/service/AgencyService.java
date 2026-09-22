@@ -1,15 +1,11 @@
 package com.realestate.backend.service;
 
 import com.realestate.backend.dto.request.AgencyAgentFilterRequest;
-import com.realestate.backend.dto.response.AgencyLogoUploadResponse;
+import com.realestate.backend.dto.response.*;
 import com.realestate.backend.dto.request.PropertyFilterRequest;
-import com.realestate.backend.dto.response.PropertyResponse;
 import com.realestate.backend.dto.request.AgencyFilterRequest;
 import com.realestate.backend.dto.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.dto.request.UpdateAgencyRequest;
-import com.realestate.backend.dto.response.AgencyResponse;
-import com.realestate.backend.dto.response.AgencySubscriptionResponse;
-import com.realestate.backend.dto.response.UserResponse;
 import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.security.CustomUserDetails;
 import org.springframework.data.domain.Page;
@@ -55,7 +51,7 @@ public interface AgencyService {
             Pageable pageable
     );
 
-    Page<UserResponse> getAgencyAgents(
+    Page<AgencyMemberResponse> getAgencyAgents(
             UUID  agencyId,
             AgencyAgentFilterRequest filterRequest,
             Pageable pageable

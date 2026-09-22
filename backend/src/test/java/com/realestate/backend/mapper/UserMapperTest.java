@@ -105,21 +105,6 @@ public class UserMapperTest {
     }
 
     @Test
-    void shouldMapAgentResponse_sameAsAdminResponse() {
-
-        UserEntity user = createUserEntity();
-
-        UserResponse response = userMapper.toAgentResponse(user);
-
-        assertNotNull(response);
-        assertEquals(user.getFullName(), response.getFullName());
-        assertEquals("Baku Realty", response.getAgency());
-        assertEquals(Set.of("AGENT", "CLIENT"), response.getRoles());
-        assertEquals("Agent", response.getPosition());
-        assertEquals("https://cdn/avatar.jpg", response.getAvatarUrl());
-    }
-
-    @Test
     void shouldMapAgentWithUserIdResponse_fromAgencyMember() {
 
         UserEntity user = createUserEntity();
@@ -224,7 +209,6 @@ public class UserMapperTest {
 
         assertNull(userMapper.toSummary(null));
         assertNull(userMapper.toAdminResponse(null));
-        assertNull(userMapper.toAgentResponse(null));
         assertNull(userMapper.toAgentWithUserIdResponse(null));
     }
 

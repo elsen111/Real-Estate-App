@@ -172,18 +172,19 @@ public class AgencyController {
 
     }
 
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER','ADMIN', 'SUPER_ADMIN')")
     @GetMapping("/{agencyId}/agents")
     @Operation(summary = "Get all agents belonging to the specific agency")
-    public ResponseEntity<ApiResponse<Page<UserResponse>>> getAgencyAgents(
+    public ResponseEntity<ApiResponse<Page<AgencyMemberResponse>>> getAgencyAgents(
             @PathVariable UUID agencyId,
             @ModelAttribute AgencyAgentFilterRequest filter,
             @PageableDefault(sort = "createdAt")
             Pageable pageable
     ) {
 
-        Page<UserResponse> response = agencyService.getAgencyAgents(agencyId, filter, pageable);
+        Page<AgencyMemberResponse> response = agencyService.getAgencyAgents(agencyId, filter, pageable);
 
-        ApiResponse<Page<UserResponse>> apiResponse =
+        ApiResponse<Page<AgencyMemberResponse>> apiResponse =
                 ApiResponse.success("Agency's agents fetched successfully", response);
 
         return ResponseEntity.ok(apiResponse);
