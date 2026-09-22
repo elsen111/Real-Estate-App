@@ -4,11 +4,9 @@ import com.realestate.backend.dto.request.*;
 import com.realestate.backend.dto.response.AuthResponse;
 import com.realestate.backend.dto.response.RefreshTokenResponse;
 import com.realestate.backend.entity.*;
+import com.realestate.backend.enums.AgencyStatus;
 import com.realestate.backend.enums.Role;
-import com.realestate.backend.exception.BadRequestException;
-import com.realestate.backend.exception.ConflictException;
-import com.realestate.backend.exception.ResourceNotFoundException;
-import com.realestate.backend.exception.UnauthorizedException;
+import com.realestate.backend.exception.*;
 import com.realestate.backend.mapper.AgencyMapper;
 import com.realestate.backend.mapper.AuthMapper;
 import com.realestate.backend.mapper.UserMapper;
@@ -184,6 +182,12 @@ public class AuthServiceImpl implements AuthService {
                 .findByUserAndActiveTrue(user)
                 .orElse(null);
         AgencyEntity agency = membership != null ? membership.getAgency() : null;
+
+        if(agency != null && agency.getStatus() != AgencyStatus.APPROVED) {
+            throw new ForbiddenException(
+                    "Your agency is not approved yet. Please try again after approval."
+            );
+        }
 
         RefreshTokenServiceImpl.CreatedRefreshToken refreshToken =
                 refreshTokenService.createRefreshToken(

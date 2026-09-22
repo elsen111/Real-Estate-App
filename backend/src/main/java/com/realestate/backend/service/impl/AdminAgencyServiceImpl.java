@@ -6,6 +6,7 @@ import com.realestate.backend.dto.response.*;
 import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.AgencyStatus;
 import com.realestate.backend.enums.PropertyStatus;
+import com.realestate.backend.enums.Role;
 import com.realestate.backend.enums.SubscriptionStatus;
 import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.BusinessException;
@@ -17,6 +18,7 @@ import com.realestate.backend.mapper.PropertyMapper;
 import com.realestate.backend.mapper.SubscriptionPlanMapper;
 import com.realestate.backend.repository.*;
 import com.realestate.backend.repository.specification.AgencySpecification;
+import com.realestate.backend.security.SecurityContextService;
 import com.realestate.backend.service.AdminAgencyService;
 import com.realestate.backend.service.AgencyService;
 import jakarta.transaction.Transactional;
@@ -25,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -36,6 +40,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AdminAgencyServiceImpl implements AdminAgencyService {
+
+    private final SecurityContextService securityContextService;
 
     private final AgencyRepository agencyRepository;
     private final AgencyMapper agencyMapper;
@@ -52,6 +58,12 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
     private final SubscriptionPlanRepository subscriptionPlanRepository;
 
     private final AgencyService agencyService;
+
+    private final List<AgencyStatus> ALLOWED_STATUSES_FOR_UPDATE = List.of(
+            AgencyStatus.APPROVED,
+            AgencyStatus.REJECTED
+    );
+    private final UserRepository userRepository;
 
     @Override
     public Page<AdminAgencyResponse> getAllAgencies(
@@ -134,7 +146,7 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
 
     @Transactional
     @Override
-    public String changeAgencyStatus(UUID id, AgencyStatus status) {
+    public String changeAgencyStatus(UUID id, AgencyStatus newStatus) {
 
         AgencyEntity agency = agencyRepository.findById(id)
                 .orElseThrow(
@@ -145,17 +157,29 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
 
         AgencyStatus previousStatus = agency.getStatus();
 
-        agency.setStatus(status);
+        if(!ALLOWED_STATUSES_FOR_UPDATE.contains(newStatus)) {
+            throw new BadRequestException("Allowed status " + ALLOWED_STATUSES_FOR_UPDATE);
+        }
+
+        if(previousStatus == newStatus) {
+            throw new ConflictException("Agency is already in status " + newStatus + ".");
+        }
+
+        if(previousStatus == AgencyStatus.REJECTED) {
+            throw new BusinessException("Cannot apply status update for rejected agency");
+        }
+
+        agency.setStatus(newStatus);
 
         log.atInfo()
                 .setMessage("agency_status_changed")
                 .addKeyValue("agencyId", agency.getId())
                 .addKeyValue("agencyName", agency.getName())
                 .addKeyValue("previousStatus", previousStatus)
-                .addKeyValue("newStatus", status)
+                .addKeyValue("newStatus", newStatus)
                 .log();
 
-        return agency.getName() + "'s status changed to " + status.toString();
+        return agency.getName() + "'s status changed to " + newStatus.toString();
     }
 
     @Transactional
@@ -187,6 +211,27 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
                         )
                 );
 
+        UserEntity currentUser = securityContextService.getCurrentUser();
+
+        if(agencySubscriptionRepository.existsByAgencyIdAndStatus(id, SubscriptionStatus.ACTIVE)) {
+            throw new BusinessException("Cannot delete this agency, as it has active subscription");
+        }
+
+        List<AgencyMemberEntity> members = agency.getMembers();
+        members.forEach(member -> {
+            member.setActive(false);
+            member.setRemovedBy(currentUser);
+            member.getUser().setAgency(null);
+            member.getUser().getRoles().removeIf(role -> role.getRoleName() == Role.AGENT
+                                        || role.getRoleName() == Role.AGENCY_OWNER
+            );
+        });
+
+        List<PropertyEntity> propertiesOfAgency = propertyRepository.findByAgencyId(id);
+
+        propertiesOfAgency.forEach(p -> p.setStatus(PropertyStatus.DELETED));
+
+        agency.setStatus(AgencyStatus.REMOVED);
         agency.setIsDeleted(true);
 
         log.atInfo()
@@ -195,7 +240,7 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
                 .addKeyValue("agencyName", agency.getName())
                 .log();
 
-        return agency.getName() + "has been deleted successfully";
+        return agency.getName() + " has been deleted successfully";
     }
 
     @Override
@@ -255,7 +300,7 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
                     .log();
 
             throw new BusinessException(
-                    "Agency has not been approved.Only approved agencies are allowed to get subscriptions."
+                    "Agency has not been approved. Only approved agencies are allowed to get subscriptions."
             );
 
         } else if (hasActiveSubscription) {
