@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -42,6 +43,18 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final PropertyRepository propertyRepository;
 
     private final AgencyMemberRepository agencyMemberRepository;
+
+    private final List<AppointmentStatus> ALLOWED_STATUSES_FOR_UPDATE = List.of(
+            AppointmentStatus.APPROVED,
+            AppointmentStatus.TENTATIVE,
+            AppointmentStatus.IN_PROGRESS,
+            AppointmentStatus.DELAYED,
+            AppointmentStatus.COMPLETED,
+            AppointmentStatus.CANCELLED,
+            AppointmentStatus.RESCHEDULED,
+            AppointmentStatus.NO_SHOW,
+            AppointmentStatus.REJECTED
+    );
 
 
     @Override
@@ -233,20 +246,23 @@ public class AppointmentServiceImpl implements AppointmentService {
                     + appointment.getId());
         }
 
-        if(request.getStatus() == AppointmentStatus.PENDING){
-            throw new BusinessException("Status cannot be changed to PENDING again.");
+        AppointmentStatus oldStatus = appointment.getStatus();
+        AppointmentStatus newStatus = request.getStatus();
+
+        if (!ALLOWED_STATUSES_FOR_UPDATE.contains(newStatus)) {
+            throw new BadRequestException(
+                    "Allowed statuses: " + ALLOWED_STATUSES_FOR_UPDATE
+            );
         }
+
+        validateStatusTransition(oldStatus, newStatus);
 
         if(request.getStatus() == AppointmentStatus.APPROVED){
             appointment.setConfirmedDateTime(LocalDateTime.now());
         }
 
-        AppointmentStatus oldStatus = appointment.getStatus();
-
-        appointment.setStatus(request.getStatus());
+        appointment.setStatus(newStatus);
         appointment.setResponseNote(request.getResponseNote());
-
-        AppointmentEntity updatedAppointment = appointmentRepository.saveAndFlush(appointment);
 
         log.atInfo()
                 .setMessage("Appointment status changed.")
@@ -264,8 +280,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .addKeyValue("clientEmail", appointment.getClient().getEmail())
                 .log();
 
-
-        return appointmentMapper.toResponse(updatedAppointment);
+        return appointmentMapper.toResponse(appointment);
     }
 
     @Override
@@ -300,6 +315,20 @@ public class AppointmentServiceImpl implements AppointmentService {
         return currentUser.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(authority -> authority.equals("ROLE_" + role.name()));
+    }
+
+    private void validateStatusTransition(
+            AppointmentStatus currentStatus,
+            AppointmentStatus newStatus
+    ) {
+        if (!currentStatus.canTransitionTo(newStatus)) {
+            throw new BusinessException(
+                    "Appointment status cannot be changed from "
+                            + currentStatus
+                            + " to "
+                            + newStatus
+            );
+        }
     }
 
 }

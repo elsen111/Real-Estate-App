@@ -8,10 +8,7 @@ import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.AppointmentStatus;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.Role;
-import com.realestate.backend.exception.BusinessException;
-import com.realestate.backend.exception.DuplicateAppointmentException;
-import com.realestate.backend.exception.ForbiddenException;
-import com.realestate.backend.exception.ResourceNotFoundException;
+import com.realestate.backend.exception.*;
 import com.realestate.backend.mapper.AppointmentMapper;
 import com.realestate.backend.repository.AppointmentRepository;
 import com.realestate.backend.repository.PropertyRepository;
@@ -195,31 +192,24 @@ class AppointmentServiceImplTest {
     }
 
     @Test
-    void updateStatus_throws_whenSettingBackToPending() {
+    void updateStatus_throwsBadRequest_whenRequestedStatusIsNotAllowed() {
         UUID appointmentId = UUID.randomUUID();
         UUID agencyId = UUID.randomUUID();
 
-        AgencyEntity agency = AgencyEntity.builder()
-                .id(agencyId)
-                .build();
-
         AppointmentEntity appointment = AppointmentEntity.builder()
                 .id(appointmentId)
-                .agency(agency)
+                .agency(
+                        AgencyEntity.builder()
+                                .id(agencyId)
+                                .build()
+                )
                 .status(AppointmentStatus.APPROVED)
                 .build();
 
-        CustomUserDetails owner =
-                CustomUserDetails.from(
-                        UserEntity.builder()
-                                .id(UUID.randomUUID())
-                                .roles(Set.of(
-                                        RoleEntity.builder()
-                                                .roleName(Role.SUPER_ADMIN)
-                                                .build()
-                                ))
-                                .build()
-                );
+        CustomUserDetails superAdmin = userWithRole(
+                UUID.randomUUID(),
+                Role.SUPER_ADMIN
+        );
 
         UpdateAppointmentStatusRequest request =
                 new UpdateAppointmentStatusRequest();
@@ -231,14 +221,206 @@ class AppointmentServiceImplTest {
 
         assertThatThrownBy(
                 () -> service.updateStatus(
-                        owner,
+                        superAdmin,
                         appointmentId,
                         request
                 )
-        ).isInstanceOf(
-                com.realestate.backend.exception.BusinessException.class
-        );
+        )
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Allowed statuses");
     }
+
+    @Test
+    void updateStatus_throwsBusinessException_whenTransitionIsNotAllowed() {
+        UUID appointmentId = UUID.randomUUID();
+        UUID agencyId = UUID.randomUUID();
+
+        AppointmentEntity appointment = AppointmentEntity.builder()
+                .id(appointmentId)
+                .agency(
+                        AgencyEntity.builder()
+                                .id(agencyId)
+                                .build()
+                )
+                .status(AppointmentStatus.APPROVED)
+                .build();
+
+        CustomUserDetails superAdmin = userWithRole(
+                UUID.randomUUID(),
+                Role.SUPER_ADMIN
+        );
+
+        UpdateAppointmentStatusRequest request =
+                new UpdateAppointmentStatusRequest();
+
+        request.setStatus(AppointmentStatus.TENTATIVE);
+
+        when(appointmentRepository.findById(appointmentId))
+                .thenReturn(Optional.of(appointment));
+
+        assertThatThrownBy(
+                () -> service.updateStatus(
+                        superAdmin,
+                        appointmentId,
+                        request
+                )
+        )
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("APPROVED")
+                .hasMessageContaining("TENTATIVE");
+    }
+
+    @Test
+    void updateStatus_updatesAppointment_whenTransitionIsAllowed() {
+        UUID appointmentId = UUID.randomUUID();
+        UUID agencyId = UUID.randomUUID();
+
+        PropertyEntity property = PropertyEntity.builder()
+                .id(UUID.randomUUID())
+                .title("Test Property")
+                .build();
+
+        UserEntity client = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .email("client@test.com")
+                .build();
+
+        UserEntity agent = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .email("agent@test.com")
+                .build();
+
+        AppointmentEntity appointment = AppointmentEntity.builder()
+                .id(appointmentId)
+                .agency(
+                        AgencyEntity.builder()
+                                .id(agencyId)
+                                .name("Test Agency")
+                                .build()
+                )
+                .property(property)
+                .client(client)
+                .agent(agent)
+                .status(AppointmentStatus.APPROVED)
+                .build();
+
+        CustomUserDetails superAdmin = userWithRole(
+                UUID.randomUUID(),
+                Role.SUPER_ADMIN
+        );
+
+        UpdateAppointmentStatusRequest request =
+                new UpdateAppointmentStatusRequest();
+
+        request.setStatus(AppointmentStatus.IN_PROGRESS);
+        request.setResponseNote("Appointment has started.");
+
+        AppointmentResponse expected =
+                AppointmentResponse.builder()
+                        .id(appointmentId)
+                        .status(AppointmentStatus.IN_PROGRESS)
+                        .build();
+
+        when(appointmentRepository.findById(appointmentId))
+                .thenReturn(Optional.of(appointment));
+
+        when(appointmentMapper.toResponse(appointment))
+                .thenReturn(expected);
+
+        AppointmentResponse result = service.updateStatus(
+                superAdmin,
+                appointmentId,
+                request
+        );
+
+        assertThat(result).isEqualTo(expected);
+
+        assertThat(appointment.getStatus())
+                .isEqualTo(AppointmentStatus.IN_PROGRESS);
+
+        assertThat(appointment.getResponseNote())
+                .isEqualTo("Appointment has started.");
+
+        verify(appointmentMapper).toResponse(appointment);
+    }
+
+    @Test
+    void updateStatus_setsConfirmedDateTime_whenAppointmentIsApproved() {
+        UUID appointmentId = UUID.randomUUID();
+        UUID agencyId = UUID.randomUUID();
+
+        PropertyEntity property = PropertyEntity.builder()
+                .id(UUID.randomUUID())
+                .title("Test Property")
+                .build();
+
+        UserEntity client = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .email("client@test.com")
+                .build();
+
+        UserEntity agent = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .email("agent@test.com")
+                .build();
+
+        AppointmentEntity appointment = AppointmentEntity.builder()
+                .id(appointmentId)
+                .agency(
+                        AgencyEntity.builder()
+                                .id(agencyId)
+                                .name("Test Agency")
+                                .build()
+                )
+                .property(property)
+                .client(client)
+                .agent(agent)
+                .status(AppointmentStatus.PENDING)
+                .build();
+
+        CustomUserDetails superAdmin = userWithRole(
+                UUID.randomUUID(),
+                Role.SUPER_ADMIN
+        );
+
+        UpdateAppointmentStatusRequest request =
+                new UpdateAppointmentStatusRequest();
+
+        request.setStatus(AppointmentStatus.APPROVED);
+
+        AppointmentResponse expected =
+                AppointmentResponse.builder()
+                        .id(appointmentId)
+                        .status(AppointmentStatus.APPROVED)
+                        .build();
+
+        when(appointmentRepository.findById(appointmentId))
+                .thenReturn(Optional.of(appointment));
+
+        when(appointmentMapper.toResponse(appointment))
+                .thenReturn(expected);
+
+        assertThat(appointment.getConfirmedDateTime())
+                .isNull();
+
+        AppointmentResponse result = service.updateStatus(
+                superAdmin,
+                appointmentId,
+                request
+        );
+
+        assertThat(result).isEqualTo(expected);
+
+        assertThat(appointment.getStatus())
+                .isEqualTo(AppointmentStatus.APPROVED);
+
+        assertThat(appointment.getConfirmedDateTime())
+                .isNotNull();
+
+        verify(appointmentMapper).toResponse(appointment);
+    }
+
+
 
     @Test
     void getAppointmentById_throws_whenAppointmentNotFound() {
