@@ -122,6 +122,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<ReviewResponse> getPropertyReviews(UUID propertyId, PublicReviewFilterRequest filterRequest, Pageable pageable) {
 
@@ -176,6 +177,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<ReviewResponse> getAgencyReviews(UUID agencyId, PublicReviewFilterRequest filterRequest, Pageable pageable) {
 

@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,12 +103,8 @@ public class InquiryServiceImpl implements InquiryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<InquiryResponse> getClientInquiries(CustomUserDetails currentUser, InquiryStatus status, Pageable pageable) {
-
-        UserEntity client = userRepository.findById(currentUser.getId())
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
-                );
 
         Page<InquiryEntity> inquiries = status == null
                 ? inquiryRepository.findByClientId(currentUser.getId(), pageable)
@@ -118,19 +115,21 @@ public class InquiryServiceImpl implements InquiryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<InquiryResponse> getMyAgencyInquiries(
-            CustomUserDetails currentUser, InquiryStatus status,
-            UUID propertyId, Pageable pageable) {
+            CustomUserDetails currentUser,
+            InquiryStatus status,
+            UUID propertyId,
+            Pageable pageable) {
 
         AgencyMemberEntity agencyMember = agencyMemberRepository.findByUser_IdAndActiveTrue(currentUser.getId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Agency not found associated with your profile."));
+                .orElseThrow(() -> new AccessDeniedException("Access denied: No active agency membership found for this account."));
+
+        if (agencyMember.getAgency() == null) {
+            throw new IllegalStateException("Data integrity error: Active member is not linked to any agency.");
+        }
 
         UUID agencyId = agencyMember.getAgency().getId();
-
-        if (!hasRole(currentUser, "AGENCY_OWNER") && !hasRole(currentUser, "AGENT")) {
-            throw new ForbiddenException("You do not have permission to view agency inquiries");
-        }
 
         Page<InquiryEntity> inquiries = inquiryRepository
                 .findByAgencyIdWithFilters(agencyId, status, propertyId, pageable);
@@ -138,7 +137,9 @@ public class InquiryServiceImpl implements InquiryService {
         return inquiries.map(inquiryMapper::toResponse);
     }
 
+
     @Override
+    @Transactional(readOnly = true)
     public InquiryResponse getInquiryById(CustomUserDetails currentUser, UUID inquiryId) {
 
         InquiryEntity inquiry = inquiryRepository.findById(inquiryId)
@@ -188,6 +189,7 @@ public class InquiryServiceImpl implements InquiryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<InquiryResponse> getAgencyInquiriesById(UUID agencyId, InquiryFilterRequest filter, Pageable pageable) {
 
         if(!agencyRepository.existsById(agencyId)){

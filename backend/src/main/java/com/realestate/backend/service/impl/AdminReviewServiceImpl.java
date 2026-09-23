@@ -33,6 +33,7 @@ public class AdminReviewServiceImpl implements AdminReviewService {
     private final ReviewMapper reviewMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ReviewResponse> getAllReviews(AdminReviewFilterRequest filter, Pageable pageable) {
 
         Specification<ReviewEntity> specification = ReviewSpecification

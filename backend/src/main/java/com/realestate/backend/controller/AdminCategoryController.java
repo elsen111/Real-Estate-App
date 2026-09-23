@@ -18,7 +18,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/admin/categories")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('SUPER_ADMIN')")
 public class AdminCategoryController {
 
     private final CategoryService categoryService;

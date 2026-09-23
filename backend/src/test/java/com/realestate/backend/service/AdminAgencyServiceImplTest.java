@@ -275,9 +275,6 @@ class AdminAgencyServiceImplTest {
 
     @Test
     void getAgencySubscription_throws_whenNoActiveSubscription() {
-        when(agencyRepository.findById(agencyId))
-                .thenReturn(Optional.of(agency));
-
         when(
                 agencySubscriptionRepository
                         .findFirstByAgencyIdAndStatusOrderByEndDateDesc(

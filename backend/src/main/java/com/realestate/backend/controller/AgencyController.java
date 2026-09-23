@@ -211,7 +211,7 @@ public class AgencyController {
 
     @GetMapping("/me/inquiries")
     @Operation(summary = "Get current user's agency's inquiries")
-    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'LANDLORD')")
+    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT')")
     public ResponseEntity<ApiResponse<Page<InquiryResponse>>> getMyAgencyInquiries(
             @RequestParam(required = false) InquiryStatus status,
             @RequestParam(required = false) UUID propertyId,

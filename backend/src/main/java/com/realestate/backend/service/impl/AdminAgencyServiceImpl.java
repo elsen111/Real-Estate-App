@@ -21,14 +21,12 @@ import com.realestate.backend.repository.specification.AgencySpecification;
 import com.realestate.backend.security.SecurityContextService;
 import com.realestate.backend.service.AdminAgencyService;
 import com.realestate.backend.service.AgencyService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -66,6 +64,7 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public Page<AdminAgencyResponse> getAllAgencies(
             AdminAgencyFilterRequest filter,
             Pageable pageable
@@ -78,6 +77,7 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public AdminAgencyResponse getAgencyById(UUID id) {
         AgencyEntity agency = agencyRepository.findById(id)
                 .orElseThrow(
@@ -342,14 +342,8 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public AgencySubscriptionResponse getAgencySubscription(UUID agencyId) {
-
-        AgencyEntity agency = agencyRepository.findById(agencyId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException(
-                                "Agency not found with id: " + agencyId
-                        )
-                );
 
         AgencySubscriptionEntity agencySubscription =
                 agencySubscriptionRepository

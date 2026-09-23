@@ -117,11 +117,11 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public Page<AppointmentResponse> getClientAppointments(CustomUserDetails currentUser, AppointmentStatus status, Pageable pageable) {
 
-        Page<AppointmentEntity> inquiries = status == null
+        Page<AppointmentEntity> appointments = status == null
                 ? appointmentRepository.findByClientId(currentUser.getId(), pageable)
                 : appointmentRepository.findByClientIdAndStatus(currentUser.getId(), status, pageable);
 
-        return inquiries.map(appointmentMapper::toResponse);
+        return appointments.map(appointmentMapper::toResponse);
 
     }
 
@@ -208,7 +208,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<AppointmentResponse> getMyAgencyAppointments(
             CustomUserDetails currentUser,
             AppointmentStatus status,

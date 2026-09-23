@@ -24,13 +24,13 @@ import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.AgencyService;
 import com.realestate.backend.service.MediaService;
 import com.realestate.backend.storage.MediaUploadPolicy;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -60,6 +60,7 @@ public class AgencyServiceImpl implements AgencyService {
     private final AgencyMemberRepository agencyMemberRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public AgencyResponse getCurrentAgency(CustomUserDetails currentUser) {
 
         UserEntity user = userRepository.findById(currentUser.getId())
@@ -89,7 +90,13 @@ public class AgencyServiceImpl implements AgencyService {
                         () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
                 );
 
-        AgencyEntity agency = updateAgency(user.getAgency().getId(), request);
+        AgencyEntity currentAgency = user.getAgency();
+
+        if(currentAgency == null) {
+            throw new ResourceNotFoundException("No agency associated with this user id: " + currentUser.getId());
+        }
+
+        AgencyEntity agency = updateAgency(currentAgency.getId(), request);
 
         log.atInfo()
                 .setMessage("Agency updated.")
@@ -102,6 +109,7 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public AgencySubscriptionResponse getMySubscription(
             CustomUserDetails currentUser
     ) {
@@ -160,6 +168,7 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PropertyResponse> getMyAgencyProperties(CustomUserDetails currentUser, AgencyPropertyFilterRequest filter, Pageable pageable) {
 
 
@@ -168,10 +177,16 @@ public class AgencyServiceImpl implements AgencyService {
                         () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
                 );
 
+        AgencyEntity currentAgency = user.getAgency();
+
+        if(currentAgency == null) {
+            throw new ResourceNotFoundException("No agency associated with this user id: " + currentUser.getId());
+        }
+
         Specification<PropertyEntity> specification = AgencyPropertySpecification
                 .withFilter(filter);
 
-        specification = specification.and(AgencyPropertySpecification.hasAgencyId(user.getAgency().getId()));
+        specification = specification.and(AgencyPropertySpecification.hasAgencyId(currentAgency.getId()));
 
         return propertyRepository.findAll(specification, pageable)
                 .map(propertyMapper::toAdminPropertyResponse);
@@ -179,6 +194,7 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<AgencyResponse> getAllPublicAgencies(AgencyFilterRequest filter, Pageable pageable) {
         Specification<AgencyEntity> specification = AgencySpecification
                 .withPublicFilter(filter);
@@ -188,6 +204,7 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public AgencyResponse getPublicAgencyInfo(UUID agencyId) {
 
         AgencyEntity agency = agencyRepository.findById(agencyId)
@@ -202,6 +219,7 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PropertyResponse> getAgencyProperties(
             UUID agencyId,
             PropertyFilterRequest filter,
@@ -216,6 +234,7 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<AgencyMemberResponse> getAgencyAgents(UUID agencyId, AgencyAgentFilterRequest filterRequest, Pageable pageable) {
         Specification<AgencyMemberEntity> specification = AgencyAgentSpecification
                 .withAgencyAgentFilter(agencyId, filterRequest);
@@ -299,11 +318,17 @@ public class AgencyServiceImpl implements AgencyService {
                         () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
                 );
 
+        AgencyEntity agency = user.getAgency();
+
+        if(agency == null) {
+            throw new ResourceNotFoundException("No agency associated with this user id: " + currentUser.getId());
+        }
+
         AgencyMediaEntity agencyMedia = agencyMediaRepository
-                .findByAgencyId(user.getAgency().getId())
+                .findByAgencyId(agency.getId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Logo not found for agency: " + user.getAgency().getId()
+                                "Logo not found for agency: " + agency.getId()
                         ));
 
         agencyMediaRepository.delete(agencyMedia);

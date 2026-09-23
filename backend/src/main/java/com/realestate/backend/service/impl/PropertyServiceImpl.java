@@ -76,6 +76,7 @@ public class PropertyServiceImpl implements PropertyService {
         UserEntity user = getCurrentUser(currentUser.getId());
 
         AgencyEntity agency = user.getAgency();
+
         if (agency == null) {
             throw new ResourceNotFoundException("Agency not found associated with your profile.");
         }
@@ -124,6 +125,7 @@ public class PropertyServiceImpl implements PropertyService {
         return propertyMapper.toCreateResponse(newProperty);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<PropertyResponse> getAllPublicProperties(PropertyPublicFilterRequest filter, Pageable pageable) {
         Specification<PropertyEntity> specification = PropertySpecification
@@ -132,6 +134,7 @@ public class PropertyServiceImpl implements PropertyService {
         return getPropertyResponses(pageable, specification);
     }
 
+    @Transactional
     @Override
     public PropertyDetailResponse getPropertyDetailsById(UUID propertyId, CustomUserDetails currentUser) {
 
@@ -242,6 +245,7 @@ public class PropertyServiceImpl implements PropertyService {
         PropertyEntity property = getPropertyEntity(propertyId);
 
         AgencyEntity agency = user.getAgency();
+
         if(!isSuperAdmin(currentUser)) {
             if (agency == null) {
                 throw new ResourceNotFoundException("Agency not found associated with your profile.");
@@ -317,6 +321,7 @@ public class PropertyServiceImpl implements PropertyService {
 
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<PropertyResponse> getFeaturedProperties(PropertyPublicFilterRequest filter, Pageable pageable) {
         Specification<PropertyEntity> specification = PropertySpecification
@@ -327,6 +332,7 @@ public class PropertyServiceImpl implements PropertyService {
 
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<PropertyResponse> getRecentProperties(PropertyPublicFilterRequest filter, int size) {
         Specification<PropertyEntity> specification = PropertySpecification
@@ -338,6 +344,7 @@ public class PropertyServiceImpl implements PropertyService {
 
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<PropertyResponse> getSimilarProperties(UUID propertyId, Pageable pageable) {
 
@@ -354,6 +361,7 @@ public class PropertyServiceImpl implements PropertyService {
 
     }
 
+    @Transactional(readOnly = true)
     @Override
     public PropertySearchSuggestionResponse getSearchSuggestions(String keyword) {
 
@@ -372,6 +380,7 @@ public class PropertyServiceImpl implements PropertyService {
 
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<PropertyMapResponse> getMapProperties(PropertyMapFilterRequest request, Pageable pageable) {
         Specification<PropertyEntity> spec = PropertySpecification.withMapFilter(request);
@@ -389,6 +398,7 @@ public class PropertyServiceImpl implements PropertyService {
         );
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<PropertyMediaResponse> getPropertyMedia(UUID propertyId) {
 

@@ -7,6 +7,7 @@ import com.realestate.backend.repository.SubscriptionPlanRepository;
 import com.realestate.backend.service.SubscriptionPlanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     private final SubscriptionPlanRepository subscriptionPlanRepository;
     private final SubscriptionPlanMapper subscriptionPlanMapper;
 
+    @Transactional(readOnly = true)
     @Override
     public List<SubscriptionPlanResponse> getSubscriptionPlans() {
 

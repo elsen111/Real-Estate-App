@@ -39,6 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryResponse> getActiveCategories() {
 
         List<CategoryEntity> activeCategories = categoryRepository.findAllByActiveTrue();
@@ -50,6 +51,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CategoryResponse getActiveCategoryById(UUID categoryId) {
 
         CategoryEntity category = categoryRepository.findByIdAndActiveTrue(categoryId)
@@ -62,6 +64,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryResponse> getAllCategories() {
 
         List<CategoryEntity> activeCategories = categoryRepository.findAll();
@@ -73,6 +76,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CategoryResponse getCategoryById(UUID categoryId) {
 
         CategoryEntity category = categoryRepository.findById(categoryId)
@@ -112,7 +116,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryResponse updateCategory(UpdateCategoryRequest request, UUID categoryId) {
 
-        CategoryEntity oldCategory = categoryRepository.findById(categoryId)
+        CategoryEntity category = categoryRepository.findById(categoryId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Category not found with id: " + categoryId)
                 );
@@ -121,11 +125,11 @@ public class CategoryServiceImpl implements CategoryService {
             throw new ConflictException("Another category already exists with name: " + request.getName());
         }
 
-        String oldName = oldCategory.getName();
+        String oldName = category.getName();
 
-        categoryMapper.toUpdatedEntity(request, oldCategory);
+        categoryMapper.toUpdatedEntity(request, category);
 
-        CategoryEntity updatedCategory = categoryRepository.save(oldCategory);
+        CategoryEntity updatedCategory = categoryRepository.save(category);
 
         updatedCategory.setSlug(generateSlug(request.getName().trim()));
 

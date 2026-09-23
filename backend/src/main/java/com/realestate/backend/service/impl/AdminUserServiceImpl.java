@@ -42,6 +42,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public Page<UserResponse> getAllUsers(
             AdminUserFilterRequest request,
             Pageable pageable
@@ -55,6 +56,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponse getUserById(UUID userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException(

@@ -56,6 +56,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<AdminSubscriptionPlanResponse> getAllSubscriptionPlans(AdminSubscriptionPlanFilterRequest filter) {
 
         Specification<SubscriptionPlanEntity> specification = AdminSubscriptionPlanSpecification.withFilter(filter);
@@ -65,6 +66,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
     }
 
     @Override
+    @Transactional(readOnly = true)
     public AdminSubscriptionPlanResponse getSubscriptionPlanById(UUID id) {
         SubscriptionPlanEntity subscriptionPlan = subscriptionPlanRepository.findById(id)
                 .orElseThrow(() ->
