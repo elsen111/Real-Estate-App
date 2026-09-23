@@ -1,5 +1,6 @@
 package com.realestate.backend.repository.specification;
 
+import com.realestate.backend.dto.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.dto.request.PropertyFilterRequest;
 import com.realestate.backend.dto.request.PropertyMapFilterRequest;
 import com.realestate.backend.dto.request.PropertyPublicFilterRequest;
@@ -8,7 +9,6 @@ import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.enums.Currency;
 import com.realestate.backend.enums.ListingType;
 import com.realestate.backend.enums.PropertyStatus;
-import com.realestate.backend.enums.PropertyType;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
@@ -163,6 +163,23 @@ public class PropertySpecification {
 
     }
 
+    public static Specification<PropertyEntity> withAgencyFilter(
+            AgencyPropertyFilterRequest filterRequest
+    ) {
+
+        if(filterRequest == null) {
+            Specification.where((Specification<Object>) null);
+        };
+
+        assert filterRequest != null;
+
+        return Specification.where(hasCity(filterRequest.getCity()))
+                .and(hasStatus(filterRequest.getStatus()))
+                .and(isFeatured(filterRequest.getFeatured()))
+                .and(hasQuery(filterRequest.getQuery()));
+
+    }
+
 
 
 //    HELPER METHODS
@@ -188,7 +205,9 @@ public class PropertySpecification {
             Collection<PropertyStatus> statuses
     ) {
         return (root, query, cb) ->
-                root.get("status").in(statuses);
+                statuses == null || statuses.isEmpty()
+                        ? null
+                        : root.get("status").in(statuses);
     }
 
     public static Specification<PropertyEntity> isFeatured(Boolean isFeatured) {

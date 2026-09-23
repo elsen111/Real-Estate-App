@@ -17,7 +17,6 @@ import com.realestate.backend.mapper.PropertyMapper;
 import com.realestate.backend.mapper.UserMapper;
 import com.realestate.backend.repository.*;
 import com.realestate.backend.repository.specification.AgencyAgentSpecification;
-import com.realestate.backend.repository.specification.AgencyPropertySpecification;
 import com.realestate.backend.repository.specification.AgencySpecification;
 import com.realestate.backend.repository.specification.PropertySpecification;
 import com.realestate.backend.security.CustomUserDetails;
@@ -183,10 +182,10 @@ public class AgencyServiceImpl implements AgencyService {
             throw new ResourceNotFoundException("No agency associated with this user id: " + currentUser.getId());
         }
 
-        Specification<PropertyEntity> specification = AgencyPropertySpecification
-                .withFilter(filter);
+        Specification<PropertyEntity> specification = PropertySpecification
+                .withAgencyFilter(filter);
 
-        specification = specification.and(AgencyPropertySpecification.hasAgencyId(currentAgency.getId()));
+        specification = specification.and(PropertySpecification.hasAgencyId(currentAgency.getId()));
 
         return propertyRepository.findAll(specification, pageable)
                 .map(propertyMapper::toAdminPropertyResponse);
