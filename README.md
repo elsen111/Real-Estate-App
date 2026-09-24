@@ -31,21 +31,22 @@ A real estate platform backend for agencies, agents, landlords, and clients. It 
 
 ## ✨ Features
 
-- JWT-based authentication (access + refresh tokens), login/logout, "me" endpoint
-- Role-based access control (`SUPER_ADMIN`, `ADMIN`, `AGENCY_OWNER`, `AGENT`, `LANDLORD`, `CLIENT`)
-- Separate registration flows for regular users and agency owners
-- Password reset via email OTP
-- Agency management (profile, members, status, admin moderation)
-- Agent management
-- Property listings: create/update/delete, media upload via MinIO, view tracking
-- Categories, subscription plans, and agency subscriptions
-- Favorites
-- Inquiries and viewing appointments
-- Reviews (property/agency), with admin moderation
-- Stripe-based payments and subscription billing, with a webhook endpoint
-- Rate limiting (Bucket4j) on sensitive endpoints
-- Swagger / OpenAPI documentation
-- Scheduled jobs for subscription expiration and notification emails
+* 🔐 JWT-based authentication (access + refresh tokens), login/logout, "me" endpoint
+* 🛡️ Role-based access control (`SUPER_ADMIN`, `ADMIN`, `AGENCY_OWNER`, `AGENT`, `LANDLORD`, `CLIENT`)
+* 📝 Separate registration flows for regular users and agency owners
+* 📧 Password reset via email OTP
+* 🏢 Agency management (profile, members, status, admin moderation)
+* 👨‍💼 Agent management
+* 🏠 Property listings: create/update/delete, media upload via MinIO, view tracking
+* 🗂️ Categories, subscription plans, and agency subscriptions
+* ❤️ Favorites
+* 📩 Inquiries and viewing appointments
+* ⭐ Reviews (property/agency), with admin moderation
+* 💳 Stripe-based payments and subscription billing, with a webhook endpoint
+* 🚦 Rate limiting (Bucket4j) on sensitive endpoints
+* 📚 Swagger / OpenAPI documentation
+* ⏰ Scheduled jobs for subscription expiration and notification emails
+
 
 ⬆️ [Back to top](#estateflow--real-estate-crm--marketplace-backend)
 
