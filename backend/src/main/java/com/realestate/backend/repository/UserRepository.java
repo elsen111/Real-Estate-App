@@ -12,7 +12,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserRepository extends JpaRepository<UserEntity, UUID>, JpaSpecificationExecutor<UserEntity> {
+public interface UserRepository
+        extends JpaRepository<UserEntity, UUID>,
+        JpaSpecificationExecutor<UserEntity> {
 
     @EntityGraph(attributePaths = "roles")
     Optional<UserEntity> findByEmail(String email);
@@ -20,21 +22,35 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID>, JpaSpec
     @EntityGraph(attributePaths = "roles")
     Optional<UserEntity> findWithRolesById(UUID id);
 
+    @EntityGraph(attributePaths = {"roles", "agency"})
+    Optional<UserEntity> findWithAgencyById(UUID id);
+
     Boolean existsByEmail(String email);
 
     long countByAgency(AgencyEntity agency);
 
-    @Query("SELECT am FROM AgencyMemberEntity am " +
-            "JOIN FETCH am.user u " +
-            "JOIN FETCH am.agency a " +
-            "JOIN u.roles r " +
-            "WHERE u.id = :userId " +
-            "AND r.roleName = com.realestate.backend.enums.Role.AGENT")
-    Optional<AgencyMemberEntity> findAgentMemberByUserId(@Param("userId") UUID userId);
+    @Query("""
+            SELECT am
+            FROM AgencyMemberEntity am
+            JOIN FETCH am.user u
+            JOIN FETCH am.agency a
+            JOIN u.roles r
+            WHERE u.id = :userId
+            AND r.roleName =
+                com.realestate.backend.enums.Role.AGENT
+            """)
+    Optional<AgencyMemberEntity> findAgentMemberByUserId(
+            @Param("userId") UUID userId
+    );
 
     Optional<UserEntity> findByEmailIgnoreCase(String email);
 
-    boolean existsByIdAndAgencyId(UUID userId, UUID agencyId);
+    boolean existsByIdAndAgencyId(
+            UUID userId,
+            UUID agencyId
+    );
 
-    Optional<UserEntity> findByEmailAndDeletedFalse(String email);
+    Optional<UserEntity> findByEmailAndDeletedFalse(
+            String email
+    );
 }

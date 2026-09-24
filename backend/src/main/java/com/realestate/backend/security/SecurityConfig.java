@@ -17,8 +17,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static com.realestate.backend.security.SecurityConstants.PUBLIC_URLS;
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -47,20 +45,36 @@ public class SecurityConfig {
             MdcLoggingFilter mdcLoggingFilter,
             RequestLoggingFilter requestLoggingFilter
     ) throws Exception {
+
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        session.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        )
                 )
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(authenticationEntryPoint)
-                        .accessDeniedHandler(accessDeniedHandler)
+                .exceptionHandling(exception ->
+                        exception
+                                .authenticationEntryPoint(
+                                        authenticationEntryPoint
+                                )
+                                .accessDeniedHandler(
+                                        accessDeniedHandler
+                                )
                 )
-                .authenticationProvider(authenticationProvider)
+                .authenticationProvider(
+                        authenticationProvider
+                )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(HttpMethod.POST,
+
+                        .requestMatchers(
+                                HttpMethod.OPTIONS,
+                                "/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                HttpMethod.POST,
                                 "/auth/register",
                                 "/auth/register/**",
                                 "/auth/login",
@@ -68,15 +82,51 @@ public class SecurityConfig {
                                 "/auth/forgot-password",
                                 "/auth/reset-password"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/agencies/public/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/properties/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/agencies/*/agents").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/agencies/*/reviews").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/agents/me/properties").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/agents/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/subscription-plans/**").permitAll()
 
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/payments/webhook"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/agencies/public/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/properties/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/categories/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/agencies/*/agents"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/agencies/*/reviews"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/agents/me/properties"
+                        ).authenticated()
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/agents/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/subscription-plans/**"
+                        ).permitAll()
 
                         .requestMatchers(
                                 "/api-docs/**",
@@ -84,7 +134,12 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
 
-                        .requestMatchers("/admin/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                        .requestMatchers(
+                                "/admin/**"
+                        ).hasAnyRole(
+                                "SUPER_ADMIN",
+                                "ADMIN"
+                        )
 
                         .anyRequest().authenticated()
                 )
@@ -100,7 +155,6 @@ public class SecurityConfig {
                         rateLimitFilter,
                         MdcLoggingFilter.class
                 )
-
                 .addFilterAfter(
                         requestLoggingFilter,
                         RateLimitFilter.class

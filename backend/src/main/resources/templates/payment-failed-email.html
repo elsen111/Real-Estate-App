@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Failed</title>
+</head>
+<body>
+
+<h2>Payment was not successful</h2>
+
+<p>Hello <span th:text="${agencyName}"></span>,</p>
+
+<p>
+    We could not complete your EstateFlow subscription payment.
+</p>
+
+<p>
+    <strong>Plan:</strong>
+    <span th:text="${planName}"></span>
+</p>
+
+<p>
+    <strong>Amount:</strong>
+    <span th:text="${amount}"></span>
+    <span th:text="${currency}"></span>
+</p>
+
+<p>
+    <strong>Status:</strong>
+    <span th:text="${status}"></span>
+</p>
+
+<p th:if="${failureReason != null}">
+    <strong>Reason:</strong>
+    <span th:text="${failureReason}"></span>
+</p>
+
+<p>
+    <strong>Payment ID:</strong>
+    <span th:text="${paymentId}"></span>
+</p>
+
+<p>
+    You can try the payment again from your EstateFlow account.
+</p>
+
+</body>
+</html>
