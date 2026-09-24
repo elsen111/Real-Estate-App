@@ -1,5 +1,13 @@
 # EstateFlow — Real Estate CRM & Marketplace
 
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Java-21-orange?logo=openjdk&logoColor=white" alt="Java 21"/>
+  <img src="https://img.shields.io/badge/Spring%20Boot-4.0.6-brightgreen?logo=springboot&logoColor=white" alt="Spring Boot"/>
+  <img src="https://img.shields.io/badge/PostgreSQL-16-blue?logo=postgresql&logoColor=white" alt="PostgreSQL"/>
+  <img src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white" alt="Docker"/>
+</p>
+
 A real estate platform backend for agencies, agents, landlords, and clients. It handles property listings, agency and agent management, inquiries, viewing appointments, reviews, favorites, categories, subscription plans, Stripe payments, and media storage via MinIO.
 
 ---
