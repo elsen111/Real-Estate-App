@@ -179,6 +179,26 @@ public class GlobalExceptionHandler {
         return error(ex.getMessage(), HttpStatus.BAD_REQUEST, request);
     }
 
+    @ExceptionHandler(PaymentProcessingException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentProcessingException(
+            PaymentProcessingException ex,
+            HttpServletRequest request
+    ) {
+
+        log.error(
+                "Payment processing failure at {}: {}",
+                request.getRequestURI(),
+                ex.getMessage(),
+                ex
+        );
+
+        return error(
+                "Payment provider is temporarily unavailable.",
+                HttpStatus.BAD_GATEWAY,
+                request
+        );
+    }
+
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ErrorResponse> handleConflictException(
             ConflictException ex,

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Successful</title>
+</head>
+<body>
+
+<h2>Payment successful</h2>
+
+<p>Hello <span th:text="${agencyName}"></span>,</p>
+
+<p>
+    Your EstateFlow subscription payment was successfully completed.
+</p>
+
+<p>
+    <strong>Plan:</strong>
+    <span th:text="${planName}"></span>
+</p>
+
+<p>
+    <strong>Amount:</strong>
+    <span th:text="${amount}"></span>
+    <span th:text="${currency}"></span>
+</p>
+
+<p>
+    <strong>Subscription starts:</strong>
+    <span th:text="${startDate}"></span>
+</p>
+
+<p>
+    <strong>Subscription ends:</strong>
+    <span th:text="${endDate}"></span>
+</p>
+
+<p>
+    <strong>Payment ID:</strong>
+    <span th:text="${paymentId}"></span>
+</p>
+
+<p>
+    Thank you for using EstateFlow.
+</p>
+
+</body>
+</html>

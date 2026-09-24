@@ -16,6 +16,7 @@ public final class SecurityConstants {
             "/api/auth/refresh-token",
             "/v3/api-docs/**",
             "/swagger-ui/**",
-            "/swagger-ui.html"
+            "/swagger-ui.html",
+            "/payments/webhook"
     };
 }

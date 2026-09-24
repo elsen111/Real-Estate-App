@@ -30,7 +30,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return !properties.isEnabled();
+
+        if (!properties.isEnabled()) {
+            return true;
+        }
+        return "/payments/webhook".equals(request.getServletPath());
     }
 
     @Override
