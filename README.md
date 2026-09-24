@@ -39,7 +39,7 @@ A real estate platform backend for agencies, agents, landlords, and clients. It 
 * 👨‍💼 Agent management
 * 🏠 Property listings: create/update/delete, media upload via MinIO, view tracking
 * 🗂️ Categories, subscription plans, and agency subscriptions
-* ❤️ Favorites
+* 🔖 Favorites
 * 📩 Inquiries and viewing appointments
 * ⭐ Reviews (property/agency), with admin moderation
 * 💳 Stripe-based payments and subscription billing, with a webhook endpoint
