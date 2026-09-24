@@ -20,7 +20,7 @@ services:
       - estateflow-net
 
   minio:
-    image: minio/minio:latest
+    image: pgsty/minio:latest
     container_name: estateflow-minio
     restart: unless-stopped
     command: server /data --console-address ":9001"

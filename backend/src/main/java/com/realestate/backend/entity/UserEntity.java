@@ -48,7 +48,8 @@ public class UserEntity {
 
     @Builder.Default
     @Column(name = "email_verified", nullable = false)
-    private boolean emailVerified = false;
+    @ColumnDefault("true")
+    private boolean emailVerified = true;
 
     @Builder.Default
     @Column(name = "deleted", nullable = false)

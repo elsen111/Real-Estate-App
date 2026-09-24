@@ -16,7 +16,8 @@ public interface AuthMapper {
     @Mapping(target = "phoneNumber", source = "phoneNumber", qualifiedByName = "normalize")
     @Mapping(target = "roles", expression = "java(new java.util.HashSet<>())")
     @Mapping(target = "enabled", constant = "true")
-    @Mapping(target = "emailVerified", constant = "false")
+//    @Mapping(target = "emailVerified", constant = "false")
+    @Mapping(target = "emailVerified", constant = "true")
     UserEntity toUserEntity(UserRegisterRequest userRegisterRequest);
 
     @Mapping(target = "name", source = "agencyName", qualifiedByName = "normalize")

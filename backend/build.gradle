@@ -4,6 +4,7 @@ plugins {
     id 'org.springframework.boot' version '4.0.6'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.liquibase.gradle' version '2.2.2'
+    id 'com.diffplug.spotless' version '7.0.2'
 }
 
 group = 'com.real-estate'
@@ -112,4 +113,18 @@ tasks.named('test') {
 
     environment "DB_USERNAME", System.getenv("DB_USERNAME")
     environment "DB_PASSWORD", System.getenv("DB_PASSWORD")
+}
+
+spotless {
+    java {
+        target 'src/**/*.java'
+        googleJavaFormat('1.24.0')
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    groovyGradle {
+        target '*.gradle'
+        greclipse()
+    }
 }

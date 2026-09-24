@@ -1,0 +1,34 @@
+# Build output
+.gradle/
+build/
+out/
+bin/
+
+# Logs
+logs/
+*.log
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# VCS / docs
+.git
+.gitignore
+README.md
+
+# Docker meta files
+Dockerfile
+docker-compose*.yml
+
+# Uploaded media (if ever written locally)
+uploads/
+media/
