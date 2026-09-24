@@ -1,6 +1,6 @@
-# EstateFlow — Real Estate CRM & Marketplace
+# EstateFlow — Real Estate CRM & Marketplace (Backend)
 
-This is a real estate platform for agencies, agents, property owners, buyers, and renters. It combines property listings, map-based search, agency management, inquiries, viewing requests, dashboards, and basic subscription logic in one system.
+A real estate platform backend for agencies, agents, landlords, and clients. It handles property listings, agency and agent management, inquiries, viewing appointments, reviews, favorites, categories, subscription plans, Stripe payments, and media storage via MinIO.
 
 ---
 
@@ -9,429 +9,305 @@ This is a real estate platform for agencies, agents, property owners, buyers, an
 - [✨ Features](#-features)
 - [👥 User Roles](#-user-roles)
 - [🛠️ Tech Stack](#️-tech-stack)
-  - [⚙️ Backend](#️-backend)
-  - [🎨 Frontend](#-frontend)
 - [📁 Project Structure](#-project-structure)
 - [🧩 Main Modules](#-main-modules)
-  - [🔐 Authentication](#-authentication)
-  - [🏠 Properties](#-properties)
-  - [🗺️ Search & Map](#️-search--map)
-  - [📩 Inquiries & Viewings](#-inquiries--viewings)
-  - [📊 Dashboards](#-dashboards)
-- [🗄️ Database Tables](#️-database-tables)
+- [🗄️ Database](#️-database)
 - [🔧 Environment Variables](#-environment-variables)
-- [🚀 How to Run](#-how-to-run)
-- [🖥️ Backend Setup](#️-backend-setup)
-- [💻 Frontend Setup](#-frontend-setup)
+- [🖥️ Run Locally (without Docker)](#️-run-locally-without-docker)
 - [🐳 Run with Docker](#-run-with-docker)
-- [🔑 Default Development Accounts](#-default-development-accounts)
+- [🗄️ Connecting DataGrip / a DB client](#️-connecting-datagrip--a-db-client)
+- [🎨 Code Formatting](#-code-formatting)
 - [🔮 Future Improvements](#-future-improvements)
-
-<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
 
 ---
 
 ## ✨ Features
 
-- User authentication with JWT
-- Role-based access control
-- Agency and agent management
-- Property listing management
-- Property image upload
-- Property search and filters
-- Interactive map with property markers
-- Property details page
-- Favorites system
-- Inquiry management
-- Viewing request management
-- Admin, agency, agent, and client dashboards
-- Basic agency subscription control
+- JWT-based authentication (access + refresh tokens), login/logout, "me" endpoint
+- Role-based access control (`SUPER_ADMIN`, `ADMIN`, `AGENCY_OWNER`, `AGENT`, `LANDLORD`, `CLIENT`)
+- Separate registration flows for regular users and agency owners
+- Password reset via email OTP
+- Agency management (profile, members, status, admin moderation)
+- Agent management
+- Property listings: create/update/delete, media upload via MinIO, view tracking
+- Categories, subscription plans, and agency subscriptions
+- Favorites
+- Inquiries and viewing appointments
+- Reviews (property/agency), with admin moderation
+- Stripe-based payments and subscription billing, with a webhook endpoint
+- Rate limiting (Bucket4j) on sensitive endpoints
+- Swagger / OpenAPI documentation
+- Scheduled jobs for subscription expiration and notification emails
 
-<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+⬆️ [Back to top](#estateflow--real-estate-crm--marketplace-backend)
 
 ---
 
 ## 👥 User Roles
 
-- **Super Admin** — manages users, agencies, properties, subscriptions, and platform statistics.
-- **Agency Admin** — manages agency profile, agents, properties, inquiries, and viewing requests.
-- **Agent** — manages assigned properties, inquiries, and viewing requests.
-- **Client** — searches properties, saves favorites, sends inquiries, and requests viewings.
+Seeded via Liquibase (`db/changelog/2.0`):
 
-<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+- **SUPER_ADMIN** — full platform control
+- **ADMIN** — assistant to the platform administrator
+- **AGENCY_OWNER** — head of an agency, manages agents/properties/inquiries for that agency
+- **AGENT** — manages assigned properties, inquiries, and appointments
+- **LANDLORD** — private owner listing their own property directly
+- **CLIENT** — searches properties, saves favorites, sends inquiries, requests viewings
+
+⬆️ [Back to top](#estateflow--real-estate-crm--marketplace-backend)
 
 ---
 
 ## 🛠️ Tech Stack
 
-### ⚙️ Backend
+- Java 21
+- Spring Boot 4 (Web, Security, Data JPA, Validation, Mail, Thymeleaf)
+- Gradle (wrapper included — no local Gradle install required)
+- PostgreSQL + Liquibase (SQL changesets, not XML)
+- JWT (jjwt)
+- MinIO (S3-compatible object storage) for property/agency/user media
+- Stripe (`stripe-java`) for payments and subscriptions
+- Bucket4j for rate limiting
+- springdoc-openapi (Swagger UI)
+- Spock (Groovy) + JUnit for tests
+- Docker / Docker Compose
+- Spotless (`google-java-format`) for code formatting
 
-<p align="left">
-  <img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java" />
-  <img src="https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot" />
-  <img src="https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white" alt="Spring Security" />
-  <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white" alt="JWT" />
-  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
-  <img src="https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge&logo=hibernate&logoColor=white" alt="Hibernate" />
-  <img src="https://img.shields.io/badge/Liquibase-2962FF?style=for-the-badge&logo=liquibase&logoColor=white" alt="Liquibase" />
-  <img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" alt="Swagger" />
-  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
-</p>
-
-- Java
-- Spring Boot
-- Spring Security
-- JWT
-- PostgreSQL
-- Spring Data JPA / Hibernate
-- Liquibase
-- Bean Validation
-- Swagger / OpenAPI
-- Docker
-
-### 🎨 Frontend
-
-<p align="left">
-  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
-  <img src="https://img.shields.io/badge/React%20Router-CA4245?style=for-the-badge&logo=reactrouter&logoColor=white" alt="React Router" />
-  <img src="https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white" alt="Axios" />
-  <img src="https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
-  <img src="https://img.shields.io/badge/Leaflet-199900?style=for-the-badge&logo=leaflet&logoColor=white" alt="Leaflet" />
-  <img src="https://img.shields.io/badge/Google%20Maps-4285F4?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Google Maps" />
-  <img src="https://img.shields.io/badge/Recharts-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white" alt="Recharts" />
-</p>
-
-- React
-- TypeScript
-- Vite
-- React Router
-- Axios
-- Tailwind CSS
-- React Helmet Async
-- React Leaflet or Google Maps
-- Recharts
-- i18n (Planned for the future)
-- React Hook Form (Planned for the future)
-- Zod (Planned for the future)
-
-<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+⬆️ [Back to top](#estateflow--real-estate-crm--marketplace-backend)
 
 ---
 
 ## 📁 Project Structure
 
-```bash
-EstateFlow/
+```
+Real-Estate-App/
 ├── backend/
-│   ├── src/main/java/com/estateflow/
-│   │   ├── config/
-│   │   ├── controller/
-│   │   ├── dto/
-│   │   ├── entity/
-│   │   ├── exception/
-│   │   ├── mapper/
-│   │   ├── repository/
-│   │   ├── security/
-│   │   └── service/
-│   └── src/main/resources/
-│       ├── db/changelog/
-│       └── application.properties
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   ├── layouts/
-│   │   ├── pages/
-│   │   ├── routes/
-│   │   ├── services/
-│   │   ├── types/
-│   │   └── utils/
-│   └── package.json
-│
+│   ├── docker-compose.yml
+│   ├── Dockerfile
+│   ├── .dockerignore
+│   ├── .env.example
+│   ├── build.gradle
+│   ├── gradlew / gradlew.bat
+│   └── src/main/
+│       ├── java/com/realestate/backend/
+│       │   ├── config/
+│       │   ├── controller/
+│       │   ├── dto/
+│       │   ├── entity/
+│       │   ├── enums/
+│       │   ├── exception/
+│       │   ├── mapper/
+│       │   ├── payment/
+│       │   ├── repository/
+│       │   ├── scheduler/
+│       │   ├── security/
+│       │   ├── service/
+│       │   ├── storage/
+│       │   └── utils/
+│       └── resources/
+│           ├── application.yaml
+│           ├── application-dev.yaml
+│           ├── application-docker.yaml
+│           └── db/changelog/
+│               ├── 1.0/   # initial schema
+│               └── 2.0/   # seed data + incremental changes
 ├── docs/
-├── docker-compose.yml
+│   └── DOCKER_GUIDE.md
+├── .github/workflows/
+│   ├── lint-format.yml
+│   └── deploy.yml
 └── README.md
 ```
 
-<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+⬆️ [Back to top](#estateflow--real-estate-crm--marketplace-backend)
 
 ---
 
 ## 🧩 Main Modules
 
-### 🔐 Authentication
+Controllers currently implemented:
 
-- Register
-- Login
-- Logout
-- Refresh token
-- Protected endpoints
-- Protected frontend routes
+| Area | Controller |
+|---|---|
+| Auth | `AuthController` — register (user/agency owner), login, refresh, logout, me, change/forgot/reset password, reactivate/deactivate |
+| Users | `UserController`, `AdminUserController` |
+| Agencies | `AgencyController`, `AgencyMemberController`, `AdminAgencyController` |
+| Agents | `AgentController` |
+| Properties | `PropertyController`, `AdminPropertyController` |
+| Categories | `CategoryController`, `AdminCategoryController` |
+| Favorites | `FavoriteController` |
+| Inquiries | `InquiryController` |
+| Appointments (viewings) | `AppointmentController` |
+| Reviews | `ReviewController`, `AdminReviewController` |
+| Subscriptions | `SubscriptionPlanController`, `AdminSubscriptionController` |
+| Payments | `PaymentController` (Stripe checkout + webhook) |
 
-### 🏠 Properties
+> ⚠️ **Email verification is not yet wired up.** Users are created with `emailVerified = false` at registration, but there's currently no endpoint or service that flips it to `true` — only the password-reset OTP flow exists so far.
 
-- Create, update, delete, and view properties
-- Upload property images
-- Add price, city, address, rooms, area, floor, description, latitude, and longitude
-- Set listing type: sale or rent
-- Set property type: apartment, house, villa, office, or land
-- Set property status: pending, active, sold, or rented
-
-### 🗺️ Search & Map
-
-- Search by keyword
-- Filter by city, property type, listing type, price range, and rooms
-- Sort by newest or price
-- Show properties on map
-- Open property details from map marker popup
-
-### 📩 Inquiries & Viewings
-
-- Client sends inquiry for a property
-- Agent or agency admin updates inquiry status
-- Client requests property viewing
-- Agent or agency admin approves, rejects, or completes viewing request
-
-### 📊 Dashboards
-
-- Super Admin dashboard
-- Agency Admin dashboard
-- Agent dashboard
-- Client dashboard
-
-<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+⬆️ [Back to top](#estateflow--real-estate-crm--marketplace-backend)
 
 ---
 
-## 🗄️ Database Tables
+## 🗄️ Database
 
-Main tables:
+Managed entirely through Liquibase SQL changesets under `backend/src/main/resources/db/changelog/`. Key tables: `users`, `roles`, `user_roles`, `agencies`, `agency_members`, `agency_media`, `categories`, `properties`, `property_media`, `property_views`, `favorites`, `inquiries`, `appointments`, `reviews`, `subscription_plans`, `agency_subscriptions`, `subscription_notifications`, `refresh_tokens`, `password_reset_tokens`, `password_reset_otp`, and payment tables.
 
-- users
-- roles
-- user_roles
-- agencies
-- agency_members
-- appointments
-- categories
-- agents
-- properties
-- media_files
-- reviews
-- favorites
-- inquiries
-- viewing_requests
-- subscription_plans
-- agency_subscriptions
+Never hand-edit an already-applied changeset — add a new one under `2.0/` (or a new version folder) instead.
 
-<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+⬆️ [Back to top](#estateflow--real-estate-crm--marketplace-backend)
 
 ---
 
 ## 🔧 Environment Variables
 
-### ⚙️ Backend
+All configuration is env-var driven — see `backend/.env.example` for the full list with placeholders:
 
-```env
-SERVER_PORT=8080
-DB_HOST=localhost
+```
+SPRING_PROFILES_ACTIVE=docker   # or "dev" for local (non-Docker) runs
+
+DB_HOST=postgres                # "localhost" for non-Docker local runs
 DB_PORT=5432
-DB_NAME=estateflow_db
+DB_NAME=real_estate_db
 DB_USERNAME=postgres
-DB_PASSWORD=postgres
-JWT_SECRET=change_this_secret_key
-JWT_ACCESS_EXPIRATION=3600000
-JWT_REFRESH_EXPIRATION=604800000
-FILE_UPLOAD_DIR=uploads
+DB_PASSWORD=change-me
+POSTGRES_HOST_PORT=5432
+
+JWT_SECRET=replace-with-a-long-random-string
+
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-gmail-app-password
+
+MINIO_URL=http://minio:9000     # "http://localhost:9000" for non-Docker local runs
+MINIO_USERNAME=minioadmin
+MINIO_SECRET_KEY=minioadmin
+MINIO_BUCKET_NAME=estateflow
+MINIO_HOST_PORT=9000
+MINIO_CONSOLE_PORT=9001
+
+STRIPE_SECRET_KEY=sk_test_replace_me
+STRIPE_WEBHOOK_SECRET=whsec_replace_me
+STRIPE_CURRENCY=usd
+STRIPE_SUCCESS_URL=http://localhost:5173/payment/success?session_id={CHECKOUT_SESSION_ID}
+STRIPE_CANCEL_URL=http://localhost:5173/payment/cancelled
+
+BACKEND_HOST_PORT=8080
 ```
 
-### 🎨 Frontend
-
-```env
-VITE_API_BASE_URL=http://localhost:8080/api
-VITE_MAP_PROVIDER=openstreetmap
-VITE_MAPS_API_KEY=
-```
-
-<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+⬆️ [Back to top](#estateflow--real-estate-crm--marketplace-backend)
 
 ---
 
-## 🚀 How to Run
+## 🖥️ Run Locally (without Docker)
 
-### 1. Clone the Repository
+1. Create a local PostgreSQL database matching `DB_NAME` in your `.env`.
+2. From `backend/`, copy the env template and fill in real values:
+   ```powershell
+   Copy-Item .env.example .env
+   ```
+   Set `SPRING_PROFILES_ACTIVE=dev`, `DB_HOST=localhost`, `MINIO_URL=http://localhost:9000`.
+3. Run the app (Windows):
+   ```powershell
+   .\gradlew.bat bootRun --args='--spring.profiles.active=dev'
+   ```
+   macOS/Linux:
+   ```bash
+   ./gradlew bootRun --args='--spring.profiles.active=dev'
+   ```
+4. Liquibase applies all changesets automatically on startup.
 
-```bash
-git clone https://github.com/your-username/EstateFlow.git
-cd EstateFlow
-```
+Backend: `http://localhost:8080`
+Swagger UI: `http://localhost:8080/api/swagger-ui.html`
 
-<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
-
----
-
-## 🖥️ Backend Setup
-
-### 1. Create PostgreSQL Database
-
-```sql
-CREATE DATABASE estateflow_db;
-```
-
-### 2. Configure Backend
-
-Create or update `backend/src/main/resources/application.yml`:
-
-```yaml
-server:
-  port: 8080
-
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/estateflow_db
-    username: postgres
-    password: postgres
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: true
-  liquibase:
-    enabled: true
-    change-log: classpath:db/changelog/db.changelog-master.yaml
-
-jwt:
-  secret: change_this_secret_key
-  access-expiration: 3600000
-  refresh-expiration: 604800000
-```
-
-### 3. Run Backend
-
-```bash
-cd backend
-mvn clean install
-mvn spring-boot:run
-```
-
-Backend runs on:
-
-```bash
-http://localhost:8080
-```
-
-Swagger runs on:
-
-```bash
-http://localhost:8080/api/swagger-ui.html
-```
-
-<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
-
----
-
-## 💻 Frontend Setup
-
-### 1. Install Dependencies
-
-```bash
-cd frontend
-npm install
-```
-
-### 2. Create `.env`
-
-```env
-VITE_API_BASE_URL=http://localhost:8080/api
-VITE_MAP_PROVIDER=openstreetmap
-VITE_MAPS_API_KEY=
-```
-
-### 3. Run Frontend
-
-```bash
-npm run dev
-```
-
-Frontend runs on:
-
-```bash
-http://localhost:5173
-```
-
-<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+⬆️ [Back to top](#estateflow--real-estate-crm--marketplace-backend)
 
 ---
 
 ## 🐳 Run with Docker
 
-Create `.env` in the project root:
+Everything below runs from **`backend/`**, since that's where `docker-compose.yml` lives.
 
-```env
-POSTGRES_DB=estateflow_db
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/estateflow_db
-SPRING_DATASOURCE_USERNAME=postgres
-SPRING_DATASOURCE_PASSWORD=postgres
-VITE_API_BASE_URL=http://localhost:8080/api
-```
+1. Copy the env template:
+   ```powershell
+   Copy-Item .env.example .env
+   ```
+   Fill in `DB_PASSWORD`, `JWT_SECRET`, `MAIL_USERNAME`/`MAIL_PASSWORD`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`. Leave `DB_HOST=postgres` and `MINIO_URL=http://minio:9000` as-is — those are the in-network service names, not `localhost`.
 
-Start containers:
+2. Build and start everything:
+   ```powershell
+   docker compose up -d --build
+   ```
 
-```bash
-docker compose up --build
-```
+3. Check status / logs:
+   ```powershell
+   docker compose ps
+   docker compose logs -f backend
+   ```
 
-Stop containers:
+4. Stop everything (keeps data):
+   ```powershell
+   docker compose down
+   ```
+   Stop and wipe all data (Postgres + MinIO volumes):
+   ```powershell
+   docker compose down -v --remove-orphans
+   ```
 
-```bash
-docker compose down
-```
+What starts:
 
-<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+| Service | Container | Host port(s) |
+|---|---|---|
+| postgres | estateflow-postgres | `POSTGRES_HOST_PORT` (default 5432) |
+| minio | estateflow-minio | `MINIO_HOST_PORT` (9000), `MINIO_CONSOLE_PORT` (9001) |
+| backend | estateflow-backend | `BACKEND_HOST_PORT` (8080) |
+
+Backend: `http://localhost:8080/api`
+Swagger UI: `http://localhost:8080/api/swagger-ui.html`
+MinIO console: `http://localhost:9001` (login with `MINIO_USERNAME` / `MINIO_SECRET_KEY`)
+
+> The `minio` service uses `bitnami/minio` — the official `minio/minio` image stopped publishing to Docker Hub after October 2025.
+
+Full walkthrough, troubleshooting, and the DataGrip setup below live in [`docs/DOCKER_GUIDE.md`](docs/DOCKER_GUIDE.md).
+
+⬆️ [Back to top](#estateflow--real-estate-crm--marketplace-backend)
 
 ---
 
-## 🔑 Default Development Accounts
+## 🗄️ Connecting DataGrip / a DB client
 
-```txt
-Super Admin
-Email: admin@estateflow.com
-Password: Admin123!
+With the containers running:
 
-Agency Admin
-Email: agency@estateflow.com
-Password: Agency123!
+- Host: `localhost`
+- Port: value of `POSTGRES_HOST_PORT` in your `.env` (default `5432`)
+- Database: value of `DB_NAME` (default `real_estate_db`)
+- User / Password: `DB_USERNAME` / `DB_PASSWORD` from your `.env`
 
-Agent
-Email: agent@estateflow.com
-Password: Agent123!
+Data persists in a named Docker volume (`postgres_data`) across `docker compose down` / `up` cycles — only `down -v` clears it. See `docs/DOCKER_GUIDE.md` for migrating data from an existing local Postgres instance.
 
-Client
-Email: client@estateflow.com
-Password: Client123!
+⬆️ [Back to top](#estateflow--real-estate-crm--marketplace-backend)
+
+---
+
+## 🎨 Code Formatting
+
+Formatting is enforced with Spotless (`google-java-format`) and checked in CI (`.github/workflows/lint-format.yml`). From `backend/`:
+
+```powershell
+.\gradlew.bat spotlessApply
+.\gradlew.bat spotlessCheck
 ```
 
-<p align="right"><a href="#estateflow--real-estate-crm--marketplace">⬆️ Back to top</a></p>
+`spotlessApply` auto-formats the codebase; `spotlessCheck` only verifies formatting and is what CI runs.
+
+⬆️ [Back to top](#estateflow--real-estate-crm--marketplace-backend)
 
 ---
 
 ## 🔮 Future Improvements
 
-- Multilanguage support
-- Currencies
-- Online payment integration
-- Featured listing payment flow
-- Advanced reports
-- Saved searches
-- Price alerts
-- Property comparison
-- AI property recommendations
-- AI price estimation
+- Email verification flow (registration currently sets `emailVerified = false` but no confirmation endpoint exists yet)
+- Frontend application
+- Map-based property search
+- Multi-language / multi-currency support
+- Saved searches, price alerts
 - Real-time chat
-- 360° virtual tours
-- Mortgage calculator
-- React Native mobile app
+- Advanced reporting dashboards
