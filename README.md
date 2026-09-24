@@ -1,4 +1,4 @@
-# EstateFlow — Real Estate CRM & Marketplace (Backend)
+# EstateFlow — Real Estate CRM & Marketplace
 
 A real estate platform backend for agencies, agents, landlords, and clients. It handles property listings, agency and agent management, inquiries, viewing appointments, reviews, favorites, categories, subscription plans, Stripe payments, and media storage via MinIO.
 
