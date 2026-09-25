@@ -94,7 +94,7 @@ public class AuthServiceImpl implements AuthService {
                 .addKeyValue("role", role)
                 .log();
 
-        return buildAuthResponse(user, refreshToken.rawToken(), null);
+        return buildAuthResponse(user, refreshToken.rawToken(), null, true);
     }
 
     @Transactional
@@ -132,13 +132,6 @@ public class AuthServiceImpl implements AuthService {
 
         agencyMemberRepository.save(ownerMembership);
 
-        RefreshTokenServiceImpl.CreatedRefreshToken refreshToken =
-                refreshTokenService.createRefreshToken(
-                        owner,
-                        extractIpAddress(servletRequest),
-                        servletRequest.getHeader("User-Agent")
-                );
-
         log.atInfo()
                 .setMessage("Agency created successfully")
                 .addKeyValue("agencyId", agency.getId())
@@ -147,7 +140,7 @@ public class AuthServiceImpl implements AuthService {
                 .addKeyValue("ownerName", owner.getFullName())
                 .log();
 
-        return buildAuthResponse(owner, refreshToken.rawToken(), agency);
+        return buildAuthResponse(owner, null, agency, false);
     }
 
     @Transactional
@@ -204,7 +197,7 @@ public class AuthServiceImpl implements AuthService {
                 .addKeyValue("role", user.getRoles().stream().map(RoleEntity::getRoleName).toList())
                 .log();
 
-        return buildAuthResponse(user, refreshToken.rawToken(), agency);
+        return buildAuthResponse(user, refreshToken.rawToken(), agency, true);
     }
 
     @Transactional
@@ -395,7 +388,8 @@ public class AuthServiceImpl implements AuthService {
         return buildAuthResponse(
                 user,
                 refreshToken.rawToken(),
-                agency
+                agency,
+                true
         );
     }
 
@@ -412,16 +406,23 @@ public class AuthServiceImpl implements AuthService {
     private AuthResponse buildAuthResponse(
             UserEntity user,
             String refreshToken,
-            AgencyEntity agency
+            AgencyEntity agency,
+            boolean includeTokens
     ) {
-        return AuthResponse.builder()
-                .accessToken(jwtService.generateAccessToken(user))
-                .refreshToken(refreshToken)
-                .tokenType(SecurityConstants.TOKEN_PREFIX.trim())
-                .expiresInSeconds(jwtService.accessTokenExpiresInSeconds())
+
+        AuthResponse.AuthResponseBuilder response = AuthResponse.builder()
                 .user(userMapper.toSummary(user))
-                .agency(agencyMapper.toAgencyOwnerResponse(agency))
-                .build();
+                .agency(agencyMapper.toAgencyOwnerResponse(agency));
+
+        if (includeTokens) {
+            response
+                    .accessToken(jwtService.generateAccessToken(user))
+                    .refreshToken(refreshToken)
+                    .tokenType(SecurityConstants.TOKEN_PREFIX.trim())
+                    .expiresInSeconds(jwtService.accessTokenExpiresInSeconds());
+        }
+
+        return response.build();
     }
 
     private RoleEntity getRole(Role role) {
