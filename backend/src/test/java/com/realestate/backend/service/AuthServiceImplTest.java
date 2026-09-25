@@ -400,7 +400,7 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void registerAgencyOwner_succeeds_whenOwnerAndAgencyEmailsAreFree() {
+    void registerAgencyOwner_succeeds_withoutTokens_whenOwnerAndAgencyEmailsAreFree() {
         UserRegisterRequest ownerRequest = UserRegisterRequest.builder()
                 .fullName("Owner Name")
                 .email("owner@example.com")
@@ -475,23 +475,6 @@ class AuthServiceImplTest {
         when(agencyMemberRepository.save(any(AgencyMemberEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        when(refreshTokenService.createRefreshToken(
-                savedOwner,
-                "127.0.0.1",
-                "JUnit-Agent"
-        )).thenReturn(
-                new RefreshTokenServiceImpl.CreatedRefreshToken(
-                        "raw-refresh-token",
-                        RefreshTokenEntity.builder().build()
-                )
-        );
-
-        when(jwtService.generateAccessToken(savedOwner))
-                .thenReturn("access-token");
-
-        when(jwtService.accessTokenExpiresInSeconds())
-                .thenReturn(3600L);
-
         when(userMapper.toSummary(savedOwner))
                 .thenReturn(
                         com.realestate.backend.dto.response.AuthUserResponse
@@ -509,6 +492,18 @@ class AuthServiceImplTest {
 
         assertThat(response)
                 .isNotNull();
+
+        assertThat(response.getAccessToken())
+                .isNull();
+
+        assertThat(response.getRefreshToken())
+                .isNull();
+
+        assertThat(response.getTokenType())
+                .isNull();
+
+        assertThat(response.getExpiresInSeconds())
+                .isNull();
 
         assertThat(mappedOwner.getAgency())
                 .isEqualTo(savedAgency);
@@ -549,6 +544,9 @@ class AuthServiceImplTest {
         verify(authMapper)
                 .toAgencyEntity(agencyRequest);
 
+        verify(roleRepository)
+                .findByRoleName(Role.AGENCY_OWNER);
+
         verify(agencyRepository)
                 .saveAndFlush(mappedAgency);
 
@@ -558,15 +556,17 @@ class AuthServiceImplTest {
         verify(userRepository)
                 .saveAndFlush(mappedOwner);
 
-        verify(refreshTokenService)
-                .createRefreshToken(
-                        savedOwner,
-                        "127.0.0.1",
-                        "JUnit-Agent"
-                );
+        verify(agencyMemberRepository)
+                .save(captor.getValue());
 
-        verify(jwtService)
-                .generateAccessToken(savedOwner);
+        verify(userMapper)
+                .toSummary(savedOwner);
+
+        verify(agencyMapper)
+                .toAgencyOwnerResponse(savedAgency);
+
+        verifyNoInteractions(refreshTokenService);
+        verifyNoInteractions(jwtService);
     }
 
     @Test
