@@ -56,7 +56,7 @@ public class UserEntity {
     private Boolean deleted = false;
 
     @Builder.Default
-    @ManyToMany(fetch =  FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),

@@ -11,15 +11,17 @@ import java.util.UUID;
 
 @Getter
 @Builder
-@JsonPropertyOrder({
-        "id",
-        "title",
-        "price",
-        "currency",
-        "listingType",
-        "latitude",
-        "longitude"
-})
+@JsonPropertyOrder(
+        {
+                "id",
+                "title",
+                "price",
+                "currency",
+                "listingType",
+                "latitude",
+                "longitude"
+        }
+)
 public class PropertyMapResponse {
 
     private UUID id;

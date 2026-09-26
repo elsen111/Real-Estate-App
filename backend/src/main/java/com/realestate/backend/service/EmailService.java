@@ -6,12 +6,23 @@ import com.realestate.backend.enums.SubscriptionNotificationType;
 
 public interface EmailService {
 
-    void sendPasswordResetOtp(String toEmail, String otp);
+    void sendPasswordResetOtp(
+            String toEmail,
+            String otp
+    );
 
-    void sendSubscriptionExpirationEmail( AgencySubscriptionEntity subscription, SubscriptionNotificationType type);
+    void sendSubscriptionExpirationEmail(
+            AgencySubscriptionEntity subscription,
+            SubscriptionNotificationType type
+    );
 
-    void sendPaymentSuccessEmail( PaymentEntity payment, AgencySubscriptionEntity subscription);
+    void sendPaymentSuccessEmail(
+            PaymentEntity payment,
+            AgencySubscriptionEntity subscription
+    );
 
-    void sendPaymentFailureEmail(PaymentEntity payment);
+    void sendPaymentFailureEmail(
+            PaymentEntity payment
+    );
 
 }

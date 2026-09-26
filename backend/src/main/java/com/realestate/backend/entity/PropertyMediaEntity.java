@@ -34,7 +34,7 @@ public class PropertyMediaEntity {
             nullable = false,
             foreignKey = @ForeignKey(name = "fk_property_media_property")
     )
-    private PropertyEntity  property;
+    private PropertyEntity property;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(

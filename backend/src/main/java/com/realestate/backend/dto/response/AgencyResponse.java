@@ -11,19 +11,21 @@ import java.util.UUID;
 @Getter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "id",
-        "name",
-        "description",
-        "logoUrl",
-        "email",
-        "phoneNumber",
-        "website",
-        "city",
-        "address",
-        "totalAgents",
-        "status"
-})
+@JsonPropertyOrder(
+        {
+                "id",
+                "name",
+                "description",
+                "logoUrl",
+                "email",
+                "phoneNumber",
+                "website",
+                "city",
+                "address",
+                "totalAgents",
+                "status"
+        }
+)
 public class AgencyResponse {
 
     private UUID id;

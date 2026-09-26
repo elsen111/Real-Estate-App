@@ -3,6 +3,7 @@ package com.realestate.backend.entity;
 import com.realestate.backend.enums.MediaType;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 

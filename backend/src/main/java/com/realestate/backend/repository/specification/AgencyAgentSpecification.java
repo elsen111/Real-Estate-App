@@ -10,7 +10,8 @@ import java.util.UUID;
 
 public class AgencyAgentSpecification {
 
-    private AgencyAgentSpecification() {}
+    private AgencyAgentSpecification() {
+    }
 
     public static Specification<AgencyMemberEntity> withAgencyAgentFilter(
             UUID agencyId,
@@ -29,8 +30,7 @@ public class AgencyAgentSpecification {
     }
 
 
-
-//    HELPER METHODS
+    //    HELPER METHODS
     private static Specification<AgencyMemberEntity> hasAgencyId(UUID agencyId) {
         return (root, query, cb) -> cb.equal(root.join("agency").get("id"), agencyId);
     }

@@ -13,7 +13,8 @@ import java.util.UUID;
 
 public class ReviewSpecification {
 
-    public ReviewSpecification() {}
+    public ReviewSpecification() {
+    }
 
     public static Specification<ReviewEntity> withAdminFilter(
             AdminReviewFilterRequest filterRequest
@@ -95,15 +96,15 @@ public class ReviewSpecification {
         return (
                 (root, query, criteriaBuilder) ->
                         rating == null ? null
-                        : criteriaBuilder.equal(root.get("rating"), rating)
-                );
+                                : criteriaBuilder.equal(root.get("rating"), rating)
+        );
     }
 
     private static Specification<ReviewEntity> hasAgencyId(UUID agencyId) {
         return (
                 (root, query, criteriaBuilder) ->
                         agencyId == null ? null : criteriaBuilder.equal(root.join("agency").get("id"), agencyId)
-                );
+        );
     }
 
     private static Specification<ReviewEntity> hasPropertyId(UUID propertyId) {

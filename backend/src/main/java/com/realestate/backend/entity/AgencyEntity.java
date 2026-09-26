@@ -12,11 +12,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "agencies", indexes = {
+@Table(
+        name = "agencies", indexes = {
         @Index(name = "idx_agencies_city", columnList = "city"),
         @Index(name = "idx_agencies_name", columnList = "name"),
         @Index(name = "idx_agencies_status", columnList = "status"),
-})
+}
+)
 @Getter
 @Setter
 @Builder

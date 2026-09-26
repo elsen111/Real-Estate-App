@@ -35,7 +35,7 @@ public class AgencyMediaEntity {
             nullable = false,
             foreignKey = @ForeignKey(name = "fk_agency_media_agency")
     )
-    private AgencyEntity  agency;
+    private AgencyEntity agency;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(

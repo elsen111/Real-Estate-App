@@ -179,28 +179,24 @@ public class StripePaymentGateway implements PaymentGateway {
         return switch (event.getType()) {
 
             case "checkout.session.completed",
-                 "checkout.session.async_payment_succeeded" ->
-                    parseSuccessfulCheckout(event, stripeObject);
+                 "checkout.session.async_payment_succeeded" -> parseSuccessfulCheckout(event, stripeObject);
 
-            case "payment_intent.payment_failed" ->
-                    parseFailedPaymentIntent(event, stripeObject);
+            case "payment_intent.payment_failed" -> parseFailedPaymentIntent(event, stripeObject);
 
             case "checkout.session.expired",
-                 "checkout.session.async_payment_failed" ->
-                    parseCanceledCheckout(event, stripeObject);
+                 "checkout.session.async_payment_failed" -> parseCanceledCheckout(event, stripeObject);
 
-            default ->
-                    new PaymentWebhookData(
-                            event.getId(),
-                            event.getType(),
-                            PaymentWebhookType.UNSUPPORTED,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null
-                    );
+            default -> new PaymentWebhookData(
+                    event.getId(),
+                    event.getType(),
+                    PaymentWebhookType.UNSUPPORTED,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
         };
     }
 

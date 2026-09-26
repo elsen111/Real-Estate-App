@@ -31,9 +31,9 @@ public class AgentController {
     @Operation(summary = "Get agent information.")
     public ResponseEntity<ApiResponse<AgentResponse>> getAgentPublicInfo(
             @PathVariable UUID userId
-    ){
+    ) {
 
-         AgentResponse response = agentService.getAgentByUserId(userId);
+        AgentResponse response = agentService.getAgentByUserId(userId);
 
         return ResponseEntity.ok(
                 ApiResponse.success("Agent information fetched successfully", response)
@@ -41,7 +41,7 @@ public class AgentController {
 
     }
 
-//    Public endpoint
+    //    Public endpoint
     @GetMapping("/{userId}/properties")
     @Operation(summary = "Get agent's assigned properties")
     public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getAgentProperties(

@@ -10,24 +10,39 @@ import java.util.UUID;
 
 public interface PropertyMediaRepository extends JpaRepository<PropertyMediaEntity, UUID> {
 
-    boolean existsByPropertyIdAndIsPrimaryTrue(UUID propertyId);
+    boolean existsByPropertyIdAndIsPrimaryTrue(
+            UUID propertyId
+    );
 
-    long countByPropertyId(UUID propertyId);
+    long countByPropertyId(
+            UUID propertyId
+    );
 
-    @Query("""
-       SELECT MAX(pm.sortOrder)
-       FROM PropertyMediaEntity pm
-       WHERE pm.property.id = :propertyId
-       """)
-    Integer findMaxSortOrder(UUID propertyId);
+    @Query(
+            """
+                    SELECT MAX(pm.sortOrder)
+                    FROM PropertyMediaEntity pm
+                    WHERE pm.property.id = :propertyId
+                    """
+    )
+    Integer findMaxSortOrder(
+            UUID propertyId
+    );
 
     List<PropertyMediaEntity> findByPropertyIdOrderBySortOrderAsc(
             UUID propertyId
     );
 
-    List<PropertyMediaEntity> findByPropertyIdInAndIsPrimaryTrue(List<UUID> propertyIds);
+    List<PropertyMediaEntity> findByPropertyIdInAndIsPrimaryTrue(
+            List<UUID> propertyIds
+    );
 
-    PropertyMediaEntity findByPropertyIdAndIsPrimary(UUID propertyId, boolean isPrimary);
+    PropertyMediaEntity findByPropertyIdAndIsPrimary(
+            UUID propertyId,
+            boolean isPrimary
+    );
 
-    Optional<PropertyMediaEntity> findFirstByPropertyIdOrderBySortOrderAsc(UUID id);
+    Optional<PropertyMediaEntity> findFirstByPropertyIdOrderBySortOrderAsc(
+            UUID id
+    );
 }

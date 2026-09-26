@@ -9,6 +9,8 @@ public interface StorageService {
             ValidatedFile validatedFile
     );
 
-    void delete(String storageKey);
+    void delete(
+            String storageKey
+    );
 
 }

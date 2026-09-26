@@ -89,14 +89,14 @@ public class PropertyServiceImpl implements PropertyService {
                         )
                 );
 
-        if(subscription.getEndDate().isBefore(LocalDate.now())) {
+        if (subscription.getEndDate().isBefore(LocalDate.now())) {
             throw new BusinessException("Your agency's subscription has expired.");
         }
 
         long currentListings = propertyRepository.countByAgencyId(agency.getId());
         int maxListings = subscription.getPlan().getMaxListings();
 
-        if(currentListings >= maxListings) {
+        if (currentListings >= maxListings) {
             throw new BusinessException(
                     "Listing limit reached (" + maxListings + "). Upgrade your subscription plan to add more properties."
             );
@@ -140,7 +140,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         PropertyEntity property = getPropertyEntity(propertyId);
 
-        if(!canView(property, currentUser)) {
+        if (!canView(property, currentUser)) {
             throw new ResourceNotFoundException("Property not found with id: " + propertyId);
         }
 
@@ -209,7 +209,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         PropertyEntity property = getPropertyEntity(propertyId);
 
-        if(!isSuperAdmin(currentUser)) {
+        if (!isSuperAdmin(currentUser)) {
             if (agency == null) {
                 throw new ResourceNotFoundException("Agency not found associated with your profile.");
             }
@@ -217,7 +217,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         havePermissionOverProperty(property, agency, currentUser);
 
-        if(!ALLOWED_STATUSES_FOR_AGENCIES.contains(request.getStatus())) {
+        if (!ALLOWED_STATUSES_FOR_AGENCIES.contains(request.getStatus())) {
             throw new BadRequestException("New status should be one of these: SOLD, RENTED.");
         }
 
@@ -246,7 +246,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         AgencyEntity agency = user.getAgency();
 
-        if(!isSuperAdmin(currentUser)) {
+        if (!isSuperAdmin(currentUser)) {
             if (agency == null) {
                 throw new ResourceNotFoundException("Agency not found associated with your profile.");
             }
@@ -262,13 +262,13 @@ public class PropertyServiceImpl implements PropertyService {
 
         havePermissionOverProperty(property, agency, currentUser);
 
-        if(property.getAssignedAgent() != null && property.getAssignedAgent().getId().equals(currentUser.getId())) {
+        if (property.getAssignedAgent() != null && property.getAssignedAgent().getId().equals(currentUser.getId())) {
             throw new ForbiddenException(
                     "You are allowed to change the property's featured attribute."
             );
         }
 
-        if(!agencySubscription.getPlan().isFeaturedListingsAllowed()) {
+        if (!agencySubscription.getPlan().isFeaturedListingsAllowed()) {
             throw new BusinessException("Your agency subscription doesn't support featured listings.");
         }
 
@@ -295,7 +295,7 @@ public class PropertyServiceImpl implements PropertyService {
         UserEntity user = getCurrentUser(currentUser.getId());
 
         AgencyEntity agency = user.getAgency();
-        if(!isSuperAdmin(currentUser)) {
+        if (!isSuperAdmin(currentUser)) {
             if (agency == null) {
                 throw new ResourceNotFoundException("Agency not found associated with your profile.");
             }
@@ -304,7 +304,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         havePermissionOverProperty(property, agency, currentUser);
 
-        if(property.getAssignedAgent() != null && property.getAssignedAgent().getId().equals(currentUser.getId())) {
+        if (property.getAssignedAgent() != null && property.getAssignedAgent().getId().equals(currentUser.getId())) {
             throw new ForbiddenException(
                     "You aren't allowed to change any property's featured attribute."
             );
@@ -326,7 +326,8 @@ public class PropertyServiceImpl implements PropertyService {
     public Page<PropertyResponse> getFeaturedProperties(PropertyPublicFilterRequest filter, Pageable pageable) {
         Specification<PropertyEntity> specification = PropertySpecification
                 .withFeaturedPublicFilter(filter)
-                .and(PropertySpecification.isFeatured(true));;
+                .and(PropertySpecification.isFeatured(true));
+        ;
 
         return getPropertyResponses(pageable, specification);
 
@@ -365,12 +366,12 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public PropertySearchSuggestionResponse getSearchSuggestions(String keyword) {
 
-        if(!StringUtils.hasText(keyword) || keyword.trim().length() < 2) {
+        if (!StringUtils.hasText(keyword) || keyword.trim().length() < 2) {
             throw new BadRequestException("Search keyword must be at least 2 characters long.");
         }
 
         String trimmedKeyword = keyword.trim();
-        Pageable limit =  PageRequest.of(0, 8);
+        Pageable limit = PageRequest.of(0, 8);
 
         List<PropertySuggestionResponse> properties = propertyRepository.findMatchingTitles(trimmedKeyword, limit);
         List<String> cities = propertyRepository.findMatchingCities(trimmedKeyword, limit);
@@ -402,13 +403,13 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public List<PropertyMediaResponse> getPropertyMedia(UUID propertyId) {
 
-        if(!propertyRepository.existsById(propertyId)) {
+        if (!propertyRepository.existsById(propertyId)) {
             throw new ResourceNotFoundException("Property not found with id: " + propertyId);
         }
 
         List<PropertyMediaEntity> mediaFiles = propertyMediaRepository.findByPropertyIdOrderBySortOrderAsc(propertyId);
 
-        if(mediaFiles.isEmpty()) {
+        if (mediaFiles.isEmpty()) {
             throw new ResourceNotFoundException("No images found for this property.");
         }
 
@@ -419,7 +420,8 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     @Transactional
-    public List<SetPropertyMediaResponse> setPrimaryImage(UUID propertyId, UUID propertyMediaId, CustomUserDetails currentUser) {
+    public List<SetPropertyMediaResponse> setPrimaryImage(
+            UUID propertyId, UUID propertyMediaId, CustomUserDetails currentUser) {
 
         UserEntity user = userRepository.findById(currentUser.getId())
                 .orElseThrow(
@@ -431,11 +433,11 @@ public class PropertyServiceImpl implements PropertyService {
                         () -> new ResourceNotFoundException("Property not found with id " + propertyId)
                 );
 
-        if(user.getAgency() == null) {
+        if (user.getAgency() == null) {
             throw new ResourceNotFoundException("Agency not found associated for user: " + user.getId());
         }
 
-        if(!propertyMediaRepository.existsById(propertyMediaId)) {
+        if (!propertyMediaRepository.existsById(propertyMediaId)) {
             throw new ResourceNotFoundException("Media not found with id: " + propertyMediaId);
         }
 
@@ -448,13 +450,13 @@ public class PropertyServiceImpl implements PropertyService {
         primaryMediaFile.setIsPrimary(false);
         propertyMediaRepository.save(primaryMediaFile);
 
-        if(mediaFiles.isEmpty()) {
+        if (mediaFiles.isEmpty()) {
             throw new ResourceNotFoundException("No images found for property: " + propertyId);
         }
 
         for (PropertyMediaEntity mediaFile : mediaFiles) {
 
-            if(mediaFile.getId().equals(propertyMediaId)) {
+            if (mediaFile.getId().equals(propertyMediaId)) {
                 mediaFile.setIsPrimary(true);
                 propertyMediaRepository.save(mediaFile);
                 break;
@@ -773,7 +775,7 @@ public class PropertyServiceImpl implements PropertyService {
         return responses;
     }
 
-//    HELPER METHODS
+    //    HELPER METHODS
     private Map<UUID, String> getMainImagesByPropertyIds(List<UUID> propertyIds) {
         if (propertyIds.isEmpty()) {
             return Map.of();
@@ -797,7 +799,8 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @NonNull
-    private Page<PropertyResponse> getPropertyResponses(Pageable pageable, Specification<PropertyEntity> specification) {
+    private Page<PropertyResponse> getPropertyResponses(
+            Pageable pageable, Specification<PropertyEntity> specification) {
         Page<PropertyEntity> propertyPage = propertyRepository.findAll(specification, pageable);
 
         Map<UUID, String> mainImageByPropertyId = getMainImagesByPropertyIds(
@@ -835,7 +838,8 @@ public class PropertyServiceImpl implements PropertyService {
         boolean isActiveMember = agencyMemberRepository
                 .existsByAgency_IdAndUser_IdAndActiveTrue(
                         agency.getId(),
-                        assignedAgent.getId());
+                        assignedAgent.getId()
+                );
 
         boolean hasAgentRole = assignedAgent.getRoles().stream()
                 .anyMatch(role -> role.getRoleName() == Role.AGENT);

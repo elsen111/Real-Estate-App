@@ -34,7 +34,11 @@ public class AppointmentController {
     public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getMyAppointments(
             @RequestParam(required = false) AppointmentStatus status,
             @AuthenticationPrincipal CustomUserDetails currentUser,
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
+            @PageableDefault(
+                    size = 20,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC
+            )
             Pageable pageable
     ) {
 
@@ -74,8 +78,10 @@ public class AppointmentController {
         AppointmentResponse response = appointmentService.updateStatus(currentUser, appointmentId, request);
 
         return ResponseEntity.ok(
-                ApiResponse.success("Appointment status updated to "
-                        + request.getStatus() + " successfully.", response)
+                ApiResponse.success(
+                        "Appointment status updated to "
+                                + request.getStatus() + " successfully.", response
+                )
         );
 
     }
@@ -88,7 +94,7 @@ public class AppointmentController {
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
 
-        AppointmentResponse response = appointmentService.getAppointmentById(currentUser,appointmentId);
+        AppointmentResponse response = appointmentService.getAppointmentById(currentUser, appointmentId);
 
         return ResponseEntity.ok(
                 ApiResponse.success("Appointment fetched successfully.", response)

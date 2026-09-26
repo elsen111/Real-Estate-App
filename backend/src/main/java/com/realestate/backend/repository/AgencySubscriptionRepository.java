@@ -43,13 +43,15 @@ public interface AgencySubscriptionRepository
     );
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("""
-            SELECT s
-            FROM AgencySubscriptionEntity s
-            WHERE s.agency.id = :agencyId
-            AND s.status = :status
-            ORDER BY s.endDate DESC
-            """)
+    @Query(
+            """
+                    SELECT s
+                    FROM AgencySubscriptionEntity s
+                    WHERE s.agency.id = :agencyId
+                    AND s.status = :status
+                    ORDER BY s.endDate DESC
+                    """
+    )
     List<AgencySubscriptionEntity> findActiveForUpdate(
             @Param("agencyId") UUID agencyId,
             @Param("status") SubscriptionStatus status,

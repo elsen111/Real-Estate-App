@@ -12,19 +12,21 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
-@JsonPropertyOrder({
-        "id",
-        "fullName",
-        "email",
-        "phoneNumber",
-        "avatarUrl",
-        "roles",
-        "position",
-        "enabled",
-        "emailVerified",
-        "createdAt",
-        "updatedAt"
-})
+@JsonPropertyOrder(
+        {
+                "id",
+                "fullName",
+                "email",
+                "phoneNumber",
+                "avatarUrl",
+                "roles",
+                "position",
+                "enabled",
+                "emailVerified",
+                "createdAt",
+                "updatedAt"
+        }
+)
 public class AuthUserResponse {
 
     private UUID id;

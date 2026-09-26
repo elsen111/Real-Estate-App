@@ -69,7 +69,7 @@ public class AgencyServiceImpl implements AgencyService {
 
         AgencyEntity currentAgency = user.getAgency();
 
-        if(currentAgency == null) {
+        if (currentAgency == null) {
             throw new ResourceNotFoundException("No agency associated with this user id: " + currentUser.getId());
         }
 
@@ -91,7 +91,7 @@ public class AgencyServiceImpl implements AgencyService {
 
         AgencyEntity currentAgency = user.getAgency();
 
-        if(currentAgency == null) {
+        if (currentAgency == null) {
             throw new ResourceNotFoundException("No agency associated with this user id: " + currentUser.getId());
         }
 
@@ -120,7 +120,7 @@ public class AgencyServiceImpl implements AgencyService {
 
         AgencyEntity agency = user.getAgency();
 
-        if(agency == null) {
+        if (agency == null) {
             throw new ResourceNotFoundException("Agency not found associated with the user: " + currentUser.getId());
         }
 
@@ -130,7 +130,8 @@ public class AgencyServiceImpl implements AgencyService {
                         SubscriptionStatus.ACTIVE
                 )
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Active subscription not found for agency: " + agency.getId())
+                        () -> new ResourceNotFoundException(
+                                "Active subscription not found for agency: " + agency.getId())
                 );
 
         long usedListings = propertyRepository.countByAgencyIdAndStatusIn(
@@ -168,7 +169,8 @@ public class AgencyServiceImpl implements AgencyService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<PropertyResponse> getMyAgencyProperties(CustomUserDetails currentUser, AgencyPropertyFilterRequest filter, Pageable pageable) {
+    public Page<PropertyResponse> getMyAgencyProperties(
+            CustomUserDetails currentUser, AgencyPropertyFilterRequest filter, Pageable pageable) {
 
 
         UserEntity user = userRepository.findById(currentUser.getId())
@@ -178,7 +180,7 @@ public class AgencyServiceImpl implements AgencyService {
 
         AgencyEntity currentAgency = user.getAgency();
 
-        if(currentAgency == null) {
+        if (currentAgency == null) {
             throw new ResourceNotFoundException("No agency associated with this user id: " + currentUser.getId());
         }
 
@@ -234,7 +236,8 @@ public class AgencyServiceImpl implements AgencyService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<AgencyMemberResponse> getAgencyAgents(UUID agencyId, AgencyAgentFilterRequest filterRequest, Pageable pageable) {
+    public Page<AgencyMemberResponse> getAgencyAgents(
+            UUID agencyId, AgencyAgentFilterRequest filterRequest, Pageable pageable) {
         Specification<AgencyMemberEntity> specification = AgencyAgentSpecification
                 .withAgencyAgentFilter(agencyId, filterRequest);
 
@@ -250,16 +253,16 @@ public class AgencyServiceImpl implements AgencyService {
             CustomUserDetails currentUser
     ) {
 
-         UserEntity user = userRepository.findById(currentUser.getId())
+        UserEntity user = userRepository.findById(currentUser.getId())
                 .orElseThrow(
                         () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
                 );
 
-         AgencyEntity agency = user.getAgency();
+        AgencyEntity agency = user.getAgency();
 
-         if(agency == null) {
-             throw new ResourceNotFoundException("Agency not found associated with the user: " + user.getId());
-         }
+        if (agency == null) {
+            throw new ResourceNotFoundException("Agency not found associated with the user: " + user.getId());
+        }
 
         Optional<AgencyMediaEntity> existingLogo =
                 agencyMediaRepository.findByAgencyId(agency.getId());
@@ -319,7 +322,7 @@ public class AgencyServiceImpl implements AgencyService {
 
         AgencyEntity agency = user.getAgency();
 
-        if(agency == null) {
+        if (agency == null) {
             throw new ResourceNotFoundException("No agency associated with this user id: " + currentUser.getId());
         }
 
@@ -346,7 +349,7 @@ public class AgencyServiceImpl implements AgencyService {
                         () -> new ResourceNotFoundException("Agency not found with id: " + agencyId)
                 );
 
-        if(agencyRepository.existsByEmail(request.getEmail()) && !agency.getEmail().equals(request.getEmail())) {
+        if (agencyRepository.existsByEmail(request.getEmail()) && !agency.getEmail().equals(request.getEmail())) {
             throw new ConflictException("Email already exists for another agency.");
         }
 

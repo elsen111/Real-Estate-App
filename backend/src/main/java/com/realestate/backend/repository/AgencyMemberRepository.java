@@ -2,10 +2,6 @@ package com.realestate.backend.repository;
 
 import com.realestate.backend.entity.AgencyMemberEntity;
 import com.realestate.backend.entity.UserEntity;
-import com.realestate.backend.enums.Role;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -19,30 +15,54 @@ import java.util.UUID;
 public interface AgencyMemberRepository extends JpaRepository<AgencyMemberEntity, UUID>,
         JpaSpecificationExecutor<AgencyMemberEntity> {
 
-    boolean existsByAgency_IdAndUser_Id(UUID agencyId, UUID userId);
+    boolean existsByAgency_IdAndUser_Id(
+            UUID agencyId,
+            UUID userId
+    );
 
-    boolean existsByUser_IdAndActiveTrue(UUID userId);
+    boolean existsByUser_IdAndActiveTrue(
+            UUID userId
+    );
 
-    Optional<AgencyMemberEntity> findByAgency_IdAndUser_IdAndActiveTrue(UUID agencyId, UUID userId);
+    Optional<AgencyMemberEntity> findByAgency_IdAndUser_IdAndActiveTrue(
+            UUID agencyId,
+            UUID userId
+    );
 
-    Optional<AgencyMemberEntity> findByUserAndActiveTrue(UserEntity user);
+    Optional<AgencyMemberEntity> findByUserAndActiveTrue(
+            UserEntity user
+    );
 
-    @Query("""
-select am
-from AgencyMemberEntity am
-join am.user u
-join u.roles r
-where am.agency.id = :agencyId
-and r.roleName = 'AGENCY_OWNER'
-""")
-    Optional<AgencyMemberEntity> findOwner(UUID agencyId);
+    @Query(
+            """
+                    select am
+                    from AgencyMemberEntity am
+                    join am.user u
+                    join u.roles r
+                    where am.agency.id = :agencyId
+                    and r.roleName = 'AGENCY_OWNER'
+                    """
+    )
+    Optional<AgencyMemberEntity> findOwner(
+            UUID agencyId
+    );
 
-    long countByAgencyIdAndActiveTrue(UUID agencyId);
+    long countByAgencyIdAndActiveTrue(
+            UUID agencyId
+    );
 
-    Optional<AgencyMemberEntity> findByUser_IdAndActiveTrue(UUID userId);
+    Optional<AgencyMemberEntity> findByUser_IdAndActiveTrue(
+            UUID userId
+    );
 
-    boolean existsByAgency_IdAndUser_IdAndActiveTrue(UUID id, UUID id1);
+    boolean existsByAgency_IdAndUser_IdAndActiveTrue(
+            UUID agencyId,
+            UUID userId
+    );
 
-    boolean existsByAgencyIdAndUserIdAndActiveTrue(UUID agencyId, UUID iuserId);
+    boolean existsByAgencyIdAndUserIdAndActiveTrue(
+            UUID agencyId,
+            UUID userId
+    );
 
 }

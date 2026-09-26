@@ -8,6 +8,8 @@ import java.util.UUID;
 
 public interface AgencyMediaRepository extends JpaRepository<AgencyMediaEntity, UUID> {
 
-    Optional<AgencyMediaEntity> findByAgencyId(UUID agencyId);
+    Optional<AgencyMediaEntity> findByAgencyId(
+            UUID agencyId
+    );
 
 }

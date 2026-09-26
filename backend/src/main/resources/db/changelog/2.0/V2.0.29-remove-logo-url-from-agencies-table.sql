@@ -5,4 +5,5 @@
 
 
 ALTER TABLE agencies
-    DROP COLUMN logo_url;
+DROP
+COLUMN logo_url;

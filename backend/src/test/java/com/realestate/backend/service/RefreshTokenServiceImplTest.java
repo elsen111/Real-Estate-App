@@ -23,10 +23,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class RefreshTokenServiceImplTest {
 
-    @Mock private RefreshTokenRepository refreshTokenRepository;
-    @Mock private JwtConfig jwtConfig;
+    @Mock
+    private RefreshTokenRepository refreshTokenRepository;
+    @Mock
+    private JwtConfig jwtConfig;
 
-    @InjectMocks private RefreshTokenServiceImpl service;
+    @InjectMocks
+    private RefreshTokenServiceImpl service;
 
     @Test
     void createRefreshToken_savesEntity_withHashedToken() {

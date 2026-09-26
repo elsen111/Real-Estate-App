@@ -24,7 +24,7 @@ import java.util.UUID;
 @PreAuthorize("hasRole('SUPER_ADMIN')")
 public class AdminPropertyController {
 
-    private final AdminPropertyService  adminPropertyService;
+    private final AdminPropertyService adminPropertyService;
 
     @GetMapping
     @Operation(summary = "Get all properties")
@@ -32,7 +32,7 @@ public class AdminPropertyController {
             @ModelAttribute PropertyFilterRequest filter,
             @PageableDefault(sort = "createdAt")
             Pageable pageable
-            ) {
+    ) {
 
         Page<PropertyResponse> response = adminPropertyService.getAllProperties(filter, pageable);
 

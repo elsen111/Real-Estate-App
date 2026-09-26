@@ -22,14 +22,16 @@ public interface PropertyViewRepository extends JpaRepository<PropertyViewEntity
             LocalDateTime threshold
     );
 
-    @Query("""
-    SELECT pv.property
-    FROM PropertyViewEntity pv
-    WHERE pv.viewedAt >= :from
-      AND pv.property.status = :status
-    GROUP BY pv.property
-    ORDER BY COUNT(pv.id) DESC
-    """)
+    @Query(
+            """
+                    SELECT pv.property
+                    FROM PropertyViewEntity pv
+                    WHERE pv.viewedAt >= :from
+                      AND pv.property.status = :status
+                    GROUP BY pv.property
+                    ORDER BY COUNT(pv.id) DESC
+                    """
+    )
     Page<PropertyEntity> findPopularProperties(
             @Param("from") LocalDateTime from,
             @Param("status") PropertyStatus status,

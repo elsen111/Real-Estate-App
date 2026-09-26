@@ -44,7 +44,7 @@ public class AdminSubscriptionController {
     @Operation(summary = "Get all subscription plans")
     public ResponseEntity<ApiResponse<List<AdminSubscriptionPlanResponse>>> getAllSubscriptionPlans(
             @ModelAttribute AdminSubscriptionPlanFilterRequest request
-            ){
+    ) {
         List<AdminSubscriptionPlanResponse> response = adminSubscriptionPlanService.getAllSubscriptionPlans(request);
 
         ApiResponse<List<AdminSubscriptionPlanResponse>> apiResponse =

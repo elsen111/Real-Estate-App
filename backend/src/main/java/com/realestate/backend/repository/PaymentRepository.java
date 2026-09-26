@@ -40,11 +40,13 @@ public interface PaymentRepository
     );
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("""
-            SELECT p
-            FROM PaymentEntity p
-            WHERE p.id = :paymentId
-            """)
+    @Query(
+            """
+                    SELECT p
+                    FROM PaymentEntity p
+                    WHERE p.id = :paymentId
+                    """
+    )
     Optional<PaymentEntity> findByIdForUpdate(
             @Param("paymentId") UUID paymentId
     );

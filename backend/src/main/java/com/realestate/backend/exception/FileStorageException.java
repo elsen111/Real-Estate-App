@@ -4,8 +4,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class FileStorageException
-        extends RuntimeException {
+public class FileStorageException extends RuntimeException {
 
     private final HttpStatus status;
 

@@ -26,11 +26,15 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class FavoriteServiceImplTest {
 
-    @Mock private FavoriteRepository favoriteRepository;
-    @Mock private UserRepository userRepository;
-    @Mock private PropertyRepository propertyRepository;
+    @Mock
+    private FavoriteRepository favoriteRepository;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private PropertyRepository propertyRepository;
 
-    @InjectMocks private FavoriteServiceImpl service;
+    @InjectMocks
+    private FavoriteServiceImpl service;
 
     private CustomUserDetails user(UUID id) {
         return CustomUserDetails.from(UserEntity.builder().id(id).roles(new HashSet<>()).build());

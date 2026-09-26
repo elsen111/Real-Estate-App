@@ -17,36 +17,53 @@ import java.util.UUID;
 public interface AppointmentRepository extends JpaRepository<AppointmentEntity, UUID>,
         JpaSpecificationExecutor<AppointmentEntity> {
 
-    boolean existsByPropertyIdAndClientIdAndStatus(UUID propertyId, UUID clientId, AppointmentStatus status);
+    boolean existsByPropertyIdAndClientIdAndStatus(
+            UUID propertyId,
+            UUID clientId,
+            AppointmentStatus status
+    );
 
     @EntityGraph(attributePaths = {"property", "client", "agent", "agency"})
-    Page<AppointmentEntity> findByClientId(UUID clientId, Pageable pageable);
+    Page<AppointmentEntity> findByClientId(
+            UUID clientId,
+            Pageable pageable
+    );
 
     @EntityGraph(attributePaths = {"property", "client", "agent", "agency"})
-    Page<AppointmentEntity> findByClientIdAndStatus(UUID clientId, AppointmentStatus status, Pageable pageable);
+    Page<AppointmentEntity> findByClientIdAndStatus(
+            UUID clientId,
+            AppointmentStatus status,
+            Pageable pageable
+    );
 
-    @Query(value = """
-    SELECT i FROM AppointmentEntity i
-    JOIN FETCH i.property p
-    JOIN FETCH i.client c
-    LEFT JOIN FETCH i.agent
-    JOIN FETCH i.agency
-    WHERE i.agency.id = :agencyId
-    AND (:status IS NULL OR i.status = :status)
-    AND (:propertyId IS NULL OR i.property.id = :propertyId)
-    ORDER BY i.createdAt DESC
-    """,
+    @Query(
+            value = """
+                    SELECT i FROM AppointmentEntity i
+                    JOIN FETCH i.property p
+                    JOIN FETCH i.client c
+                    LEFT JOIN FETCH i.agent
+                    JOIN FETCH i.agency
+                    WHERE i.agency.id = :agencyId
+                    AND (:status IS NULL OR i.status = :status)
+                    AND (:propertyId IS NULL OR i.property.id = :propertyId)
+                    ORDER BY i.createdAt DESC
+                    """,
             countQuery = """
-    SELECT COUNT(i) FROM InquiryEntity i
-    WHERE i.agency.id = :agencyId
-    AND (:status IS NULL OR i.status = :status)
-    AND (:propertyId IS NULL OR i.property.id = :propertyId)
-    """)
+                    SELECT COUNT(i) FROM InquiryEntity i
+                    WHERE i.agency.id = :agencyId
+                    AND (:status IS NULL OR i.status = :status)
+                    AND (:propertyId IS NULL OR i.property.id = :propertyId)
+                    """
+    )
     Page<AppointmentEntity> findByAgencyIdWithFilters(
             @Param("agencyId") UUID agencyId,
             @Param("status") AppointmentStatus status,
             @Param("propertyId") UUID propertyId,
-            Pageable pageable);
+            Pageable pageable
+    );
 
-    boolean existsByIdAndAgencyId(UUID appointmentId, UUID agencyId);
+    boolean existsByIdAndAgencyId(
+            UUID appointmentId,
+            UUID agencyId
+    );
 }

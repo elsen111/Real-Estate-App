@@ -31,7 +31,7 @@ public class InquiryController {
     @PreAuthorize("hasRole('CLIENT')")
     @Operation(summary = "Get client's inquiries")
     public ResponseEntity<ApiResponse<Page<InquiryResponse>>> getMyInquiries(
-            @RequestParam(required = false)InquiryStatus status,
+            @RequestParam(required = false) InquiryStatus status,
             @AuthenticationPrincipal CustomUserDetails currentUser,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable

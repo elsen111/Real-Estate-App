@@ -38,7 +38,7 @@ public class PropertyController {
     public ResponseEntity<ApiResponse<PropertyResponse>> createProperty(
             @Valid @RequestBody PropertyRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUser
-            ){
+    ) {
 
         PropertyResponse response = propertyService.createProperty(request, currentUser);
 
@@ -54,7 +54,7 @@ public class PropertyController {
             @ModelAttribute PropertyPublicFilterRequest filter,
             @PageableDefault(sort = "createdAt")
             Pageable pageable
-    ){
+    ) {
 
         Page<PropertyResponse> response = propertyService.getAllPublicProperties(filter, pageable);
 
@@ -69,7 +69,7 @@ public class PropertyController {
     public ResponseEntity<ApiResponse<PropertyDetailResponse>> getPropertyById(
             @PathVariable UUID propertyId,
             @AuthenticationPrincipal CustomUserDetails currentUser
-    ){
+    ) {
 
         PropertyDetailResponse response = propertyService.getPropertyDetailsById(propertyId, currentUser);
 
@@ -86,7 +86,7 @@ public class PropertyController {
             @Valid @RequestBody PropertyRequest request,
             @PathVariable UUID propertyId,
             @AuthenticationPrincipal CustomUserDetails currentUser
-    ){
+    ) {
 
         PropertyResponse response = propertyService.updateProperty(propertyId, request, currentUser);
 
@@ -103,7 +103,7 @@ public class PropertyController {
             @Valid @RequestBody PropertyStatusRequest request,
             @PathVariable UUID propertyId,
             @AuthenticationPrincipal CustomUserDetails currentUser
-    ){
+    ) {
 
         propertyService.updateStatus(propertyId, request, currentUser);
 
@@ -119,7 +119,7 @@ public class PropertyController {
     public ResponseEntity<ApiResponse<PropertyResponse>> toggleFeatured(
             @PathVariable UUID propertyId,
             @AuthenticationPrincipal CustomUserDetails currentUser
-    ){
+    ) {
 
         PropertyResponse response = propertyService.toggleFeaturedProperty(propertyId, currentUser);
 
@@ -135,7 +135,7 @@ public class PropertyController {
     public ResponseEntity<ApiResponse<Void>> softDeleteProperty(
             @PathVariable UUID propertyId,
             @AuthenticationPrincipal CustomUserDetails currentUser
-    ){
+    ) {
 
         propertyService.softDeleteProperty(propertyId, currentUser);
 
@@ -151,7 +151,7 @@ public class PropertyController {
             @ModelAttribute PropertyPublicFilterRequest filter,
             @PageableDefault(sort = "createdAt")
             Pageable pageable
-    ){
+    ) {
 
         Page<PropertyResponse> response = propertyService.getFeaturedProperties(filter, pageable);
 
@@ -166,7 +166,7 @@ public class PropertyController {
     public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getRecentProperties(
             @ModelAttribute PropertyPublicFilterRequest filter,
             @RequestParam(defaultValue = "8") int size
-    ){
+    ) {
 
         Page<PropertyResponse> response = propertyService.getRecentProperties(filter, size);
 
@@ -180,7 +180,7 @@ public class PropertyController {
     @Operation(summary = "Get popular (most viewed) properties.")
     public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getPopularProperties(
             @PageableDefault(size = 3) Pageable pageable
-    ){
+    ) {
 
         Page<PropertyResponse> response = propertyService.getPopularProperties(pageable);
 
@@ -194,10 +194,10 @@ public class PropertyController {
     @GetMapping("/{propertyId}/similar")
     @Operation(summary = "Get similar properties.")
     public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getSimilarProperties(
-            @PathVariable  UUID propertyId,
+            @PathVariable UUID propertyId,
             @PageableDefault(sort = "featured")
             Pageable pageable
-    ){
+    ) {
 
         Page<PropertyResponse> response = propertyService.getSimilarProperties(propertyId, pageable);
 
@@ -211,7 +211,7 @@ public class PropertyController {
     @Operation(summary = "Get search suggestion according to the typed keyword.")
     public ResponseEntity<ApiResponse<PropertySearchSuggestionResponse>> getSuggestedProperties(
             @Valid @RequestParam String keyword
-    ){
+    ) {
 
         PropertySearchSuggestionResponse response = propertyService.getSearchSuggestions(keyword);
 
@@ -227,7 +227,7 @@ public class PropertyController {
             @ModelAttribute PropertyMapFilterRequest request,
             @PageableDefault(size = 100)
             Pageable pageable
-    ){
+    ) {
 
         Page<PropertyMapResponse> response = propertyService.getMapProperties(request, pageable);
 
@@ -247,7 +247,7 @@ public class PropertyController {
             @PathVariable UUID propertyId,
             @AuthenticationPrincipal CustomUserDetails currentUser,
             @RequestPart("files") List<MultipartFile> files
-    ){
+    ) {
 
         List<PropertyMediaResponse> response = propertyService.uploadMedia(propertyId, files, currentUser);
 
@@ -260,8 +260,8 @@ public class PropertyController {
     @GetMapping("/{propertyId}/images")
     @Operation(summary = "Get property images.")
     public ResponseEntity<ApiResponse<List<PropertyMediaResponse>>> getPropertyMedia(
-        @PathVariable UUID propertyId
-    ){
+            @PathVariable UUID propertyId
+    ) {
 
         List<PropertyMediaResponse> response = propertyService.getPropertyMedia(propertyId);
 
@@ -278,7 +278,7 @@ public class PropertyController {
             @PathVariable UUID propertyId,
             @PathVariable UUID mediaId,
             @AuthenticationPrincipal CustomUserDetails currentUser
-    ){
+    ) {
 
         List<SetPropertyMediaResponse> response = propertyService.setPrimaryImage(propertyId, mediaId, currentUser);
 
@@ -294,7 +294,7 @@ public class PropertyController {
     public ResponseEntity<ApiResponse<Void>> deleteImage(
             @PathVariable UUID mediaId,
             @AuthenticationPrincipal CustomUserDetails currentUser
-    ){
+    ) {
 
         propertyService.removePropertyMediaFile(currentUser, mediaId);
 
@@ -324,7 +324,7 @@ public class PropertyController {
     @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'LANDLORD')")
     @PostMapping("/{propertyId}/appointments")
     @Operation(summary = "Create a new appointment for the specific property.")
-    public ResponseEntity<ApiResponse<AppointmentResponse>> createAppointment (
+    public ResponseEntity<ApiResponse<AppointmentResponse>> createAppointment(
             @PathVariable UUID propertyId,
             @Valid @RequestBody CreateAppointmentRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUser
@@ -342,7 +342,7 @@ public class PropertyController {
     @PreAuthorize("hasRole('AGENCY_OWNER')")
     @PutMapping("/{propertyId}/agent")
     @Operation(summary = "Assign agent to a property")
-    public ResponseEntity<ApiResponse<Void>> assignAgentToProperty (
+    public ResponseEntity<ApiResponse<Void>> assignAgentToProperty(
             @PathVariable UUID propertyId,
             @Valid @RequestBody AssignAgentToPropertyRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUser

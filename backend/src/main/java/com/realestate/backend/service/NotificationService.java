@@ -5,8 +5,12 @@ import com.realestate.backend.entity.InquiryEntity;
 
 public interface NotificationService {
 
-    void notifyAgencyOfNewInquiry(InquiryEntity inquiry);
+    void notifyAgencyOfNewInquiry(
+            InquiryEntity inquiry
+    );
 
-    void notifyAgencyOfNewAppointment(AppointmentEntity appointment);
+    void notifyAgencyOfNewAppointment(
+            AppointmentEntity appointment
+    );
 
 }

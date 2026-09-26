@@ -43,7 +43,7 @@ public class AgencyController {
     @Operation(summary = "Get current agency information.")
     public ResponseEntity<ApiResponse<AgencyResponse>> getCurrentAgency(
             @AuthenticationPrincipal CustomUserDetails currentUser
-    ){
+    ) {
 
         AgencyResponse response = agencyService.getCurrentAgency(currentUser);
 
@@ -59,7 +59,7 @@ public class AgencyController {
     public ResponseEntity<ApiResponse<AgencyResponse>> updateOwnAgency(
             @AuthenticationPrincipal CustomUserDetails currentUser,
             @Valid @RequestBody UpdateAgencyRequest request
-            ) {
+    ) {
 
         AgencyResponse response = agencyService.updateOwnAgency(currentUser, request);
 
@@ -93,7 +93,7 @@ public class AgencyController {
     @PreAuthorize("hasAnyRole('AGENCY_OWNER', 'AGENT', 'LANDLORD')")
     public ResponseEntity<ApiResponse<AgencySubscriptionResponse>> getMySubscription(
             @AuthenticationPrincipal CustomUserDetails currentUser
-    ){
+    ) {
 
         AgencySubscriptionResponse response = agencyService.getMySubscription(currentUser);
 
@@ -144,7 +144,7 @@ public class AgencyController {
     @Operation(summary = "Get specific agency's public information.")
     public ResponseEntity<ApiResponse<AgencyResponse>> getAgencyPublicInfo(
             @PathVariable UUID agencyId
-    ){
+    ) {
 
         AgencyResponse response = agencyService.getPublicAgencyInfo(agencyId);
 
@@ -191,7 +191,7 @@ public class AgencyController {
 
     }
 
-    @DeleteMapping( "/me/logo")
+    @DeleteMapping("/me/logo")
     @Operation(summary = "Remove agency logo")
     @PreAuthorize("hasRole('AGENCY_OWNER')")
     public ResponseEntity<ApiResponse<Void>> removeAgencyLogo(
@@ -216,7 +216,11 @@ public class AgencyController {
             @RequestParam(required = false) InquiryStatus status,
             @RequestParam(required = false) UUID propertyId,
             @AuthenticationPrincipal CustomUserDetails currentUser,
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
+            @PageableDefault(
+                    size = 20,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC
+            )
             Pageable pageable
     ) {
 
@@ -231,15 +235,22 @@ public class AgencyController {
     @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'LANDLORD')")
     @GetMapping("/agencies/me/appointments")
     @Operation(summary = "Get agency's appointments")
-    public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getMyAgencyAppointments (
+    public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getMyAgencyAppointments(
             @RequestParam(required = false) AppointmentStatus status,
             @RequestParam(required = false) UUID propertyId,
             @AuthenticationPrincipal CustomUserDetails currentUser,
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
+            @PageableDefault(
+                    size = 20,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC
+            )
             Pageable pageable
     ) {
 
-        Page<AppointmentResponse> response = appointmentService.getMyAgencyAppointments(currentUser, status, propertyId, pageable);
+        Page<AppointmentResponse> response = appointmentService.getMyAgencyAppointments(
+                currentUser, status, propertyId,
+                pageable
+        );
 
         return ResponseEntity.ok(
                 ApiResponse.success("Appointment list fetched successfully", response)

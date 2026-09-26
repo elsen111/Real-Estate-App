@@ -32,9 +32,12 @@ public class AdminUserController {
     @Operation(summary = "Get all users")
     public ResponseEntity<ApiResponse<Page<UserResponse>>> getAllUsers(
             @ModelAttribute AdminUserFilterRequest filter,
-            @PageableDefault(size = 10, sort = "createdAt")
+            @PageableDefault(
+                    size = 10,
+                    sort = "createdAt"
+            )
             Pageable pageable
-            ) {
+    ) {
 
         Page<UserResponse> response = adminUserService.getAllUsers(filter, pageable);
 
@@ -67,7 +70,7 @@ public class AdminUserController {
     public ResponseEntity<ApiResponse<Void>> changeUserStatus(
             @PathVariable UUID userId,
             @Valid @RequestBody UserStatusRequest request
-            ) {
+    ) {
         String message = adminUserService.changeUserStatus(userId, request);
 
         return ResponseEntity.ok(
@@ -95,7 +98,7 @@ public class AdminUserController {
     public ResponseEntity<ApiResponse<Void>> softDeleteUser(
             @PathVariable UUID userId,
             @AuthenticationPrincipal CustomUserDetails currentUser
-            ) {
+    ) {
 
         adminUserService.softDeleteUser(userId, currentUser);
 

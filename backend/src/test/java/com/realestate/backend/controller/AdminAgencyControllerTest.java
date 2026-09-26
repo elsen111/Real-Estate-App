@@ -194,8 +194,10 @@ class AdminAgencyControllerTest {
         when(adminAgencyService.createAgencySubscription(agencyId, subscriptionId))
                 .thenReturn(subscriptionResponse);
 
-        mockMvc.perform(post("/admin/agencies/{agencyId}/subscription-plans/{subscriptionId}",
-                        agencyId, subscriptionId))
+        mockMvc.perform(post(
+                        "/admin/agencies/{agencyId}/subscription-plans/{subscriptionId}",
+                        agencyId, subscriptionId
+                ))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("Agency assigned successfully"))

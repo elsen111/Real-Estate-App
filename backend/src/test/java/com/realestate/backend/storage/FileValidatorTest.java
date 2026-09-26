@@ -18,7 +18,7 @@ class FileValidatorTest {
     void validate_validJpeg_acceptsFile() {
 
         byte[] jpegBytes =
-                new byte[] {
+                new byte[]{
                         (byte) 0xFF,
                         (byte) 0xD8,
                         (byte) 0xFF,
@@ -59,7 +59,7 @@ class FileValidatorTest {
     void validate_validPng_acceptsFile() {
 
         byte[] pngBytes =
-                new byte[] {
+                new byte[]{
                         (byte) 0x89,
                         'P',
                         'N',
@@ -119,7 +119,7 @@ class FileValidatorTest {
                         "file",
                         null,
                         "image/jpeg",
-                        new byte[] {1, 2, 3}
+                        new byte[]{1, 2, 3}
                 );
 
         assertThrows(
@@ -139,7 +139,7 @@ class FileValidatorTest {
                         "file",
                         "../../secret.jpg",
                         "image/jpeg",
-                        new byte[] {1, 2, 3}
+                        new byte[]{1, 2, 3}
                 );
 
         assertThrows(
@@ -159,7 +159,7 @@ class FileValidatorTest {
                         "file",
                         "..\\..\\secret.jpg",
                         "image/jpeg",
-                        new byte[] {1, 2, 3}
+                        new byte[]{1, 2, 3}
                 );
 
         assertThrows(
@@ -182,7 +182,7 @@ class FileValidatorTest {
                         "file",
                         filename,
                         "image/jpeg",
-                        new byte[] {1, 2, 3}
+                        new byte[]{1, 2, 3}
                 );
 
         assertThrows(
@@ -202,7 +202,7 @@ class FileValidatorTest {
                         "file",
                         "house.exe",
                         "image/jpeg",
-                        new byte[] {
+                        new byte[]{
                                 (byte) 0xFF,
                                 (byte) 0xD8,
                                 (byte) 0xFF
@@ -245,7 +245,7 @@ class FileValidatorTest {
     void validateImageAsVideo_rejectsFile() {
 
         byte[] jpegBytes =
-                new byte[] {
+                new byte[]{
                         (byte) 0xFF,
                         (byte) 0xD8,
                         (byte) 0xFF

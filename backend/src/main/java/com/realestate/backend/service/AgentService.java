@@ -13,10 +13,12 @@ import java.util.UUID;
 
 public interface AgentService {
 
-    AgentResponse getAgentByUserId(UUID userId);
+    AgentResponse getAgentByUserId(
+            UUID userId
+    );
 
     Page<PropertyResponse> getPublicAgentProperties(
-            UUID  userId,
+            UUID userId,
             PropertyFilterRequest filter,
             Pageable pageable
     );
@@ -27,7 +29,10 @@ public interface AgentService {
             Pageable pageable
     );
 
-    void deleteAgentFromAgency(UUID agentId, CustomUserDetails currentUser );
+    void deleteAgentFromAgency(
+            UUID agentId,
+            CustomUserDetails currentUser
+    );
 
     Page<InquiryResponse> getOwnInquiries(
             CustomUserDetails currentUser,

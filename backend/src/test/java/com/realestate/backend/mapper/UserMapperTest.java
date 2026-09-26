@@ -169,7 +169,8 @@ public class UserMapperTest {
         user.setRoles(Set.of(
                 createRoleEntity(Role.CLIENT),
                 createRoleEntity(Role.AGENCY_OWNER),
-                createRoleEntity(Role.AGENT)));
+                createRoleEntity(Role.AGENT)
+        ));
 
         assertEquals("Agency Owner", userMapper.resolvePosition(user));
     }

@@ -14,15 +14,17 @@ import java.util.UUID;
 
 public class AppointmentSpecification {
 
-    public AppointmentSpecification() {}
+    public AppointmentSpecification() {
+    }
 
     public static Specification<AppointmentEntity> withFilter(
             AppointmentFilterRequest filterRequest
     ) {
 
-        if(filterRequest == null) {
+        if (filterRequest == null) {
             Specification.where((Specification<Object>) null);
-        };
+        }
+        ;
 
         assert filterRequest != null;
 
@@ -41,10 +43,11 @@ public class AppointmentSpecification {
 
     }
 
-//    HELPER METHODS
+    //    HELPER METHODS
     public static Specification<AppointmentEntity> hasPropertyId(UUID propertyId) {
         return (root, query, cb) -> {
-            if (propertyId == null) return null;
+            if (propertyId == null)
+                return null;
             Join<AppointmentEntity, ?> propertyJoin = getOrCreateJoin(root, "property");
             return cb.equal(propertyJoin.get("id"), propertyId);
         };
@@ -52,7 +55,8 @@ public class AppointmentSpecification {
 
     public static Specification<AppointmentEntity> hasPropertyTitle(String propertyTitle) {
         return (root, query, cb) -> {
-            if (propertyTitle == null || propertyTitle.isBlank()) return null;
+            if (propertyTitle == null || propertyTitle.isBlank())
+                return null;
             Join<AppointmentEntity, ?> propertyJoin = getOrCreateJoin(root, "property");
             return cb.like(cb.lower(propertyJoin.get("title")), "%" + propertyTitle.trim().toLowerCase() + "%");
         };
@@ -61,7 +65,8 @@ public class AppointmentSpecification {
     public static Specification<AppointmentEntity> hasClientId(UUID clientId) {
 
         return (root, query, cb) -> {
-            if (clientId == null) return null;
+            if (clientId == null)
+                return null;
             Join<AppointmentEntity, ?> clientJoin = getOrCreateJoin(root, "client");
             return cb.equal(clientJoin.get("id"), clientId);
         };
@@ -69,7 +74,8 @@ public class AppointmentSpecification {
 
     public static Specification<AppointmentEntity> hasClientName(String clientName) {
         return (root, query, cb) -> {
-            if (clientName == null || clientName.isBlank()) return null;
+            if (clientName == null || clientName.isBlank())
+                return null;
             Join<AppointmentEntity, ?> clientJoin = getOrCreateJoin(root, "client");
             return cb.like(cb.lower(clientJoin.get("fullName")), "%" + clientName.trim().toLowerCase() + "%");
         };
@@ -78,7 +84,8 @@ public class AppointmentSpecification {
     public static Specification<AppointmentEntity> hasClientEmail(String clientEmail) {
 
         return (root, query, cb) -> {
-            if (clientEmail == null || clientEmail.isBlank()) return null;
+            if (clientEmail == null || clientEmail.isBlank())
+                return null;
             Join<AppointmentEntity, ?> clientJoin = getOrCreateJoin(root, "client");
             return cb.equal(clientJoin.get("email"), clientEmail);
         };
@@ -88,7 +95,8 @@ public class AppointmentSpecification {
     public static Specification<AppointmentEntity> hasAgentId(UUID agentId) {
 
         return (root, query, cb) -> {
-            if (agentId == null) return null;
+            if (agentId == null)
+                return null;
             Join<AppointmentEntity, ?> agentJoin = getOrCreateJoin(root, "agent");
             return cb.equal(agentJoin.get("id"), agentId);
         };
@@ -97,7 +105,8 @@ public class AppointmentSpecification {
     public static Specification<AppointmentEntity> hasAgentName(String agentName) {
 
         return (root, query, cb) -> {
-            if (agentName == null || agentName.isBlank()) return null;
+            if (agentName == null || agentName.isBlank())
+                return null;
             Join<AppointmentEntity, ?> agentJoin = getOrCreateJoin(root, "agent");
             return cb.like(cb.lower(agentJoin.get("fullName")), "%" + agentName.trim().toLowerCase() + "%");
         };
@@ -110,9 +119,9 @@ public class AppointmentSpecification {
         return (
                 ((root, query, cb) ->
                         type == null ? null
-                        : cb.equal(root.get("appointmentType"), type)
-                        )
-                );
+                                : cb.equal(root.get("appointmentType"), type)
+                )
+        );
     }
 
     public static Specification<AppointmentEntity> hasStatus(AppointmentStatus status) {
@@ -125,7 +134,8 @@ public class AppointmentSpecification {
     public static Specification<AppointmentEntity> hasAgencyId(UUID agencyId) {
 
         return (root, query, cb) -> {
-            if (agencyId == null) return null;
+            if (agencyId == null)
+                return null;
             Join<AppointmentEntity, ?> agencyJoin = getOrCreateJoin(root, "agency");
             return cb.equal(agencyJoin.get("id"), agencyId);
         };
@@ -135,14 +145,16 @@ public class AppointmentSpecification {
     public static Specification<AppointmentEntity> hasAgencyName(String agencyName) {
 
         return (root, query, cb) -> {
-            if (agencyName == null || agencyName.isBlank()) return null;
+            if (agencyName == null || agencyName.isBlank())
+                return null;
             Join<AppointmentEntity, ?> agencyJoin = getOrCreateJoin(root, "agency");
             return cb.like(cb.lower(agencyJoin.get("name")), "%" + agencyName.trim().toLowerCase() + "%");
         };
 
     }
 
-    private static Specification<AppointmentEntity> createTimeBetween(LocalDateTime createdAfter, LocalDateTime createdBefore) {
+    private static Specification<AppointmentEntity> createTimeBetween(
+            LocalDateTime createdAfter, LocalDateTime createdBefore) {
         return (root, query, cb) -> {
             if (createdAfter == null && createdBefore == null) {
                 return null;

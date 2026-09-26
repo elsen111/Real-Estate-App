@@ -8,6 +8,8 @@ import java.util.UUID;
 
 public interface UserMediaRepository extends JpaRepository<UserMediaEntity, UUID> {
 
-    Optional<UserMediaEntity> findByUserId(UUID uuid);
+    Optional<UserMediaEntity> findByUserId(
+            UUID userId
+    );
 
 }

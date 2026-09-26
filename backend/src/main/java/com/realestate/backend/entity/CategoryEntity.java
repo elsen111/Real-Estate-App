@@ -23,34 +23,34 @@ import java.util.UUID;
 @Builder
 public class CategoryEntity {
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.UUID)
-        @Column(name = "id", updatable = false, nullable = false)
-        private UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
 
-        @Column(name = "name", length = 100, nullable = false)
-        private String name;
+    @Column(name = "name", length = 100, nullable = false)
+    private String name;
 
-        @Column(name = "slug", length = 100, nullable = false)
-        private String slug;
+    @Column(name = "slug", length = 100, nullable = false)
+    private String slug;
 
-        @Column(name = "description")
-        private String description;
+    @Column(name = "description")
+    private String description;
 
-        @Builder.Default
-        @Column(name = "active", nullable = false)
-        private Boolean active = true;
+    @Builder.Default
+    @Column(name = "active", nullable = false)
+    private Boolean active = true;
 
-        @Builder.Default
-        @Column(name="deleted", nullable = false)
-        private Boolean deleted = false;
+    @Builder.Default
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted = false;
 
-        @CreationTimestamp
-        @Column(name = "created_at", nullable = false, updatable = false)
-        private LocalDateTime createdAt;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-        @UpdateTimestamp
-        @Column(name = "updated_at", nullable = false)
-        private LocalDateTime updatedAt;
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 
 }

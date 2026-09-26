@@ -32,10 +32,10 @@ public interface AuthMapper {
 
     @Named("normalize")
     default String normalizeValue(String value) {
-        if(value == null)
+        if (value == null)
             return null;
 
-        if(value.contains("@")) {
+        if (value.contains("@")) {
             value = value.toLowerCase();
         }
 

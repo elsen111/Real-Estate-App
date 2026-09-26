@@ -13,16 +13,40 @@ import java.util.UUID;
 
 public interface InquiryService {
 
-    InquiryResponse createInquiry(UUID propertyId, CreateInquiryRequest request, CustomUserDetails currentUser);
+    InquiryResponse createInquiry(
+            UUID propertyId,
+            CreateInquiryRequest request,
+            CustomUserDetails currentUser
+    );
 
-    Page<InquiryResponse> getClientInquiries(CustomUserDetails currentUser, InquiryStatus status, Pageable pageable);
+    Page<InquiryResponse> getClientInquiries(
+            CustomUserDetails currentUser,
+            InquiryStatus status,
+            Pageable pageable
+    );
 
-    Page<InquiryResponse> getMyAgencyInquiries(CustomUserDetails currentUser, InquiryStatus status, UUID propertyId, Pageable pageable);
+    Page<InquiryResponse> getMyAgencyInquiries(
+            CustomUserDetails currentUser,
+            InquiryStatus status,
+            UUID propertyId,
+            Pageable pageable
+    );
 
-    InquiryResponse getInquiryById(CustomUserDetails currentUser, UUID id);
+    InquiryResponse getInquiryById(
+            CustomUserDetails currentUser,
+            UUID id
+    );
 
-    InquiryResponse updateStatus(CustomUserDetails currentUser, UUID inquiryId, UpdateInquiryStatusRequest request);
+    InquiryResponse updateStatus(
+            CustomUserDetails currentUser,
+            UUID inquiryId,
+            UpdateInquiryStatusRequest request
+    );
 
-    Page<InquiryResponse> getAgencyInquiriesById(UUID agencyId, InquiryFilterRequest filter, Pageable pageable);
+    Page<InquiryResponse> getAgencyInquiriesById(
+            UUID agencyId,
+            InquiryFilterRequest filter,
+            Pageable pageable
+    );
 
 }

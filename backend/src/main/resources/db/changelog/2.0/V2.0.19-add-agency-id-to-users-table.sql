@@ -4,4 +4,4 @@ ALTER TABLE users
 ALTER TABLE users
     ADD CONSTRAINT fk_users_agency
         FOREIGN KEY (agency_id)
-            REFERENCES agencies(id);
+            REFERENCES agencies (id);

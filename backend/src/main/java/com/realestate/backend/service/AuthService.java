@@ -38,9 +38,13 @@ public interface AuthService {
             CustomUserDetails currentUser
     );
 
-    void forgotPassword(ForgotPasswordRequest request);
+    void forgotPassword(
+            ForgotPasswordRequest request
+    );
 
-    void resetPassword(ResetPasswordRequest request);
+    void resetPassword(
+            ResetPasswordRequest request
+    );
 
     AuthResponse reactivateAccount(
             AccountReactivationRequest request,

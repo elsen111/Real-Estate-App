@@ -7,12 +7,14 @@ import lombok.Getter;
 
 @Getter
 @Builder
-@JsonPropertyOrder({
-        "tokenType",
-        "accessToken",
-        "refreshToken",
-        "expiresInSeconds"
-})
+@JsonPropertyOrder(
+        {
+                "tokenType",
+                "accessToken",
+                "refreshToken",
+                "expiresInSeconds"
+        }
+)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AuthResponse {
 

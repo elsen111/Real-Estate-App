@@ -23,10 +23,13 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class OtpServiceImplTest {
 
-    @Mock private PasswordResetOtpRepository passwordResetOtpRepository;
-    @Mock private EmailService emailService;
+    @Mock
+    private PasswordResetOtpRepository passwordResetOtpRepository;
+    @Mock
+    private EmailService emailService;
 
-    @InjectMocks private OtpServiceImpl service;
+    @InjectMocks
+    private OtpServiceImpl service;
 
     @Test
     void generateAndSendOtp_deletesOldOtps_savesNewOne_andSendsEmail() {

@@ -9,16 +9,18 @@ import java.util.UUID;
 
 @Getter
 @Builder
-@JsonPropertyOrder({
-        "id",
-        "name",
-        "description",
-        "price",
-        "durationDays",
-        "maxListings",
-        "maxAgents",
-        "featuredListingsAllowed"
-})
+@JsonPropertyOrder(
+        {
+                "id",
+                "name",
+                "description",
+                "price",
+                "durationDays",
+                "maxListings",
+                "maxAgents",
+                "featuredListingsAllowed"
+        }
+)
 public class SubscriptionPlanResponse {
 
     private UUID id;

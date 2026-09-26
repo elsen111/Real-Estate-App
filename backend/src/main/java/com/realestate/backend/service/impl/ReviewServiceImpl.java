@@ -55,11 +55,11 @@ public class ReviewServiceImpl implements ReviewService {
         boolean isClient = currentUser.getAuthorities().stream()
                 .allMatch(auth -> Objects.equals(auth.getAuthority(), "ROLE_CLIENT"));
 
-        if(!isClient) {
+        if (!isClient) {
             throw new ForbiddenException("Only client users are allowed to create reviews");
         }
 
-        if(!propertyRepository.existsById(propertyId)) {
+        if (!propertyRepository.existsById(propertyId)) {
             throw new ResourceNotFoundException("Property not found with id: " + propertyId);
         }
 
@@ -68,7 +68,7 @@ public class ReviewServiceImpl implements ReviewService {
                         () -> new ResourceNotFoundException("User not found with id " + currentUser.getId())
                 );
 
-        if(reviewRepository.existsByReviewerIdAndPropertyId(user.getId(), propertyId)) {
+        if (reviewRepository.existsByReviewerIdAndPropertyId(user.getId(), propertyId)) {
             throw new ConflictException("You already have a review for this property.");
         }
 
@@ -124,13 +124,15 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<ReviewResponse> getPropertyReviews(UUID propertyId, PublicReviewFilterRequest filterRequest, Pageable pageable) {
+    public Page<ReviewResponse> getPropertyReviews(
+            UUID propertyId, PublicReviewFilterRequest filterRequest, Pageable pageable) {
 
-        if(!propertyRepository.existsById(propertyId)) {
+        if (!propertyRepository.existsById(propertyId)) {
             throw new ResourceNotFoundException("Property not found with id: " + propertyId);
         }
 
-        Specification<ReviewEntity> specification = ReviewSpecification.withPublicFilter(null, propertyId, filterRequest);
+        Specification<ReviewEntity> specification = ReviewSpecification.withPublicFilter(
+                null, propertyId, filterRequest);
 
         return reviewRepository.findAll(specification, pageable).map(reviewMapper::toResponse);
 
@@ -143,21 +145,21 @@ public class ReviewServiceImpl implements ReviewService {
         boolean isClient = currentUser.getAuthorities().stream()
                 .allMatch(auth -> Objects.equals(auth.getAuthority(), "ROLE_CLIENT"));
 
-        if(!isClient) {
+        if (!isClient) {
             throw new ForbiddenException("Only client users are allowed to create reviews");
         }
 
         AgencyEntity agency = agencyRepository.findById(agencyId)
-            .orElseThrow(
-                () -> new ResourceNotFoundException("Agency not found with id: " + agencyId)
-        );
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Agency not found with id: " + agencyId)
+                );
 
         UserEntity user = userRepository.findById(currentUser.getId())
                 .orElseThrow(
                         () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
                 );
 
-        if(reviewRepository.existsByReviewerIdAndAgencyId(user.getId(), agencyId)) {
+        if (reviewRepository.existsByReviewerIdAndAgencyId(user.getId(), agencyId)) {
             throw new ConflictException("You already have a review for this agency.");
         }
 
@@ -173,15 +175,16 @@ public class ReviewServiceImpl implements ReviewService {
                 .addKeyValue("agencyId", agencyId)
                 .log();
 
-        return  reviewMapper.toResponse(savedReview);
+        return reviewMapper.toResponse(savedReview);
 
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Page<ReviewResponse> getAgencyReviews(UUID agencyId, PublicReviewFilterRequest filterRequest, Pageable pageable) {
+    public Page<ReviewResponse> getAgencyReviews(
+            UUID agencyId, PublicReviewFilterRequest filterRequest, Pageable pageable) {
 
-        if(!agencyRepository.existsById(agencyId)) {
+        if (!agencyRepository.existsById(agencyId)) {
             throw new ResourceNotFoundException("Agency not found with id: " + agencyId);
         }
 
@@ -195,7 +198,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public ReviewResponse updateOwnReview(UUID reviewId, ReviewRequest request, CustomUserDetails currentUser) {
 
-        if(!reviewRepository.existsByIdAndReviewerId(reviewId, currentUser.getId())) {
+        if (!reviewRepository.existsByIdAndReviewerId(reviewId, currentUser.getId())) {
             throw new ResourceNotFoundException("Review not found with id: " + reviewId);
         }
 
@@ -205,13 +208,13 @@ public class ReviewServiceImpl implements ReviewService {
                 );
 
         ReviewEntity review = reviewRepository.findById(reviewId)
-            .orElseThrow(
-                () -> new ResourceNotFoundException("Review not found with id " + reviewId)
-        );
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Review not found with id " + reviewId)
+                );
 
         reviewMapper.toEntity(request, user, review);
 
-        ReviewEntity  savedReview = reviewRepository.saveAndFlush(review);
+        ReviewEntity savedReview = reviewRepository.saveAndFlush(review);
 
         if (savedReview.getTarget() == ReviewTargetType.PROPERTY && savedReview.getProperty() != null) {
             UUID propertyId = savedReview.getProperty().getId();
@@ -242,7 +245,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .addKeyValue("reviewId", reviewId)
                 .log();
 
-        return  reviewMapper.toResponse(savedReview);
+        return reviewMapper.toResponse(savedReview);
 
     }
 

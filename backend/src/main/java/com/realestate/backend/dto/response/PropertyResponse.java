@@ -11,44 +11,45 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "id",
-        "title",
-        "description",
-        "price",
-        "currency",
-        "listingType",
-        "featured",
-        "area",
-        "rooms",
-        "bathrooms",
-        "floor",
-        "totalFloors",
-        "city",
-        "district",
-        "address",
-        "categoryId",
-        "categoryName",
-        "images",
-        "mainImageUrl",
-        "viewCount",
-        "reviewCount",
-        "averageRating",
-        "agencyId",
-        "agencyName",
-        "assignedAgentId",
-        "assignedAgentName",
-        "status",
-        "createdAt",
-        "updatedAt"
-})
+@JsonPropertyOrder(
+        {
+                "id",
+                "title",
+                "description",
+                "price",
+                "currency",
+                "listingType",
+                "featured",
+                "area",
+                "rooms",
+                "bathrooms",
+                "floor",
+                "totalFloors",
+                "city",
+                "district",
+                "address",
+                "categoryId",
+                "categoryName",
+                "images",
+                "mainImageUrl",
+                "viewCount",
+                "reviewCount",
+                "averageRating",
+                "agencyId",
+                "agencyName",
+                "assignedAgentId",
+                "assignedAgentName",
+                "status",
+                "createdAt",
+                "updatedAt"
+        }
+)
 public class PropertyResponse {
 
     private UUID id;

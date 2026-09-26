@@ -371,14 +371,11 @@ public class EmailServiceImpl implements EmailService {
 
         return switch (type) {
 
-            case EXPIRING_IN_7_DAYS ->
-                    "EstateFlow subscription expires in 7 days";
+            case EXPIRING_IN_7_DAYS -> "EstateFlow subscription expires in 7 days";
 
-            case EXPIRING_IN_1_DAY ->
-                    "EstateFlow subscription expires tomorrow";
+            case EXPIRING_IN_1_DAY -> "EstateFlow subscription expires tomorrow";
 
-            case EXPIRED ->
-                    "EstateFlow subscription has expired";
+            case EXPIRED -> "EstateFlow subscription has expired";
         };
     }
 }
