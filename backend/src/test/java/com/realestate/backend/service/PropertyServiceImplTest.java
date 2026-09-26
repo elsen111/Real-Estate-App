@@ -96,7 +96,8 @@ class PropertyServiceImplTest {
                 )
         )
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Agency not found associated with your profile.");    }
+                .hasMessage("Agency not found associated with your profile.");
+    }
 
     @Test
     void createProperty_throws_whenNoActiveSubscription() {

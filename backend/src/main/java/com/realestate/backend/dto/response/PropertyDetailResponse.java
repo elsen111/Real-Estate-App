@@ -16,36 +16,38 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder(toBuilder = true)
-@JsonPropertyOrder({
-        "id",
-        "title",
-        "description",
-        "price",
-        "currency",
-        "viewCount",
-        "reviewCount",
-        "averageRating",
-        "listingType",
-        "propertyType",
-        "featured",
-        "area",
-        "rooms",
-        "bathrooms",
-        "floor",
-        "totalFloors",
-        "city",
-        "district",
-        "address",
-        "latitude",
-        "longitude",
-        "images",
-        "agency",
-        "agent",
-        "categoryName",
-        "propertyStatus",
-        "createdAt",
-        "updatedAt"
-})
+@JsonPropertyOrder(
+        {
+                "id",
+                "title",
+                "description",
+                "price",
+                "currency",
+                "viewCount",
+                "reviewCount",
+                "averageRating",
+                "listingType",
+                "propertyType",
+                "featured",
+                "area",
+                "rooms",
+                "bathrooms",
+                "floor",
+                "totalFloors",
+                "city",
+                "district",
+                "address",
+                "latitude",
+                "longitude",
+                "images",
+                "agency",
+                "agent",
+                "categoryName",
+                "propertyStatus",
+                "createdAt",
+                "updatedAt"
+        }
+)
 public class PropertyDetailResponse {
 
     private UUID id;

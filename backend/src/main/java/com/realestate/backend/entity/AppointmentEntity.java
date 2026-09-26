@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.util.Lazy;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -65,7 +64,7 @@ public class AppointmentEntity {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "appointment_type", length = 30, nullable = false)
-    AppointmentType appointmentType =  AppointmentType.PROPERTY_VIEWING;
+    AppointmentType appointmentType = AppointmentType.PROPERTY_VIEWING;
 
     @Column(name = "preferred_date_time", nullable = false)
     private LocalDateTime preferredDateTime;

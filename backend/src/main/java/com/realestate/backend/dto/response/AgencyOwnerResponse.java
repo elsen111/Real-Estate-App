@@ -10,15 +10,17 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-@JsonPropertyOrder({
-        "id",
-        "fullName",
-        "avatarUrl",
-        "email",
-        "phoneNumber",
-        "enabled",
-        "emailVerified"
-})
+@JsonPropertyOrder(
+        {
+                "id",
+                "fullName",
+                "avatarUrl",
+                "email",
+                "phoneNumber",
+                "enabled",
+                "emailVerified"
+        }
+)
 public class AgencyOwnerResponse {
 
     private UUID id;

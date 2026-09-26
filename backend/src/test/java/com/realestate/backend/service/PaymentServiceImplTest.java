@@ -76,13 +76,20 @@ class PaymentServiceImplTest {
     private static final String PAYLOAD = "payload";
     private static final String SIGNATURE = "signature";
 
-    @Mock private UserRepository userRepository;
-    @Mock private SubscriptionPlanRepository subscriptionPlanRepository;
-    @Mock private AgencySubscriptionRepository subscriptionRepository;
-    @Mock private PaymentRepository paymentRepository;
-    @Mock private PaymentWebhookEventRepository webhookEventRepository;
-    @Mock private PaymentGateway paymentGateway;
-    @Mock private EmailService emailService;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private SubscriptionPlanRepository subscriptionPlanRepository;
+    @Mock
+    private AgencySubscriptionRepository subscriptionRepository;
+    @Mock
+    private PaymentRepository paymentRepository;
+    @Mock
+    private PaymentWebhookEventRepository webhookEventRepository;
+    @Mock
+    private PaymentGateway paymentGateway;
+    @Mock
+    private EmailService emailService;
 
     @InjectMocks
     private PaymentServiceImpl paymentService;
@@ -191,8 +198,10 @@ class PaymentServiceImplTest {
         when(paymentRepository.findByAgencyIdAndIdempotencyKey(AGENCY_ID, IDEMPOTENCY_KEY))
                 .thenReturn(Optional.of(payment));
 
-        assertThrows(ConflictException.class,
-                () -> paymentService.createCheckout(USER_ID, OTHER_PLAN_ID, IDEMPOTENCY_KEY));
+        assertThrows(
+                ConflictException.class,
+                () -> paymentService.createCheckout(USER_ID, OTHER_PLAN_ID, IDEMPOTENCY_KEY)
+        );
 
         verifyNoInteractions(subscriptionPlanRepository, paymentGateway);
     }
@@ -214,8 +223,10 @@ class PaymentServiceImplTest {
                 AGENCY_ID, SubscriptionStatus.ACTIVE))
                 .thenReturn(Optional.of(active));
 
-        assertThrows(ConflictException.class,
-                () -> paymentService.createCheckout(USER_ID, PLAN_ID, IDEMPOTENCY_KEY));
+        assertThrows(
+                ConflictException.class,
+                () -> paymentService.createCheckout(USER_ID, PLAN_ID, IDEMPOTENCY_KEY)
+        );
 
         verify(paymentRepository, never()).saveAndFlush(any());
         verifyNoInteractions(paymentGateway);
@@ -229,8 +240,10 @@ class PaymentServiceImplTest {
         when(paymentRepository.existsByAgencyIdAndStatus(AGENCY_ID, PaymentStatus.PENDING))
                 .thenReturn(true);
 
-        assertThrows(ConflictException.class,
-                () -> paymentService.createCheckout(USER_ID, PLAN_ID, IDEMPOTENCY_KEY));
+        assertThrows(
+                ConflictException.class,
+                () -> paymentService.createCheckout(USER_ID, PLAN_ID, IDEMPOTENCY_KEY)
+        );
 
         verify(paymentRepository, never()).saveAndFlush(any());
         verifyNoInteractions(paymentGateway);
@@ -242,8 +255,10 @@ class PaymentServiceImplTest {
         when(subscriptionPlanRepository.findByIdAndActiveTrueAndDeletedFalse(PLAN_ID))
                 .thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class,
-                () -> paymentService.createCheckout(USER_ID, PLAN_ID, IDEMPOTENCY_KEY));
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> paymentService.createCheckout(USER_ID, PLAN_ID, IDEMPOTENCY_KEY)
+        );
 
         verify(paymentRepository, never()).saveAndFlush(any());
         verifyNoInteractions(paymentGateway);
@@ -257,8 +272,10 @@ class PaymentServiceImplTest {
         when(paymentGateway.createCheckout(any(PaymentEntity.class), eq(agency), eq(plan)))
                 .thenThrow(new PaymentProcessingException("Stripe checkout failed."));
 
-        PaymentProcessingException exception = assertThrows(PaymentProcessingException.class,
-                () -> paymentService.createCheckout(USER_ID, PLAN_ID, IDEMPOTENCY_KEY));
+        PaymentProcessingException exception = assertThrows(
+                PaymentProcessingException.class,
+                () -> paymentService.createCheckout(USER_ID, PLAN_ID, IDEMPOTENCY_KEY)
+        );
 
         assertEquals("Stripe checkout failed.", exception.getMessage());
 
@@ -295,8 +312,10 @@ class PaymentServiceImplTest {
     void createCheckout_shouldThrowWhenUserNotFound() {
         when(userRepository.findWithAgencyById(USER_ID)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class,
-                () -> paymentService.createCheckout(USER_ID, PLAN_ID, IDEMPOTENCY_KEY));
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> paymentService.createCheckout(USER_ID, PLAN_ID, IDEMPOTENCY_KEY)
+        );
 
         verifyNoInteractions(subscriptionPlanRepository, paymentRepository, paymentGateway, emailService);
     }
@@ -306,8 +325,10 @@ class PaymentServiceImplTest {
         user.setAgency(null);
         givenAuthenticatedUser();
 
-        assertThrows(BadRequestException.class,
-                () -> paymentService.createCheckout(USER_ID, PLAN_ID, IDEMPOTENCY_KEY));
+        assertThrows(
+                BadRequestException.class,
+                () -> paymentService.createCheckout(USER_ID, PLAN_ID, IDEMPOTENCY_KEY)
+        );
 
         verifyNoInteractions(subscriptionPlanRepository, paymentRepository, paymentGateway, emailService);
     }
@@ -317,8 +338,10 @@ class PaymentServiceImplTest {
         agency.setIsDeleted(true);
         givenAuthenticatedUser();
 
-        assertThrows(BadRequestException.class,
-                () -> paymentService.createCheckout(USER_ID, PLAN_ID, IDEMPOTENCY_KEY));
+        assertThrows(
+                BadRequestException.class,
+                () -> paymentService.createCheckout(USER_ID, PLAN_ID, IDEMPOTENCY_KEY)
+        );
 
         verifyNoInteractions(subscriptionPlanRepository, paymentRepository, paymentGateway, emailService);
     }
@@ -328,8 +351,10 @@ class PaymentServiceImplTest {
         agency.setEmail(null);
         givenAuthenticatedUser();
 
-        assertThrows(BadRequestException.class,
-                () -> paymentService.createCheckout(USER_ID, PLAN_ID, IDEMPOTENCY_KEY));
+        assertThrows(
+                BadRequestException.class,
+                () -> paymentService.createCheckout(USER_ID, PLAN_ID, IDEMPOTENCY_KEY)
+        );
 
         verifyNoInteractions(subscriptionPlanRepository, paymentRepository, paymentGateway, emailService);
     }
@@ -338,8 +363,10 @@ class PaymentServiceImplTest {
     @NullAndEmptySource
     @ValueSource(strings = {"   "})
     void createCheckout_shouldThrowWhenIdempotencyKeyIsMissingOrBlank(String key) {
-        assertThrows(BadRequestException.class,
-                () -> paymentService.createCheckout(USER_ID, PLAN_ID, key));
+        assertThrows(
+                BadRequestException.class,
+                () -> paymentService.createCheckout(USER_ID, PLAN_ID, key)
+        );
 
         verifyNoInteractions(userRepository, subscriptionPlanRepository, paymentRepository, paymentGateway);
     }
@@ -348,8 +375,10 @@ class PaymentServiceImplTest {
     void createCheckout_shouldThrowWhenIdempotencyKeyIsTooLong() {
         String longKey = "a".repeat(256);
 
-        assertThrows(BadRequestException.class,
-                () -> paymentService.createCheckout(USER_ID, PLAN_ID, longKey));
+        assertThrows(
+                BadRequestException.class,
+                () -> paymentService.createCheckout(USER_ID, PLAN_ID, longKey)
+        );
 
         verifyNoInteractions(userRepository, subscriptionPlanRepository, paymentRepository, paymentGateway);
     }
@@ -397,16 +426,20 @@ class PaymentServiceImplTest {
         when(paymentRepository.findByIdAndAgencyId(PAYMENT_ID, AGENCY_ID))
                 .thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class,
-                () -> paymentService.getPayment(USER_ID, PAYMENT_ID));
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> paymentService.getPayment(USER_ID, PAYMENT_ID)
+        );
     }
 
     @Test
     void getPayment_shouldThrowWhenUserNotFound() {
         when(userRepository.findWithAgencyById(USER_ID)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class,
-                () -> paymentService.getPayment(USER_ID, PAYMENT_ID));
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> paymentService.getPayment(USER_ID, PAYMENT_ID)
+        );
 
         verifyNoInteractions(paymentRepository);
     }
@@ -416,8 +449,10 @@ class PaymentServiceImplTest {
         user.setAgency(null);
         givenAuthenticatedUser();
 
-        assertThrows(BadRequestException.class,
-                () -> paymentService.getPayment(USER_ID, PAYMENT_ID));
+        assertThrows(
+                BadRequestException.class,
+                () -> paymentService.getPayment(USER_ID, PAYMENT_ID)
+        );
 
         verifyNoInteractions(paymentRepository);
     }
@@ -445,8 +480,10 @@ class PaymentServiceImplTest {
         when(paymentRepository.findByProviderCheckoutSessionId(CHECKOUT_SESSION_ID))
                 .thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class,
-                () -> paymentService.getPaymentBySession(USER_ID, CHECKOUT_SESSION_ID));
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> paymentService.getPaymentBySession(USER_ID, CHECKOUT_SESSION_ID)
+        );
     }
 
     @Test
@@ -456,16 +493,20 @@ class PaymentServiceImplTest {
         when(paymentRepository.findByProviderCheckoutSessionId(CHECKOUT_SESSION_ID))
                 .thenReturn(Optional.of(payment));
 
-        assertThrows(ResourceNotFoundException.class,
-                () -> paymentService.getPaymentBySession(USER_ID, CHECKOUT_SESSION_ID));
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> paymentService.getPaymentBySession(USER_ID, CHECKOUT_SESSION_ID)
+        );
     }
 
     @Test
     void getPaymentBySession_shouldThrowWhenUserNotFound() {
         when(userRepository.findWithAgencyById(USER_ID)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class,
-                () -> paymentService.getPaymentBySession(USER_ID, CHECKOUT_SESSION_ID));
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> paymentService.getPaymentBySession(USER_ID, CHECKOUT_SESSION_ID)
+        );
 
         verifyNoInteractions(paymentRepository);
     }
@@ -475,8 +516,10 @@ class PaymentServiceImplTest {
         user.setAgency(null);
         givenAuthenticatedUser();
 
-        assertThrows(BadRequestException.class,
-                () -> paymentService.getPaymentBySession(USER_ID, CHECKOUT_SESSION_ID));
+        assertThrows(
+                BadRequestException.class,
+                () -> paymentService.getPaymentBySession(USER_ID, CHECKOUT_SESSION_ID)
+        );
 
         verifyNoInteractions(paymentRepository);
     }
@@ -556,8 +599,10 @@ class PaymentServiceImplTest {
         givenWebhook(succeededWebhook(4900L, CURRENCY));
         givenPaymentLocked();
 
-        assertThrows(ConflictException.class,
-                () -> paymentService.handleWebhook(PAYLOAD, SIGNATURE));
+        assertThrows(
+                ConflictException.class,
+                () -> paymentService.handleWebhook(PAYLOAD, SIGNATURE)
+        );
 
         assertEquals(PaymentStatus.PENDING, payment.getStatus());
         verifyNoInteractions(subscriptionRepository, emailService);
@@ -568,8 +613,10 @@ class PaymentServiceImplTest {
         givenWebhook(succeededWebhook(5000L, "eur"));
         givenPaymentLocked();
 
-        assertThrows(ConflictException.class,
-                () -> paymentService.handleWebhook(PAYLOAD, SIGNATURE));
+        assertThrows(
+                ConflictException.class,
+                () -> paymentService.handleWebhook(PAYLOAD, SIGNATURE)
+        );
 
         assertEquals(PaymentStatus.PENDING, payment.getStatus());
         verifyNoInteractions(subscriptionRepository, emailService);
@@ -580,8 +627,10 @@ class PaymentServiceImplTest {
         givenWebhook(succeededWebhook(null, CURRENCY));
         givenPaymentLocked();
 
-        assertThrows(BadRequestException.class,
-                () -> paymentService.handleWebhook(PAYLOAD, SIGNATURE));
+        assertThrows(
+                BadRequestException.class,
+                () -> paymentService.handleWebhook(PAYLOAD, SIGNATURE)
+        );
 
         verifyNoInteractions(subscriptionRepository, emailService);
     }
@@ -591,8 +640,10 @@ class PaymentServiceImplTest {
         givenWebhook(succeededWebhook(5000L, null));
         givenPaymentLocked();
 
-        assertThrows(BadRequestException.class,
-                () -> paymentService.handleWebhook(PAYLOAD, SIGNATURE));
+        assertThrows(
+                BadRequestException.class,
+                () -> paymentService.handleWebhook(PAYLOAD, SIGNATURE)
+        );
 
         verifyNoInteractions(subscriptionRepository, emailService);
     }
@@ -603,8 +654,10 @@ class PaymentServiceImplTest {
         givenWebhook(succeededWebhook(5000L, CURRENCY));
         givenPaymentLocked();
 
-        assertThrows(PaymentProcessingException.class,
-                () -> paymentService.handleWebhook(PAYLOAD, SIGNATURE));
+        assertThrows(
+                PaymentProcessingException.class,
+                () -> paymentService.handleWebhook(PAYLOAD, SIGNATURE)
+        );
 
         verifyNoInteractions(subscriptionRepository, emailService);
     }
@@ -716,7 +769,8 @@ class PaymentServiceImplTest {
     void handleWebhook_shouldIgnoreUnsupportedEvent() {
         givenWebhook(new PaymentWebhookData(
                 "evt_1", "customer.created", PaymentWebhookType.UNSUPPORTED,
-                null, null, null, null, null, null));
+                null, null, null, null, null, null
+        ));
 
         paymentService.handleWebhook(PAYLOAD, SIGNATURE);
 
@@ -728,8 +782,10 @@ class PaymentServiceImplTest {
         givenWebhook(succeededWebhook(5000L, CURRENCY));
         when(paymentRepository.findByIdForUpdate(PAYMENT_ID)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class,
-                () -> paymentService.handleWebhook(PAYLOAD, SIGNATURE));
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> paymentService.handleWebhook(PAYLOAD, SIGNATURE)
+        );
 
         verifyNoInteractions(subscriptionRepository, emailService);
     }
@@ -752,8 +808,10 @@ class PaymentServiceImplTest {
         when(paymentRepository.findByProviderPaymentIntentId(PAYMENT_INTENT_ID))
                 .thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class,
-                () -> paymentService.handleWebhook(PAYLOAD, SIGNATURE));
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> paymentService.handleWebhook(PAYLOAD, SIGNATURE)
+        );
 
         verifyNoInteractions(subscriptionRepository, emailService);
     }
@@ -762,10 +820,13 @@ class PaymentServiceImplTest {
     void handleWebhook_shouldThrowWhenNoPaymentIdentifierIsPresent() {
         givenWebhook(new PaymentWebhookData(
                 "evt_1", "checkout.session.completed", PaymentWebhookType.PAYMENT_SUCCEEDED,
-                null, null, null, 5000L, CURRENCY, null));
+                null, null, null, 5000L, CURRENCY, null
+        ));
 
-        assertThrows(BadRequestException.class,
-                () -> paymentService.handleWebhook(PAYLOAD, SIGNATURE));
+        assertThrows(
+                BadRequestException.class,
+                () -> paymentService.handleWebhook(PAYLOAD, SIGNATURE)
+        );
 
         verifyNoInteractions(subscriptionRepository, emailService);
     }
@@ -782,7 +843,9 @@ class PaymentServiceImplTest {
         when(paymentRepository.findByIdForUpdate(PAYMENT_ID)).thenReturn(Optional.of(payment));
     }
 
-    /** Gateway returns the webhook and the event is recorded as new. */
+    /**
+     * Gateway returns the webhook and the event is recorded as new.
+     */
     private void givenWebhook(PaymentWebhookData data) {
         when(paymentGateway.parseWebhook(PAYLOAD, SIGNATURE)).thenReturn(data);
         when(webhookEventRepository.insertIfAbsent(
@@ -793,18 +856,21 @@ class PaymentServiceImplTest {
     private PaymentWebhookData succeededWebhook(Long amountMinor, String currency) {
         return new PaymentWebhookData(
                 "evt_success", "checkout.session.completed", PaymentWebhookType.PAYMENT_SUCCEEDED,
-                PAYMENT_ID, CHECKOUT_SESSION_ID, PAYMENT_INTENT_ID, amountMinor, currency, null);
+                PAYMENT_ID, CHECKOUT_SESSION_ID, PAYMENT_INTENT_ID, amountMinor, currency, null
+        );
     }
 
     private PaymentWebhookData failedWebhook(UUID paymentId) {
         return new PaymentWebhookData(
                 "evt_failed", "payment_intent.payment_failed", PaymentWebhookType.PAYMENT_FAILED,
-                paymentId, null, PAYMENT_INTENT_ID, 5000L, CURRENCY, "Card was declined.");
+                paymentId, null, PAYMENT_INTENT_ID, 5000L, CURRENCY, "Card was declined."
+        );
     }
 
     private PaymentWebhookData canceledWebhook() {
         return new PaymentWebhookData(
                 "evt_canceled", "checkout.session.expired", PaymentWebhookType.PAYMENT_CANCELED,
-                PAYMENT_ID, CHECKOUT_SESSION_ID, null, 5000L, CURRENCY, "Payment was not completed.");
+                PAYMENT_ID, CHECKOUT_SESSION_ID, null, 5000L, CURRENCY, "Payment was not completed."
+        );
     }
 }

@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 
 public class AgencySpecification {
 
-    public AgencySpecification() {}
+    public AgencySpecification() {
+    }
 
     public static Specification<AgencyEntity> withPublicFilter(
             AgencyFilterRequest filterRequest
@@ -33,14 +34,14 @@ public class AgencySpecification {
     }
 
 
-
     public static Specification<AgencyEntity> withFilter(
             AdminAgencyFilterRequest filterRequest
     ) {
 
-        if(filterRequest == null) {
+        if (filterRequest == null) {
             Specification.where((Specification<Object>) null);
-        };
+        }
+        ;
 
         assert filterRequest != null;
 
@@ -57,8 +58,7 @@ public class AgencySpecification {
     }
 
 
-
-//    HELPER METHODS
+    //    HELPER METHODS
     private static Specification<AgencyEntity> hasCity(String city) {
 
         return getAgencyEntitySpecification("city", city);
@@ -66,7 +66,8 @@ public class AgencySpecification {
     }
 
     private static Specification<AgencyEntity> hasEmail(Object email) {
-        return ((root, query, criteriaBuilder) -> email == null ? null : criteriaBuilder.equal(root.get("email"), email));
+        return ((root, query, criteriaBuilder) -> email == null ? null : criteriaBuilder.equal(
+                root.get("email"), email));
     }
 
     private static Specification<AgencyEntity> hasName(String name) {
@@ -95,11 +96,13 @@ public class AgencySpecification {
     }
 
     private static Specification<AgencyEntity> isEnabled(Boolean status) {
-        return ((root, query, criteriaBuilder) -> status == null ? null : criteriaBuilder.equal(root.get("status"), status));
+        return ((root, query, criteriaBuilder) -> status == null ? null : criteriaBuilder.equal(
+                root.get("status"), status));
     }
 
     private static Specification<AgencyEntity> isDeleted(Boolean isDeleted) {
-        return ((root, query, criteriaBuilder) -> isDeleted == null ? null : criteriaBuilder.equal(root.get("isDeleted"), isDeleted));
+        return ((root, query, criteriaBuilder) -> isDeleted == null ? null : criteriaBuilder.equal(
+                root.get("isDeleted"), isDeleted));
     }
 
     private static Specification<AgencyEntity> hasQuery(String keyword) {

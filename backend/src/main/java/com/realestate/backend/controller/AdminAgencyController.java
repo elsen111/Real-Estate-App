@@ -39,7 +39,7 @@ public class AdminAgencyController {
             @ModelAttribute AdminAgencyFilterRequest filter,
             @PageableDefault(sort = "createdAt")
             Pageable pageable
-            ) {
+    ) {
 
         Page<AdminAgencyResponse> response = adminAgencyService.getAllAgencies(filter, pageable);
 

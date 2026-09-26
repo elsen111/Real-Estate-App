@@ -77,7 +77,7 @@ public class AdminUserServiceImpl implements AdminUserService {
                 )
         );
 
-        if(user.getDeleted()) {
+        if (user.getDeleted()) {
             throw new ResourceNotFoundException("User not found with id: " + userId);
         }
 
@@ -106,7 +106,7 @@ public class AdminUserServiceImpl implements AdminUserService {
                 )
         );
 
-        if(!user.getEnabled()){
+        if (!user.getEnabled()) {
             throw new BusinessException(
                     "This user profile is not enabled. Firstly, activate this profile, then try again."
             );
@@ -156,20 +156,21 @@ public class AdminUserServiceImpl implements AdminUserService {
                 .map(RoleEntity::getRoleName)
                 .anyMatch(role -> role == Role.AGENCY_OWNER);
 
-        if(isUserSuperAdmin){
+        if (isUserSuperAdmin) {
             throw new ForbiddenException("Cannot delete super admin.");
         }
 
-        if(isUserAgencyOwner) {
+        if (isUserAgencyOwner) {
 
             AgencyEntity agency = agencyRepository.findById(user.getAgency().getId())
                     .orElseThrow(
                             () -> new ResourceNotFoundException("Agency not found with id: " + user.getAgency().getId())
                     );
 
-            boolean hasActiveListings = propertyRepository.existsByAgencyIdAndStatus(agency.getId(), PropertyStatus.ACTIVE);
+            boolean hasActiveListings = propertyRepository.existsByAgencyIdAndStatus(
+                    agency.getId(), PropertyStatus.ACTIVE);
 
-            if(hasActiveListings) {
+            if (hasActiveListings) {
                 throw new BusinessException("Cannot delete the user (agency owner) whose agency has active listings.");
             }
 

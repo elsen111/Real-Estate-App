@@ -13,17 +13,17 @@ public interface AgencyMapper {
     @Mapping(target = "logoUrl", source = "logoUrl.media.fileUrl")
     AgencyResponse toAgencyOwnerResponse(AgencyEntity agency);
 
-    @Mapping(target = "properties",  ignore = true)
+    @Mapping(target = "properties", ignore = true)
     @Mapping(target = "logoUrl", source = "logoUrl.media.fileUrl")
     AdminAgencyResponse toAdminResponse(AgencyEntity agency);
 
-    @Mapping(target = "status",  ignore = true)
+    @Mapping(target = "status", ignore = true)
     @Mapping(target = "logoUrl", source = "logoUrl.media.fileUrl")
     AgencyResponse toPublicAgencyListItem(AgencyEntity agency);
 
     @Mapping(target = "totalAgents", source = "totalAgents")
     @Mapping(target = "logoUrl", source = "agency.logoUrl.media.fileUrl")
-    @Mapping(target = "status",  ignore = true)
+    @Mapping(target = "status", ignore = true)
     AgencyResponse toPublicAgencyResponse(AgencyEntity agency, long totalAgents);
 
     @Named("propertyAgency")

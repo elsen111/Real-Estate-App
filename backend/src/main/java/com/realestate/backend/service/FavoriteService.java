@@ -10,10 +10,19 @@ import java.util.UUID;
 
 public interface FavoriteService {
 
-    FavoriteResponse addFavorite(UUID propertyId, CustomUserDetails currentUser);
+    FavoriteResponse addFavorite(
+            UUID propertyId,
+            CustomUserDetails currentUser
+    );
 
-    void deleteFavorite(UUID propertyId, CustomUserDetails currentUser);
+    void deleteFavorite(
+            UUID propertyId,
+            CustomUserDetails currentUser
+    );
 
-    Page<PropertyResponse> getMyFavorites(CustomUserDetails currentUser, Pageable pageable);
+    Page<PropertyResponse> getMyFavorites(
+            CustomUserDetails currentUser,
+            Pageable pageable
+    );
 
 }

@@ -83,7 +83,7 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
     @Transactional
     public String changePropertyStatus(UUID id, PropertyStatus newStatus) {
 
-        PropertyEntity property =  propertyRepository.findById(id)
+        PropertyEntity property = propertyRepository.findById(id)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Property not found with id: " + id)
                 );
@@ -105,14 +105,14 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
         return "'" + property.getTitle() + "'s status changed to " + newStatus.toString();
     }
 
-//    HELPER METHODS
+    //    HELPER METHODS
     private void validateStatusTransition(
             PropertyEntity property,
             PropertyStatus currentStatus,
             PropertyStatus newStatus
     ) {
 
-        if(currentStatus == newStatus) {
+        if (currentStatus == newStatus) {
 
             log.atWarn()
                     .setMessage("Property status change rejected: property already has this status" + currentStatus)
@@ -130,7 +130,7 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
         Set<PropertyStatus> allowedStatuses = ALLOWED_STATUS_TRANSITIONS
                 .getOrDefault(currentStatus, Set.of());
 
-        if(!allowedStatuses.contains(newStatus)) {
+        if (!allowedStatuses.contains(newStatus)) {
 
             log.atWarn()
                     .setMessage("Invalid property status transition attempted.")
@@ -142,9 +142,9 @@ public class AdminPropertyServiceImpl implements AdminPropertyService {
 
             throw new BusinessException(
                     "Cannot change property status from "
-                    + currentStatus
-                    + " to "
-                    + newStatus
+                            + currentStatus
+                            + " to "
+                            + newStatus
             );
         }
 

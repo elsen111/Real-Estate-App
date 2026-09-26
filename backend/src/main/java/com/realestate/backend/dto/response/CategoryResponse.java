@@ -11,16 +11,18 @@ import java.util.UUID;
 @Getter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "id",
-        "name",
-        "slug",
-        "description",
-        "active",
-        "deleted",
-        "createdAt",
-        "updatedAt"
-})
+@JsonPropertyOrder(
+        {
+                "id",
+                "name",
+                "slug",
+                "description",
+                "active",
+                "deleted",
+                "createdAt",
+                "updatedAt"
+        }
+)
 public class CategoryResponse {
 
     private UUID id;

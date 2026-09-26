@@ -421,7 +421,6 @@ class AppointmentServiceImplTest {
     }
 
 
-
     @Test
     void getAppointmentById_throws_whenAppointmentNotFound() {
         UUID appointmentId = UUID.randomUUID();

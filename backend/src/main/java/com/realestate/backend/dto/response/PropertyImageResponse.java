@@ -10,12 +10,14 @@ import java.util.UUID;
 @Getter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "id",
-        "fileUrl",
-        "isMain",
-        "sortOrder"
-})
+@JsonPropertyOrder(
+        {
+                "id",
+                "fileUrl",
+                "isMain",
+                "sortOrder"
+        }
+)
 public class PropertyImageResponse {
     private UUID id;
     private String fileUrl;

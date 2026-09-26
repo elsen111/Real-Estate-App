@@ -61,7 +61,7 @@ public class InquiryServiceImpl implements InquiryService {
                         () -> new ResourceNotFoundException("Property not found with id: " + propertyId)
                 );
 
-        if(property.getStatus() != PropertyStatus.ACTIVE){
+        if (property.getStatus() != PropertyStatus.ACTIVE) {
             throw new BusinessException("Property status should be active for this procedure. ID: " + propertyId);
         }
 
@@ -71,9 +71,10 @@ public class InquiryServiceImpl implements InquiryService {
                 InquiryStatus.CLOSED
         );
 
-        if (hasOpenInquiry){
+        if (hasOpenInquiry) {
             throw new DuplicateInquiryException("Inquiry already exists with id: " + propertyId);
-        };
+        }
+        ;
 
         InquiryEntity newInquiry = InquiryEntity.builder()
                 .property(property)
@@ -94,8 +95,14 @@ public class InquiryServiceImpl implements InquiryService {
                 .addKeyValue("clientId", client.getId())
                 .addKeyValue("agencyId", savedInquiry.getAgency().getId())
                 .addKeyValue("agencyName", savedInquiry.getAgency().getName())
-                .addKeyValue("agentId", savedInquiry.getAssignedAgent() != null ? savedInquiry.getAssignedAgent().getId() : null)
-                .addKeyValue("agentEmail", savedInquiry.getAssignedAgent() != null ? savedInquiry.getAssignedAgent().getEmail() : null)
+                .addKeyValue(
+                        "agentId",
+                        savedInquiry.getAssignedAgent() != null ? savedInquiry.getAssignedAgent().getId() : null
+                )
+                .addKeyValue(
+                        "agentEmail",
+                        savedInquiry.getAssignedAgent() != null ? savedInquiry.getAssignedAgent().getEmail() : null
+                )
                 .log();
 
         return inquiryMapper.toResponse(savedInquiry);
@@ -104,7 +111,8 @@ public class InquiryServiceImpl implements InquiryService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<InquiryResponse> getClientInquiries(CustomUserDetails currentUser, InquiryStatus status, Pageable pageable) {
+    public Page<InquiryResponse> getClientInquiries(
+            CustomUserDetails currentUser, InquiryStatus status, Pageable pageable) {
 
         Page<InquiryEntity> inquiries = status == null
                 ? inquiryRepository.findByClientId(currentUser.getId(), pageable)
@@ -120,10 +128,12 @@ public class InquiryServiceImpl implements InquiryService {
             CustomUserDetails currentUser,
             InquiryStatus status,
             UUID propertyId,
-            Pageable pageable) {
+            Pageable pageable
+    ) {
 
         AgencyMemberEntity agencyMember = agencyMemberRepository.findByUser_IdAndActiveTrue(currentUser.getId())
-                .orElseThrow(() -> new AccessDeniedException("Access denied: No active agency membership found for this account."));
+                .orElseThrow(() -> new AccessDeniedException(
+                        "Access denied: No active agency membership found for this account."));
 
         if (agencyMember.getAgency() == null) {
             throw new IllegalStateException("Data integrity error: Active member is not linked to any agency.");
@@ -154,18 +164,19 @@ public class InquiryServiceImpl implements InquiryService {
 
     @Override
     @Transactional
-    public InquiryResponse updateStatus(CustomUserDetails currentUser, UUID inquiryId, UpdateInquiryStatusRequest request) {
+    public InquiryResponse updateStatus(
+            CustomUserDetails currentUser, UUID inquiryId, UpdateInquiryStatusRequest request) {
 
         InquiryEntity inquiry = inquiryRepository.findById(inquiryId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Inquiry not found with id: " + inquiryId)
                 );
 
-        if(!canManageInquiry(inquiry, currentUser)){
+        if (!canManageInquiry(inquiry, currentUser)) {
             throw new ResourceNotFoundException("Inquiry not found with id: " + inquiryId);
         }
 
-        if(!ALLOWED_STATUSES_FOR_UPDATE.contains(request.getStatus())){
+        if (!ALLOWED_STATUSES_FOR_UPDATE.contains(request.getStatus())) {
             throw new BadRequestException("Allowed statuses:  " + ALLOWED_STATUSES_FOR_UPDATE);
         }
 
@@ -192,7 +203,7 @@ public class InquiryServiceImpl implements InquiryService {
     @Transactional(readOnly = true)
     public Page<InquiryResponse> getAgencyInquiriesById(UUID agencyId, InquiryFilterRequest filter, Pageable pageable) {
 
-        if(!agencyRepository.existsById(agencyId)){
+        if (!agencyRepository.existsById(agencyId)) {
             throw new ResourceNotFoundException("Agency not found with id: " + agencyId);
         }
 

@@ -19,10 +19,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SubscriptionPlanServiceImplTest {
 
-    @Mock private SubscriptionPlanRepository subscriptionPlanRepository;
-    @Mock private SubscriptionPlanMapper subscriptionPlanMapper;
+    @Mock
+    private SubscriptionPlanRepository subscriptionPlanRepository;
+    @Mock
+    private SubscriptionPlanMapper subscriptionPlanMapper;
 
-    @InjectMocks private SubscriptionPlanServiceImpl service;
+    @InjectMocks
+    private SubscriptionPlanServiceImpl service;
 
     @Test
     void getSubscriptionPlans_returnsMappedActivePlans() {

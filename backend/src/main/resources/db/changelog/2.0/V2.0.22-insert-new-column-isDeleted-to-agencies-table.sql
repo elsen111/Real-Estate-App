@@ -5,4 +5,4 @@
 
 
 ALTER TABLE agencies
-ADD is_deleted BOOLEAN NOT NULL DEFAULT TRUE;
+    ADD is_deleted BOOLEAN NOT NULL DEFAULT TRUE;

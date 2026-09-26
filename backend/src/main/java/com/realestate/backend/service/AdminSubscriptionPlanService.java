@@ -9,18 +9,29 @@ import java.util.UUID;
 
 public interface AdminSubscriptionPlanService {
 
-    AdminSubscriptionPlanResponse createSubscriptionPlan(SubscriptionPlanRequest subscriptionPlanEntity);
+    AdminSubscriptionPlanResponse createSubscriptionPlan(
+            SubscriptionPlanRequest subscriptionPlanEntity
+    );
 
     List<AdminSubscriptionPlanResponse> getAllSubscriptionPlans(
             AdminSubscriptionPlanFilterRequest filterRequest
     );
 
-    AdminSubscriptionPlanResponse getSubscriptionPlanById(UUID id);
+    AdminSubscriptionPlanResponse getSubscriptionPlanById(
+            UUID id
+    );
 
-    AdminSubscriptionPlanResponse updateSubscriptionPlan(UUID id, SubscriptionPlanRequest subscriptionPlanEntity);
+    AdminSubscriptionPlanResponse updateSubscriptionPlan(
+            UUID id,
+            SubscriptionPlanRequest subscriptionPlanEntity
+    );
 
-    void toggleSubscriptionPlanStatus(UUID id);
+    void toggleSubscriptionPlanStatus(
+            UUID id
+    );
 
-    String softDeleteSubscriptionPlan(UUID id);
+    String softDeleteSubscriptionPlan(
+            UUID id
+    );
 
 }

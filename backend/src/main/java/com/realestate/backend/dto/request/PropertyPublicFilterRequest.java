@@ -2,7 +2,6 @@ package com.realestate.backend.dto.request;
 
 import com.realestate.backend.enums.Currency;
 import com.realestate.backend.enums.ListingType;
-import com.realestate.backend.enums.PropertyType;
 import lombok.Getter;
 import lombok.Setter;
 

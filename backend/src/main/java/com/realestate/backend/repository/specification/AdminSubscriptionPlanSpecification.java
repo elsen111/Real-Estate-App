@@ -6,7 +6,8 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class AdminSubscriptionPlanSpecification {
 
-    public AdminSubscriptionPlanSpecification() {}
+    public AdminSubscriptionPlanSpecification() {
+    }
 
     public static Specification<SubscriptionPlanEntity> withFilter(
             AdminSubscriptionPlanFilterRequest filterRequest
@@ -23,10 +24,10 @@ public class AdminSubscriptionPlanSpecification {
     }
 
 
-
-//    HELPER METHODS
+    //    HELPER METHODS
     private static Specification<SubscriptionPlanEntity> isActive(Boolean isActive) {
-        return ((root, query, criteriaBuilder) -> isActive == null ? null : criteriaBuilder.equal(root.get("active"), isActive));
+        return ((root, query, criteriaBuilder) -> isActive == null ? null : criteriaBuilder.equal(
+                root.get("active"), isActive));
     }
 
 }

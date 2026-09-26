@@ -7,15 +7,17 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class UserSpecification {
 
-    private UserSpecification() {}
+    private UserSpecification() {
+    }
 
     public static Specification<UserEntity> withFilter(
             AdminUserFilterRequest filterRequest
     ) {
 
-        if(filterRequest == null) {
+        if (filterRequest == null) {
             Specification.where((Specification<Object>) null);
-        };
+        }
+        ;
 
         assert filterRequest != null;
         return Specification.where(hasRole(filterRequest.getRole()))
@@ -26,18 +28,19 @@ public class UserSpecification {
     }
 
 
-
-//    HELPER METHODS
+    //    HELPER METHODS
     private static Specification<UserEntity> hasRole(Object role) {
         return ((root, query, criteriaBuilder) -> role == null ? null : criteriaBuilder.equal(root.get("role"), role));
     }
 
     private static Specification<UserEntity> isEnabled(Boolean enabled) {
-        return ((root, query, criteriaBuilder) -> enabled == null ? null : criteriaBuilder.equal(root.get("enabled"), enabled));
+        return ((root, query, criteriaBuilder) -> enabled == null ? null : criteriaBuilder.equal(
+                root.get("enabled"), enabled));
     }
 
     private static Specification<UserEntity> isDeleted(Boolean deleted) {
-        return ((root, query, criteriaBuilder) -> deleted == null ? null : criteriaBuilder.equal(root.get("deleted"), deleted));
+        return ((root, query, criteriaBuilder) -> deleted == null ? null : criteriaBuilder.equal(
+                root.get("deleted"), deleted));
     }
 
     private static Specification<UserEntity> hasQuery(String keyword) {

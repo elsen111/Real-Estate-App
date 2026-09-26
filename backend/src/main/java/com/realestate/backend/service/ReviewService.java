@@ -11,16 +11,39 @@ import java.util.UUID;
 
 public interface ReviewService {
 
-    ReviewResponse createPropertyReview(UUID propertyId, ReviewRequest request, CustomUserDetails currentUser);
+    ReviewResponse createPropertyReview(
+            UUID propertyId,
+            ReviewRequest request,
+            CustomUserDetails currentUser
+    );
 
-    Page<ReviewResponse> getPropertyReviews(UUID propertyId, PublicReviewFilterRequest filter, Pageable pageable);
+    Page<ReviewResponse> getPropertyReviews(
+            UUID propertyId,
+            PublicReviewFilterRequest filter,
+            Pageable pageable
+    );
 
-    ReviewResponse createAgencyReview(UUID agencyId, ReviewRequest request, CustomUserDetails currentUser);
+    ReviewResponse createAgencyReview(
+            UUID agencyId,
+            ReviewRequest request,
+            CustomUserDetails currentUser
+    );
 
-    Page<ReviewResponse> getAgencyReviews(UUID agencyId, PublicReviewFilterRequest filter, Pageable pageable);
+    Page<ReviewResponse> getAgencyReviews(
+            UUID agencyId,
+            PublicReviewFilterRequest filter,
+            Pageable pageable
+    );
 
-    ReviewResponse updateOwnReview(UUID reviewId, ReviewRequest request, CustomUserDetails currentUser);
+    ReviewResponse updateOwnReview(
+            UUID reviewId,
+            ReviewRequest request,
+            CustomUserDetails currentUser
+    );
 
-    void deleteOwnReview(UUID reviewId, CustomUserDetails currentUser);
+    void deleteOwnReview(
+            UUID reviewId,
+            CustomUserDetails currentUser
+    );
 
 }

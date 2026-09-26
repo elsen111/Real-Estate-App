@@ -5,6 +5,9 @@ import com.realestate.backend.security.CustomUserDetails;
 
 public interface PropertyViewService {
 
-    void recordView(PropertyEntity property, CustomUserDetails viewer);
+    void recordView(
+            PropertyEntity property,
+            CustomUserDetails viewer
+    );
 
 }

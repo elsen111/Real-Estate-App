@@ -15,6 +15,9 @@ public interface AdminPropertyService {
             Pageable pageable
     );
 
-    String changePropertyStatus(UUID id, PropertyStatus status);
+    String changePropertyStatus(
+            UUID id,
+            PropertyStatus status
+    );
 
 }

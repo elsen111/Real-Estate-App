@@ -266,23 +266,20 @@ public class PaymentServiceImpl implements PaymentService {
 
         switch (webhook.type()) {
 
-            case PAYMENT_SUCCEEDED ->
-                    processSuccessfulPayment(
-                            payment,
-                            webhook
-                    );
+            case PAYMENT_SUCCEEDED -> processSuccessfulPayment(
+                    payment,
+                    webhook
+            );
 
-            case PAYMENT_FAILED ->
-                    processFailedPayment(
-                            payment,
-                            webhook
-                    );
+            case PAYMENT_FAILED -> processFailedPayment(
+                    payment,
+                    webhook
+            );
 
-            case PAYMENT_CANCELED ->
-                    processCanceledPayment(
-                            payment,
-                            webhook
-                    );
+            case PAYMENT_CANCELED -> processCanceledPayment(
+                    payment,
+                    webhook
+            );
 
             case UNSUPPORTED -> {
             }

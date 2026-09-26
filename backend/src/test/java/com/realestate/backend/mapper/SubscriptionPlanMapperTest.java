@@ -3,7 +3,6 @@ package com.realestate.backend.mapper;
 import com.realestate.backend.dto.request.SubscriptionPlanRequest;
 import com.realestate.backend.dto.response.AdminSubscriptionPlanResponse;
 import com.realestate.backend.dto.response.AgencySubscriptionResponse;
-import com.realestate.backend.dto.response.SubscriptionPlanResponse;
 import com.realestate.backend.entity.AgencySubscriptionEntity;
 import com.realestate.backend.entity.SubscriptionPlanEntity;
 import com.realestate.backend.enums.SubscriptionStatus;

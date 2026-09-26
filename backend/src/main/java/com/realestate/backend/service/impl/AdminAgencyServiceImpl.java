@@ -157,15 +157,15 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
 
         AgencyStatus previousStatus = agency.getStatus();
 
-        if(!ALLOWED_STATUSES_FOR_UPDATE.contains(newStatus)) {
+        if (!ALLOWED_STATUSES_FOR_UPDATE.contains(newStatus)) {
             throw new BadRequestException("Allowed status " + ALLOWED_STATUSES_FOR_UPDATE);
         }
 
-        if(previousStatus == newStatus) {
+        if (previousStatus == newStatus) {
             throw new ConflictException("Agency is already in status " + newStatus + ".");
         }
 
-        if(previousStatus == AgencyStatus.REJECTED) {
+        if (previousStatus == AgencyStatus.REJECTED) {
             throw new BusinessException("Cannot apply status update for rejected agency");
         }
 
@@ -213,7 +213,7 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
 
         UserEntity currentUser = securityContextService.getCurrentUser();
 
-        if(agencySubscriptionRepository.existsByAgencyIdAndStatus(id, SubscriptionStatus.ACTIVE)) {
+        if (agencySubscriptionRepository.existsByAgencyIdAndStatus(id, SubscriptionStatus.ACTIVE)) {
             throw new BusinessException("Cannot delete this agency, as it has active subscription");
         }
 
@@ -223,7 +223,7 @@ public class AdminAgencyServiceImpl implements AdminAgencyService {
             member.setRemovedBy(currentUser);
             member.getUser().setAgency(null);
             member.getUser().getRoles().removeIf(role -> role.getRoleName() == Role.AGENT
-                                        || role.getRoleName() == Role.AGENCY_OWNER
+                    || role.getRoleName() == Role.AGENCY_OWNER
             );
         });
 

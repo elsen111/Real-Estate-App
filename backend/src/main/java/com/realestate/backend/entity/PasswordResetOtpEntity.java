@@ -40,5 +40,4 @@ public class PasswordResetOtpEntity {
     private LocalDateTime createdAt;
 
 
-
 }

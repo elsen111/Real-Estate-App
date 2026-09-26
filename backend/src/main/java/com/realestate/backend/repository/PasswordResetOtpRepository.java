@@ -19,11 +19,17 @@ public interface PasswordResetOtpRepository extends JpaRepository<PasswordResetO
             String otp
     );
 
-    List<PasswordResetOtpEntity> findByUser(UserEntity user);
+    List<PasswordResetOtpEntity> findByUser(
+            UserEntity user
+    );
 
-    void deleteByUser(UserEntity user);
+    void deleteByUser(
+            UserEntity user
+    );
 
     Optional<PasswordResetOtpEntity>
-    findTopByUserAndUsedFalseOrderByCreatedAtDesc(UserEntity user);
+    findTopByUserAndUsedFalseOrderByCreatedAtDesc(
+            UserEntity user
+    );
 
 }

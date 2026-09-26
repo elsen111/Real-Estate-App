@@ -15,10 +15,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @EnableMethodSecurity
 @EnableScheduling
 @EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
-@EnableConfigurationProperties({
-        MinioProperties.class,
-        StripeProperties.class
-})
+@EnableConfigurationProperties(
+        {
+                MinioProperties.class,
+                StripeProperties.class
+        }
+)
 public class BackendApplication {
     public static void main(String[] args) {
         SpringApplication.run(BackendApplication.class, args);

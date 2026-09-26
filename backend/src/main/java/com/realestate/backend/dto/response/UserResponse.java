@@ -16,20 +16,22 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "id",
-        "fullName",
-        "email",
-        "phoneNumber",
-        "avatarUrl",
-        "agency",
-        "position",
-        "roles",
-        "enabled",
-        "deleted",
-        "emailVerified",
-        "createdAt"
-})
+@JsonPropertyOrder(
+        {
+                "id",
+                "fullName",
+                "email",
+                "phoneNumber",
+                "avatarUrl",
+                "agency",
+                "position",
+                "roles",
+                "enabled",
+                "deleted",
+                "emailVerified",
+                "createdAt"
+        }
+)
 public class UserResponse {
 
     UUID id;

@@ -41,7 +41,7 @@ public class AgencyOwnerMapperTest {
 
     }
 
-//    HELPER
+    //    HELPER
     private UserEntity createAgencyOwner() {
 
         MediaFileEntity mediaFile = new MediaFileEntity();

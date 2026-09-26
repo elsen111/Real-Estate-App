@@ -131,9 +131,9 @@ public class RefreshTokenServiceImpl {
         List<RefreshTokenEntity> tokens = refreshTokenRepository.findAllByUser_IdAndRevokedFalse(userId);
 
         tokens.forEach(token -> {
-                    token.revoke(null);
-                    refreshTokenRepository.save(token);
-                });
+            token.revoke(null);
+            refreshTokenRepository.save(token);
+        });
 
         log.atInfo()
                 .setMessage("Refresh tokens revoked for user")

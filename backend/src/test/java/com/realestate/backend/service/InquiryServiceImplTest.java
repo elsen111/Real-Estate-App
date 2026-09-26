@@ -19,7 +19,6 @@ import com.realestate.backend.security.CustomUserDetails;
 import com.realestate.backend.service.impl.InquiryServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;

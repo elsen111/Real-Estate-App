@@ -53,8 +53,10 @@ class StripePaymentGatewayTest {
 
     private final StripePaymentGateway gateway = new StripePaymentGateway(properties);
 
-    @Captor private ArgumentCaptor<Map<String, Object>> paramsCaptor;
-    @Captor private ArgumentCaptor<RequestOptions> optionsCaptor;
+    @Captor
+    private ArgumentCaptor<Map<String, Object>> paramsCaptor;
+    @Captor
+    private ArgumentCaptor<RequestOptions> optionsCaptor;
 
     private AgencyEntity agency;
     private SubscriptionPlanEntity plan;
@@ -166,8 +168,10 @@ class StripePaymentGatewayTest {
             stripeSession.when(() -> Session.create(anyMap(), any(RequestOptions.class)))
                     .thenThrow(new ApiConnectionException("Stripe unreachable"));
 
-            PaymentProcessingException exception = assertThrows(PaymentProcessingException.class,
-                    () -> gateway.createCheckout(payment, agency, plan));
+            PaymentProcessingException exception = assertThrows(
+                    PaymentProcessingException.class,
+                    () -> gateway.createCheckout(payment, agency, plan)
+            );
 
             assertEquals("Failed to create Stripe checkout session.", exception.getMessage());
         }
@@ -177,8 +181,10 @@ class StripePaymentGatewayTest {
     void createCheckout_shouldRejectAmountWithMoreThanTwoDecimals() {
         payment.setAmount(new BigDecimal("50.001"));
 
-        assertThrows(PaymentProcessingException.class,
-                () -> gateway.createCheckout(payment, agency, plan));
+        assertThrows(
+                PaymentProcessingException.class,
+                () -> gateway.createCheckout(payment, agency, plan)
+        );
     }
 
     // ------------------------------------------------------------------
@@ -213,10 +219,12 @@ class StripePaymentGatewayTest {
 
     @Test
     void parseWebhook_shouldParseFailedPaymentIntentAsFailed() throws Exception {
-        String payload = event("payment_intent.payment_failed", """
-                {"id":"pi_test_123","object":"payment_intent","amount":5000,"currency":"usd",
-                 "metadata":{"paymentId":"%s"}}
-                """.formatted(PAYMENT_ID));
+        String payload = event(
+                "payment_intent.payment_failed", """
+                        {"id":"pi_test_123","object":"payment_intent","amount":5000,"currency":"usd",
+                         "metadata":{"paymentId":"%s"}}
+                        """.formatted(PAYMENT_ID)
+        );
 
         PaymentWebhookData data = gateway.parseWebhook(payload, signatureFor(payload));
 
@@ -240,9 +248,11 @@ class StripePaymentGatewayTest {
 
     @Test
     void parseWebhook_shouldMarkUnknownEventsAsUnsupported() throws Exception {
-        String payload = event("customer.created", """
-                {"id":"cus_123","object":"customer"}
-                """);
+        String payload = event(
+                "customer.created", """
+                        {"id":"cus_123","object":"customer"}
+                        """
+        );
 
         PaymentWebhookData data = gateway.parseWebhook(payload, signatureFor(payload));
 
@@ -255,16 +265,20 @@ class StripePaymentGatewayTest {
     void parseWebhook_shouldRejectInvalidSignature() {
         String payload = event("checkout.session.completed", sessionJson(PAYMENT_ID.toString()));
 
-        assertThrows(BadRequestException.class,
-                () -> gateway.parseWebhook(payload, "t=" + Instant.now().getEpochSecond() + ",v1=deadbeef"));
+        assertThrows(
+                BadRequestException.class,
+                () -> gateway.parseWebhook(payload, "t=" + Instant.now().getEpochSecond() + ",v1=deadbeef")
+        );
     }
 
     @Test
     void parseWebhook_shouldRejectMalformedPayload() throws Exception {
         String payload = "{ not json";
 
-        assertThrows(BadRequestException.class,
-                () -> gateway.parseWebhook(payload, signatureFor(payload)));
+        assertThrows(
+                BadRequestException.class,
+                () -> gateway.parseWebhook(payload, signatureFor(payload))
+        );
     }
 
     @Test
@@ -275,27 +289,35 @@ class StripePaymentGatewayTest {
                  "data":{"object":%s}}
                 """.formatted(sessionJson(PAYMENT_ID.toString()));
 
-        assertThrows(BadRequestException.class,
-                () -> gateway.parseWebhook(payload, signatureFor(payload)));
+        assertThrows(
+                BadRequestException.class,
+                () -> gateway.parseWebhook(payload, signatureFor(payload))
+        );
     }
 
     @Test
     void parseWebhook_shouldRejectMissingPaymentIdMetadata() throws Exception {
-        String payload = event("checkout.session.completed", """
-                {"id":"cs_test_123","object":"checkout.session","payment_intent":"pi_test_123",
-                 "amount_total":5000,"currency":"usd","payment_status":"paid","metadata":{}}
-                """);
+        String payload = event(
+                "checkout.session.completed", """
+                        {"id":"cs_test_123","object":"checkout.session","payment_intent":"pi_test_123",
+                         "amount_total":5000,"currency":"usd","payment_status":"paid","metadata":{}}
+                        """
+        );
 
-        assertThrows(BadRequestException.class,
-                () -> gateway.parseWebhook(payload, signatureFor(payload)));
+        assertThrows(
+                BadRequestException.class,
+                () -> gateway.parseWebhook(payload, signatureFor(payload))
+        );
     }
 
     @Test
     void parseWebhook_shouldRejectInvalidPaymentIdMetadata() throws Exception {
         String payload = event("checkout.session.completed", sessionJson("not-a-uuid"));
 
-        assertThrows(BadRequestException.class,
-                () -> gateway.parseWebhook(payload, signatureFor(payload)));
+        assertThrows(
+                BadRequestException.class,
+                () -> gateway.parseWebhook(payload, signatureFor(payload))
+        );
     }
 
     // ------------------------------------------------------------------

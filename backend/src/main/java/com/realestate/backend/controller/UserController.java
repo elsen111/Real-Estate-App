@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserController {
 
-    private  final UserService userService;
+    private final UserService userService;
 
     @PreAuthorize("isAuthenticated()")
     @PatchMapping("/me/profile")
@@ -32,7 +32,7 @@ public class UserController {
     public ResponseEntity<ApiResponse<AuthUserResponse>> updateProfile(
             @Valid @RequestBody UpdateProfileRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUser
-            ) {
+    ) {
 
         AuthUserResponse response = userService.updateProfile(request, currentUser);
 
@@ -76,15 +76,15 @@ public class UserController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
-                "Profile photo uploaded successfully",
-                userService.uploadProfilePhoto(file, currentUser)
+                        "Profile photo uploaded successfully",
+                        userService.uploadProfilePhoto(file, currentUser)
                 )
         );
 
     }
 
     @PreAuthorize("isAuthenticated()")
-    @DeleteMapping( "/me/photo")
+    @DeleteMapping("/me/photo")
     @Operation(summary = "Remove profile photo")
     public ResponseEntity<ApiResponse<Void>> removeProfilePhoto(
             @AuthenticationPrincipal CustomUserDetails currentUser

@@ -11,21 +11,23 @@ import java.util.UUID;
 
 @Getter
 @Builder
-@JsonPropertyOrder({
-        "id",
-        "status",
-        "message",
-        "preferredContactMethod",
-        "propertyId",
-        "propertyTitle",
-        "clientId",
-        "clientPhone",
-        "clientEmail",
-        "clientFullName",
-        "agencyId",
-        "assignedAgentId",
-        "createdAt"
-})
+@JsonPropertyOrder(
+        {
+                "id",
+                "status",
+                "message",
+                "preferredContactMethod",
+                "propertyId",
+                "propertyTitle",
+                "clientId",
+                "clientPhone",
+                "clientEmail",
+                "clientFullName",
+                "agencyId",
+                "assignedAgentId",
+                "createdAt"
+        }
+)
 public class InquiryResponse {
 
     private UUID id;

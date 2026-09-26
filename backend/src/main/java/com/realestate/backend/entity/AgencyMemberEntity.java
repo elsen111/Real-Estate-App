@@ -29,55 +29,55 @@ import java.util.UUID;
 @Builder
 public class AgencyMemberEntity {
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.UUID)
-        @Column(name = "id", nullable = false, updatable = false)
-        private UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false, updatable = false)
+    private UUID id;
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(
-                name = "agency_id",
-                nullable = false,
-                foreignKey = @ForeignKey(name = "fk_agency_members_agency_id")
-        )
-        private AgencyEntity agency;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "agency_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_agency_members_agency_id")
+    )
+    private AgencyEntity agency;
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(
-                name = "user_id",
-                nullable = false,
-                foreignKey = @ForeignKey(name = "fk_agency_members_user_id")
-        )
-        private UserEntity user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "user_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_agency_members_user_id")
+    )
+    private UserEntity user;
 
-        @Builder.Default
-        @Column(name = "active", nullable = false)
-        private boolean active = true;
+    @Builder.Default
+    @Column(name = "active", nullable = false)
+    private boolean active = true;
 
-        @Enumerated(EnumType.STRING)
-        @Column(nullable = false, length = 30)
-        private Role role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private Role role;
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(
-                name = "added_by",
-                foreignKey = @ForeignKey(name = "fk_agency_members_added_by")
-        )
-        private UserEntity addedBy;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "added_by",
+            foreignKey = @ForeignKey(name = "fk_agency_members_added_by")
+    )
+    private UserEntity addedBy;
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(
-                name = "removed_by",
-                foreignKey = @ForeignKey(name = "fk_agency_members_removed_by")
-        )
-        private UserEntity removedBy;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "removed_by",
+            foreignKey = @ForeignKey(name = "fk_agency_members_removed_by")
+    )
+    private UserEntity removedBy;
 
-        @CreationTimestamp
-        @Column(name = "created_at", nullable = false, updatable = false)
-        private LocalDateTime createdAt;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-        @UpdateTimestamp
-        @Column(name = "updated_at", nullable = false)
-        private LocalDateTime updatedAt;
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 
 }

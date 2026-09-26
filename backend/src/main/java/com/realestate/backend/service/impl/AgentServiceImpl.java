@@ -65,7 +65,8 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<PropertyResponse> getPublicAgentProperties(UUID userId, PropertyFilterRequest filter, Pageable pageable) {
+    public Page<PropertyResponse> getPublicAgentProperties(
+            UUID userId, PropertyFilterRequest filter, Pageable pageable) {
 
         userRepository.findAgentMemberByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Agent not found with user id: " + userId));
@@ -136,7 +137,7 @@ public class AgentServiceImpl implements AgentService {
                 .setMessage("Agent has been removed from agency.")
                 .addKeyValue("agentId", agent.getId())
                 .addKeyValue("agentEmail", agent.getEmail())
-                .addKeyValue("agencyId",agency.getId())
+                .addKeyValue("agencyId", agency.getId())
                 .addKeyValue("agencyName", agency.getName())
                 .log();
 

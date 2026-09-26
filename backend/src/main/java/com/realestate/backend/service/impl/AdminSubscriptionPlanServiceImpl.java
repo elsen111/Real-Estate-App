@@ -33,7 +33,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
     private final SubscriptionPlanRepository subscriptionPlanRepository;
     private final SubscriptionPlanMapper subscriptionPlanMapper;
 
-    private final AgencySubscriptionRepository  agencySubscriptionRepository;
+    private final AgencySubscriptionRepository agencySubscriptionRepository;
 
     @Override
     @Transactional
@@ -51,7 +51,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
                 .addKeyValue("subscriptionTitle", subscriptionPlanEntity.getName())
                 .log();
 
-        return  subscriptionPlanMapper.toAdminSubscriptionPlanResponse(subscriptionPlanEntity);
+        return subscriptionPlanMapper.toAdminSubscriptionPlanResponse(subscriptionPlanEntity);
 
     }
 
@@ -61,7 +61,8 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
 
         Specification<SubscriptionPlanEntity> specification = AdminSubscriptionPlanSpecification.withFilter(filter);
 
-        return subscriptionPlanRepository.findAll(specification).stream().map(subscriptionPlanMapper::toAdminSubscriptionPlanResponse).toList();
+        return subscriptionPlanRepository.findAll(specification).stream()
+                .map(subscriptionPlanMapper::toAdminSubscriptionPlanResponse).toList();
 
     }
 
@@ -70,7 +71,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
     public AdminSubscriptionPlanResponse getSubscriptionPlanById(UUID id) {
         SubscriptionPlanEntity subscriptionPlan = subscriptionPlanRepository.findById(id)
                 .orElseThrow(() ->
-                    new ResourceNotFoundException("Subscription plan not found with id: " + id)
+                        new ResourceNotFoundException("Subscription plan not found with id: " + id)
                 );
 
         return subscriptionPlanMapper.toAdminSubscriptionPlanResponse(subscriptionPlan);
@@ -132,7 +133,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
     @Transactional
     public String softDeleteSubscriptionPlan(UUID id) {
 
-        SubscriptionPlanEntity subscriptionPlan =  subscriptionPlanRepository.findById(id)
+        SubscriptionPlanEntity subscriptionPlan = subscriptionPlanRepository.findById(id)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Subscription plan not found with id: " + id)
                 );
@@ -156,8 +157,7 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
     }
 
 
-
-//    HELPER METHODS
+    //    HELPER METHODS
     private void validatePlanName(String name, UUID planId) {
 
         String trimmedName = name.trim();
@@ -183,9 +183,10 @@ public class AdminSubscriptionPlanServiceImpl implements AdminSubscriptionPlanSe
 
     private void validatePlanUsage(UUID planId) {
 
-        boolean usedByAnyAgency = agencySubscriptionRepository.existsByPlanIdAndStatus(planId, SubscriptionStatus.ACTIVE);
+        boolean usedByAnyAgency = agencySubscriptionRepository.existsByPlanIdAndStatus(
+                planId, SubscriptionStatus.ACTIVE);
 
-        if(usedByAnyAgency) {
+        if (usedByAnyAgency) {
             log.atWarn()
                     .setMessage("Plan already in use by agency(ies).")
                     .addKeyValue("planId", planId)

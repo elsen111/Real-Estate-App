@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    private  final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     private final RefreshTokenRepository refreshTokenRepository;
 
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
                 currentUser.getEmail()
         ).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if(!passwordEncoder.matches(
+        if (!passwordEncoder.matches(
                 request.getPassword(),
                 user.getPasswordHash()
         )) {
@@ -107,7 +107,7 @@ public class UserServiceImpl implements UserService {
                 currentUser.getEmail()
         ).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if(!passwordEncoder.matches(
+        if (!passwordEncoder.matches(
                 request.getPassword(),
                 user.getPasswordHash()
         )) {
@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService {
             );
         }
 
-        if(!user.getEnabled()) {
+        if (!user.getEnabled()) {
             throw new AccountStateException("Account is already disabled.");
         }
 
@@ -137,7 +137,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserEntity enableAccount(AccountReactivationRequest request) {
 
-        String email = request.getEmail() == null ? null : request.getEmail().trim().toLowerCase();;
+        String email = request.getEmail() == null ? null : request.getEmail().trim().toLowerCase();
+        ;
 
         UserEntity user = userRepository
                 .findByEmailAndDeletedFalse(email)
@@ -235,8 +236,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-
-//    HELPER METHODS
+    //    HELPER METHODS
     private void updatePhoneNumber(
             UserEntity user,
             UpdateProfileRequest request
@@ -261,11 +261,11 @@ public class UserServiceImpl implements UserService {
                 .trim()
                 .toLowerCase();
 
-        if(email.equals(user.getEmail())) {
+        if (email.equals(user.getEmail())) {
             return;
         }
 
-        if(userRepository.existsByEmail(email)) {
+        if (userRepository.existsByEmail(email)) {
             throw new ConflictException(
                     "User already exists with the email: " + email
             );
@@ -280,7 +280,7 @@ public class UserServiceImpl implements UserService {
             UpdateProfileRequest request
     ) {
 
-        if(request.getFullName() != null) {
+        if (request.getFullName() != null) {
             user.setFullName(request.getFullName().trim());
         }
 

@@ -13,18 +13,44 @@ import java.util.UUID;
 
 public interface AppointmentService {
 
-    AppointmentResponse createAppointment(UUID propertyId, CreateAppointmentRequest request, CustomUserDetails currentUser);
+    AppointmentResponse createAppointment(
+            UUID propertyId,
+            CreateAppointmentRequest request,
+            CustomUserDetails currentUser
+    );
 
-    Page<AppointmentResponse> getClientAppointments(CustomUserDetails currentUser, AppointmentStatus status, Pageable pageable);
+    Page<AppointmentResponse> getClientAppointments(
+            CustomUserDetails currentUser,
+            AppointmentStatus status,
+            Pageable pageable
+    );
 
-    AppointmentResponse getAppointmentById(CustomUserDetails currentUser, UUID appointmentId);
+    AppointmentResponse getAppointmentById(
+            CustomUserDetails currentUser,
+            UUID appointmentId
+    );
 
-    void cancelAppointment(UUID appointmentId, CustomUserDetails currentUser);
+    void cancelAppointment(
+            UUID appointmentId,
+            CustomUserDetails currentUser
+    );
 
-    Page<AppointmentResponse> getMyAgencyAppointments(CustomUserDetails currentUser, AppointmentStatus status, UUID propertyId, Pageable pageable);
+    Page<AppointmentResponse> getMyAgencyAppointments(
+            CustomUserDetails currentUser,
+            AppointmentStatus status,
+            UUID propertyId,
+            Pageable pageable
+    );
 
-    AppointmentResponse updateStatus(CustomUserDetails currentUser, UUID inquiryId, UpdateAppointmentStatusRequest request);
+    AppointmentResponse updateStatus(
+            CustomUserDetails currentUser,
+            UUID inquiryId,
+            UpdateAppointmentStatusRequest request
+    );
 
-    Page<AppointmentResponse> getAllAppointments(AppointmentFilterRequest filter, Pageable pageable);
+    Page<AppointmentResponse> getAllAppointments(
+            AppointmentFilterRequest filter,
+            Pageable pageable
+    );
 
 }

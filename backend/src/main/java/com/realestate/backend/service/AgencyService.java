@@ -30,7 +30,9 @@ public interface AgencyService {
             UpdateAgencyRequest request
     );
 
-    AgencySubscriptionResponse getMySubscription(CustomUserDetails currentUser);
+    AgencySubscriptionResponse getMySubscription(
+            CustomUserDetails currentUser
+    );
 
     Page<PropertyResponse> getMyAgencyProperties(
             CustomUserDetails currentUser,
@@ -43,16 +45,18 @@ public interface AgencyService {
             Pageable pageable
     );
 
-    AgencyResponse getPublicAgencyInfo(UUID agencyId);
+    AgencyResponse getPublicAgencyInfo(
+            UUID agencyId
+    );
 
     Page<PropertyResponse> getAgencyProperties(
-            UUID  agencyId,
+            UUID agencyId,
             PropertyFilterRequest filter,
             Pageable pageable
     );
 
     Page<AgencyMemberResponse> getAgencyAgents(
-            UUID  agencyId,
+            UUID agencyId,
             AgencyAgentFilterRequest filterRequest,
             Pageable pageable
     );
@@ -62,6 +66,8 @@ public interface AgencyService {
             CustomUserDetails currentUser
     );
 
-    void removeAgencyLogo(CustomUserDetails currentUser);
+    void removeAgencyLogo(
+            CustomUserDetails currentUser
+    );
 
 }

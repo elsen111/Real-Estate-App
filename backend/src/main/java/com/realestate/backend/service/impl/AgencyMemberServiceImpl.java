@@ -134,8 +134,10 @@ public class AgencyMemberServiceImpl implements AgencyMemberService {
                 )
                 .orElseThrow(() -> new ForbiddenException("You are not a member of this agency"));
 
-        if (!hasAnyRole(member.getUser(),
-                Set.of(Role.AGENCY_OWNER))) {
+        if (!hasAnyRole(
+                member.getUser(),
+                Set.of(Role.AGENCY_OWNER)
+        )) {
 
             throw new ForbiddenException(
                     "Only agency owners can assign agents"

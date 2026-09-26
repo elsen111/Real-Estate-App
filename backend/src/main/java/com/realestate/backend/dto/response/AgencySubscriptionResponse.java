@@ -13,22 +13,24 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-@JsonPropertyOrder({
-        "id",
-        "planId",
-        "planName",
-        "subscriptionStatus",
-        "startDate",
-        "endDate",
-        "durationDays",
-        "price",
-        "maxListings",
-        "usedListings",
-        "remainingListings",
-        "maxAgents",
-        "usedAgents",
-        "remainingAgents"
-})
+@JsonPropertyOrder(
+        {
+                "id",
+                "planId",
+                "planName",
+                "subscriptionStatus",
+                "startDate",
+                "endDate",
+                "durationDays",
+                "price",
+                "maxListings",
+                "usedListings",
+                "remainingListings",
+                "maxAgents",
+                "usedAgents",
+                "remainingAgents"
+        }
+)
 public class AgencySubscriptionResponse {
 
     private UUID id;

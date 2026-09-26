@@ -12,19 +12,21 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonPropertyOrder({
-        "id",
-        "name",
-        "description",
-        "price",
-        "durationDays",
-        "maxListings",
-        "maximumAgents",
-        "featuredListingsAllowed",
-        "active",
-        "createdAt",
-        "updatedAt"
-})
+@JsonPropertyOrder(
+        {
+                "id",
+                "name",
+                "description",
+                "price",
+                "durationDays",
+                "maxListings",
+                "maximumAgents",
+                "featuredListingsAllowed",
+                "active",
+                "createdAt",
+                "updatedAt"
+        }
+)
 public class AdminSubscriptionPlanResponse {
 
     private UUID id;

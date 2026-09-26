@@ -159,8 +159,7 @@ public class AuthServiceImpl implements AuthService {
             throw new UnauthorizedException(
                     "This user profile is not active. Please contact support or restore your account."
             );
-        }
-        catch (BadCredentialsException ex) {
+        } catch (BadCredentialsException ex) {
             throw new UnauthorizedException("Invalid email or password");
         }
 
@@ -176,7 +175,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElse(null);
         AgencyEntity agency = membership != null ? membership.getAgency() : null;
 
-        if(agency != null && agency.getStatus() != AgencyStatus.APPROVED) {
+        if (agency != null && agency.getStatus() != AgencyStatus.APPROVED) {
             throw new ForbiddenException(
                     "Your agency is not approved yet. Please try again after approval."
             );
@@ -268,7 +267,7 @@ public class AuthServiceImpl implements AuthService {
                         () -> new ResourceNotFoundException("User not found. ")
                 );
 
-        if(!request.getNewPassword().equals(request.getConfirmNewPassword())) {
+        if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
             throw new BadRequestException("Passwords don't match.");
         }
 
@@ -277,7 +276,7 @@ public class AuthServiceImpl implements AuthService {
                 currentUser.getPassword()
         );
 
-        if(!isCurrentPasswordMatching) {
+        if (!isCurrentPasswordMatching) {
             throw new BadRequestException("Current password is wrong.");
         }
 

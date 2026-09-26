@@ -12,22 +12,42 @@ import java.util.UUID;
 
 public interface PropertyService {
 
-    PropertyResponse createProperty(PropertyRequest createdProperty, CustomUserDetails currentUser);
+    PropertyResponse createProperty(
+            PropertyRequest createdProperty,
+            CustomUserDetails currentUser
+    );
 
     Page<PropertyResponse> getAllPublicProperties(
             PropertyPublicFilterRequest filter,
             Pageable pageable
     );
 
-    PropertyDetailResponse getPropertyDetailsById(UUID propertyId, CustomUserDetails currentUser);
+    PropertyDetailResponse getPropertyDetailsById(
+            UUID propertyId,
+            CustomUserDetails currentUser
+    );
 
-    PropertyResponse updateProperty(UUID propertyId, PropertyRequest updatedProperty, CustomUserDetails currentUser);
+    PropertyResponse updateProperty(
+            UUID propertyId,
+            PropertyRequest updatedProperty,
+            CustomUserDetails currentUser
+    );
 
-    void updateStatus(UUID propertyId, PropertyStatusRequest request, CustomUserDetails currentUser);
+    void updateStatus(
+            UUID propertyId,
+            PropertyStatusRequest request,
+            CustomUserDetails currentUser
+    );
 
-    PropertyResponse toggleFeaturedProperty(UUID propertyId, CustomUserDetails currentUser);
+    PropertyResponse toggleFeaturedProperty(
+            UUID propertyId,
+            CustomUserDetails currentUser
+    );
 
-    void softDeleteProperty(UUID propertyId, CustomUserDetails currentUser);
+    void softDeleteProperty(
+            UUID propertyId,
+            CustomUserDetails currentUser
+    );
 
     Page<PropertyResponse> getFeaturedProperties(
             PropertyPublicFilterRequest filter,
@@ -44,9 +64,14 @@ public interface PropertyService {
             Pageable pageable
     );
 
-    PropertySearchSuggestionResponse getSearchSuggestions(String keyword);
+    PropertySearchSuggestionResponse getSearchSuggestions(
+            String keyword
+    );
 
-    Page<PropertyMapResponse> getMapProperties(PropertyMapFilterRequest request, Pageable pageable);
+    Page<PropertyMapResponse> getMapProperties(
+            PropertyMapFilterRequest request,
+            Pageable pageable
+    );
 
     List<PropertyMediaResponse> uploadMedia(
             UUID propertyId,
@@ -54,14 +79,29 @@ public interface PropertyService {
             CustomUserDetails currentUser
     );
 
-    List<PropertyMediaResponse> getPropertyMedia(UUID propertyId);
+    List<PropertyMediaResponse> getPropertyMedia(
+            UUID propertyId
+    );
 
-    List<SetPropertyMediaResponse> setPrimaryImage(UUID propertyId, UUID propertyMediaId, CustomUserDetails currentUser);
+    List<SetPropertyMediaResponse> setPrimaryImage(
+            UUID propertyId,
+            UUID propertyMediaId,
+            CustomUserDetails currentUser
+    );
 
-    void removePropertyMediaFile(CustomUserDetails currentUser, UUID propertyMediaId);
+    void removePropertyMediaFile(
+            CustomUserDetails currentUser,
+            UUID propertyMediaId
+    );
 
-    void assignAgentToProperty(UUID propertyId, AssignAgentToPropertyRequest request, CustomUserDetails currentUser);
+    void assignAgentToProperty(
+            UUID propertyId,
+            AssignAgentToPropertyRequest request,
+            CustomUserDetails currentUser
+    );
 
-    Page<PropertyResponse> getPopularProperties(Pageable pageable);
+    Page<PropertyResponse> getPopularProperties(
+            Pageable pageable
+    );
 
 }

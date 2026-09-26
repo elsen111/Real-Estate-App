@@ -26,11 +26,15 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceImplTest {
 
-    @Mock private CategoryRepository categoryRepository;
-    @Mock private CategoryMapper categoryMapper;
-    @Mock private PropertyRepository propertyRepository;
+    @Mock
+    private CategoryRepository categoryRepository;
+    @Mock
+    private CategoryMapper categoryMapper;
+    @Mock
+    private PropertyRepository propertyRepository;
 
-    @InjectMocks private CategoryServiceImpl service;
+    @InjectMocks
+    private CategoryServiceImpl service;
 
     @Test
     void createCategory_throws_whenNameAlreadyExists() {

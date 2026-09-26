@@ -259,11 +259,13 @@ public class GlobalExceptionHandler {
         return error(ex.getMessage(), HttpStatus.BAD_REQUEST, request);
     }
 
-    @ExceptionHandler({
-            UnauthorizedException.class,
-            BadCredentialsException.class,
-            UsernameNotFoundException.class
-    })
+    @ExceptionHandler(
+            {
+                    UnauthorizedException.class,
+                    BadCredentialsException.class,
+                    UsernameNotFoundException.class
+            }
+    )
     public ResponseEntity<ErrorResponse> handleUnauthorizedException(
             RuntimeException ex,
             HttpServletRequest request

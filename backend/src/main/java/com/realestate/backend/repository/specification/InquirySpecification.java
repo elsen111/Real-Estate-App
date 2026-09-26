@@ -2,10 +2,8 @@ package com.realestate.backend.repository.specification;
 
 import com.realestate.backend.dto.request.InquiryFilterRequest;
 import com.realestate.backend.entity.InquiryEntity;
-import com.realestate.backend.entity.ReviewEntity;
 import com.realestate.backend.enums.InquiryStatus;
 import com.realestate.backend.enums.InquiryType;
-import com.realestate.backend.enums.ReviewStatus;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Root;
@@ -16,16 +14,18 @@ import java.util.UUID;
 
 public class InquirySpecification {
 
-    public InquirySpecification() {}
+    public InquirySpecification() {
+    }
 
     public static Specification<InquiryEntity> withAgencyIdFilterForAdmin(
             UUID agencyId,
             InquiryFilterRequest filterRequest
     ) {
 
-        if(filterRequest == null) {
+        if (filterRequest == null) {
             Specification.where((Specification<Object>) null);
-        };
+        }
+        ;
 
         assert filterRequest != null;
 
@@ -58,34 +58,36 @@ public class InquirySpecification {
                     .and(hasPropertyId(filterRequest.propertyId()))
                     .and(hasPropertyTitle(filterRequest.propertyTitle()))
                     .and(hasContactMethod(filterRequest.contact()))
-                    .and(createTimeBetween(filterRequest.startDate(), filterRequest.endDate()));;
+                    .and(createTimeBetween(filterRequest.startDate(), filterRequest.endDate()));
+            ;
         }
 
         return spec;
 
     }
 
-//    HELPER METHODS
+    //    HELPER METHODS
     public static Specification<InquiryEntity> hasStatus(InquiryStatus status) {
         return (root, criteriaQuery, criteriaBuilder) ->
                 status == null ? null
-                : criteriaBuilder.equal(root.get("status"), status
-        );
+                        : criteriaBuilder.equal(root.get("status"), status
+                );
     }
 
     public static Specification<InquiryEntity> hasAgencyId(UUID agencyId) {
 
-                return((root, query, criteriaBuilder) ->
+        return ((root, query, criteriaBuilder) ->
                 agencyId == null ? null
-                : criteriaBuilder.equal(root.join("agency").get("id"), agencyId)
-                );
+                        : criteriaBuilder.equal(root.join("agency").get("id"), agencyId)
+        );
 
     }
 
     public static Specification<InquiryEntity> hasAgentId(UUID agentId) {
 
         return (root, query, cb) -> {
-            if (agentId == null) return null;
+            if (agentId == null)
+                return null;
             Join<InquiryEntity, ?> agentJoin = getOrCreateJoin(root, "assignedAgent");
             return cb.equal(agentJoin.get("id"), agentId);
         };
@@ -94,7 +96,8 @@ public class InquirySpecification {
     public static Specification<InquiryEntity> hasAgentName(String agentName) {
 
         return (root, query, cb) -> {
-            if (agentName == null || agentName.isBlank()) return null;
+            if (agentName == null || agentName.isBlank())
+                return null;
             Join<InquiryEntity, ?> agentJoin = getOrCreateJoin(root, "assignedAgent");
             return cb.like(cb.lower(agentJoin.get("fullName")), "%" + agentName.trim().toLowerCase() + "%");
         };
@@ -104,7 +107,8 @@ public class InquirySpecification {
     public static Specification<InquiryEntity> hasClientId(UUID clientId) {
 
         return (root, query, cb) -> {
-            if (clientId == null) return null;
+            if (clientId == null)
+                return null;
             Join<InquiryEntity, ?> agentJoin = getOrCreateJoin(root, "client");
             return cb.equal(agentJoin.get("id"), clientId);
         };
@@ -113,7 +117,8 @@ public class InquirySpecification {
     public static Specification<InquiryEntity> hasClientEmail(String clientEmail) {
 
         return (root, query, cb) -> {
-            if (clientEmail == null || clientEmail.isBlank()) return null;
+            if (clientEmail == null || clientEmail.isBlank())
+                return null;
             Join<InquiryEntity, ?> agentJoin = getOrCreateJoin(root, "client");
             return cb.equal(root.join("client").get("email"), clientEmail);
         };
@@ -122,7 +127,8 @@ public class InquirySpecification {
 
     public static Specification<InquiryEntity> hasClientName(String clientName) {
         return (root, query, cb) -> {
-            if (clientName == null || clientName.isBlank()) return null;
+            if (clientName == null || clientName.isBlank())
+                return null;
             Join<InquiryEntity, ?> clientJoin = getOrCreateJoin(root, "client");
             return cb.like(cb.lower(clientJoin.get("fullName")), "%" + clientName.trim().toLowerCase() + "%");
         };
@@ -130,7 +136,8 @@ public class InquirySpecification {
 
     public static Specification<InquiryEntity> hasPropertyId(UUID propertyId) {
         return (root, query, cb) -> {
-            if (propertyId == null) return null;
+            if (propertyId == null)
+                return null;
             Join<InquiryEntity, ?> propertyJoin = getOrCreateJoin(root, "property");
             return cb.equal(propertyJoin.get("id"), propertyId);
         };
@@ -138,7 +145,8 @@ public class InquirySpecification {
 
     public static Specification<InquiryEntity> hasPropertyTitle(String propertyTitle) {
         return (root, query, cb) -> {
-            if (propertyTitle == null || propertyTitle.isBlank()) return null;
+            if (propertyTitle == null || propertyTitle.isBlank())
+                return null;
             Join<InquiryEntity, ?> propertyJoin = getOrCreateJoin(root, "property");
             return cb.like(cb.lower(propertyJoin.get("title")), "%" + propertyTitle.trim().toLowerCase() + "%");
         };
@@ -148,10 +156,10 @@ public class InquirySpecification {
     public static Specification<InquiryEntity> hasContactMethod(InquiryType contact) {
         return (
                 ((root, query, criteriaBuilder) ->
-                        contact == null ?  null
-                        : criteriaBuilder.equal(root.get("preferredContactMethod"), contact)
-                        )
-                );
+                        contact == null ? null
+                                : criteriaBuilder.equal(root.get("preferredContactMethod"), contact)
+                )
+        );
     }
 
     private static Specification<InquiryEntity> createTimeBetween(LocalDateTime startDate, LocalDateTime endDate) {

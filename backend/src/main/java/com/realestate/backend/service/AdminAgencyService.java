@@ -17,20 +17,39 @@ public interface AdminAgencyService {
             Pageable pageable
     );
 
-    AdminAgencyResponse getAgencyById(UUID id);
+    AdminAgencyResponse getAgencyById(
+            UUID id
+    );
 
-    AdminAgencyResponse updateAgency(UUID agencyId, UpdateAgencyRequest request);
+    AdminAgencyResponse updateAgency(
+            UUID agencyId,
+            UpdateAgencyRequest request
+    );
 
-    String changeAgencyStatus(UUID id, AgencyStatus status);
+    String changeAgencyStatus(
+            UUID id,
+            AgencyStatus status
+    );
 
-    String softDeleteAgency(UUID id);
+    String softDeleteAgency(
+            UUID id
+    );
 
-    AgencySubscriptionResponse createAgencySubscription(UUID agencyId, UUID subscriptionId);
+    AgencySubscriptionResponse createAgencySubscription(
+            UUID agencyId,
+            UUID subscriptionId
+    );
 
-    AgencySubscriptionResponse getAgencySubscription(UUID agencyId);
+    AgencySubscriptionResponse getAgencySubscription(
+            UUID agencyId
+    );
 
-    String approveAgency(UUID agencyId);
+    String approveAgency(
+            UUID agencyId
+    );
 
-    String rejectAgency(UUID agencyId);
+    String rejectAgency(
+            UUID agencyId
+    );
 
 }

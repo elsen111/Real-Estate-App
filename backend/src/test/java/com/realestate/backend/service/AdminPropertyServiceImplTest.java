@@ -16,15 +16,16 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AdminPropertyServiceImplTest {
 
-    @Mock private PropertyRepository propertyRepository;
+    @Mock
+    private PropertyRepository propertyRepository;
 
-    @InjectMocks private AdminPropertyServiceImpl service;
+    @InjectMocks
+    private AdminPropertyServiceImpl service;
 
     @Test
     void changePropertyStatus_updatesStatus_whenPropertyExists() {

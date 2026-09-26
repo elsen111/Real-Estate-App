@@ -29,18 +29,15 @@ public interface MediaMapper {
 
             case "image/jpeg",
                  "image/png",
-                 "image/webp" ->
-                    MediaType.IMAGE;
+                 "image/webp" -> MediaType.IMAGE;
 
             case "video/mp4",
-                 "video/webm" ->
-                    MediaType.VIDEO;
+                 "video/webm" -> MediaType.VIDEO;
 
-            default ->
-                    throw new StorageException(
-                            "Unsupported media type: "
-                                    + mimeType
-                    );
+            default -> throw new StorageException(
+                    "Unsupported media type: "
+                            + mimeType
+            );
         };
     }
 }

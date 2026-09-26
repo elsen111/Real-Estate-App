@@ -19,49 +19,79 @@ import java.util.UUID;
 public interface PropertyRepository extends JpaRepository<PropertyEntity, UUID>,
         JpaSpecificationExecutor<PropertyEntity> {
 
-    long countByAgencyId(UUID agencyId);
+    long countByAgencyId(
+            UUID agencyId
+    );
 
     long countByAgencyIdAndStatus(
             UUID agencyId,
             PropertyStatus status
-        );
+    );
 
-    List<PropertyEntity> findByAgencyId(UUID agencyId);
+    List<PropertyEntity> findByAgencyId(
+            UUID agencyId
+    );
 
     @Modifying
     @Query("UPDATE PropertyEntity p SET p.assignedAgent = null WHERE p.assignedAgent.id = :agentId")
-    void unassignAgentFromAllProperties(@Param("agentId") UUID agentId);
+    void unassignAgentFromAllProperties(
+            @Param("agentId") UUID agentId
+    );
 
-    @Query("""
-    SELECT new com.realestate.backend.dto.response.PropertySuggestionResponse(p.id, p.title)
-    FROM PropertyEntity p
-    WHERE p.status = 'ACTIVE'
-    AND LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
-    ORDER BY p.title
-    """)
-    List<PropertySuggestionResponse> findMatchingTitles(@Param("keyword") String keyword, Pageable pageable);
+    @Query(
+            """
+                    SELECT new com.realestate.backend.dto.response.PropertySuggestionResponse(p.id, p.title)
+                    FROM PropertyEntity p
+                    WHERE p.status = 'ACTIVE'
+                    AND LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                    ORDER BY p.title
+                    """
+    )
+    List<PropertySuggestionResponse> findMatchingTitles(
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
 
-    @Query("""
-    SELECT DISTINCT p.city FROM PropertyEntity p
-    WHERE p.status = 'ACTIVE'
-    AND LOWER(p.city) LIKE LOWER(CONCAT('%', :keyword, '%'))
-    ORDER BY p.city
-    """)
-    List<String> findMatchingCities(@Param("keyword") String keyword, Pageable pageable);
+    @Query(
+            """
+                    SELECT DISTINCT p.city FROM PropertyEntity p
+                    WHERE p.status = 'ACTIVE'
+                    AND LOWER(p.city) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                    ORDER BY p.city
+                    """
+    )
+    List<String> findMatchingCities(
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
 
-    @Query("""
-    SELECT DISTINCT p.district FROM PropertyEntity p
-    WHERE p.status = 'ACTIVE'
-    AND p.district IS NOT NULL
-    AND LOWER(p.district) LIKE LOWER(CONCAT('%', :keyword, '%'))
-    ORDER BY p.district
-    """)
-    List<String> findMatchingDistricts(@Param("keyword") String keyword, Pageable pageable);
+    @Query(
+            """
+                    SELECT DISTINCT p.district FROM PropertyEntity p
+                    WHERE p.status = 'ACTIVE'
+                    AND p.district IS NOT NULL
+                    AND LOWER(p.district) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                    ORDER BY p.district
+                    """
+    )
+    List<String> findMatchingDistricts(
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
 
-    boolean existsByCategoryIdAndStatus(UUID categoryId, PropertyStatus status);
+    boolean existsByCategoryIdAndStatus(
+            UUID categoryId,
+            PropertyStatus status
+    );
 
-    boolean existsByAgencyIdAndStatus(UUID id, PropertyStatus status);
+    boolean existsByAgencyIdAndStatus(
+            UUID id,
+            PropertyStatus status
+    );
 
-    long countByAgencyIdAndStatusIn(UUID id, Collection<PropertyStatus> propertyStatus);
+    long countByAgencyIdAndStatusIn(
+            UUID id,
+            Collection<PropertyStatus> propertyStatus
+    );
 
 }

@@ -81,7 +81,8 @@ public class MdcLoggingFilter extends OncePerRequestFilter {
                 .map(GrantedAuthority::getAuthority)
                 .filter(ROLE_PRIORITY_LIST::contains)
                 .min(Comparator.comparingInt(ROLE_PRIORITY_LIST::indexOf))
-                .orElseThrow(() -> new IllegalStateException("User has no recognized roles matching the system priority list"));
+                .orElseThrow(() -> new IllegalStateException(
+                        "User has no recognized roles matching the system priority list"));
 
 
         if (!role.isBlank()) {

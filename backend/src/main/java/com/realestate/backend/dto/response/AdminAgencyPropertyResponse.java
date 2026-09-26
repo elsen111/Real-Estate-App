@@ -17,30 +17,32 @@ import java.util.UUID;
 @Setter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "id",
-        "title",
-        "description",
-        "status",
-        "listingType",
-        "price",
-        "currency",
-        "featured",
-        "city",
-        "district",
-        "address",
-        "area",
-        "rooms",
-        "bathrooms",
-        "floor",
-        "totalFloors",
-        "viewCount",
-        "reviewCount",
-        "averageRating",
-        "categoryId",
-        "categoryName",
-        "createdAt"
-})
+@JsonPropertyOrder(
+        {
+                "id",
+                "title",
+                "description",
+                "status",
+                "listingType",
+                "price",
+                "currency",
+                "featured",
+                "city",
+                "district",
+                "address",
+                "area",
+                "rooms",
+                "bathrooms",
+                "floor",
+                "totalFloors",
+                "viewCount",
+                "reviewCount",
+                "averageRating",
+                "categoryId",
+                "categoryName",
+                "createdAt"
+        }
+)
 public class AdminAgencyPropertyResponse {
 
     private UUID id;

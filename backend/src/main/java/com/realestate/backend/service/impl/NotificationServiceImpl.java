@@ -17,7 +17,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .setMessage("Notifying agency for the new inquiry")
                 .addKeyValue("inquiryId", inquiry.getId())
                 .addKeyValue("propertyId", inquiry.getProperty().getId())
-                .addKeyValue("agencyId",  inquiry.getAgency().getId())
+                .addKeyValue("agencyId", inquiry.getAgency().getId())
                 .addKeyValue("agencyName", inquiry.getAgency().getName())
                 .addKeyValue("clientId", inquiry.getClient().getId())
                 .log();
@@ -31,7 +31,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .setMessage("Notifying agency for the new appointment")
                 .addKeyValue("appointmentId", appointment.getId())
                 .addKeyValue("propertyId", appointment.getProperty().getId())
-                .addKeyValue("agencyId",  appointment.getAgency().getId())
+                .addKeyValue("agencyId", appointment.getAgency().getId())
                 .addKeyValue("agencyName", appointment.getAgency().getName())
                 .addKeyValue("clientId", appointment.getClient().getId())
                 .log();

@@ -59,7 +59,8 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional
-    public AppointmentResponse createAppointment(UUID propertyId, CreateAppointmentRequest request, CustomUserDetails currentUser) {
+    public AppointmentResponse createAppointment(
+            UUID propertyId, CreateAppointmentRequest request, CustomUserDetails currentUser) {
 
         PropertyEntity property = propertyRepository.findById(propertyId)
                 .orElseThrow(
@@ -71,7 +72,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                         () -> new ResourceNotFoundException("User not found with id: " + currentUser.getId())
                 );
 
-        if(property.getStatus() != PropertyStatus.ACTIVE){
+        if (property.getStatus() != PropertyStatus.ACTIVE) {
             throw new BusinessException("Property status should be active for this procedure. ID: " + propertyId);
         }
 
@@ -81,10 +82,11 @@ public class AppointmentServiceImpl implements AppointmentService {
                 AppointmentStatus.PENDING
         );
 
-        if (hasPendingAppointment){
+        if (hasPendingAppointment) {
             throw new DuplicateAppointmentException("Pending appointment already exists for the property with id: "
                     + propertyId);
-        };
+        }
+        ;
 
         AppointmentEntity newAppointment = AppointmentEntity.builder()
                 .property(property)
@@ -105,8 +107,12 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .addKeyValue("propertyTitle", property.getTitle())
                 .addKeyValue("agencyId", savedAppointment.getAgency().getId())
                 .addKeyValue("agencyName", savedAppointment.getAgency().getName())
-                .addKeyValue("agentId", savedAppointment.getAgent() != null ? savedAppointment.getAgent().getId() : null)
-                .addKeyValue("agentEmail", savedAppointment.getAgent() != null ? savedAppointment.getAgent().getEmail() : null)
+                .addKeyValue(
+                        "agentId", savedAppointment.getAgent() != null ? savedAppointment.getAgent().getId() : null)
+                .addKeyValue(
+                        "agentEmail",
+                        savedAppointment.getAgent() != null ? savedAppointment.getAgent().getEmail() : null
+                )
                 .log();
 
 
@@ -115,7 +121,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public Page<AppointmentResponse> getClientAppointments(CustomUserDetails currentUser, AppointmentStatus status, Pageable pageable) {
+    public Page<AppointmentResponse> getClientAppointments(
+            CustomUserDetails currentUser, AppointmentStatus status, Pageable pageable) {
 
         Page<AppointmentEntity> appointments = status == null
                 ? appointmentRepository.findByClientId(currentUser.getId(), pageable)
@@ -128,7 +135,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public AppointmentResponse getAppointmentById(
             CustomUserDetails currentUser,
-            UUID appointmentId) {
+            UUID appointmentId
+    ) {
 
         AppointmentEntity appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() ->
@@ -139,19 +147,13 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         if (hasRole(currentUser, Role.SUPER_ADMIN)) {
             canViewAppointment = true;
-        }
-
-        else if (appointment.getClient() != null
+        } else if (appointment.getClient() != null
                 && appointment.getClient().getId().equals(currentUser.getId())) {
             canViewAppointment = true;
-        }
-
-        else if (appointment.getAgent() != null
+        } else if (appointment.getAgent() != null
                 && appointment.getAgent().getId().equals(currentUser.getId())) {
             canViewAppointment = true;
-        }
-
-        else if (hasRole(currentUser, Role.AGENCY_OWNER)) {
+        } else if (hasRole(currentUser, Role.AGENCY_OWNER)) {
 
             UserEntity authenticatedUser = userRepository.findById(currentUser.getId())
                     .orElseThrow(() ->
@@ -184,10 +186,10 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new ResourceNotFoundException("Appointment not found with id: " + appointmentId);
         }
 
-        if(
+        if (
                 appointment.getStatus() != AppointmentStatus.PENDING &&
-                appointment.getStatus() != AppointmentStatus.APPROVED
-        ){
+                        appointment.getStatus() != AppointmentStatus.APPROVED
+        ) {
             throw new BusinessException("Only pending and approved appointments can be cancelled.");
         }
 
@@ -213,7 +215,8 @@ public class AppointmentServiceImpl implements AppointmentService {
             CustomUserDetails currentUser,
             AppointmentStatus status,
             UUID propertyId,
-            Pageable pageable) {
+            Pageable pageable
+    ) {
 
         if (hasRole(currentUser, Role.AGENCY_OWNER) || hasRole(currentUser, Role.AGENT)) {
 
@@ -234,14 +237,15 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional
-    public AppointmentResponse updateStatus(CustomUserDetails currentUser, UUID appointmentId, UpdateAppointmentStatusRequest request) {
+    public AppointmentResponse updateStatus(
+            CustomUserDetails currentUser, UUID appointmentId, UpdateAppointmentStatusRequest request) {
 
         AppointmentEntity appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Appointment not found with id: " + appointmentId)
                 );
 
-        if(!canManageAppointment(appointment, currentUser)){
+        if (!canManageAppointment(appointment, currentUser)) {
             throw new ResourceNotFoundException("Appointment not found in your list. Appointment ID: "
                     + appointment.getId());
         }
@@ -257,7 +261,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         validateStatusTransition(oldStatus, newStatus);
 
-        if(request.getStatus() == AppointmentStatus.APPROVED){
+        if (request.getStatus() == AppointmentStatus.APPROVED) {
             appointment.setConfirmedDateTime(LocalDateTime.now());
         }
 

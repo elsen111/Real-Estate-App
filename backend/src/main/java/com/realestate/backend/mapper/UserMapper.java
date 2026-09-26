@@ -55,11 +55,11 @@ public interface UserMapper {
     AgentResponse toAgentWithUserIdResponse(AgencyMemberEntity agencyMember);
 
 
-
-//    HELPER METHODS
+    //    HELPER METHODS
     @Named("toRoleNames")
     default Set<String> toRoleNames(UserEntity user) {
-        if (user == null || user.getRoles() == null) return Set.of();
+        if (user == null || user.getRoles() == null)
+            return Set.of();
         return user.getRoles()
                 .stream()
                 .map(RoleEntity::getRoleName)
@@ -69,7 +69,8 @@ public interface UserMapper {
 
     @Named("resolvePosition")
     default String resolvePosition(UserEntity user) {
-        if (user == null || user.getRoles() == null) return null;
+        if (user == null || user.getRoles() == null)
+            return null;
         Set<Role> roles = user.getRoles()
                 .stream()
                 .map(RoleEntity::getRoleName)

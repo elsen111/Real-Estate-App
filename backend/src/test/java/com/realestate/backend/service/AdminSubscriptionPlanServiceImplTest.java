@@ -4,7 +4,6 @@ import com.realestate.backend.dto.request.SubscriptionPlanRequest;
 import com.realestate.backend.dto.response.AdminSubscriptionPlanResponse;
 import com.realestate.backend.entity.SubscriptionPlanEntity;
 import com.realestate.backend.enums.SubscriptionStatus;
-import com.realestate.backend.exception.BadRequestException;
 import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ResourceNotFoundException;
@@ -28,11 +27,15 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AdminSubscriptionPlanServiceImplTest {
 
-    @Mock private SubscriptionPlanRepository subscriptionPlanRepository;
-    @Mock private SubscriptionPlanMapper subscriptionPlanMapper;
-    @Mock private AgencySubscriptionRepository agencySubscriptionRepository;
+    @Mock
+    private SubscriptionPlanRepository subscriptionPlanRepository;
+    @Mock
+    private SubscriptionPlanMapper subscriptionPlanMapper;
+    @Mock
+    private AgencySubscriptionRepository agencySubscriptionRepository;
 
-    @InjectMocks private AdminSubscriptionPlanServiceImpl service;
+    @InjectMocks
+    private AdminSubscriptionPlanServiceImpl service;
 
     @Test
     void createSubscriptionPlan_throws_whenNameAlreadyExists() {

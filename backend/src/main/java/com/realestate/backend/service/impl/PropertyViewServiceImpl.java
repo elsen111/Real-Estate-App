@@ -46,7 +46,7 @@ public class PropertyViewServiceImpl implements PropertyViewService {
                 property.getId(),
                 viewer.getId(),
                 threshold
-            );
+        );
 
         if (!alreadyViewedDuringLastDay) {
             createNewRecord(property, viewer);

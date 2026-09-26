@@ -41,25 +41,25 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Transactional
     public FavoriteResponse addFavorite(UUID propertyId, CustomUserDetails currentUser) {
 
-        if(currentUser == null) {
+        if (currentUser == null) {
             throw new UnauthorizedException("You should log in to add favorites.");
         }
 
         UserEntity user = userRepository.findById(currentUser.getId())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found with id " +  currentUser.getId())
+                        () -> new ResourceNotFoundException("User not found with id " + currentUser.getId())
                 );
 
         boolean IsAlreadyFavorite = favoriteRepository.existsByUser_IdAndProperty_Id(user.getId(), propertyId);
 
-        if(IsAlreadyFavorite) {
+        if (IsAlreadyFavorite) {
             throw new ConflictException("This property is already added to your favorites.");
         }
 
         PropertyEntity property = propertyRepository.getReferenceById(propertyId);
 
-        if(property.getStatus() != PropertyStatus.ACTIVE) {
-            throw  new BusinessException("Property is not active. Property ID: " + propertyId);
+        if (property.getStatus() != PropertyStatus.ACTIVE) {
+            throw new BusinessException("Property is not active. Property ID: " + propertyId);
         }
 
         FavoriteEntity addedFavorite = FavoriteEntity.builder()
@@ -86,7 +86,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
         boolean isFavorite = favoriteRepository.existsByUser_IdAndProperty_Id(currentUser.getId(), propertyId);
 
-        if(!isFavorite) {
+        if (!isFavorite) {
             throw new ResourceNotFoundException("Property not found in your list. Property ID: " + propertyId);
         }
 

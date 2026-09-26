@@ -17,33 +17,47 @@ public interface UserRepository
         JpaSpecificationExecutor<UserEntity> {
 
     @EntityGraph(attributePaths = "roles")
-    Optional<UserEntity> findByEmail(String email);
+    Optional<UserEntity> findByEmail(
+            String email
+    );
 
     @EntityGraph(attributePaths = "roles")
-    Optional<UserEntity> findWithRolesById(UUID id);
+    Optional<UserEntity> findWithRolesById(
+            UUID id
+    );
 
     @EntityGraph(attributePaths = {"roles", "agency"})
-    Optional<UserEntity> findWithAgencyById(UUID id);
+    Optional<UserEntity> findWithAgencyById(
+            UUID id
+    );
 
-    Boolean existsByEmail(String email);
+    Boolean existsByEmail(
+            String email
+    );
 
-    long countByAgency(AgencyEntity agency);
+    long countByAgency(
+            AgencyEntity agency
+    );
 
-    @Query("""
-            SELECT am
-            FROM AgencyMemberEntity am
-            JOIN FETCH am.user u
-            JOIN FETCH am.agency a
-            JOIN u.roles r
-            WHERE u.id = :userId
-            AND r.roleName =
-                com.realestate.backend.enums.Role.AGENT
-            """)
+    @Query(
+            """
+                    SELECT am
+                    FROM AgencyMemberEntity am
+                    JOIN FETCH am.user u
+                    JOIN FETCH am.agency a
+                    JOIN u.roles r
+                    WHERE u.id = :userId
+                    AND r.roleName =
+                        com.realestate.backend.enums.Role.AGENT
+                    """
+    )
     Optional<AgencyMemberEntity> findAgentMemberByUserId(
             @Param("userId") UUID userId
     );
 
-    Optional<UserEntity> findByEmailIgnoreCase(String email);
+    Optional<UserEntity> findByEmailIgnoreCase(
+            String email
+    );
 
     boolean existsByIdAndAgencyId(
             UUID userId,

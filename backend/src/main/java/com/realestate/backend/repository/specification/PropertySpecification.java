@@ -20,15 +20,17 @@ import java.util.UUID;
 
 public class PropertySpecification {
 
-    public PropertySpecification() {}
+    public PropertySpecification() {
+    }
 
     public static Specification<PropertyEntity> withFilter(
             PropertyFilterRequest filterRequest
     ) {
 
-        if(filterRequest == null) {
+        if (filterRequest == null) {
             Specification.where((Specification<Object>) null);
-        };
+        }
+        ;
 
         assert filterRequest != null;
 
@@ -167,9 +169,10 @@ public class PropertySpecification {
             AgencyPropertyFilterRequest filterRequest
     ) {
 
-        if(filterRequest == null) {
+        if (filterRequest == null) {
             Specification.where((Specification<Object>) null);
-        };
+        }
+        ;
 
         assert filterRequest != null;
 
@@ -181,10 +184,10 @@ public class PropertySpecification {
     }
 
 
-
-//    HELPER METHODS
+    //    HELPER METHODS
     private static Specification<PropertyEntity> hasCity(String city) {
-        return ((root, query, cb) -> city == null ? null : cb.equal(cb.lower(root.get("city")), city.trim().toLowerCase()));
+        return ((root, query, cb) -> city == null ? null : cb.equal(
+                cb.lower(root.get("city")), city.trim().toLowerCase()));
     }
 
     private static Specification<PropertyEntity> hasAgencyName(String agencyName) {
@@ -198,7 +201,8 @@ public class PropertySpecification {
     }
 
     public static Specification<PropertyEntity> hasStatus(PropertyStatus status) {
-        return ((root, query, criteriaBuilder) -> status == null ? null : criteriaBuilder.equal(root.get("status"), status));
+        return ((root, query, criteriaBuilder) -> status == null ? null : criteriaBuilder.equal(
+                root.get("status"), status));
     }
 
     public static Specification<PropertyEntity> hasStatusIn(
@@ -211,7 +215,8 @@ public class PropertySpecification {
     }
 
     public static Specification<PropertyEntity> isFeatured(Boolean isFeatured) {
-        return ((root, query, criteriaBuilder) -> isFeatured == null ? null : criteriaBuilder.equal(root.get("featured"), isFeatured));
+        return ((root, query, criteriaBuilder) -> isFeatured == null ? null : criteriaBuilder.equal(
+                root.get("featured"), isFeatured));
     }
 
     private static Specification<PropertyEntity> hasQuery(String keyword) {
@@ -317,7 +322,7 @@ public class PropertySpecification {
                 : cb.equal(root.get("agency").get("id"), agencyId);
     }
 
-    private static Specification<PropertyEntity> hasCategoryId(UUID  categoryId) {
+    private static Specification<PropertyEntity> hasCategoryId(UUID categoryId) {
         return (root, query, cb) -> categoryId == null
                 ? null
                 : cb.equal(root.get("category").get("id"), categoryId);
@@ -325,8 +330,8 @@ public class PropertySpecification {
 
     private static Specification<PropertyEntity> excludePropertyId(UUID propertyId) {
         return (root, query, cb) -> propertyId == null
-            ? null
-            : cb.notEqual(root.get("id"), propertyId);
+                ? null
+                : cb.notEqual(root.get("id"), propertyId);
     }
 
 }

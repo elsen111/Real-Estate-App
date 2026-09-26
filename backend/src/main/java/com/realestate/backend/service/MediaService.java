@@ -6,8 +6,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface MediaService {
 
-    MediaFileEntity upload(MultipartFile file, MediaUploadPolicy policy);
+    MediaFileEntity upload(
+            MultipartFile file,
+            MediaUploadPolicy policy
+    );
 
-    void delete(MediaFileEntity mediaFile);
+    void delete(
+            MediaFileEntity mediaFile
+    );
 
 }
