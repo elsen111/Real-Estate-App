@@ -304,7 +304,7 @@ public class PropertyController {
 
     }
 
-    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'LANDLORD')")
+//    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'LANDLORD')")
     @PostMapping("/{propertyId}/inquiries")
     @Operation(summary = "Create a new inquiry for the specific property")
     public ResponseEntity<ApiResponse<InquiryResponse>> createInquiry(
