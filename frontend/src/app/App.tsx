@@ -1,3 +1,5 @@
+import PropertyList from "../components/PropertyList"
+
 function App() {
 
   return (
@@ -7,6 +9,7 @@ function App() {
           Real Estate Management Platform
         </h1>
       </section>
+        <PropertyList />
     </>
   )
 }
