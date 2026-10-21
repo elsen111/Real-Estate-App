@@ -1,15 +1,14 @@
-import PropertyList from "../components/PropertyList"
+import { RouterProvider } from "react-router-dom"
+import { AppRouter } from "./routes"
+import { AuthProvider } from "../context/AuthContext"
 
 function App() {
 
   return (
     <>
-      <section className="bg-green-700 flex h-screen justify-center items-center">
-        <h1 className="text-white text-3xl text-center">
-          Real Estate Management Platform
-        </h1>
-      </section>
-        <PropertyList />
+      <AuthProvider>
+        <RouterProvider router={AppRouter} />
+      </AuthProvider>
     </>
   )
 }

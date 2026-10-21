@@ -1,1 +1,22 @@
-@import "tailwindcss"
+@import "tailwindcss";
+
+@theme {
+
+      --color-primary: #fff;
+      --color-secondary: #100a55;
+
+      --color-purple: #7065f0;
+      
+      --color-primaryText: #000;
+      --color-secondaryText: #000929;
+      --color-gray-scale: #F9FAFB;
+
+}
+
+html {
+      font-size: 62.5% !important;
+}
+
+body {
+      scroll-behavior: smooth;
+}
