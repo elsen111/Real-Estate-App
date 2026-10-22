@@ -1,8 +1,9 @@
 import { Menu, UserRound, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import Brand from "../Brand";
+import Button from "../ui/Button";
 
 type TopNavLink = {
       label: string;
@@ -49,7 +50,7 @@ const HeaderNav = () => {
 
                         <Brand styles="lg:hidden w-85! h-10! pl-10" />
 
-                        <div className="flex flex-col gap-4 lg:flex-row lg:gap-10">
+                        <div className="flex flex-col gap-4 xl:gap-10 lg:flex-row">
                               {topNavLinks.map((link) => (
                                     <NavLink
                                           key={link.label}
@@ -76,36 +77,38 @@ const HeaderNav = () => {
                               {
                                     user ? (
                                           <div className="flex gap-8 items-center lg:p-0 px-8 py-4">
-                                                <Link
-                                                      to="/dashboard"
-                                                      onClick={() => setMenuOpen(false)}
-                                                      className="rounded-full h-20 w-20 shrink-0 overflow-hidden flex justify-center items-center bg-secondary/80 text-center font-semibold text-white shadow-md transition-all duration-300 hover:bg-secondary hover:shadow-lg active:scale-[0.98]"
+                                                <Button
+                                                      path="/dashboard"
+                                                      variant="blue"
+                                                      circled={true}
+                                                      hasFixedDimensions={true}
+                                                      isLink={true}
                                                 >
                                                       {user.image ?
                                                             <img src={user.image} className="!h-full block !w-full object-cover rounded-full" alt="Profile avatar" />
                                                             : <UserRound size="24" />
                                                       }
-                                                </Link>
+                                                </Button>
                                                 <span className="lg:hidden text-primaryText font-medium"> Account </span>
 
                                           </div>
                                     ) : (
                                           <>
-
-                                                <Link
-                                                      to="/login"
-                                                      onClick={() => setMenuOpen(false)}
-                                                      className="rounded-2xl bg-purple/80 px-8 py-4 text-center font-semibold text-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:bg-purple hover:shadow-lg active:scale-[0.98] lg:py-3"
+                                                <Button
+                                                      path="/login"
+                                                      variant="white"
+                                                      isLink={true}
                                                 >
                                                       Login
-                                                </Link>
-                                                <Link
-                                                      to="/register"
-                                                      onClick={() => setMenuOpen(false)}
-                                                      className="rounded-2xl bg-secondary/80 px-8 py-4 text-center font-semibold text-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:bg-secondary hover:shadow-lg active:scale-[0.98] lg:py-3"
+                                                </Button>
+                                                
+                                                <Button
+                                                      path="/register"
+                                                      variant="blue"
+                                                      isLink={true}
                                                 >
                                                       List your agency
-                                                </Link>
+                                                </Button>
                                           </>
                                     )
                               }

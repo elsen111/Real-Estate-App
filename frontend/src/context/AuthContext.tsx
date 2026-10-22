@@ -21,7 +21,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             // .catch(() => setUser(null))
             // .finally(() => setIsLoading(false));
 
-            setUser(dummyUser);
+            // setUser(dummyUser);
+            setUser(null);
             setIsLoading(false);
       }, [])
 
