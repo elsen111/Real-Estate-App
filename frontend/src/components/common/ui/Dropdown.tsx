@@ -1,40 +1,41 @@
-import { useState, type ComponentProps } from "react"
+import { useState } from "react"
 import { twMerge } from "tailwind-merge"
 
-interface Category {
+export interface Option {
   value: string
   label: string
 }
 
 interface DropdownProps {
-  categories: Category[],
-  className?: string,
+  options: Option[]
+  value: string
   onChange: (value: string) => void
+  className?: string
 }
 
-const Dropdown = ({ categories, className, onChange }: DropdownProps) => {
-  const [selectedCategory, setSelectedCategory] = useState<Category>(categories[0])
-  const [categoriesOpen, setCategoriesOpen] = useState(false)
+const Dropdown = ({ options, value, onChange, className }: DropdownProps) => {
+  const [open, setOpen] = useState(false)
 
-  const handleSelectCategory = (category: Category):void => {
-    setSelectedCategory(category)
-    onChange(category.value)
-    setCategoriesOpen(false)
+  const selected = options.find((o) => o.value === value)
+
+  const handleSelect = (option: Option): void => {
+    onChange(option.value)
+    setOpen(false)
   }
 
   return (
-    <div className={twMerge('relative w-[20rem]', className)}>
+    <div className={twMerge("relative w-[20rem]", className)}>
       <button
         type="button"
-        aria-expanded={categoriesOpen}
-        onClick={() => setCategoriesOpen(!categoriesOpen)}
+        aria-expanded={open}
+        onClick={() => setOpen(!open)}
         className={`flex w-full items-center justify-between gap-4 border-2 border-gray-300 px-8 py-4 text-[1.6rem] outline-none transition-all duration-200 focus:border-purple lg:py-3 ${
-          categoriesOpen ? "rounded-t-2xl border-purple" : "rounded-2xl"
+          open ? "rounded-t-2xl border-purple" : "rounded-2xl"
         }`}
       >
-        {selectedCategory.label}
+        {selected?.label ?? "Select"}
         <svg
-          className={`h-5 w-5 transition-transform duration-200 ${categoriesOpen ? "rotate-180" : ""}`}
+          className={`h-5 w-5 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
           viewBox="0 0 20 20"
           fill="currentColor"
         >
@@ -43,22 +44,22 @@ const Dropdown = ({ categories, className, onChange }: DropdownProps) => {
       </button>
 
       <ul
-        className={`h-60 overflow-y-auto absolute top-full z-10 w-full origin-top overflow-hidden rounded-b-2xl border-2 border-t-0 border-purple bg-white shadow-lg transition-all duration-200 ${
-          categoriesOpen
+        className={`absolute top-full z-10 max-h-60 w-full origin-top overflow-y-auto rounded-b-2xl border-2 border-t-0 border-purple bg-white shadow-lg transition-all duration-200 ${
+          open
             ? "visible translate-y-0 scale-y-100 opacity-100"
             : "pointer-events-none invisible -translate-y-1 scale-y-95 opacity-0"
         }`}
       >
-        {categories.map((c) => (
-          <li key={c.value}>
+        {options.map((o) => (
+          <li key={o.value}>
             <button
               type="button"
-              onClick={() => handleSelectCategory(c)}
+              onClick={() => handleSelect(o)}
               className={`w-full px-8 py-3 text-left text-[1.6rem] transition-colors duration-150 hover:bg-gray-100 ${
-                c.value === selectedCategory.value ? "font-semibold text-purple" : ""
+                o.value === value ? "font-semibold text-purple" : ""
               }`}
             >
-              {c.label}
+              {o.label}
             </button>
           </li>
         ))}

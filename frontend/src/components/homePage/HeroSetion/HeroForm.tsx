@@ -1,39 +1,10 @@
-import { useState, type ReactEventHandler } from "react";
+import { useEffect, useState, type ReactEventHandler } from "react";
 import Button from "../../common/ui/Button"
 import Input from "../../common/ui/Input"
-import Dropdown from "../../common/ui/Dropdown";
+import Dropdown, { type Option } from "../../common/ui/Dropdown"
 import { useNavigate } from "react-router-dom";
-
-const categories = [
-      { value: "ANY", label: "any" },
-      { value: "APARTMENT", label: "Apartment" },
-      { value: "HOUSE", label: "House" },
-      { value: "LAND", label: "Land" },
-      { value: "ANY", label: "any" },
-      { value: "APARTMENT", label: "Apartment" },
-      { value: "HOUSE", label: "House" },
-      { value: "LAND", label: "Land" },
-      { value: "ANY", label: "any" },
-      { value: "APARTMENT", label: "Apartment" },
-      { value: "HOUSE", label: "House" },
-      { value: "LAND", label: "Land" },
-      { value: "ANY", label: "any" },
-      { value: "APARTMENT", label: "Apartment" },
-      { value: "HOUSE", label: "House" },
-      { value: "LAND", label: "Land" },
-      { value: "ANY", label: "any" },
-      { value: "APARTMENT", label: "Apartment" },
-      { value: "HOUSE", label: "House" },
-      { value: "LAND", label: "Land" },
-      { value: "ANY", label: "any" },
-      { value: "APARTMENT", label: "Apartment" },
-      { value: "HOUSE", label: "House" },
-      { value: "LAND", label: "Land" },
-      { value: "ANY", label: "any" },
-      { value: "APARTMENT", label: "Apartment" },
-      { value: "HOUSE", label: "House" },
-      { value: "LAND", label: "Land" },
-];
+import type { CategoryResponse } from "../../../types/api/category";
+import categoryService from "../../../services/categoryService";
 
 const HeroForm = () => {
 
@@ -41,8 +12,9 @@ const HeroForm = () => {
 
       const [query, setQuery] = useState("")
       const [city, setCity] = useState("");
-      const [propertyType, setPropertyType] = useState("");
+      const [category, setCategory] = useState("");
       const [selectedListing, setSelectedListing] = useState("buy");
+      const [categories, setCategories] = useState<CategoryResponse[]>([])
 
       const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
             e.preventDefault();
@@ -51,8 +23,8 @@ const HeroForm = () => {
             const filters = {
                   q: query.trim(),
                   city: city.trim(),
-                  type: propertyType,
-                  listing: selectedListing
+                  category: category,
+                  listingType: selectedListing
             }
 
             Object.entries(filters).forEach(([key, value]) => {
@@ -61,6 +33,25 @@ const HeroForm = () => {
 
             navigate(`/properties?${params}`);
       }
+
+      const getCategories = async () => {
+            try {
+                  const response = await categoryService.getAll();
+                  setCategories(response.data);
+            } catch (error) {
+                  console.error("Failed to fetch categories", error);
+                  setCategories([])
+            }
+      }
+
+      useEffect(() => {
+            void getCategories();
+      }, [])
+
+      const options: Option[] = [
+            { value: "ANY", label: "Any" },
+            ...categories.map((c) => ({ value: c.name, label: c.name })),
+      ]
 
       const handleSelectListing = (e: React.MouseEvent<HTMLButtonElement>, listingLabel: string): void => {
             e.preventDefault();
@@ -88,18 +79,12 @@ const HeroForm = () => {
                               value={city}
                         />
 
-                        {/* <CustomSelect
-                              options={propertyTypes}
-                              value={propertyType}
-                              onChange={setPropertyType}
-                              placeholder="Property type"
-                              classNames="w-[60%]"
-                        /> */}
-
                         <Dropdown
-                              categories={categories}
+                              options={options}
                               className="w-full md:w-100"
-                              onChange={setPropertyType}
+                              onChange={setCategory}
+                              value={category}
+
                         />
 
                         <div className="self-end text-[1.6rem] sm:self-center">
