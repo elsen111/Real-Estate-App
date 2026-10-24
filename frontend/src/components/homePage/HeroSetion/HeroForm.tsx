@@ -37,7 +37,7 @@ const HeroForm = () => {
 
       const options: Option[] = [
             { value: "ANY", label: "Any" },
-            ...categories.map((c) => ({ value: c.name, label: c.name })),
+            ...categories.map((c) => ({ value: c.slug, label: c.name })),
       ]
 
       const handleSelectListing = (e: React.MouseEvent<HTMLButtonElement>, listingLabel: string): void => {
