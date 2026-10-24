@@ -1,4 +1,4 @@
-import { useState, type ReactEventHandler } from "react";
+import { useState } from "react";
 import Button from "../../common/ui/Button"
 import Input from "../../common/ui/Input"
 import Dropdown, { type Option } from "../../common/ui/Dropdown"

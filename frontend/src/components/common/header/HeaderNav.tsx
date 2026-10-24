@@ -35,7 +35,7 @@ const HeaderNav = () => {
                         className={`
                               ${menuOpen ? "translate-x-0" : "-translate-x-full"}
                               fixed inset-y-0 left-0 z-20 flex h-screen w-[80%] max-w-xl flex-col gap-10 overflow-y-auto
-                              rounded-r-3xl bg-gray-scale p-8 text-[2.2rem] shadow-2xl transition-transform duration-500
+                              rounded-r-3xl bg-gray-scale p-8 text-[20px] shadow-2xl transition-transform duration-500
                               lg:static lg:h-auto lg:w-[80%] lg:max-w-none lg:translate-x-0 lg:flex-row lg:items-center
                               lg:justify-between lg:overflow-visible lg:rounded-none lg:p-0 lg:shadow-none min-w-[30rem]
                         `}
