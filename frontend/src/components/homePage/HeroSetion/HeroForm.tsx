@@ -1,10 +1,9 @@
-import { useEffect, useState, type ReactEventHandler } from "react";
+import { useState, type ReactEventHandler } from "react";
 import Button from "../../common/ui/Button"
 import Input from "../../common/ui/Input"
 import Dropdown, { type Option } from "../../common/ui/Dropdown"
 import { useNavigate } from "react-router-dom";
-import type { CategoryResponse } from "../../../types/api/category";
-import categoryService from "../../../services/categoryService";
+import useCategories from "../../../hooks/useCategories";
 
 const HeroForm = () => {
 
@@ -14,7 +13,9 @@ const HeroForm = () => {
       const [city, setCity] = useState("");
       const [category, setCategory] = useState("");
       const [selectedListing, setSelectedListing] = useState("buy");
-      const [categories, setCategories] = useState<CategoryResponse[]>([])
+
+      const {data: response} = useCategories();
+      const categories = response?.data ?? [];
 
       const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
             e.preventDefault();
@@ -33,20 +34,6 @@ const HeroForm = () => {
 
             navigate(`/properties?${params}`);
       }
-
-      const getCategories = async () => {
-            try {
-                  const response = await categoryService.getAll();
-                  setCategories(response.data);
-            } catch (error) {
-                  console.error("Failed to fetch categories", error);
-                  setCategories([])
-            }
-      }
-
-      useEffect(() => {
-            void getCategories();
-      }, [])
 
       const options: Option[] = [
             { value: "ANY", label: "Any" },
@@ -84,7 +71,6 @@ const HeroForm = () => {
                               className="w-full md:w-100"
                               onChange={setCategory}
                               value={category}
-
                         />
 
                         <div className="self-end text-[1.6rem] sm:self-center">
