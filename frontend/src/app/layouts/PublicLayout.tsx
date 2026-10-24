@@ -9,10 +9,10 @@ const PublicLayout = () => {
             <>
                   {/* <SEO /> */}
                   <Header />
-                  <main className="relative md:top-[9.6rem] top-[7.2rem]">
+                  <main className="relative md:pt-[9.6rem] pt-[7.2rem]">
                         <Outlet />
                   </main>
-                  <Footer />
+                  {/* <Footer /> */}
             </>
       )
 }

@@ -1,6 +1,6 @@
+import { apiClient } from "../config/api";
 import type { ApiResponse } from "../types/api/api";
 import type { CategoryResponse } from "../types/api/category";
-import { apiClient } from "./api";
 
 const categoryService = {
       getAll: async (): Promise<ApiResponse<CategoryResponse[]>> => {
