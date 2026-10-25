@@ -687,8 +687,17 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<PopularCityProjection> getTrendingCities(Pageable pageable) {
+    public Page<PopularCityResponse> getTrendingCities(Pageable pageable) {
         return propertyRepository.findPopularCities(
+                PropertyStatus.ACTIVE,
+                pageable
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<TopAgencyResponse> getTopAgencies(Pageable pageable) {
+        return propertyRepository.findTopAgencies(
                 PropertyStatus.ACTIVE,
                 pageable
         );

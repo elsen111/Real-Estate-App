@@ -1,7 +1,8 @@
 package com.realestate.backend.repository;
 
-import com.realestate.backend.dto.response.PopularCityProjection;
+import com.realestate.backend.dto.response.PopularCityResponse;
 import com.realestate.backend.dto.response.PropertySuggestionResponse;
+import com.realestate.backend.dto.response.TopAgencyResponse;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.enums.PropertyStatus;
 import org.springframework.data.domain.Page;
@@ -96,22 +97,6 @@ public interface PropertyRepository extends JpaRepository<PropertyEntity, UUID>,
             Collection<PropertyStatus> propertyStatus
     );
 
-//    @Query("""
-//        SELECT p.city AS cityName,
-//               COUNT(p) AS propertyCount,
-//               COALESCE(SUM(p.viewCount), 0) AS totalViews
-//        FROM PropertyEntity p
-//        WHERE p.status = :status
-//          AND p.city IS NOT NULL
-//          AND TRIM(p.city) <> ''
-//        GROUP BY p.city
-//        ORDER BY SUM(p.viewCount) DESC, COUNT(p) DESC
-//        """)
-//    List<PopularCityProjection> findPopularCities(
-//            @Param("status") PropertyStatus status,
-//            Pageable pageable
-//    );
-
     @Query("""
         SELECT p.city AS cityName,
                COUNT(p) AS propertyCount,
@@ -123,9 +108,31 @@ public interface PropertyRepository extends JpaRepository<PropertyEntity, UUID>,
         GROUP BY p.city
         ORDER BY SUM(p.viewCount) DESC, COUNT(p) DESC, p.city ASC
         """)
-    Page<PopularCityProjection> findPopularCities(
+    Page<PopularCityResponse> findPopularCities(
             @Param("status") PropertyStatus status,
             Pageable pageable
     );
+
+    @Query("""
+            SELECT new com.realestate.backend.dto.response.TopAgencyResponse(
+                a.id, 
+                a.name, 
+                f.fileUrl, 
+                COUNT(p), 
+                SUM(p.viewCount)
+            )
+            FROM PropertyEntity p
+            JOIN p.agency a
+            LEFT JOIN a.logoUrl am
+            LEFT JOIN am.media f
+            WHERE p.status = :status
+            GROUP BY a.id, a.name, f.fileUrl
+            ORDER BY SUM(p.viewCount) DESC, COUNT(p) DESC
+            """)
+    Page<TopAgencyResponse> findTopAgencies(
+            @Param("status") PropertyStatus status,
+            Pageable pageable
+    );
+
 
 }

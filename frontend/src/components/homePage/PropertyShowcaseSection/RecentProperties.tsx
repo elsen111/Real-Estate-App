@@ -10,7 +10,6 @@ import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 
-
 const RecentProperties = () => {
 
       const [recentProperties, setRecentProperties] = useState<PropertyResponse[]>([])

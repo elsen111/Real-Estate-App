@@ -358,12 +358,12 @@ public class PropertyController {
 
     @GetMapping("/cities/popular")
     @Operation(summary = "Get trending cities by property.")
-    public ResponseEntity<ApiResponse<Page<PopularCityProjection>>> getTrendingCities(
+    public ResponseEntity<ApiResponse<Page<PopularCityResponse>>> getTrendingCities(
             @PageableDefault(size = 8)
             Pageable pageable
     ) {
 
-        Page<PopularCityProjection> response = propertyService.getTrendingCities(pageable);
+        Page<PopularCityResponse> response = propertyService.getTrendingCities(pageable);
 
         return ResponseEntity.ok(
                 ApiResponse.success("Trending cities fetched successfully", response)
