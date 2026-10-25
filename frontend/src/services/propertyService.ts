@@ -29,7 +29,7 @@ const propertyService = {
     return response.data;
   },
 
-    getPopularCities: async (
+  getPopularCities: async (
     page: number = 0,
     size: number = 0,
   ): Promise<PageResponse<PopularCityResponse>> => {

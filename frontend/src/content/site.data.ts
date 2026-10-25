@@ -1,4 +1,9 @@
-import { BadgeCheck, ChartNoAxesCombined, MessageCircle, Search } from "lucide-react";
+import {
+  BadgeCheck,
+  ChartNoAxesCombined,
+  MessageCircle,
+  Search,
+} from "lucide-react";
 import type {
   FeaturesSectionContent,
   HeroSectionContent,
@@ -47,27 +52,33 @@ export const featuresSectionContent: FeaturesSectionContent = {
       name: "Best Price",
       description:
         "Not sure what  you should be charging for your property? No need to worry, let us do the numbers for you.",
-    }
+    },
   ],
 };
 
-export const propertyShowcaseSubsectionContents: PropertyShowcaseSubsectionContent[] = [
-  {
-    title: 'Browse by Property Type',
-    tagline: 'Spaces tailored to your lifestyle.'
-  },
+export const propertyShowcaseSubsectionContents: PropertyShowcaseSubsectionContent[] =
+  [
+    {
+      title: "Browse by Property Type",
+      tagline: "Spaces tailored to your lifestyle.",
+    },
 
-  {
-    title: 'Featured properties'
-  },
+    {
+      title: "Featured properties",
+    },
 
-  {
-    title: 'Recently added',
-    tagline: 'Fresh listings from agencies.'
-  },
+    {
+      title: "Recently added",
+      tagline: "Fresh listings from agencies.",
+    },
 
-  {
-    title: 'Popular cities',
-    tagline: 'Where most people are searching right now.'
-  }
-]
+    {
+      title: "Popular cities",
+      tagline: "Where most people are searching right now.",
+    },
+
+    {
+      title: "Top agencies",
+      tagline: `Meet some of the agencies listing on ${siteMetaData.name}.`,
+    },
+  ];

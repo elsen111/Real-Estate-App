@@ -4,7 +4,9 @@ import com.realestate.backend.dto.response.PopularCityResponse;
 import com.realestate.backend.dto.response.PropertySuggestionResponse;
 import com.realestate.backend.dto.response.TopAgencyResponse;
 import com.realestate.backend.entity.PropertyEntity;
+import com.realestate.backend.enums.AgencyStatus;
 import com.realestate.backend.enums.PropertyStatus;
+import com.realestate.backend.enums.ReviewStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -117,20 +119,27 @@ public interface PropertyRepository extends JpaRepository<PropertyEntity, UUID>,
             SELECT new com.realestate.backend.dto.response.TopAgencyResponse(
                 a.id, 
                 a.name, 
+                a.city,
                 f.fileUrl, 
-                COUNT(p), 
-                SUM(p.viewCount)
+                COUNT(DISTINCT p.id), 
+                CAST(COALESCE(SUM(DISTINCT p.viewCount), 0) AS Long),
+                CAST(AVG(CAST(r.rating AS Double)) AS Double)
             )
-            FROM PropertyEntity p
-            JOIN p.agency a
+            FROM AgencyEntity a
             LEFT JOIN a.logoUrl am
             LEFT JOIN am.media f
-            WHERE p.status = :status
+            LEFT JOIN PropertyEntity p ON p.agency.id = a.id AND p.status = :propStatus
+            LEFT JOIN ReviewEntity r ON r.agency.id = a.id AND r.status = :reviewStatus
+            WHERE a.status = :agencyStatus 
+            AND a.isDeleted = false
             GROUP BY a.id, a.name, f.fileUrl
-            ORDER BY SUM(p.viewCount) DESC, COUNT(p) DESC
+            HAVING COUNT(DISTINCT p.id) > 0 OR AVG(r.rating) IS NOT NULL
+            ORDER BY COALESCE(AVG(CAST(r.rating AS Double)), 0.0) DESC, COALESCE(SUM(DISTINCT p.viewCount), 0) DESC, COUNT(DISTINCT p.id) DESC
             """)
     Page<TopAgencyResponse> findTopAgencies(
-            @Param("status") PropertyStatus status,
+            @Param("agencyStatus") AgencyStatus agencyStatus,
+            @Param("propStatus") PropertyStatus propStatus,
+            @Param("reviewStatus") ReviewStatus reviewStatus,
             Pageable pageable
     );
 

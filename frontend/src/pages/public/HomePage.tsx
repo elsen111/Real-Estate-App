@@ -3,6 +3,7 @@
 import FeaturesSection from '../../components/homePage/FeaturesSection'
 import HeroSection from '../../components/homePage/HeroSetion'
 import PropertyShowcase from '../../components/homePage/PropertyShowcaseSection';
+import TopAgenciesSection from '../../components/homePage/TopAgenciesSection';
 import TrendingCitiesSection from '../../components/homePage/TrendingCitiesSection';
 
 const HomePage = () => {
@@ -13,6 +14,7 @@ const HomePage = () => {
       <FeaturesSection />
       <PropertyShowcase />
       <TrendingCitiesSection />
+      <TopAgenciesSection />
     </div>
   )
 }

@@ -3,9 +3,7 @@ package com.realestate.backend.service.impl;
 import com.realestate.backend.dto.request.*;
 import com.realestate.backend.dto.response.*;
 import com.realestate.backend.entity.*;
-import com.realestate.backend.enums.PropertyStatus;
-import com.realestate.backend.enums.Role;
-import com.realestate.backend.enums.SubscriptionStatus;
+import com.realestate.backend.enums.*;
 import com.realestate.backend.exception.*;
 import com.realestate.backend.mapper.PropertyMapper;
 import com.realestate.backend.repository.*;
@@ -698,7 +696,9 @@ public class PropertyServiceImpl implements PropertyService {
     @Transactional(readOnly = true)
     public Page<TopAgencyResponse> getTopAgencies(Pageable pageable) {
         return propertyRepository.findTopAgencies(
+                AgencyStatus.APPROVED,
                 PropertyStatus.ACTIVE,
+                ReviewStatus.APPROVED,
                 pageable
         );
     }
