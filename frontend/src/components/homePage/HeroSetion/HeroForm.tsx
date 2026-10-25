@@ -1,7 +1,7 @@
 import { useState } from "react";
-import Button from "../../common/ui/Button"
-import Input from "../../common/ui/Input"
-import Dropdown, { type Option } from "../../common/ui/Dropdown"
+import Button from "../../common/UI/Button"
+import Input from "../../common/UI/Input"
+import Dropdown, { type Option } from "../../common/UI/Dropdown"
 import { useNavigate } from "react-router-dom";
 import useCategories from "../../../hooks/useCategories";
 

@@ -34,6 +34,8 @@ const PropertyCard = ({
 
                   {/* Image */}
                   <div className="relative h-[19rem] w-full">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-black/5 to-transparent transition-opacity duration-30" />
+
                         {image ? (
                               <img
                                     src={image}

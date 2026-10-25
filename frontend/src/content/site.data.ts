@@ -64,5 +64,10 @@ export const propertyShowcaseSubsectionContents: PropertyShowcaseSubsectionConte
   {
     title: 'Recently added',
     tagline: 'Fresh listings from agencies.'
+  },
+
+  {
+    title: 'Popular cities',
+    tagline: 'Where most people are searching right now.'
   }
 ]

@@ -1,7 +1,7 @@
 import SectionContainer from "../../../app/layouts/SectionContainer"
 import featuresImg from "../../../assets/images/features.jpg"
 import { featuresSectionContent } from "../../../content/site.data"
-import Button from "../../common/ui/Button"
+import Button from "../../common/UI/Button"
 import FeatureCard from "./FeatureCard"
 
 const FeaturesSection = () => {

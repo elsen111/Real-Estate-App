@@ -1,11 +1,11 @@
-import { useEffect, useState, type ReactNode } from "react"
+import { useEffect, useState } from "react"
 import type { PropertyResponse } from "../../../types/api/property"
 import propertyService from "../../../services/propertyService";
 import axios from "axios";
 import SubsectionHeader from "./SubsectionHeader";
 import { propertyShowcaseSubsectionContents } from "../../../content/site.data";
-import { Carousel } from "../../common/ui/Carousel";
-import PropertyCard from "../../common/ui/PropertyCard";
+import { Carousel } from "../../common/UI/Carousel";
+import PropertyCard from "../../common/UI/PropertyCard";
 import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
@@ -13,7 +13,7 @@ import { ChevronRight } from "lucide-react";
 
 const RecentProperties = () => {
 
-      const [featuredProperties, setFeaturedProperties] = useState<PropertyResponse[]>([])
+      const [recentProperties, setRecentProperties] = useState<PropertyResponse[]>([])
       const [isLoading, setIsLoading] = useState(true);
       const [error, setError] = useState<string | null>(null)
 
@@ -22,7 +22,7 @@ const RecentProperties = () => {
       useEffect(() => {
             let isMounted = true;
 
-            const fetchFeaturedProperties = async () => {
+            const fetchRecentProperties = async () => {
                   try {
                         setIsLoading(true);
                         setError(null);
@@ -31,7 +31,7 @@ const RecentProperties = () => {
 
                         if (!isMounted) return;
 
-                        setFeaturedProperties(response.content);
+                        setRecentProperties(response.content);
                   } catch (error: unknown) {
                         if (!isMounted) return;
 
@@ -41,13 +41,13 @@ const RecentProperties = () => {
                               if (!error.response) {
                                     setError("Unable to connect to the server. Please check your internet connection.");
                               } else if (status === 404) {
-                                    setError("Featured properties were not found.");
+                                    setError("Recent properties were not found.");
                               } else if (status === 500) {
                                     setError("A server error occurred. Please try again later.");
                               } else {
                                     setError(
                                           error.response.data?.message ||
-                                          "Failed to load featured properties."
+                                          "Failed to load recent properties."
                                     );
                               }
                         } else {
@@ -60,7 +60,7 @@ const RecentProperties = () => {
                   }
             };
 
-            fetchFeaturedProperties();
+            fetchRecentProperties();
 
             return () => {
                   isMounted = false;
@@ -100,7 +100,7 @@ const RecentProperties = () => {
       if (isLoading) {
             return (
                   <div className="flex justify-center">
-                        <ClipLoader color="#470bb7ff" size={40} loading={isLoading} className="flex justify-center" />
+                        <ClipLoader color="#470bb7ff" size={40} loading={isLoading} className="mt-20 flex justify-center" />
                   </div>
             );
       }
@@ -109,14 +109,14 @@ const RecentProperties = () => {
             return <div>{error}</div>;
       }
 
-      if (featuredProperties.length === 0) {
+      if (recentProperties.length === 0) {
             return null;
       }
 
       return (
             <section className="mt-30">
                   <SubsectionHeader title={propertyShowcaseSubsectionContents[2].title} tagline={propertyShowcaseSubsectionContents[2].tagline} />
-                  <Carousel items={featuredProperties} renderItem={renderItem} itemClassName="w-[30rem] h-[40rem]" onChange={handleChange} endItem={endItem} />
+                  <Carousel items={recentProperties} renderItem={renderItem} itemClassName="w-[30rem] h-[40rem]" onChange={handleChange} endItem={endItem} />
             </section>
       )
 }

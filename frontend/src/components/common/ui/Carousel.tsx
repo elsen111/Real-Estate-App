@@ -8,7 +8,7 @@ import {
 } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-type CarouselProps<T extends { id: string }> = {
+type CarouselProps<T extends { id?: string }> = {
   items: T[];
   value?: string | null;
   onChange?: (id: string | null) => void;
@@ -17,7 +17,7 @@ type CarouselProps<T extends { id: string }> = {
   itemClassName?: string;
 };
 
-export function Carousel<T extends { id: string }>({
+export function Carousel<T extends { id?: string }>({
   items,
   value = null,
   onChange,
@@ -80,7 +80,7 @@ export function Carousel<T extends { id: string }>({
         className="snap-x snap-mandatory overflow-x-auto scroll-smooth px-1 py-3
           [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        <div className="flex w-max min-w-full justify-center gap-4">
+        <div className="flex w-max min-w-full gap-4">
           {items.map((item, i) => {
             const selected = item.id === value;
 

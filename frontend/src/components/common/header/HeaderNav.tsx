@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import Brand from "../Brand";
-import Button from "../ui/Button";
+import Button from "../UI/Button";
 
 type TopNavLink = {
       label: string;

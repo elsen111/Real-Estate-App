@@ -1,6 +1,6 @@
 
 
-import { Carousel } from '../../common/ui/Carousel'
+import { Carousel } from '../../common/UI/Carousel'
 import useCategories from '../../../hooks/useCategories'
 import type { CategoryResponse } from '../../../types/api/category';
 import { useNavigate } from 'react-router-dom';

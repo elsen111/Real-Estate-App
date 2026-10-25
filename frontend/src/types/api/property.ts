@@ -1,10 +1,10 @@
 export interface PropertyResponse {
-  id: string; 
+  id: string;
   title: string;
   description: string;
   price: number;
-  currency: "AZN" | string; 
-  listingType: 'SALE' | 'RENT';
+  currency: "AZN" | string;
+  listingType: "SALE" | "RENT";
   featured: boolean;
   area: number;
   rooms: number;
@@ -14,17 +14,23 @@ export interface PropertyResponse {
   city: string;
   district: string;
   address: string;
-  categoryId: string; 
+  categoryId: string;
   categoryName: string;
   mainImageUrl: string;
   viewCount: number;
   reviewCount: number;
   averageRating: number;
-  agencyId: string; 
+  agencyId: string;
   agencyName: string;
-  assignedAgentId: string; 
+  assignedAgentId: string;
   assignedAgentName: string;
-  status: 'PENDING' | 'ACTIVE' | 'APPROVED' | 'REJECTED';
-  createdAt: string; 
-  updatedAt: string; 
+  status: "PENDING" | "ACTIVE" | "APPROVED" | "REJECTED";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PopularCityResponse {
+  cityName: string;
+  propertyCount: number;
+  totalViews: number;
 }
