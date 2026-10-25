@@ -1,8 +1,10 @@
 package com.realestate.backend.repository;
 
+import com.realestate.backend.dto.response.PopularCityProjection;
 import com.realestate.backend.dto.response.PropertySuggestionResponse;
 import com.realestate.backend.entity.PropertyEntity;
 import com.realestate.backend.enums.PropertyStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -92,6 +94,38 @@ public interface PropertyRepository extends JpaRepository<PropertyEntity, UUID>,
     long countByAgencyIdAndStatusIn(
             UUID id,
             Collection<PropertyStatus> propertyStatus
+    );
+
+//    @Query("""
+//        SELECT p.city AS cityName,
+//               COUNT(p) AS propertyCount,
+//               COALESCE(SUM(p.viewCount), 0) AS totalViews
+//        FROM PropertyEntity p
+//        WHERE p.status = :status
+//          AND p.city IS NOT NULL
+//          AND TRIM(p.city) <> ''
+//        GROUP BY p.city
+//        ORDER BY SUM(p.viewCount) DESC, COUNT(p) DESC
+//        """)
+//    List<PopularCityProjection> findPopularCities(
+//            @Param("status") PropertyStatus status,
+//            Pageable pageable
+//    );
+
+    @Query("""
+        SELECT p.city AS cityName,
+               COUNT(p) AS propertyCount,
+               COALESCE(SUM(p.viewCount), 0) AS totalViews
+        FROM PropertyEntity p
+        WHERE p.status = :status
+          AND p.city IS NOT NULL
+          AND TRIM(p.city) <> ''
+        GROUP BY p.city
+        ORDER BY SUM(p.viewCount) DESC, COUNT(p) DESC, p.city ASC
+        """)
+    Page<PopularCityProjection> findPopularCities(
+            @Param("status") PropertyStatus status,
+            Pageable pageable
     );
 
 }

@@ -115,7 +115,7 @@ const RecentProperties = () => {
 
       return (
             <section className="mt-30">
-                  <SubsectionHeader title={propertyShowcaseSubsectionContents[2].title} />
+                  <SubsectionHeader title={propertyShowcaseSubsectionContents[2].title} tagline={propertyShowcaseSubsectionContents[2].tagline} />
                   <Carousel items={featuredProperties} renderItem={renderItem} itemClassName="w-[30rem] h-[40rem]" onChange={handleChange} endItem={endItem} />
             </section>
       )

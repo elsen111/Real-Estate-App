@@ -686,6 +686,15 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Page<PopularCityProjection> getTrendingCities(Pageable pageable) {
+        return propertyRepository.findPopularCities(
+                PropertyStatus.ACTIVE,
+                pageable
+        );
+    }
+
+    @Override
     @Transactional
     public List<PropertyMediaResponse> uploadMedia(
             UUID propertyId,

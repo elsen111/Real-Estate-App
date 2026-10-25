@@ -104,4 +104,8 @@ public interface PropertyService {
             Pageable pageable
     );
 
+    Page<PopularCityProjection> getTrendingCities(
+            Pageable pageable
+    );
+
 }

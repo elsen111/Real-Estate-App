@@ -5,7 +5,7 @@ const SubsectionHeader = ({title, tagline=''} : PropertyShowcaseSubsectionConten
   return (
       <header className="mb-12">
             <h5 className="text-5xl sm:text-start text-center text-secondary font-bold tracking-tight leading-15">{title}</h5>
-            {tagline && <p className="mt-2 text-[1.8rem] text-center sm:text-start leading-relaxed text-gray-700 font-medium"> {tagline} </p>}
+            {tagline && <p className="mt-2 text-[1.6rem] text-center sm:text-start leading-relaxed text-gray-400 font-medium"> {tagline} </p>}
       </header>
   )
 }
