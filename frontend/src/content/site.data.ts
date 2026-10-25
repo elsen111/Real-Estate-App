@@ -2,6 +2,7 @@ import { BadgeCheck, ChartNoAxesCombined, MessageCircle, Search } from "lucide-r
 import type {
   FeaturesSectionContent,
   HeroSectionContent,
+  PropertyShowcaseSubsectionContent,
   SiteMetaData,
 } from "../types/content/siteContentTypes";
 
@@ -49,3 +50,12 @@ export const featuresSectionContent: FeaturesSectionContent = {
     }
   ],
 };
+
+export const propertyShowcaseSubsectionContents: PropertyShowcaseSubsectionContent[] = [
+  {
+    title: 'Browse by Property Type',
+    tagline: 'Spaces tailored to your lifestyle.'
+  },
+
+  {title: 'Featured properties'}
+]

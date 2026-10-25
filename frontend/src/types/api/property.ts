@@ -1,0 +1,30 @@
+export interface PropertyResponse {
+  id: string; 
+  title: string;
+  description: string;
+  price: number;
+  currency: "AZN" | string; 
+  listingType: 'SALE' | 'RENT';
+  featured: boolean;
+  area: number;
+  rooms: number;
+  bathrooms: number;
+  floor: number;
+  totalFloors: number;
+  city: string;
+  district: string;
+  address: string;
+  categoryId: string; 
+  categoryName: string;
+  mainImageUrl: string;
+  viewCount: number;
+  reviewCount: number;
+  averageRating: number;
+  agencyId: string; 
+  agencyName: string;
+  assignedAgentId: string; 
+  assignedAgentName: string;
+  status: 'PENDING' | 'ACTIVE' | 'APPROVED' | 'REJECTED';
+  createdAt: string; 
+  updatedAt: string; 
+}

@@ -4,6 +4,8 @@ import { Carousel } from '../../common/ui/Carousel'
 import useCategories from '../../../hooks/useCategories'
 import type { CategoryResponse } from '../../../types/api/category';
 import { useNavigate } from 'react-router-dom';
+import SubsectionHeader from './SubsectionHeader';
+import { propertyShowcaseSubsectionContents } from '../../../content/site.data';
 
 const CategoryFilter = () => {
 
@@ -28,9 +30,10 @@ const CategoryFilter = () => {
       }
 
       return (
-            <>
+            <section className='mb-30'>
+                  <SubsectionHeader {...propertyShowcaseSubsectionContents[0]} />
                   <Carousel items={categories} renderItem={renderCategory} onChange={handleChange} />
-            </>
+            </section>
       )
 }
 

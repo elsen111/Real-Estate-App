@@ -13,6 +13,7 @@ type CarouselProps<T extends { id: string }> = {
   value?: string | null;
   onChange?: (id: string | null) => void;
   renderItem: (item: T, selected: boolean) => ReactNode;
+  endItem?: ReactNode
   itemClassName?: string;
 };
 
@@ -21,6 +22,7 @@ export function Carousel<T extends { id: string }>({
   value = null,
   onChange,
   renderItem,
+  endItem,
   itemClassName = "w-72",
 }: CarouselProps<T>) {
   const track = useRef<HTMLDivElement>(null);
@@ -69,7 +71,7 @@ export function Carousel<T extends { id: string }>({
   };
 
   return (
-    <div className="relative">
+    <div className="relative group">
       <div
         ref={track}
         role="listbox"
@@ -86,22 +88,20 @@ export function Carousel<T extends { id: string }>({
               <div
                 key={item.id}
                 style={{ transitionDelay: `${i * 70}ms` }}
-                className={`shrink-0 snap-start transition-all duration-500 ${itemClassName} ${
-                  mounted
-                    ? "translate-y-0 opacity-100"
-                    : "translate-y-4 opacity-0"
-                }`}
+                className={`shrink-0 snap-start transition-all duration-500 ${itemClassName} ${mounted
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-4 opacity-0"
+                  }`}
               >
                 <button
                   type="button"
                   role="option"
                   aria-selected={selected}
                   onClick={() => onChange?.(selected ? null : item.id)}
-                  className={`h-full w-full rounded-2xl text-left outline-none transition-all duration-300
-                    focus-visible:ring-2 focus-visible:ring-indigo-400 ${
-                      selected
-                        ? "scale-[1.02] ring-2 ring-indigo-600 shadow-lg"
-                        : "hover:-translate-y-1 hover:shadow-md"
+                  className={`h-full min-w-full rounded-2xl text-left outline-none transition-all duration-300
+                    focus-visible:ring-2 focus-visible:ring-indigo-400 ${selected
+                      ? "scale-[1.02] ring-2 ring-indigo-600 shadow-lg"
+                      : "hover:-translate-y-1 hover:shadow-md"
                     }`}
                 >
                   {renderItem(item, selected)}
@@ -109,7 +109,13 @@ export function Carousel<T extends { id: string }>({
               </div>
             );
           })}
+        {endItem && (
+          <div className="shrink-0 snap-start cursor-pointer">
+            {endItem}
+          </div>
+        )}
         </div>
+
       </div>
 
       {(["start", "end"] as const).map((side) => (
@@ -120,15 +126,15 @@ export function Carousel<T extends { id: string }>({
           disabled={edge[side]}
           onClick={() => scrollByPage(side === "start" ? -1 : 1)}
           className={`absolute top-1/2 z-10 -translate-y-1/2 rounded-full
-            bg-white p-1.5 sm:p-2 shadow-md transition-all
-            hover:bg-gray-100
+            bg-gray-200 duration-300 cursor-pointer p-1.5 sm:p-2 shadow-md transition-all
+            hover:bg-gray-100 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto
             disabled:pointer-events-none disabled:opacity-0
             ${side === "start" ? "left-0" : "right-0"}`}
         >
           {side === "start" ? (
-            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700" />
+            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 md:h-12 md:w-12 text-gray-700" />
           ) : (
-            <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700" />
+            <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 md:h-12 md:w-12 text-gray-700" />
           )}
         </button>
       ))}

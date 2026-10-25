@@ -21,6 +21,7 @@ const FeaturesSection = () => {
             featuresSectionContent.features.map((feature) => (
               <FeatureCard
                 {...feature}
+                key={feature.name}
               />
             ))
           }

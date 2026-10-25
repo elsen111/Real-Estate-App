@@ -7,6 +7,7 @@ import BuyPage from "../../pages/public/BuyPage";
 import PricingPage from "../../pages/public/PricingPage";
 import MapPage from "../../pages/public/MapPage";
 import PropertySearchPage from "../../pages/public/PropertySearchPage";
+import PropertyDetailsPage from "../../pages/public/PropertyDetailsPage";
 
 export const PublicRoutes = [
       {
@@ -19,6 +20,7 @@ export const PublicRoutes = [
                    {path: "/map", element: <MapPage />},
                    {path: "/pricing", element: <PricingPage />},
                    {path: "/properties", element: <PropertySearchPage />},
+                   {path: "/properties/:id", element: <PropertyDetailsPage />},
             ],
       },
 
