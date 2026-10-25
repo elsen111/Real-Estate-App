@@ -15,6 +15,19 @@ const propertyService = {
 
     return response.data;
   },
+
+  getRecent: async (
+    page: number = 0,
+    size: number = 0,
+  ): Promise<PageResponse<PropertyResponse>> => {
+    const response = await apiClient.get<
+      PageResponse<PropertyResponse>
+    >("/properties/recent", {
+      params: { page, size },
+    });
+
+    return response.data;
+  },
 };
 
 export default propertyService;

@@ -93,27 +93,33 @@ export function Carousel<T extends { id: string }>({
                   : "translate-y-4 opacity-0"
                   }`}
               >
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={selected}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={selected}
                   onClick={() => onChange?.(selected ? null : item.id)}
-                  className={`h-full min-w-full rounded-2xl text-left outline-none transition-all duration-300
-                    focus-visible:ring-2 focus-visible:ring-indigo-400 ${selected
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onChange?.(selected ? null : item.id);
+                    }
+                  }}
+                  className={`h-full min-w-full cursor-pointer rounded-2xl text-left outline-none transition-all duration-300
+    focus-visible:ring-2 focus-visible:ring-indigo-400 ${selected
                       ? "scale-[1.02] ring-2 ring-indigo-600 shadow-lg"
                       : "hover:-translate-y-1 hover:shadow-md"
                     }`}
                 >
                   {renderItem(item, selected)}
-                </button>
+                </div>
               </div>
             );
           })}
-        {endItem && (
-          <div className="shrink-0 snap-start cursor-pointer">
-            {endItem}
-          </div>
-        )}
+          {endItem && (
+            <div className="shrink-0 snap-start cursor-pointer">
+              {endItem}
+            </div>
+          )}
         </div>
 
       </div>

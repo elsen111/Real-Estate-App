@@ -57,5 +57,7 @@ export const propertyShowcaseSubsectionContents: PropertyShowcaseSubsectionConte
     tagline: 'Spaces tailored to your lifestyle.'
   },
 
-  {title: 'Featured properties'}
+  {title: 'Featured properties'},
+
+  {title: 'Recently added'}
 ]
