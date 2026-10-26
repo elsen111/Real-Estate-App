@@ -77,7 +77,7 @@ const TrendingCitiesSection = () => {
         style={{ backgroundImage: `url(${cityCardBgImg})` }}
         className="group relative flex h-full w-full cursor-pointer flex-col justify-end overflow-hidden rounded-2xl bg-cover bg-center text-white transition-transform duration-300 hover:rotate-x-30"
       >
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent transition-colors duration-300 group-hover:from-black/90" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/50 to-transparent transition-colors duration-300 group-hover:from-black/90" />
 
         <div className="relative z-10 flex flex-col gap-5 p-6">
           <div className="flex items-center gap-2 text-white/80">

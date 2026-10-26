@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import SectionContainer from "../../../app/layouts/SectionContainer";
-import type { PopularCityResponse } from "../../../types/api/property";
 import { Carousel } from "../../common/UI/Carousel";
 import SubsectionHeader from "../../common/SubsectionHeader";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { propertyShowcaseSubsectionContents } from "../../../content/site.data";
 import { ClipLoader } from "react-spinners";
-import cityCardBgImg from "../../../assets/images/city-card-bg.png";
-import { Building2, Eye, House, Houses, MapPin, Star } from "lucide-react";
+import { Building2, Eye, Houses, Star } from "lucide-react";
 import type { TopAgencyResponse } from "../../../types/api/agency";
 import agencyService from "../../../services/agencyService";
 
@@ -70,7 +68,7 @@ const TopAgenciesSection = () => {
 
   const renderAgencyCard = (agency: TopAgencyResponse) => {
     return (
-      <section className="group border-secondary/10 relative flex h-full w-full cursor-pointer flex-col justify-end overflow-hidden rounded-2xl border bg-gradient-to-t from-black/10 via-black/5 to-transparent bg-cover bg-center text-white transition-transform duration-300">
+      <section className="group border-secondary/10 relative flex h-full w-full cursor-pointer flex-col justify-end overflow-hidden rounded-2xl border bg-linear-to-t from-black/10 via-black/5 to-transparent bg-cover bg-center text-white transition-transform duration-300">
         <div className="relative z-10 flex h-full flex-col justify-between p-6">
           <div className="flex items-center gap-5">
             <div className="h-23 w-25 shrink-0 overflow-hidden rounded-2xl">

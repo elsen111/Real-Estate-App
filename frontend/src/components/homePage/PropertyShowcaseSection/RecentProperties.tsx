@@ -98,7 +98,7 @@ const RecentProperties = () => {
     <button
       type="button"
       onClick={() => navigate("/properties?sort=createdAt,desc")}
-      className="flex h-[40rem] w-[30rem] shrink-0 cursor-pointer items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 text-lg text-[1.8rem] font-semibold text-gray-500 transition-colors hover:bg-gray-200"
+      className="flex h-160 w-120 shrink-0 cursor-pointer items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 text-lg text-[1.8rem] font-semibold text-gray-500 transition-colors hover:bg-gray-200"
     >
       View All
       <ChevronRight size={20} className="ml-2" />

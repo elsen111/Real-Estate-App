@@ -1,7 +1,7 @@
 import { Carousel } from "../../common/UI/Carousel";
 import useCategories from "../../../hooks/useCategories";
 import type { CategoryResponse } from "../../../types/api/category";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import SubsectionHeader from "../../common/SubsectionHeader";
 import { propertyShowcaseSubsectionContents } from "../../../content/site.data";
 import { ArrowRight } from "lucide-react";
@@ -21,11 +21,11 @@ const CategoryFilter = () => {
         style={{
           backgroundImage: `url(${category.imageUrl ? category.imageUrl : categoryDefaultImage})`,
         }}
-        className="group relative isolate flex h-full min-h-[280px] w-full flex-col justify-end overflow-hidden rounded-2xl bg-cover bg-center text-white transition-transform duration-500 hover:-translate-y-1"
+        className="group relative isolate flex h-full min-h-70 w-full flex-col justify-end overflow-hidden rounded-2xl bg-cover bg-center text-white transition-transform duration-500 hover:-translate-y-1"
       >
         <div className="absolute inset-0 -z-20 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110" />
 
-        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-slate-950 via-slate-950/45 to-slate-950/10 opacity-90 transition-all duration-500" />
+        <div className="absolute inset-0 -z-10 bg-linear-to-t from-slate-950 via-slate-950/45 to-slate-950/10 opacity-90 transition-all duration-500" />
 
         <div className="relative z-10 p-6 sm:p-7">
           <h3 className="text-2xl font-bold tracking-tight transition-transform duration-300 sm:text-3xl">

@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import type { PropertyResponse } from "../../../types/api/property";
 import propertyService from "../../../services/propertyService";
 import axios from "axios";
@@ -98,7 +98,7 @@ const FeaturedProperties = () => {
     <button
       type="button"
       onClick={() => navigate("/properties?featured=true")}
-      className="flex h-[40rem] w-[30rem] shrink-0 cursor-pointer items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 text-lg text-[1.8rem] font-semibold text-gray-500 transition-colors hover:bg-gray-200"
+      className="flex h-160 w-120 shrink-0 cursor-pointer items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 text-lg text-[1.8rem] font-semibold text-gray-500 transition-colors hover:bg-gray-200"
     >
       View All
       <ChevronRight size={20} className="ml-2" />
