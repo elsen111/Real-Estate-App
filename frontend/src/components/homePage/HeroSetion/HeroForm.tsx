@@ -50,9 +50,9 @@ const HeroForm = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-primary flex w-full flex-col gap-8 rounded-2xl p-10 sm:w-[80%] sm:min-w-[60rem]"
+      className="bg-primary flex w-full flex-col gap-8 rounded-2xl p-10 sm:w-[80%] sm:min-w-240"
     >
-      <div className="flex w-[10rem] items-center justify-between gap-2 text-[1.6rem] font-bold">
+      <div className="flex w-40 items-center justify-between gap-2 text-[1.6rem] font-bold">
         <Button
           variant={selectedListing == "buy" ? "blue" : "white"}
           onClick={(e) => handleSelectListing(e, "buy")}

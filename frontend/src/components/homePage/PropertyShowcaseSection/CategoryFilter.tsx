@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import SubsectionHeader from "../../common/SubsectionHeader";
 import { propertyShowcaseSubsectionContents } from "../../../content/site.data";
 import categoryDefaultImage from "../../../assets/images/category-default-bg.jpg";
-import CategoryCard from "./CategoryCard";
+import CategoryCard from "../../common/Cards/CategoryCard";
 
 const CategoryFilter = () => {
   const { data: response } = useCategories();
@@ -15,7 +15,7 @@ const CategoryFilter = () => {
 
   if (categories.length == 0) return;
 
-  const renderCategory = (category: CategoryResponse) => (
+  const renderCategoryCard = (category: CategoryResponse) => (
     <CategoryCard
       name={category.name}
       description={category.description}
@@ -34,9 +34,9 @@ const CategoryFilter = () => {
       <SubsectionHeader {...propertyShowcaseSubsectionContents[0]} />
       <Carousel
         items={categories}
-        renderItem={renderCategory}
+        renderItem={renderCategoryCard}
         onChange={handleChange}
-        itemClassName="h-[30rem] w-[25rem]"
+        itemClassName="h-[25rem] sm:h-[30rem] w-[25rem] w-[60vw] xxs:w-[45vw] sm:w-[30rem]"
       />
     </section>
   );

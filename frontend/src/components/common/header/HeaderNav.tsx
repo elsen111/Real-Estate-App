@@ -32,7 +32,7 @@ const HeaderNav = () => {
   return (
     <>
       <nav
-        className={` ${menuOpen ? "translate-x-0" : "-translate-x-full"} bg-gray-scale fixed inset-y-0 left-0 z-20 flex h-screen w-[80%] max-w-xl min-w-[30rem] flex-col gap-10 overflow-y-auto rounded-r-3xl p-8 text-[20px] shadow-2xl transition-transform duration-500 lg:static lg:h-auto lg:w-[80%] lg:max-w-none lg:translate-x-0 lg:flex-row lg:items-center lg:justify-between lg:overflow-visible lg:rounded-none lg:p-0 lg:shadow-none`}
+        className={` ${menuOpen ? "translate-x-0" : "-translate-x-full"} bg-gray-scale fixed inset-y-0 left-0 z-20 flex h-screen w-[80%] max-w-xl min-w-120 flex-col gap-10 overflow-y-auto rounded-r-3xl p-8 text-[20px] shadow-2xl transition-transform duration-500 lg:static lg:h-auto lg:w-[80%] lg:max-w-none lg:translate-x-0 lg:flex-row lg:items-center lg:justify-between lg:overflow-visible lg:rounded-none lg:p-0 lg:shadow-none`}
       >
         <button
           aria-label="Close menu"
@@ -51,7 +51,7 @@ const HeaderNav = () => {
               to={link.path}
               onClick={() => setMenuOpen(false)}
               className={({ isActive }) =>
-                `text-purple before:bg-purple lg:after:bg-purple relative flex items-center gap-4 rounded-2xl px-5 py-4 transition-all duration-300 before:h-8 before:w-1.5 before:rounded-full before:transition-all before:duration-300 before:content-[''] lg:px-4 lg:py-3 lg:before:hidden lg:after:absolute lg:after:right-0 lg:after:bottom-0 lg:after:left-0 lg:after:h-[4px] lg:after:transition-all lg:after:duration-300 lg:after:content-[''] ${
+                `text-purple before:bg-purple lg:after:bg-purple relative flex items-center gap-4 rounded-2xl px-5 py-4 transition-all duration-300 before:h-8 before:w-1.5 before:rounded-full before:transition-all before:duration-300 before:content-[''] lg:px-4 lg:py-3 lg:before:hidden lg:after:absolute lg:after:right-0 lg:after:bottom-0 lg:after:left-0 lg:after:h-1 lg:after:transition-all lg:after:duration-300 lg:after:content-[''] ${
                   isActive
                     ? "bg-purple/10 font-semibold shadow-md before:scale-y-100 before:opacity-100 lg:-translate-y-1 lg:bg-transparent lg:shadow-none lg:after:translate-y-0 lg:after:opacity-100"
                     : "hover:bg-purple/5 before:scale-y-0 before:opacity-0 hover:shadow-sm hover:before:scale-y-100 hover:before:opacity-100 lg:after:translate-y-2 lg:after:opacity-0 lg:hover:-translate-y-1 lg:hover:bg-transparent lg:hover:shadow-none lg:hover:after:translate-y-0 lg:hover:after:opacity-100"
@@ -76,7 +76,7 @@ const HeaderNav = () => {
                 {user.image ? (
                   <img
                     src={user.image}
-                    className="block !h-full !w-full rounded-full object-cover"
+                    className="block h-full! w-full! rounded-full object-cover"
                     alt="Profile avatar"
                   />
                 ) : (

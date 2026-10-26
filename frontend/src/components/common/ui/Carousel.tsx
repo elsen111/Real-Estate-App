@@ -75,7 +75,7 @@ export function Carousel<T extends { id: string }>({
         role="listbox"
         onScroll={updateEdges}
         onKeyDown={onKeyDown}
-        className="snap-x snap-mandatory [scrollbar-width:none] overflow-x-auto scroll-smooth px-1 py-3 [&::-webkit-scrollbar]:hidden"
+        className="snap-x snap-mandatory scrollbar-none overflow-x-auto scroll-smooth px-1 py-3 [&::-webkit-scrollbar]:hidden"
       >
         <div className="flex w-max min-w-full gap-4">
           {items.map((item, i) => {

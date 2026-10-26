@@ -12,7 +12,7 @@ const FeaturesSection = () => {
           <img
             src={featuresImg}
             alt="Features section's image"
-            className="relative h-full min-h-[43rem] w-full rounded-2xl md:w-auto"
+            className="relative h-full min-h-172 w-full rounded-2xl md:w-auto"
           />
           <div className="text-primary absolute top-[5%] left-[5%] z-6 w-[90%] rounded-3xl bg-black/70 p-5 sm:top-10 md:left-10 md:w-[80%]">
             <h2 className="mb-5 text-5xl leading-15 font-bold"> {featuresSectionContent.title} </h2>
@@ -22,10 +22,9 @@ const FeaturesSection = () => {
               variant="white"
               isLink
               hasFixedDimensions={false}
-              className="w-[15rem]"
+              className="w-60"
             >
-              {" "}
-              Browse All{" "}
+              Browse All
             </Button>
           </div>
         </div>

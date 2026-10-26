@@ -5,7 +5,7 @@ import axios from "axios";
 import SubsectionHeader from "../../common/SubsectionHeader";
 import { propertyShowcaseSubsectionContents } from "../../../content/site.data";
 import { Carousel } from "../../common/UI/Carousel";
-import PropertyCard from "../../common/UI/PropertyCard";
+import PropertyCard from "../../common/Cards/PropertyCard";
 import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
@@ -66,7 +66,7 @@ const RecentProperties = () => {
     if (id) navigate(`/properties/${id}`);
   };
 
-  const renderItem = ({
+  const renderPropertyCard = ({
     title,
     description,
     price,
@@ -98,7 +98,7 @@ const RecentProperties = () => {
     <button
       type="button"
       onClick={() => navigate("/properties?sort=createdAt,desc")}
-      className="flex h-160 w-120 shrink-0 cursor-pointer items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 text-lg text-[1.8rem] font-semibold text-gray-500 transition-colors hover:bg-gray-200"
+      className="xxs:w-[45vw] flex h-180 w-[60vw] shrink-0 cursor-pointer items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 text-lg text-[1.8rem] font-semibold text-gray-500 transition-colors hover:bg-gray-200 sm:w-120"
     >
       View All
       <ChevronRight size={20} className="ml-2" />
@@ -134,8 +134,8 @@ const RecentProperties = () => {
       />
       <Carousel
         items={recentProperties}
-        renderItem={renderItem}
-        itemClassName="w-[30rem] h-[40rem]"
+        renderItem={renderPropertyCard}
+        itemClassName="w-[60vw] xxs:w-[45vw] sm:w-[30rem] h-[45rem]"
         onChange={handleChange}
         endItem={endItem}
       />

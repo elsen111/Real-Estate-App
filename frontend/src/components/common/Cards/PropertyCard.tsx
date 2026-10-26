@@ -28,15 +28,15 @@ const PropertyCard = ({
   listingType,
 }: PropertyCardProps) => {
   return (
-    <section className="relative flex h-full w-full max-w-[36rem] cursor-pointer flex-col overflow-hidden rounded-xl bg-white shadow-md">
+    <section className="relative flex h-full w-full max-w-xl cursor-pointer flex-col overflow-hidden rounded-xl bg-white shadow-md">
       {/* Image */}
-      <div className="relative h-[19rem] w-full">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-black/5 to-transparent transition-opacity duration-30" />
+      <div className="relative h-76 w-full">
+        <div className="absolute inset-0 bg-linear-to-t from-black/10 via-black/5 to-transparent transition-opacity duration-30" />
 
         {image ? (
-          <img src={image} alt={title} className="h-full w-full object-cover" loading="lazy" />
+          <img src={image} alt={title} className="h-76 w-full object-cover" loading="lazy" />
         ) : (
-          <div className="flex h-full flex-col items-center justify-center gap-3 rounded-t-2xl border-1 border-gray-500/20">
+          <div className="flex h-76 flex-col items-center justify-center gap-3 rounded-t-2xl border border-gray-500/20">
             <Image size={28} color="#bbb" />
             <p className="text-xl text-gray-400"> No preview image available</p>
           </div>
@@ -51,7 +51,7 @@ const PropertyCard = ({
 
         {listingType && (
           <div
-            className={`absolute top-4 right-4 flex items-center gap-2 rounded-full bg-white px-4 py-2 text-[1.1rem] font-semibold shadow-lg ${
+            className={`xm:right-4 absolute top-4 right-1 flex items-center gap-2 rounded-full bg-white px-4 py-2 text-[1.1rem] font-semibold shadow-lg ${
               listingType === "SALE" ? "text-emerald-700" : "text-blue-700"
             }`}
           >
@@ -66,16 +66,19 @@ const PropertyCard = ({
       </div>
 
       {/* Details */}
-      <div className="relative flex flex-1 flex-col justify-between gap-3 p-5">
+      <div className="relative flex flex-1 flex-col justify-between gap-1 p-5 sm:gap-3">
         <div className="flex items-center justify-between">
           <div className="flex items-baseline">
-            <span className="text-purple text-[2rem] font-bold">
+            <span className="text-purple xs:text-[2rem] text-[1.8rem] font-bold">
               {price.toLocaleString("en-US")}
-              <small> {currency} </small>
+              <small>
+                {" "}
+                {currency}
+                {listingType == "RENT" && (
+                  <span className="ml-[0.2rem] text-[1.3rem] text-gray-500 sm:ml-1">/{period}</span>
+                )}
+              </small>
             </span>
-            {listingType == "RENT" && (
-              <span className="ml-1 text-[1.3rem] text-gray-500">/{period}</span>
-            )}
           </div>
 
           <button
@@ -100,7 +103,7 @@ const PropertyCard = ({
         <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3 text-[1.2rem] text-gray-600">
           <div className="flex items-center gap-2">
             <MapPinHouse size={17} className="text-purple" />
-            <span> {address} </span>
+            <span className="line-clamp-1"> {address} </span>
           </div>
 
           <div className="flex items-center gap-2">
