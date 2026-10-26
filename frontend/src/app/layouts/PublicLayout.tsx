@@ -6,12 +6,12 @@ import SEO from "../../components/common/SEO";
 const PublicLayout = () => {
   return (
     <>
-      {/* <SEO /> */}
+      <SEO />
       <Header />
       <main className="relative pt-[7.2rem] md:pt-[9.6rem]">
         <Outlet />
       </main>
-      {/* <Footer /> */}
+      <Footer />
     </>
   );
 };

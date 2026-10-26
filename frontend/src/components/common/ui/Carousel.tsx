@@ -17,7 +17,7 @@ type CarouselProps<T extends { id?: string }> = {
   itemClassName?: string;
 };
 
-export function Carousel<T extends { id?: string }>({
+export function Carousel<T extends { id: string }>({
   items,
   value = null,
   onChange,

@@ -1,5 +1,3 @@
-import React from "react";
-
 const AgencyDetailsPage = () => {
   return <div>AgencyDetailsPage</div>;
 };

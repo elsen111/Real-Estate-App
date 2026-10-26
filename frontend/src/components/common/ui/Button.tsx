@@ -28,7 +28,7 @@ const Button = ({
 }: ButtonProps) => {
   return isLink ? (
     <Link
-      to={path}
+      to={path ?? "/"}
       className={`rounded-2xl text-[2rem] ${circled && "rounded-full"} ${hasFixedDimensions ? "h-20 w-20" : "px-8 py-4 lg:py-3"} ${variants[variant]} flex shrink-0 items-center justify-center overflow-hidden text-center font-semibold shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg active:scale-[0.98] ${className} `}
     >
       {children}
