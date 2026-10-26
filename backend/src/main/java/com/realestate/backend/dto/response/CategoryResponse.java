@@ -17,6 +17,7 @@ import java.util.UUID;
                 "name",
                 "slug",
                 "description",
+                "imageUrl",
                 "active",
                 "deleted",
                 "createdAt",
@@ -29,6 +30,7 @@ public class CategoryResponse {
     private String name;
     private String slug;
     private String description;
+    private String imageUrl;
     private boolean active;
     private Boolean deleted;
     private LocalDateTime createdAt;

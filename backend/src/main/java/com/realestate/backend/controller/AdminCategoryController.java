@@ -3,14 +3,17 @@ package com.realestate.backend.controller;
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.request.CreateCategoryRequest;
 import com.realestate.backend.dto.request.UpdateCategoryRequest;
+import com.realestate.backend.dto.response.CategoryLogoUploadResponse;
 import com.realestate.backend.dto.response.CategoryResponse;
 import com.realestate.backend.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -107,6 +110,24 @@ public class AdminCategoryController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Category successfully deleted", null)
+        );
+
+    }
+
+    @PostMapping(
+            value = "/{categoryId}/image",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    @Operation(summary = "Upload image for category")
+    public ResponseEntity<ApiResponse<CategoryLogoUploadResponse>> uploadCategoryImage(
+            @PathVariable UUID categoryId,
+            @RequestPart("file") MultipartFile file
+    ) {
+
+        CategoryLogoUploadResponse response = categoryService.uploadImage(categoryId, file);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Category image uploaded successfully.", response)
         );
 
     }

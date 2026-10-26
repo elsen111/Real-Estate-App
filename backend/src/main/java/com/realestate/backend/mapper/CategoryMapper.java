@@ -12,8 +12,10 @@ import org.mapstruct.MappingTarget;
 public interface CategoryMapper {
 
     @Mapping(target = "deleted", expression = "java(null)")
+    @Mapping(target = "imageUrl", source = "category.image.media.fileUrl")
     CategoryResponse toPublicResponse(CategoryEntity category);
 
+    @Mapping(target = "imageUrl", source = "category.image.media.fileUrl")
     CategoryResponse toAdminResponse(CategoryEntity category);
 
     @Mapping(target = "id", ignore = true)

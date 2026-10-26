@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum MediaFolder {
     USER_PROFILE("users/profile"),
     AGENCY_LOGO("agencies/logo"),
+    CATEGORY_IMAGE("categories/images"),
     PROPERTY_IMAGE("properties/images"),
     PROPERTY_VIDEO("properties/videos"),
     SITE_LOGO("site/logo");

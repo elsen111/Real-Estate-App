@@ -37,6 +37,12 @@ public class CategoryEntity {
     @Column(name = "description")
     private String description;
 
+    @OneToOne(
+            mappedBy = "category",
+            cascade = CascadeType.ALL
+    )
+    private CategoryMediaEntity image;
+
     @Builder.Default
     @Column(name = "active", nullable = false)
     private Boolean active = true;
