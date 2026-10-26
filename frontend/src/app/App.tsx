@@ -1,11 +1,10 @@
-import { RouterProvider } from "react-router-dom"
-import { AppRouter } from "./routes"
-import { AuthProvider } from "../context/AuthContext"
-import { QueryClientProvider } from "@tanstack/react-query"
-import queryClient from "../config/QueryClient"
+import { RouterProvider } from "react-router-dom";
+import { AppRouter } from "./routes";
+import { AuthProvider } from "../context/AuthContext";
+import { QueryClientProvider } from "@tanstack/react-query";
+import queryClient from "../config/QueryClient";
 
 function App() {
-
   return (
     <>
       <AuthProvider>
@@ -14,7 +13,7 @@ function App() {
         </QueryClientProvider>
       </AuthProvider>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

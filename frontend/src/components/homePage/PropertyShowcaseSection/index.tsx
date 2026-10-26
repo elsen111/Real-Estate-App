@@ -1,9 +1,7 @@
-
-
-import SectionContainer from '../../../app/layouts/SectionContainer'
-import CategoryFilter from './CategoryFilter'
-import FeaturedProperties from './FeaturedProperties'
-import RecentProperties from './RecentProperties'
+import SectionContainer from "../../../app/layouts/SectionContainer";
+import CategoryFilter from "./CategoryFilter";
+import FeaturedProperties from "./FeaturedProperties";
+import RecentProperties from "./RecentProperties";
 
 const PropertyShowcase = () => {
   return (
@@ -12,7 +10,7 @@ const PropertyShowcase = () => {
       <FeaturedProperties />
       <RecentProperties />
     </SectionContainer>
-  )
-}
+  );
+};
 
-export default PropertyShowcase
+export default PropertyShowcase;

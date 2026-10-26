@@ -7,9 +7,7 @@ const propertyService = {
     page: number = 0,
     size: number = 0,
   ): Promise<PageResponse<PropertyResponse>> => {
-    const response = await apiClient.get<
-      PageResponse<PropertyResponse>
-    >("/properties/featured", {
+    const response = await apiClient.get<PageResponse<PropertyResponse>>("/properties/featured", {
       params: { page, size },
     });
 
@@ -20,9 +18,7 @@ const propertyService = {
     page: number = 0,
     size: number = 0,
   ): Promise<PageResponse<PropertyResponse>> => {
-    const response = await apiClient.get<
-      PageResponse<PropertyResponse>
-    >("/properties/recent", {
+    const response = await apiClient.get<PageResponse<PropertyResponse>>("/properties/recent", {
       params: { page, size },
     });
 
@@ -33,15 +29,15 @@ const propertyService = {
     page: number = 0,
     size: number = 0,
   ): Promise<PageResponse<PopularCityResponse>> => {
-    const response = await apiClient.get<
-      PageResponse<PopularCityResponse>
-    >("/properties/cities/popular", {
-      params: { page, size },
-    });
+    const response = await apiClient.get<PageResponse<PopularCityResponse>>(
+      "/properties/cities/popular",
+      {
+        params: { page, size },
+      },
+    );
 
     return response.data;
   },
-
 };
 
 export default propertyService;

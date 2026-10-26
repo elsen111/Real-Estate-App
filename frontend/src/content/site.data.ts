@@ -1,9 +1,4 @@
-import {
-  BadgeCheck,
-  ChartNoAxesCombined,
-  MessageCircle,
-  Search,
-} from "lucide-react";
+import { BadgeCheck, ChartNoAxesCombined, MessageCircle, Search } from "lucide-react";
 import type {
   FeaturesSectionContent,
   HeroSectionContent,
@@ -13,8 +8,7 @@ import type {
 
 export const siteMetaData: SiteMetaData = {
   name: "EstateFlow",
-  description:
-    "A real estate platform backend for agencies, agents, landlords, and clients.",
+  description: "A real estate platform backend for agencies, agents, landlords, and clients.",
 };
 
 export const heroSectionContent: HeroSectionContent = {
@@ -36,15 +30,13 @@ export const featuresSectionContent: FeaturesSectionContent = {
     {
       icon: Search,
       name: "Search your way",
-      description:
-        "Filter by city, price, rooms and area, or explore listings on the map.",
+      description: "Filter by city, price, rooms and area, or explore listings on the map.",
     },
 
     {
       icon: MessageCircle,
       name: "Talk to the agent",
-      description:
-        "Send an inquiry or book a viewing straight from the property page.",
+      description: "Send an inquiry or book a viewing straight from the property page.",
     },
 
     {
@@ -56,29 +48,28 @@ export const featuresSectionContent: FeaturesSectionContent = {
   ],
 };
 
-export const propertyShowcaseSubsectionContents: PropertyShowcaseSubsectionContent[] =
-  [
-    {
-      title: "Browse by Property Type",
-      tagline: "Spaces tailored to your lifestyle.",
-    },
+export const propertyShowcaseSubsectionContents: PropertyShowcaseSubsectionContent[] = [
+  {
+    title: "Browse by Category",
+    tagline: "Spaces tailored to your lifestyle.",
+  },
 
-    {
-      title: "Featured properties",
-    },
+  {
+    title: "Featured properties",
+  },
 
-    {
-      title: "Recently added",
-      tagline: "Fresh listings from agencies.",
-    },
+  {
+    title: "Recently added",
+    tagline: "Fresh listings from agencies.",
+  },
 
-    {
-      title: "Popular cities",
-      tagline: "Where most people are searching right now.",
-    },
+  {
+    title: "Popular cities",
+    tagline: "Where most people are searching right now.",
+  },
 
-    {
-      title: "Top agencies",
-      tagline: `Meet some of the agencies listing on ${siteMetaData.name}.`,
-    },
-  ];
+  {
+    title: "Top agencies",
+    tagline: `Meet some of the agencies listing on ${siteMetaData.name}.`,
+  },
+];

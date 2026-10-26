@@ -13,7 +13,7 @@ type CarouselProps<T extends { id?: string }> = {
   value?: string | null;
   onChange?: (id: string | null) => void;
   renderItem: (item: T, selected: boolean) => ReactNode;
-  endItem?: ReactNode
+  endItem?: ReactNode;
   itemClassName?: string;
 };
 
@@ -61,9 +61,7 @@ export function Carousel<T extends { id?: string }>({
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
 
-    const options = Array.from(
-      track.current!.querySelectorAll<HTMLButtonElement>("[role=option]")
-    );
+    const options = Array.from(track.current!.querySelectorAll<HTMLButtonElement>("[role=option]"));
 
     const i = options.indexOf(document.activeElement as HTMLButtonElement);
     options[i + (e.key === "ArrowRight" ? 1 : -1)]?.focus();
@@ -71,14 +69,13 @@ export function Carousel<T extends { id?: string }>({
   };
 
   return (
-    <div className="relative group">
+    <div className="group relative">
       <div
         ref={track}
         role="listbox"
         onScroll={updateEdges}
         onKeyDown={onKeyDown}
-        className="snap-x snap-mandatory overflow-x-auto scroll-smooth px-1 py-3
-          [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="snap-x snap-mandatory [scrollbar-width:none] overflow-x-auto scroll-smooth px-1 py-3 [&::-webkit-scrollbar]:hidden"
       >
         <div className="flex w-max min-w-full gap-4">
           {items.map((item, i) => {
@@ -88,10 +85,9 @@ export function Carousel<T extends { id?: string }>({
               <div
                 key={item.id}
                 style={{ transitionDelay: `${i * 70}ms` }}
-                className={`shrink-0 snap-start transition-all duration-500 ${itemClassName} ${mounted
-                  ? "translate-y-0 opacity-100"
-                  : "translate-y-4 opacity-0"
-                  }`}
+                className={`shrink-0 snap-start transition-all duration-500 ${itemClassName} ${
+                  mounted ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+                }`}
               >
                 <div
                   role="button"
@@ -104,24 +100,19 @@ export function Carousel<T extends { id?: string }>({
                       onChange?.(selected ? null : item.id);
                     }
                   }}
-                  className={`h-full min-w-full cursor-pointer rounded-2xl text-left outline-none transition-all duration-300
-    focus-visible:ring-2 focus-visible:ring-indigo-400 ${selected
-                      ? "scale-[1.02] ring-2 ring-indigo-600 shadow-lg"
+                  className={`h-full min-w-full cursor-pointer rounded-2xl text-left transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
+                    selected
+                      ? "scale-[1.02] shadow-lg ring-2 ring-indigo-600"
                       : "hover:-translate-y-1 hover:shadow-md"
-                    }`}
+                  }`}
                 >
                   {renderItem(item, selected)}
                 </div>
               </div>
             );
           })}
-          {endItem && (
-            <div className="shrink-0 snap-start cursor-pointer">
-              {endItem}
-            </div>
-          )}
+          {endItem && <div className="shrink-0 cursor-pointer snap-start">{endItem}</div>}
         </div>
-
       </div>
 
       {(["start", "end"] as const).map((side) => (
@@ -131,16 +122,12 @@ export function Carousel<T extends { id?: string }>({
           aria-label={side === "start" ? "Previous" : "Next"}
           disabled={edge[side]}
           onClick={() => scrollByPage(side === "start" ? -1 : 1)}
-          className={`absolute top-1/2 z-10 -translate-y-1/2 rounded-full
-            bg-gray-200 duration-300 cursor-pointer p-1.5 sm:p-2 shadow-md transition-all
-            hover:bg-gray-100 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto
-            disabled:pointer-events-none disabled:opacity-0
-            ${side === "start" ? "left-0" : "right-0"}`}
+          className={`pointer-events-none absolute top-1/2 z-10 -translate-y-1/2 cursor-pointer rounded-full bg-gray-200 p-1.5 opacity-0 shadow-md transition-all duration-300 group-hover:pointer-events-auto group-hover:opacity-100 hover:bg-gray-100 disabled:pointer-events-none disabled:opacity-0 sm:p-2 ${side === "start" ? "left-0" : "right-0"}`}
         >
           {side === "start" ? (
-            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 md:h-12 md:w-12 text-gray-700" />
+            <ChevronLeft className="h-5 w-5 text-gray-700 sm:h-6 sm:w-6 md:h-12 md:w-12" />
           ) : (
-            <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 md:h-12 md:w-12 text-gray-700" />
+            <ChevronRight className="h-5 w-5 text-gray-700 sm:h-6 sm:w-6 md:h-12 md:w-12" />
           )}
         </button>
       ))}

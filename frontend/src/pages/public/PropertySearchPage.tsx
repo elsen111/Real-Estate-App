@@ -1,9 +1,5 @@
-
-
 const PropertySearchPage = () => {
-  return (
-    <div>PropertySearchPage</div>
-  )
-}
+  return <div>PropertySearchPage</div>;
+};
 
-export default PropertySearchPage
+export default PropertySearchPage;

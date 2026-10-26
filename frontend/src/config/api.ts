@@ -1,37 +1,37 @@
-import axios from "axios"
-import type { AxiosRequestConfig } from "axios"
-import type { ApiResponse } from "../types/api/api"
+import axios from "axios";
+import type { AxiosRequestConfig } from "axios";
+import type { ApiResponse } from "../types/api/api";
 
-const API_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:8080/api").replace(/\/+$/, "")
+const API_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:8080/api").replace(/\/+$/, "");
 
-const PUBLIC_ENDPOINTS = ["/auth/login", "/auth/register", "/auth/refresh"]
+const PUBLIC_ENDPOINTS = ["/auth/login", "/auth/register", "/auth/refresh"];
 
 const api = axios.create({
   baseURL: API_URL,
   timeout: 10_000,
   withCredentials: true,
-})
+});
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken")
-  const isPublic = PUBLIC_ENDPOINTS.some((path) => config.url?.startsWith(path))
+  const token = localStorage.getItem("accessToken");
+  const isPublic = PUBLIC_ENDPOINTS.some((path) => config.url?.startsWith(path));
 
-  if (token && !isPublic) config.headers.Authorization = `Bearer ${token}`
-  return config
-})
+  if (token && !isPublic) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const isPublic = PUBLIC_ENDPOINTS.some((path) => error.config?.url?.startsWith(path))
+    const isPublic = PUBLIC_ENDPOINTS.some((path) => error.config?.url?.startsWith(path));
 
     if (error.response?.status === 401 && !isPublic) {
-      localStorage.removeItem("accessToken")
-      window.location.href = "/login"
+      localStorage.removeItem("accessToken");
+      window.location.href = "/login";
     }
-    return Promise.reject(error)
-  }
-)
+    return Promise.reject(error);
+  },
+);
 
 export const apiClient = {
   get: <T>(url: string, params?: object, config?: AxiosRequestConfig) =>
@@ -48,6 +48,6 @@ export const apiClient = {
 
   delete: <T = void>(url: string, config?: AxiosRequestConfig) =>
     api.delete<ApiResponse<T>>(url, config).then((res) => res.data),
-}
+};
 
-export default api
+export default api;
