@@ -1,4 +1,4 @@
-package com.realestate.backend.security;
+package com.realestate.backend.security.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.realestate.backend.common.response.ErrorResponse;
@@ -9,8 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -18,31 +20,37 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class RestAccessDeniedHandler implements AccessDeniedHandler {
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-
     private final ObjectMapper objectMapper;
 
     @Override
-    public void commence(
+    public void handle(
             HttpServletRequest request,
             HttpServletResponse response,
-            @NonNull AuthenticationException authException
+            @NonNull AccessDeniedException accessDeniedException
     ) throws IOException {
         ErrorResponse body = ErrorResponse.of(
-                "Authentication is required",
-                HttpStatus.UNAUTHORIZED.value(),
+                "You do not have permission to access this resource",
+                HttpStatus.FORBIDDEN.value(),
                 request.getRequestURI()
         );
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String username = authentication != null
+                ? authentication.getName()
+                : "anonymous";
+
         log.atWarn()
-                .setMessage("Unauthenticated request.")
+                .setMessage("Access denied for user.")
+                .addKeyValue("username", username)
+                .addKeyValue("method", request.getMethod())
                 .addKeyValue("requestUrl", request.getRequestURI())
-                .addKeyValue("exceptionMessage", authException.getMessage())
                 .log();
 
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         objectMapper.writeValue(response.getOutputStream(), body);
     }

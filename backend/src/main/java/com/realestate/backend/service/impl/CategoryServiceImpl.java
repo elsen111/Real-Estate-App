@@ -2,24 +2,33 @@ package com.realestate.backend.service.impl;
 
 import com.realestate.backend.dto.request.CreateCategoryRequest;
 import com.realestate.backend.dto.request.UpdateCategoryRequest;
+import com.realestate.backend.dto.response.CategoryLogoUploadResponse;
 import com.realestate.backend.dto.response.CategoryResponse;
 import com.realestate.backend.entity.CategoryEntity;
+import com.realestate.backend.entity.CategoryMediaEntity;
+import com.realestate.backend.entity.MediaFileEntity;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.exception.ConflictException;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.CategoryMapper;
+import com.realestate.backend.repository.CategoryMediaRepository;
 import com.realestate.backend.repository.CategoryRepository;
 import com.realestate.backend.repository.PropertyRepository;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.CategoryService;
+import com.realestate.backend.service.MediaService;
+import com.realestate.backend.storage.MediaUploadPolicy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.text.Normalizer;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -32,6 +41,10 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper categoryMapper;
 
     private final PropertyRepository propertyRepository;
+
+    private final CategoryMediaRepository categoryMediaRepository;
+
+    private final MediaService mediaService;
 
     private static final Pattern NON_ALPHANUMERIC = Pattern.compile("[^a-z0-9\\s-]");
     private static final Pattern WHITESPACE_OR_HYPHEN = Pattern.compile("[\\s-]+");
@@ -206,6 +219,62 @@ public class CategoryServiceImpl implements CategoryService {
                 .addKeyValue("categoryId", category.getId())
                 .addKeyValue("categoryName", categoryName)
                 .log();
+
+    }
+
+    @Override
+    @Transactional
+    public CategoryLogoUploadResponse uploadImage(UUID categoryId, MultipartFile file) {
+
+        CategoryEntity category = categoryRepository.findById(categoryId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Category not found with id: " + categoryId)
+                );
+
+        Optional<CategoryMediaEntity> existingImage =
+                categoryMediaRepository.findByCategoryId(categoryId);
+
+        log.atInfo()
+                .setMessage("Uploading image for category.")
+                .addKeyValue("categoryId", categoryId)
+                .addKeyValue("categoryName", category.getName())
+                .log();
+
+        MediaFileEntity uploadedMedia =
+                mediaService.upload(file, MediaUploadPolicy.CATEGORY_IMAGE);
+
+        if (existingImage.isPresent()) {
+
+            CategoryMediaEntity categoryMedia = existingImage.get();
+
+            categoryMediaRepository.delete(categoryMedia);
+
+            mediaService.delete(categoryMedia.getMedia());
+
+            log.atInfo()
+                    .setMessage("Replacing existing image for category.")
+                    .addKeyValue("categoryId", categoryId)
+                    .addKeyValue("categoryName", category.getName())
+                    .log();
+
+        }
+
+        CategoryMediaEntity categoryMedia = CategoryMediaEntity.builder()
+                .category(category)
+                .media(uploadedMedia)
+                .build();
+
+        categoryMediaRepository.save(categoryMedia);
+
+        log.atInfo()
+                .setMessage("Category image uploaded.")
+                .addKeyValue("agencyId", categoryId)
+                .addKeyValue("categoryName", category.getName())
+                .log();
+
+        return CategoryLogoUploadResponse.builder()
+                .image(uploadedMedia.getFileUrl())
+                .build();
 
     }
 

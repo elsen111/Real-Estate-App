@@ -12,7 +12,7 @@ import com.realestate.backend.mapper.UserMapper;
 import com.realestate.backend.repository.RefreshTokenRepository;
 import com.realestate.backend.repository.UserMediaRepository;
 import com.realestate.backend.repository.UserRepository;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

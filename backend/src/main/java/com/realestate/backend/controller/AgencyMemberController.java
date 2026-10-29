@@ -2,7 +2,7 @@ package com.realestate.backend.controller;
 
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.response.AgencyMemberResponse;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.AgencyMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;

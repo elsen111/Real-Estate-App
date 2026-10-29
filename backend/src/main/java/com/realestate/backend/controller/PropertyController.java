@@ -3,7 +3,7 @@ package com.realestate.backend.controller;
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.request.*;
 import com.realestate.backend.dto.response.*;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.AppointmentService;
 import com.realestate.backend.service.InquiryService;
 import com.realestate.backend.service.PropertyService;
@@ -352,6 +352,21 @@ public class PropertyController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Agent assigned to the property successfully", null)
+        );
+
+    }
+
+    @GetMapping("/cities/popular")
+    @Operation(summary = "Get trending cities by property.")
+    public ResponseEntity<ApiResponse<Page<PopularCityResponse>>> getTrendingCities(
+            @PageableDefault(size = 8)
+            Pageable pageable
+    ) {
+
+        Page<PopularCityResponse> response = propertyService.getTrendingCities(pageable);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Trending cities fetched successfully", response)
         );
 
     }

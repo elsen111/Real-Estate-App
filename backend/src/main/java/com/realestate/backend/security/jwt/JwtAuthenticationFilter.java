@@ -1,5 +1,6 @@
-package com.realestate.backend.security;
+package com.realestate.backend.security.jwt;
 
+import com.realestate.backend.security.principal.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.realestate.backend.security.SecurityConstants.PUBLIC_URLS;
+import static com.realestate.backend.security.core.SecurityConstants.PUBLIC_URLS;
 
 @Component
 @RequiredArgsConstructor

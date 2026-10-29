@@ -9,10 +9,11 @@ import com.realestate.backend.dto.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.dto.request.UpdateAgencyRequest;
 import com.realestate.backend.enums.AppointmentStatus;
 import com.realestate.backend.enums.InquiryStatus;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.AgencyService;
 import com.realestate.backend.service.AppointmentService;
 import com.realestate.backend.service.InquiryService;
+import com.realestate.backend.service.PropertyService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class AgencyController {
     private final AgencyService agencyService;
     private final InquiryService inquiryService;
     private final AppointmentService appointmentService;
+    private final PropertyService propertyService;
 
     @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT')")
     @GetMapping("/me")
@@ -254,6 +256,21 @@ public class AgencyController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Appointment list fetched successfully", response)
+        );
+
+    }
+
+    @GetMapping("/public/top")
+    @Operation(summary = "Get top agencies by performance.")
+    public ResponseEntity<ApiResponse<Page<TopAgencyResponse>>> getTopAgencies(
+            @PageableDefault(size = 8)
+            Pageable pageable
+    ) {
+
+        Page<TopAgencyResponse> response = propertyService.getTopAgencies(pageable);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Trending cities fetched successfully", response)
         );
 
     }

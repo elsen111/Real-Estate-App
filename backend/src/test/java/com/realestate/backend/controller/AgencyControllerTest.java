@@ -8,7 +8,7 @@ import com.realestate.backend.dto.request.PropertyFilterRequest;
 import com.realestate.backend.dto.request.UpdateAgencyRequest;
 import com.realestate.backend.dto.response.*;
 import com.realestate.backend.enums.AgencyStatus;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.AgencyService;
 import com.realestate.backend.service.AppointmentService;

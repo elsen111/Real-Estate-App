@@ -1,4 +1,4 @@
-package com.realestate.backend.config;
+package com.realestate.backend.config.properties;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,11 +1,11 @@
-import { type ReactNode } from 'react'
+import { type ReactNode } from "react";
 
-const SectionContainer = ({children} : {children: ReactNode}) => {
+const SectionContainer = ({ children }: { children: ReactNode }) => {
   return (
-    <section className='lg:px-14 md:px-10 sm:py-25 sm:px-8 px-6 py-15 relative z-30 w-full relative'>
+    <section className="relative z-30 w-full px-6 py-15 sm:px-8 sm:py-25 md:px-10 lg:px-14">
       {children}
     </section>
-  )
-}
+  );
+};
 
-export default SectionContainer
+export default SectionContainer;

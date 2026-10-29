@@ -12,6 +12,16 @@ dist
 dist-ssr
 *.local
 
+# Production / Build outputs
+dist/
+build/
+.next/
+out/
+.nuxt/
+.output/
+.cache/
+.parcel-cache/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

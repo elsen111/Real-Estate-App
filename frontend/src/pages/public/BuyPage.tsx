@@ -1,9 +1,5 @@
-import React from 'react'
-
 const BuyPage = () => {
-  return (
-    <div>BuyPage</div>
-  )
-}
+  return <div>BuyPage</div>;
+};
 
-export default BuyPage
+export default BuyPage;

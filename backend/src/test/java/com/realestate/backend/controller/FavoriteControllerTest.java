@@ -3,7 +3,7 @@ package com.realestate.backend.controller;
 import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.response.FavoriteResponse;
 import com.realestate.backend.dto.response.PropertyResponse;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.FavoriteService;
 import org.junit.jupiter.api.Test;

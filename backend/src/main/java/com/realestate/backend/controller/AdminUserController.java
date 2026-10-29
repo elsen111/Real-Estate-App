@@ -4,7 +4,7 @@ import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.request.AdminUserFilterRequest;
 import com.realestate.backend.dto.request.UserStatusRequest;
 import com.realestate.backend.dto.response.UserResponse;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.AdminUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;

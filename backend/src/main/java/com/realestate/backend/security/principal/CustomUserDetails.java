@@ -1,7 +1,8 @@
-package com.realestate.backend.security;
+package com.realestate.backend.security.principal;
 
 import com.realestate.backend.entity.RoleEntity;
 import com.realestate.backend.entity.UserEntity;
+import com.realestate.backend.security.core.SecurityConstants;
 import lombok.Getter;
 import lombok.NonNull;
 import org.springframework.security.core.GrantedAuthority;

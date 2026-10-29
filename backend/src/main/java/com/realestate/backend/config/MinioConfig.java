@@ -1,5 +1,6 @@
 package com.realestate.backend.config;
 
+import com.realestate.backend.config.properties.MinioProperties;
 import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

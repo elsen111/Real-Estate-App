@@ -6,7 +6,7 @@ import com.realestate.backend.dto.request.ReviewRequest;
 import com.realestate.backend.dto.response.ReviewResponse;
 import com.realestate.backend.enums.ReviewStatus;
 import com.realestate.backend.enums.ReviewTargetType;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.ReviewService;
 import org.junit.jupiter.api.Test;

@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -127,6 +128,9 @@ public class PropertyEntity {
     @Builder.Default
     @Column(name = "average_rating", precision = 3, scale = 2, nullable = false)
     private BigDecimal averageRating = BigDecimal.ZERO;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "property")
+    private List<PropertyMediaEntity> images;
 
     @Builder.Default
     @Column(name = "review_count", nullable = false)

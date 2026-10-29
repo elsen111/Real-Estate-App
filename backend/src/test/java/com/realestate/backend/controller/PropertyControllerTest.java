@@ -19,7 +19,7 @@ import com.realestate.backend.dto.response.SetPropertyMediaResponse;
 import com.realestate.backend.enums.InquiryType;
 import com.realestate.backend.enums.ListingType;
 import com.realestate.backend.enums.PropertyStatus;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.AppointmentService;
 import com.realestate.backend.service.InquiryService;

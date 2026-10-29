@@ -19,7 +19,7 @@ import com.realestate.backend.repository.*;
 import com.realestate.backend.repository.specification.AgencyAgentSpecification;
 import com.realestate.backend.repository.specification.AgencySpecification;
 import com.realestate.backend.repository.specification.PropertySpecification;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.AgencyService;
 import com.realestate.backend.service.MediaService;
 import com.realestate.backend.storage.MediaUploadPolicy;

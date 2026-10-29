@@ -1,7 +1,9 @@
 package com.realestate.backend;
 
-import com.realestate.backend.config.MinioProperties;
-import com.realestate.backend.config.StripeProperties;
+import com.realestate.backend.config.properties.CorsProperties;
+import com.realestate.backend.config.properties.MinioProperties;
+import com.realestate.backend.config.properties.StripeProperties;
+import com.realestate.backend.config.properties.BootstrapAdminProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -18,7 +20,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @EnableConfigurationProperties(
         {
                 MinioProperties.class,
-                StripeProperties.class
+                StripeProperties.class,
+                BootstrapAdminProperties.class,
+                CorsProperties.class
         }
 )
 public class BackendApplication {

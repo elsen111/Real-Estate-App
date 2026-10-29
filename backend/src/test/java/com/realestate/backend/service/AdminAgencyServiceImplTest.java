@@ -12,7 +12,7 @@ import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.AgencyMapper;
 import com.realestate.backend.mapper.SubscriptionPlanMapper;
 import com.realestate.backend.repository.*;
-import com.realestate.backend.security.SecurityContextService;
+import com.realestate.backend.security.core.SecurityContextService;
 import com.realestate.backend.service.impl.AdminAgencyServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

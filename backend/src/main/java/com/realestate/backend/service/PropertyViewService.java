@@ -1,7 +1,7 @@
 package com.realestate.backend.service;
 
 import com.realestate.backend.entity.PropertyEntity;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 
 public interface PropertyViewService {
 

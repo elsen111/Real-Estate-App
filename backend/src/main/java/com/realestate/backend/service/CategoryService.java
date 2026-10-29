@@ -2,7 +2,10 @@ package com.realestate.backend.service;
 
 import com.realestate.backend.dto.request.CreateCategoryRequest;
 import com.realestate.backend.dto.request.UpdateCategoryRequest;
+import com.realestate.backend.dto.response.CategoryLogoUploadResponse;
 import com.realestate.backend.dto.response.CategoryResponse;
+import com.realestate.backend.security.principal.CustomUserDetails;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,6 +39,11 @@ public interface CategoryService {
 
     void softDeleteCategory(
             UUID categoryId
+    );
+
+    CategoryLogoUploadResponse uploadImage(
+            UUID categoryId,
+            MultipartFile file
     );
 
 }

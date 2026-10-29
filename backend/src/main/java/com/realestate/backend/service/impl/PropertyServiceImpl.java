@@ -3,15 +3,13 @@ package com.realestate.backend.service.impl;
 import com.realestate.backend.dto.request.*;
 import com.realestate.backend.dto.response.*;
 import com.realestate.backend.entity.*;
-import com.realestate.backend.enums.PropertyStatus;
-import com.realestate.backend.enums.Role;
-import com.realestate.backend.enums.SubscriptionStatus;
+import com.realestate.backend.enums.*;
 import com.realestate.backend.exception.*;
 import com.realestate.backend.mapper.PropertyMapper;
 import com.realestate.backend.repository.*;
 import com.realestate.backend.repository.specification.PropertySpecification;
-import com.realestate.backend.security.CustomUserDetails;
-import com.realestate.backend.security.SecurityConstants;
+import com.realestate.backend.security.principal.CustomUserDetails;
+import com.realestate.backend.security.core.SecurityConstants;
 import com.realestate.backend.service.MediaService;
 import com.realestate.backend.service.PropertyService;
 import com.realestate.backend.service.PropertyViewService;
@@ -683,6 +681,26 @@ public class PropertyServiceImpl implements PropertyService {
                 );
 
         return properties.map(propertyMapper::toPublicClientResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PopularCityResponse> getTrendingCities(Pageable pageable) {
+        return propertyRepository.findPopularCities(
+                PropertyStatus.ACTIVE,
+                pageable
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<TopAgencyResponse> getTopAgencies(Pageable pageable) {
+        return propertyRepository.findTopAgencies(
+                AgencyStatus.APPROVED,
+                PropertyStatus.ACTIVE,
+                ReviewStatus.APPROVED,
+                pageable
+        );
     }
 
     @Override

@@ -21,7 +21,7 @@ import com.realestate.backend.repository.AgencyMemberRepository;
 import com.realestate.backend.repository.InquiryRepository;
 import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.UserRepository;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.impl.AgentServiceImpl;
 import com.realestate.backend.service.impl.RefreshTokenServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;

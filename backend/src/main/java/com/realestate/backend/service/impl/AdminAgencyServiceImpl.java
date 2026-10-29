@@ -18,7 +18,7 @@ import com.realestate.backend.mapper.PropertyMapper;
 import com.realestate.backend.mapper.SubscriptionPlanMapper;
 import com.realestate.backend.repository.*;
 import com.realestate.backend.repository.specification.AgencySpecification;
-import com.realestate.backend.security.SecurityContextService;
+import com.realestate.backend.security.core.SecurityContextService;
 import com.realestate.backend.service.AdminAgencyService;
 import com.realestate.backend.service.AgencyService;
 import lombok.RequiredArgsConstructor;

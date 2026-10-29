@@ -1,4 +1,4 @@
-package com.realestate.backend.security;
+package com.realestate.backend.security.core;
 
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.exception.ResourceNotFoundException;

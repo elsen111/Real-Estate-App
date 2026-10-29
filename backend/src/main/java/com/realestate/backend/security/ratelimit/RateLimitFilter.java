@@ -2,7 +2,7 @@ package com.realestate.backend.security.ratelimit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.realestate.backend.common.response.ErrorResponse;
-import com.realestate.backend.config.RateLimitProperties;
+import com.realestate.backend.config.properties.RateLimitProperties;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

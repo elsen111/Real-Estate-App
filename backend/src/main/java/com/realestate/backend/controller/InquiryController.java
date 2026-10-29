@@ -4,7 +4,7 @@ import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.request.UpdateInquiryStatusRequest;
 import com.realestate.backend.dto.response.InquiryResponse;
 import com.realestate.backend.enums.InquiryStatus;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.InquiryService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;

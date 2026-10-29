@@ -16,7 +16,7 @@ import com.realestate.backend.mapper.UserMapper;
 import com.realestate.backend.repository.RefreshTokenRepository;
 import com.realestate.backend.repository.UserMediaRepository;
 import com.realestate.backend.repository.UserRepository;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.MediaService;
 import com.realestate.backend.service.UserService;
 import com.realestate.backend.storage.MediaUploadPolicy;

@@ -21,7 +21,7 @@ import com.realestate.backend.mapper.AgencyMemberMapper;
 import com.realestate.backend.mapper.PropertyMapper;
 import com.realestate.backend.mapper.UserMapper;
 import com.realestate.backend.repository.*;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.impl.AgencyServiceImpl;
 import com.realestate.backend.storage.MediaUploadPolicy;
 import org.junit.jupiter.api.Test;

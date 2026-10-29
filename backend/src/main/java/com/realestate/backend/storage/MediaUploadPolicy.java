@@ -26,6 +26,15 @@ public enum MediaUploadPolicy {
             )
     ),
 
+    CATEGORY_IMAGE(
+            5 * 1024 * 1024L,
+            Map.of(
+                    "image/jpeg", Set.of("jpg", "jpeg"),
+                    "image/png", Set.of("png"),
+                    "image/webp", Set.of("webp")
+            )
+    ),
+
     PROPERTY_MEDIA(
             25 * 1024 * 1024L,
             Map.of(
@@ -100,6 +109,9 @@ public enum MediaUploadPolicy {
 
             case AGENCY_LOGO ->
                     MediaFolder.AGENCY_LOGO;
+
+            case CATEGORY_IMAGE ->
+                    MediaFolder.CATEGORY_IMAGE;
 
             case PROPERTY_MEDIA -> {
 

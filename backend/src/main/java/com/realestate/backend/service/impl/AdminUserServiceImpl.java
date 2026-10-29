@@ -15,7 +15,7 @@ import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.mapper.UserMapper;
 import com.realestate.backend.repository.*;
 import com.realestate.backend.repository.specification.UserSpecification;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.AdminUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
