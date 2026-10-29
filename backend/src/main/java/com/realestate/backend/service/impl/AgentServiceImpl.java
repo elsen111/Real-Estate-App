@@ -20,7 +20,7 @@ import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.UserRepository;
 import com.realestate.backend.repository.specification.InquirySpecification;
 import com.realestate.backend.repository.specification.PropertySpecification;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.AgentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

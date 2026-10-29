@@ -1,6 +1,6 @@
 package com.realestate.backend.payment.gateway;
 
-import com.realestate.backend.config.StripeProperties;
+import com.realestate.backend.config.properties.StripeProperties;
 import com.realestate.backend.entity.AgencyEntity;
 import com.realestate.backend.entity.PaymentEntity;
 import com.realestate.backend.entity.SubscriptionPlanEntity;

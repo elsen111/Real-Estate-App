@@ -9,7 +9,7 @@ import com.realestate.backend.dto.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.dto.request.UpdateAgencyRequest;
 import com.realestate.backend.enums.AppointmentStatus;
 import com.realestate.backend.enums.InquiryStatus;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.AgencyService;
 import com.realestate.backend.service.AppointmentService;
 import com.realestate.backend.service.InquiryService;

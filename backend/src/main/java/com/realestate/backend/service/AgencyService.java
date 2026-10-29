@@ -7,7 +7,7 @@ import com.realestate.backend.dto.request.AgencyFilterRequest;
 import com.realestate.backend.dto.request.AgencyPropertyFilterRequest;
 import com.realestate.backend.dto.request.UpdateAgencyRequest;
 import com.realestate.backend.entity.AgencyEntity;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;

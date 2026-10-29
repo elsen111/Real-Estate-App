@@ -1,6 +1,6 @@
 package com.realestate.backend.config;
 
-import com.realestate.backend.security.CustomUserDetailsService;
+import com.realestate.backend.security.principal.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

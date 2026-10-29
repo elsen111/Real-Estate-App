@@ -3,7 +3,7 @@ package com.realestate.backend.service;
 import com.realestate.backend.dto.request.PublicReviewFilterRequest;
 import com.realestate.backend.dto.request.ReviewRequest;
 import com.realestate.backend.dto.response.ReviewResponse;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

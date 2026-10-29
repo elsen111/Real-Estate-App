@@ -5,7 +5,7 @@ import com.realestate.backend.dto.response.AgentResponse;
 import com.realestate.backend.dto.request.PropertyFilterRequest;
 import com.realestate.backend.dto.response.InquiryResponse;
 import com.realestate.backend.dto.response.PropertyResponse;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

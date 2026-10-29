@@ -15,7 +15,7 @@ import com.realestate.backend.repository.AgencyRepository;
 import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.ReviewRepository;
 import com.realestate.backend.repository.UserRepository;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.impl.ReviewServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

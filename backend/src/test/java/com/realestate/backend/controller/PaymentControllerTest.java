@@ -3,7 +3,7 @@ package com.realestate.backend.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.realestate.backend.dto.response.PaymentCheckoutResponse;
 import com.realestate.backend.dto.response.PaymentResponse;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.PaymentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

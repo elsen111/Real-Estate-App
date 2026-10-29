@@ -6,7 +6,7 @@ import com.realestate.backend.dto.request.PropertyFilterRequest;
 import com.realestate.backend.dto.response.AgentResponse;
 import com.realestate.backend.dto.response.InquiryResponse;
 import com.realestate.backend.dto.response.PropertyResponse;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import com.realestate.backend.service.AgentService;
 import org.junit.jupiter.api.Test;

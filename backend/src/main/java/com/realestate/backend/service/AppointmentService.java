@@ -5,7 +5,7 @@ import com.realestate.backend.dto.request.CreateAppointmentRequest;
 import com.realestate.backend.dto.request.UpdateAppointmentStatusRequest;
 import com.realestate.backend.dto.response.AppointmentResponse;
 import com.realestate.backend.enums.AppointmentStatus;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

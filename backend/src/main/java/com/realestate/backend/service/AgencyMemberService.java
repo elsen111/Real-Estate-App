@@ -2,7 +2,7 @@ package com.realestate.backend.service;
 
 import com.realestate.backend.dto.response.AgencyMemberResponse;
 import com.realestate.backend.enums.Role;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 
 import java.util.UUID;
 

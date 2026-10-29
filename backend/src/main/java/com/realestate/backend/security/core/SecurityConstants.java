@@ -1,4 +1,4 @@
-package com.realestate.backend.security;
+package com.realestate.backend.security.core;
 
 public final class SecurityConstants {
 

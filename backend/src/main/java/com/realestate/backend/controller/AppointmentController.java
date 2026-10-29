@@ -5,7 +5,7 @@ import com.realestate.backend.dto.request.AppointmentFilterRequest;
 import com.realestate.backend.dto.request.UpdateAppointmentStatusRequest;
 import com.realestate.backend.dto.response.AppointmentResponse;
 import com.realestate.backend.enums.AppointmentStatus;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;

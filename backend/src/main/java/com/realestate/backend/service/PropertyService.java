@@ -2,7 +2,7 @@ package com.realestate.backend.service;
 
 import com.realestate.backend.dto.request.*;
 import com.realestate.backend.dto.response.*;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;

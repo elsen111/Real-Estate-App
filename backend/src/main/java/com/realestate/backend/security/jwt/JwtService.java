@@ -1,8 +1,9 @@
-package com.realestate.backend.security;
+package com.realestate.backend.security.jwt;
 
 import com.realestate.backend.config.JwtConfig;
 import com.realestate.backend.entity.RoleEntity;
 import com.realestate.backend.entity.UserEntity;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

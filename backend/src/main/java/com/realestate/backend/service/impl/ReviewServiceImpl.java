@@ -18,7 +18,7 @@ import com.realestate.backend.repository.PropertyRepository;
 import com.realestate.backend.repository.ReviewRepository;
 import com.realestate.backend.repository.UserRepository;
 import com.realestate.backend.repository.specification.ReviewSpecification;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

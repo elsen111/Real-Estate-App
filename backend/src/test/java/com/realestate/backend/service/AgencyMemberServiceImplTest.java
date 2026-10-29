@@ -14,7 +14,7 @@ import com.realestate.backend.repository.AgencyMemberRepository;
 import com.realestate.backend.repository.AgencyRepository;
 import com.realestate.backend.repository.RoleRepository;
 import com.realestate.backend.repository.UserRepository;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.impl.AgencyMemberServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

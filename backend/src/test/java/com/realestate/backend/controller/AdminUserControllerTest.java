@@ -7,7 +7,7 @@ import com.realestate.backend.dto.response.UserResponse;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.exception.BusinessException;
 import com.realestate.backend.exception.ResourceNotFoundException;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.AdminUserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

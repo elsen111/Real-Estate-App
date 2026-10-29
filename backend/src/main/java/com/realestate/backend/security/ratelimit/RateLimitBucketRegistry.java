@@ -1,6 +1,6 @@
 package com.realestate.backend.security.ratelimit;
 
-import com.realestate.backend.config.RateLimitProperties;
+import com.realestate.backend.config.properties.RateLimitProperties;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;

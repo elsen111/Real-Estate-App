@@ -3,7 +3,7 @@ package com.realestate.backend.service;
 import com.realestate.backend.dto.request.*;
 import com.realestate.backend.dto.response.AuthResponse;
 import com.realestate.backend.dto.response.RefreshTokenResponse;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface AuthService {

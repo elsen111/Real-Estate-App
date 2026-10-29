@@ -1,6 +1,6 @@
 package com.realestate.backend.storage;
 
-import com.realestate.backend.config.MinioProperties;
+import com.realestate.backend.config.properties.MinioProperties;
 import com.realestate.backend.exception.StorageException;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;

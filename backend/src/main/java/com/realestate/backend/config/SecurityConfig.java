@@ -1,7 +1,10 @@
-package com.realestate.backend.security;
+package com.realestate.backend.config;
 
 import com.realestate.backend.common.logging.MdcLoggingFilter;
 import com.realestate.backend.common.logging.RequestLoggingFilter;
+import com.realestate.backend.security.jwt.JwtAuthenticationFilter;
+import com.realestate.backend.security.core.RestAccessDeniedHandler;
+import com.realestate.backend.security.core.RestAuthenticationEntryPoint;
 import com.realestate.backend.security.ratelimit.RateLimitFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

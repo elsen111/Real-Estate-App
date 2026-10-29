@@ -6,7 +6,7 @@ import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.exception.ResourceNotFoundException;
 import com.realestate.backend.repository.PropertyViewRepository;
 import com.realestate.backend.repository.UserRepository;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.PropertyViewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

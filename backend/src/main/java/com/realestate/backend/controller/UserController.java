@@ -5,7 +5,7 @@ import com.realestate.backend.dto.response.AuthUserResponse;
 import com.realestate.backend.dto.request.AccountPasswordRequest;
 import com.realestate.backend.dto.request.UpdateProfileRequest;
 import com.realestate.backend.dto.response.UserProfilePhotoResponse;
-import com.realestate.backend.security.CustomUserDetails;
+import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
