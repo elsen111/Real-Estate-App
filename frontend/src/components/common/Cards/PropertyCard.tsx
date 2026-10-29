@@ -72,7 +72,6 @@ const PropertyCard = ({
             <span className="text-purple xs:text-[2rem] text-[1.8rem] font-bold">
               {price.toLocaleString("en-US")}
               <small>
-                {" "}
                 {currency}
                 {listingType == "RENT" && (
                   <span className="ml-[0.2rem] text-[1.3rem] text-gray-500 sm:ml-1">/{period}</span>

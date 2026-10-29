@@ -1,5 +1,6 @@
 import { BadgeCheck, ChartNoAxesCombined, MessageCircle, Search } from "lucide-react";
 import type {
+  CtaSectionContent,
   FeaturesSectionContent,
   HeroSectionContent,
   PropertyShowcaseSubsectionContent,
@@ -73,3 +74,8 @@ export const propertyShowcaseSubsectionContents: PropertyShowcaseSubsectionConte
     tagline: `Meet some of the agencies listing on ${siteMetaData.name}.`,
   },
 ];
+
+export const ctaSectionContent: CtaSectionContent = {
+  heading: "Grow Your Real Estate Agency",
+  description: "Showcase your listings and connect with potential clients.",
+};

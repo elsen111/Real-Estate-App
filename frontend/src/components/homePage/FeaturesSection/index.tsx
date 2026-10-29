@@ -12,17 +12,19 @@ const FeaturesSection = () => {
           <img
             src={featuresImg}
             alt="Features section's image"
-            className="relative h-full min-h-172 w-full rounded-2xl md:w-auto"
+            className="relative h-full min-h-130 w-full rounded-2xl sm:min-h-172 md:w-auto"
           />
-          <div className="text-primary absolute top-[5%] left-[5%] z-6 w-[90%] rounded-3xl bg-black/70 p-5 sm:top-10 md:left-10 md:w-[80%]">
-            <h2 className="mb-5 text-5xl leading-15 font-bold"> {featuresSectionContent.title} </h2>
+          <div className="text-primary absolute top-[5%] left-[5%] z-6 w-[90%] rounded-3xl bg-black/70 p-5 text-center sm:top-10 sm:text-left md:left-10 md:w-[80%]">
+            <h2 className="mb-5 text-[2.4rem] leading-15 font-bold sm:text-[2.8rem] md:text-5xl">
+              {featuresSectionContent.title}
+            </h2>
             <p className="mb-10 text-2xl"> {featuresSectionContent.description} </p>
             <Button
               path="/properties"
               variant="white"
               isLink
               hasFixedDimensions={false}
-              className="w-60"
+              className="mx-auto w-60 sm:mr-auto sm:ml-0"
             >
               Browse All
             </Button>

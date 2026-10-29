@@ -26,3 +26,8 @@ export interface PropertyShowcaseSubsectionContent {
   title: string;
   tagline?: string;
 }
+
+export interface CtaSectionContent {
+  heading: string;
+  description: string;
+}
