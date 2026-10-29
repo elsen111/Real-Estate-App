@@ -105,6 +105,7 @@ rate-limit:
 
 minio:
   endpoint: ${MINIO_URL}
+  MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL:-http://localhost:9000}
   access-key: ${MINIO_USERNAME}
   secret-key: ${MINIO_SECRET_KEY}
   bucket: ${MINIO_BUCKET_NAME:estateflow}

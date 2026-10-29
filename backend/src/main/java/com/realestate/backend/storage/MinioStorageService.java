@@ -2,11 +2,7 @@ package com.realestate.backend.storage;
 
 import com.realestate.backend.config.properties.MinioProperties;
 import com.realestate.backend.exception.StorageException;
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.RemoveObjectArgs;
+import io.minio.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import jakarta.annotation.PostConstruct;
@@ -189,6 +185,19 @@ public class MinioStorageService implements StorageService {
                         .log();
             }
 
+            String policy = """
+                    {"Version":"2012-10-17","Statement":[{
+                      "Effect":"Allow","Principal":{"AWS":["*"]},
+                      "Action":["s3:GetObject"],
+                      "Resource":["arn:aws:s3:::%s/*"]}]}
+                    """.formatted(properties.getBucket());
+
+            minioClient.setBucketPolicy(
+                    SetBucketPolicyArgs.builder()
+                            .bucket(properties.getBucket())
+                            .config(policy)
+                            .build());
+
         } catch (Exception e) {
 
             log.atError()
@@ -227,14 +236,10 @@ public class MinioStorageService implements StorageService {
                 + validatedFile.extension();
     }
 
-    private String buildFileUrl(
-            String storageKey
-    ) {
-
-        return properties.getEndpoint()
-                + "/"
-                + properties.getBucket()
-                + "/"
-                + storageKey;
+    private String buildFileUrl(String storageKey) {
+        String base = (properties.getPublicUrl() != null && !properties.getPublicUrl().isBlank())
+                ? properties.getPublicUrl()
+                : properties.getEndpoint();
+        return base.replaceAll("/+$", "") + "/" + properties.getBucket() + "/" + storageKey;
     }
 }
