@@ -8,8 +8,7 @@ const Brand = ({ styles }: { styles?: string }) => {
     <Link to="/" className={clsx("flex h-full items-center justify-between gap-6", styles)}>
       <img src={logo} alt={`Site Logo - ${siteMetaData.name}`} className="h-full" />
       <h2 className="text-secondaryText text-5xl font-medium">
-        {" "}
-        {siteMetaData.name ? siteMetaData.name : "Real Estate"}{" "}
+        {siteMetaData.name ? siteMetaData.name : "Real Estate"}
       </h2>
     </Link>
   );

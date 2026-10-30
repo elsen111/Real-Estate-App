@@ -15,12 +15,10 @@ const FeatureCard = ({ icon, name, description }: FeatureCardProps) => {
         <Icon size={25} strokeWidth={1.8} className="text-primary" />
       </div>
       <h6 className="manrope-600 xs:text-5xl text-secondary mb-5 text-center text-[2.5rem] font-medium sm:text-start">
-        {" "}
-        {name}{" "}
+        {name}
       </h6>
       <p className="text-center text-[1.6rem] font-medium text-gray-600 sm:text-start">
-        {" "}
-        {description}{" "}
+        {description}
       </p>
     </section>
   );

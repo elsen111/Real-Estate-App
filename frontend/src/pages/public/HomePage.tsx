@@ -1,3 +1,4 @@
+import CtaSection from "../../components/homePage/CtaSection";
 import FeaturesSection from "../../components/homePage/FeaturesSection";
 import HeroSection from "../../components/homePage/HeroSetion";
 import PropertyShowcase from "../../components/homePage/PropertyShowcaseSection";
@@ -12,6 +13,7 @@ const HomePage = () => {
       <PropertyShowcase />
       <TrendingCitiesSection />
       <TopAgenciesSection />
+      <CtaSection />
     </div>
   );
 };

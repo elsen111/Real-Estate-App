@@ -11,12 +11,10 @@ const HeroSection = () => {
     >
       <SectionContainer>
         <h1 className="mb-2 w-full text-[3.2rem] leading-15 font-bold text-white sm:w-[50%] md:leading-25 lg:text-[5.2rem]">
-          {" "}
-          {heroSectionContent.title}{" "}
+          {heroSectionContent.title}
         </h1>
         <p className="mb-10 w-full text-[1.8rem] text-[#dcfff7] sm:w-[50%]">
-          {" "}
-          {heroSectionContent.description}{" "}
+          {heroSectionContent.description}
         </p>
         <HeroForm />
       </SectionContainer>

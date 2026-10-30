@@ -57,15 +57,13 @@ const HeroForm = () => {
           variant={selectedListing == "buy" ? "blue" : "white"}
           onClick={(e) => handleSelectListing(e, "buy")}
         >
-          {" "}
-          Buy{" "}
+          Buy
         </Button>
         <Button
           variant={selectedListing == "rent" ? "blue" : "white"}
           onClick={(e) => handleSelectListing(e, "rent")}
         >
-          {" "}
-          Rent{" "}
+          Rent
         </Button>
       </div>
 
