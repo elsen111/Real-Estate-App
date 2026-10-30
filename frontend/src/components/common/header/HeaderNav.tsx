@@ -4,6 +4,8 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import Brand from "../Brand";
 import Button from "../UI/Button";
+import { MdOutlineFavorite } from "react-icons/md";
+import Tooltip from "../UI/Tooltip";
 
 type TopNavLink = {
   label: string;
@@ -20,6 +22,8 @@ const topNavLinks: TopNavLink[] = [
 
 const HeaderNav = () => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  const [favHovered, setFavHovered] = useState<boolean>(false);
+
   const { user } = useAuth();
 
   useEffect(() => {
@@ -32,7 +36,7 @@ const HeaderNav = () => {
   return (
     <>
       <nav
-        className={` ${menuOpen ? "translate-x-0" : "-translate-x-full"} bg-gray-scale fixed inset-y-0 left-0 z-20 flex h-screen w-[80%] max-w-xl min-w-120 flex-col gap-10 overflow-y-auto rounded-r-3xl p-8 text-[20px] shadow-2xl transition-transform duration-500 lg:static lg:h-auto lg:w-[80%] lg:max-w-none lg:translate-x-0 lg:flex-row lg:items-center lg:justify-between lg:overflow-visible lg:rounded-none lg:p-0 lg:shadow-none`}
+        className={` ${menuOpen ? "translate-x-0" : "-translate-x-full"} bg-gray-scale/95 fixed inset-y-0 left-0 z-20 flex h-screen w-[80%] max-w-xl min-w-120 flex-col justify-between gap-10 overflow-y-auto rounded-r-3xl p-8 text-[20px] shadow-2xl transition-transform duration-500 lg:static lg:h-auto lg:w-[80%] lg:max-w-none lg:translate-x-0 lg:flex-row lg:items-center lg:justify-between lg:overflow-visible lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none`}
       >
         <button
           aria-label="Close menu"
@@ -64,6 +68,23 @@ const HeaderNav = () => {
         </div>
 
         <div className="mt-auto flex flex-col gap-4 lg:mt-0 lg:flex-row">
+          <div
+            className="relative hidden lg:block"
+            onMouseEnter={() => setFavHovered(true)}
+            onMouseLeave={() => setFavHovered(false)}
+          >
+            <Button
+              path="/me/favorites"
+              variant="white"
+              isLink
+              className="flex items-center justify-center bg-transparent! shadow-none! hover:scale-110"
+            >
+              <MdOutlineFavorite size={28} color="#100a55" />
+            </Button>
+
+            <Tooltip title="Favorites" placement="bottom" visible={favHovered} />
+          </div>
+
           {user ? (
             <div className="flex items-center gap-8 px-8 py-4 lg:p-0">
               <Button
@@ -99,13 +120,32 @@ const HeaderNav = () => {
         </div>
       </nav>
 
-      <button
-        aria-label="Open menu"
-        onClick={() => setMenuOpen(true)}
-        className="block rounded-2xl p-2 shadow-md transition-all duration-300 active:scale-95 lg:hidden"
-      >
-        <Menu size={32} className="text-primaryText" />
-      </button>
+      <div className="flex">
+        <div
+          className="relative block lg:hidden"
+          onMouseEnter={() => setFavHovered(true)}
+          onMouseLeave={() => setFavHovered(false)}
+        >
+          <Button
+            path="/me/favorites"
+            variant="white"
+            isLink
+            className="flex items-center justify-center bg-transparent! shadow-none! hover:scale-110"
+          >
+            <MdOutlineFavorite size={28} color="#100a55" />
+          </Button>
+
+          <Tooltip title="Favorites" placement="bottom" visible={favHovered} />
+        </div>
+
+        <button
+          aria-label="Open menu"
+          onClick={() => setMenuOpen(true)}
+          className="block rounded-2xl p-2 shadow-md transition-all duration-300 active:scale-95 lg:hidden"
+        >
+          <Menu size={32} className="text-primaryText" />
+        </button>
+      </div>
 
       <div
         onClick={() => setMenuOpen(false)}

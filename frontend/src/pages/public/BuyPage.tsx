@@ -1,5 +1,12 @@
+// import SEO from "../../components/common/SEO";
+
 const BuyPage = () => {
-  return <div>BuyPage</div>;
+  return (
+    <div>
+      {/* <SEO />  */}
+      BuyPage
+    </div>
+  );
 };
 
 export default BuyPage;

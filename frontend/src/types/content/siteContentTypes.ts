@@ -31,3 +31,20 @@ export interface CtaSectionContent {
   heading: string;
   description: string;
 }
+
+export interface FooterContent {
+  siteName: string;
+  tagline: string;
+  footerNavGroups: FooterNavGroup[];
+  copyright: string;
+}
+
+export interface FooterNavLink {
+  label: string;
+  path: string;
+}
+
+export interface FooterNavGroup {
+  heading: string;
+  links: FooterNavLink[];
+}

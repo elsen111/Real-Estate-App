@@ -9,6 +9,7 @@ import { ClipLoader } from "react-spinners";
 import type { TopAgencyResponse } from "../../../types/api/agency";
 import agencyService from "../../../services/agencyService";
 import AgencyCard from "../../common/Cards/AgencyCard";
+import OfflineErrorMessage from "../../common/UI/OfflineErrorMessage";
 
 const TopAgenciesSection = () => {
   const [agencies, setAgencies] = useState<TopAgencyResponse[]>([]);
@@ -37,7 +38,7 @@ const TopAgenciesSection = () => {
           const status = error.response?.status;
 
           if (!error.response) {
-            setError("Unable to connect to the server. Please check your internet connection.");
+            setError("Failed to get top agencies. Please check your internet connection.");
           } else if (status === 404) {
             setError("Top agencies were not found.");
           } else if (status === 500) {
@@ -90,7 +91,7 @@ const TopAgenciesSection = () => {
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return <OfflineErrorMessage message={error} />;
   }
 
   if (agencies.length === 0) {

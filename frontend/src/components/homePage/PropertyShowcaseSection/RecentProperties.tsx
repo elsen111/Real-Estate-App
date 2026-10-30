@@ -9,6 +9,7 @@ import PropertyCard from "../../common/Cards/PropertyCard";
 import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
+import OfflineErrorMessage from "../../common/UI/OfflineErrorMessage";
 
 const RecentProperties = () => {
   const [recentProperties, setRecentProperties] = useState<PropertyResponse[]>([]);
@@ -37,7 +38,7 @@ const RecentProperties = () => {
           const status = error.response?.status;
 
           if (!error.response) {
-            setError("Unable to connect to the server. Please check your internet connection.");
+            setError("Failed to get recent features. Please check your internet connection.");
           } else if (status === 404) {
             setError("Recent properties were not found.");
           } else if (status === 500) {
@@ -119,7 +120,7 @@ const RecentProperties = () => {
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return <OfflineErrorMessage message={error} />;
   }
 
   if (recentProperties.length === 0) {
