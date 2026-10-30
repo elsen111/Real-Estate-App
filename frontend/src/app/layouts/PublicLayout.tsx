@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
-import Footer from "../../components/common/Footer";
 import Header from "../../components/common/Header";
 import SEO from "../../components/common/SEO";
+import Footer from "../../components/common/Footer";
 
 const PublicLayout = () => {
   return (
