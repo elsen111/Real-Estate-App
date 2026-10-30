@@ -17,8 +17,7 @@ const NavGroup = ({ heading, links }: FooterNavGroupProps) => {
               className="inline-block text-[1.6rem] text-[#cbd5e1] transition-all duration-300 hover:translate-x-2"
               to={link.path}
             >
-              {" "}
-              {link.label}{" "}
+              {link.label}
             </Link>
           </li>
         ))}

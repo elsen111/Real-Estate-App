@@ -18,8 +18,8 @@ const Footer = () => {
             <NavGroup heading={group.heading} links={group.links} />
           ))}
         </div>
-        <div className="mt-5 mt-15 text-center text-2xl font-medium text-gray-500">
-          <p className="text-[1.6rem]"> {footerContent.copyright} </p>
+        <div className="mt-15 text-center text-2xl font-medium text-gray-500">
+          <p className="xxs:text-[1.6rem] text-[1.4rem]"> {footerContent.copyright} </p>
         </div>
       </SectionContainer>
     </footer>

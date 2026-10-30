@@ -9,6 +9,7 @@ import axios from "axios";
 import { propertyShowcaseSubsectionContents } from "../../../content/site.data";
 import { ClipLoader } from "react-spinners";
 import CityCard from "./CityCard";
+import OfflineErrorMessage from "../../common/UI/OfflineErrorMessage";
 
 const TrendingCitiesSection = () => {
   const [popularCities, setPopularCities] = useState<PopularCityResponse[]>([]);
@@ -37,7 +38,7 @@ const TrendingCitiesSection = () => {
           const status = error.response?.status;
 
           if (!error.response) {
-            setError("Unable to connect to the server. Please check your internet connection.");
+            setError("Failed to get top cities. Please check your internet connection.");
           } else if (status === 404) {
             setError("Popular cities were not found.");
           } else if (status === 500) {
@@ -95,7 +96,11 @@ const TrendingCitiesSection = () => {
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return (
+      <p className="mb-15">
+        <OfflineErrorMessage message={error} />
+      </p>
+    );
   }
 
   if (popularCities.length === 0) {

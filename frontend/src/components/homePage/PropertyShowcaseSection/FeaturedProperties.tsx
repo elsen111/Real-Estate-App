@@ -9,6 +9,7 @@ import PropertyCard from "../../common/Cards/PropertyCard";
 import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
+import OfflineErrorMessage from "../../common/UI/OfflineErrorMessage";
 
 const FeaturedProperties = () => {
   const [featuredProperties, setFeaturedProperties] = useState<PropertyResponse[]>([]);
@@ -37,7 +38,7 @@ const FeaturedProperties = () => {
           const status = error.response?.status;
 
           if (!error.response) {
-            setError("Unable to connect to the server. Please check your internet connection.");
+            setError("Failed get featured properties. Please check your internet connection.");
           } else if (status === 404) {
             setError("Featured properties were not found.");
           } else if (status === 500) {
@@ -119,7 +120,11 @@ const FeaturedProperties = () => {
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return (
+      <div className="mb-11">
+        <OfflineErrorMessage message={error} />;
+      </div>
+    );
   }
 
   if (featuredProperties.length === 0) {

@@ -1,3 +1,4 @@
+// import SEO from "../../components/common/SEO";
 import CtaSection from "../../components/homePage/CtaSection";
 import FeaturesSection from "../../components/homePage/FeaturesSection";
 import HeroSection from "../../components/homePage/HeroSetion";
@@ -8,6 +9,8 @@ import TrendingCitiesSection from "../../components/homePage/TrendingCitiesSecti
 const HomePage = () => {
   return (
     <div>
+      {/* <SEO />  */}
+
       <HeroSection />
       <FeaturesSection />
       <PropertyShowcase />
