@@ -10,7 +10,7 @@ const CtaSection = () => {
           <h5 className="text-primary mb-5 text-[2.4rem] font-bold sm:text-[2.8rem] lg:text-[3.2rem]">
             {ctaSectionContent.heading}
           </h5>
-          <p className="text-2xl sm:text-[1.8rem] font-medium text-[#ccfbf1] lg:text-3xl">
+          <p className="text-2xl font-medium text-[#ccfbf1] sm:text-[1.8rem] lg:text-3xl">
             {ctaSectionContent.description}
           </p>
         </div>

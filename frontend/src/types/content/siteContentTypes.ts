@@ -33,18 +33,18 @@ export interface CtaSectionContent {
 }
 
 export interface FooterContent {
-  siteName: string,
-  tagline: string,
-  footerNavGroups: FooterNavGroup[],
-  copyright: string
+  siteName: string;
+  tagline: string;
+  footerNavGroups: FooterNavGroup[];
+  copyright: string;
 }
 
 export interface FooterNavLink {
-  label: string,
-  path: string
+  label: string;
+  path: string;
 }
 
 export interface FooterNavGroup {
-  heading: string,
-  links: FooterNavLink[],
+  heading: string;
+  links: FooterNavLink[];
 }

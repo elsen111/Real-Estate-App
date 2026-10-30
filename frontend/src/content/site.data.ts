@@ -3,7 +3,6 @@ import type {
   CtaSectionContent,
   FeaturesSectionContent,
   FooterContent,
-  FooterNavLink,
   HeroSectionContent,
   PropertyShowcaseSubsectionContent,
   SiteMetaData,
@@ -84,36 +83,37 @@ export const ctaSectionContent: CtaSectionContent = {
 
 export const footerContent: FooterContent = {
   siteName: "EstateFlow",
-  tagline: "Buy, rent and list properties across your country. Every agency on the platform is reviewed and approved by our team.",
+  tagline:
+    "Buy, rent and list properties across your country. Every agency on the platform is reviewed and approved by our team.",
   footerNavGroups: [
     {
       heading: "Browse",
       links: [
-        {label: "Buy", path:"/buy"},
-        {label: "Rent", path:"/rent"},
-        {label: "Map search", path:"/map"},
-        {label: "Property categories", path:"/categpory"}
-      ]
+        { label: "Buy", path: "/buy" },
+        { label: "Rent", path: "/rent" },
+        { label: "Map search", path: "/map" },
+        { label: "Property categories", path: "/categpory" },
+      ],
     },
 
     {
       heading: "Agencies",
       links: [
-        {label: "Explore agencies", path:"/agencies"},
-        {label: "List your agency", path:"/register"},
-        {label: "Pricing plans", path:"/pricing"},
-      ]
+        { label: "Explore agencies", path: "/agencies" },
+        { label: "List your agency", path: "/register" },
+        { label: "Pricing plans", path: "/pricing" },
+      ],
     },
 
-        {
+    {
       heading: "Company",
       links: [
-        {label: "About us", path:"/about"},
-        {label: "Contact", path:"/contact"},
-        {label: "Terms of use", path:"/terms"},
-        {label: "Privacy policy", path:"/privacy-policy"},
-      ]
-    }
+        { label: "About us", path: "/about" },
+        { label: "Contact", path: "/contact" },
+        { label: "Terms of use", path: "/terms" },
+        { label: "Privacy policy", path: "/privacy-policy" },
+      ],
+    },
   ],
-  copyright: `\u00A9 ${new Date().getFullYear()} ${siteMetaData.name}. All rights reserved.`
-}
+  copyright: `\u00A9 ${new Date().getFullYear()} ${siteMetaData.name}. All rights reserved.`,
+};
