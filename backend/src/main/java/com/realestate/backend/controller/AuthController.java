@@ -4,9 +4,13 @@ import com.realestate.backend.common.response.ApiResponse;
 import com.realestate.backend.dto.request.*;
 import com.realestate.backend.dto.response.AuthResponse;
 import com.realestate.backend.dto.response.RefreshTokenResponse;
+import com.realestate.backend.security.core.AuthSessionResponder;
+import com.realestate.backend.security.core.RefreshTokenCookieService;
 import com.realestate.backend.security.principal.CustomUserDetails;
-import com.realestate.backend.service.impl.AuthServiceImpl;
+import com.realestate.backend.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,20 +25,22 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthServiceImpl authService;
+    private final AuthService authService;
+    private final RefreshTokenCookieService refreshTokenCookie;
+    private final AuthSessionResponder responder;
 
     @PostMapping("/register/user")
     @Operation(summary = "Register a new user.")
     public ResponseEntity<ApiResponse<AuthResponse>> registerUser(
             @Valid @RequestBody UserRegisterRequest request,
-            @RequestParam(required = false, name = "registrationType", defaultValue = "buyer") String type,
+            @RequestParam(name = "registrationType", defaultValue = "buyer") String type,
             HttpServletRequest servletRequest
     ) {
-        AuthResponse response = authService.registerUser(request, type, servletRequest);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(ApiResponse.success("User registered successfully as a " + type, response));
+        return responder.authenticated(
+                HttpStatus.CREATED,
+                "User registered successfully as a " + type,
+                authService.registerUser(request, type, servletRequest)
+        );
     }
 
     @PostMapping("/register/agency-owner")
@@ -43,11 +49,11 @@ public class AuthController {
             @Valid @RequestBody AgencyOwnerRegisterRequest request,
             HttpServletRequest servletRequest
     ) {
-        AuthResponse response = authService.registerAgencyOwner(request, servletRequest);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Agency owner registered successfully", response));
+        return responder.authenticated(
+                HttpStatus.CREATED,
+                "Agency owner registered successfully",
+                authService.registerAgencyOwner(request, servletRequest)
+        );
     }
 
     @PostMapping("/login")
@@ -56,37 +62,36 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request,
             HttpServletRequest servletRequest
     ) {
-        AuthResponse response = authService.login(request, servletRequest);
-
-        return ResponseEntity.ok(
-                ApiResponse.success("Logged in successfully", response)
+        return responder.authenticated(
+                HttpStatus.OK,
+                "Logged in successfully",
+                authService.login(request, servletRequest)
         );
     }
 
     @PostMapping("/refresh")
-    @Operation(summary = "Refresh the token.")
+    @Operation(summary = "Refresh the token (cookie, or X-Refresh-Token header).")
+    @Parameter(in = ParameterIn.HEADER, name = RefreshTokenCookieService.HEADER_NAME, required = false)
     public ResponseEntity<ApiResponse<RefreshTokenResponse>> refreshToken(
-            @Valid @RequestBody RefreshTokenRequest request,
             HttpServletRequest servletRequest
     ) {
-        RefreshTokenResponse response = authService.refreshToken(request, servletRequest);
-
-        return ResponseEntity.ok(
-                ApiResponse.success("Token refreshed successfully", response)
+        RefreshTokenResponse tokens = authService.refreshToken(
+                refreshTokenCookie.resolve(servletRequest),
+                servletRequest
         );
+
+        return responder.refreshed("Token refreshed successfully", tokens);
     }
 
-    @PreAuthorize("isAuthenticated()")
     @PostMapping("/logout")
-    @Operation(summary = "Log out from the account.")
+    @Operation(summary = "Log out and clear the refresh-token cookie.")
+    @Parameter(in = ParameterIn.HEADER, name = RefreshTokenCookieService.HEADER_NAME, required = false)
     public ResponseEntity<ApiResponse<Void>> logout(
-            @Valid @RequestBody LogoutRequest request
+            HttpServletRequest servletRequest
     ) {
-        authService.logout(request);
+        authService.logout(refreshTokenCookie.resolve(servletRequest));
 
-        return ResponseEntity.ok(
-                ApiResponse.success("Logged out successfully")
-        );
+        return responder.loggedOut("Logged out successfully");
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -95,10 +100,8 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthResponse>> me(
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
-        AuthResponse response = authService.currentUser(currentUser);
-
         return ResponseEntity.ok(
-                ApiResponse.success("Current user fetched successfully", response)
+                ApiResponse.success("Current user fetched successfully", authService.currentUser(currentUser))
         );
     }
 
@@ -109,12 +112,9 @@ public class AuthController {
             @AuthenticationPrincipal CustomUserDetails currentUser,
             @Valid @RequestBody ChangePasswordRequest request
     ) {
-
         authService.changePassword(request, currentUser);
 
-        return ResponseEntity.ok(
-                ApiResponse.success("Password successfully changed.", null)
-        );
+        return ResponseEntity.ok(ApiResponse.success("Password successfully changed.", null));
     }
 
     @PostMapping("/forgot-password")
@@ -122,7 +122,6 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> forgotPassword(
             @Valid @RequestBody ForgotPasswordRequest request
     ) {
-
         authService.forgotPassword(request);
 
         return ResponseEntity.ok(
@@ -135,12 +134,9 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> resetPassword(
             @Valid @RequestBody ResetPasswordRequest request
     ) {
-
         authService.resetPassword(request);
 
-        return ResponseEntity.ok(
-                ApiResponse.success("Password has been changed successfully.", null)
-        );
+        return ResponseEntity.ok(ApiResponse.success("Password has been changed successfully.", null));
     }
 
     @PostMapping("/me/reactivate")
@@ -149,11 +145,10 @@ public class AuthController {
             @Valid @RequestBody AccountReactivationRequest request,
             HttpServletRequest servletRequest
     ) {
-
-        AuthResponse response = authService.reactivateAccount(request, servletRequest);
-
-        return ResponseEntity.ok(
-                ApiResponse.success("Account successfully re-activated and logged in.", response)
+        return responder.authenticated(
+                HttpStatus.OK,
+                "Account successfully re-activated and logged in.",
+                authService.reactivateAccount(request, servletRequest)
         );
     }
 
@@ -163,12 +158,8 @@ public class AuthController {
             @Valid @RequestBody AccountPasswordRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
-
         authService.deactivateAccount(request, currentUser);
 
-        return ResponseEntity.ok(
-                ApiResponse.success("Account successfully deactivated.", null)
-        );
+        return ResponseEntity.ok(ApiResponse.success("Account successfully deactivated.", null));
     }
-
 }

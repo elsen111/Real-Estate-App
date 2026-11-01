@@ -13,7 +13,7 @@ public final class SecurityConstants {
             "/api/auth/register",
             "/api/auth/register/**",
             "/api/auth/login",
-            "/api/auth/refresh-token",
+            "/api/auth/refresh",
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html",

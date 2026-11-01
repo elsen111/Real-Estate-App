@@ -77,6 +77,12 @@ app:
     from: ${MAIL_USERNAME}
     from-name: EstateFlow
 
+  cookie:
+    secure: false
+    same-site: Lax
+    path: /api/auth
+    expose-token-in-body: true
+
 payment:
   stripe:
     secret-key: ${STRIPE_SECRET_KEY}

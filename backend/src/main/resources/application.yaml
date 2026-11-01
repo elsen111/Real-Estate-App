@@ -74,10 +74,16 @@ app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:${FRONTEND_URL:http://localhost:5173,http://localhost:5174,http://localhost:5175}}
     allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
-    allowed-headers: Authorization,Content-Type,Accept
+    allowed-headers: Authorization,Content-Type,Accept,X-Refresh-Token
     exposed-headers: Authorization
     allow-credentials: true
     max-age: 36000
+
+  cookie:
+    secure: ${COOKIE_SECURE:true}
+    same-site: ${COOKIE_SAME_SITE:Strict}
+    path: /api/auth
+    expose-token-in-body: ${COOKIE_EXPOSE_TOKEN_IN_BODY:false}
 
 payment:
   stripe:

@@ -2,8 +2,11 @@ package com.realestate.backend.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.realestate.backend.common.response.ErrorResponse;
+import com.realestate.backend.security.core.RefreshTokenCookieService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -22,7 +25,10 @@ import java.util.Map;
 
 @RestControllerAdvice
 @Slf4j
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final RefreshTokenCookieService refreshTokenCookie;
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(
@@ -364,7 +370,22 @@ public class GlobalExceptionHandler {
                 request.getRequestURI()
         );
 
-        return ResponseEntity.status(status).body(response);
+        ResponseEntity.BodyBuilder builder = ResponseEntity.status(status);
+
+        if (shouldClearRefreshCookie(status, request)) {
+            builder.header(HttpHeaders.SET_COOKIE, refreshTokenCookie.clear().toString());
+        }
+
+        return builder.body(response);
+    }
+
+    private boolean shouldClearRefreshCookie(HttpStatus status, HttpServletRequest request) {
+        if (status != HttpStatus.UNAUTHORIZED && status != HttpStatus.FORBIDDEN) {
+            return false;
+        }
+
+        String uri = request.getRequestURI();
+        return uri != null && (uri.endsWith("/auth/login") || uri.endsWith("/auth/refresh"));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

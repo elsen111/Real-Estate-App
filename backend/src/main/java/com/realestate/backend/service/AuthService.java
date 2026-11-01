@@ -25,11 +25,11 @@ public interface AuthService {
     );
 
     RefreshTokenResponse refreshToken(
-            RefreshTokenRequest request,
+            String request,
             HttpServletRequest servletRequest
     );
 
-    void logout(LogoutRequest request);
+    void logout(String request);
 
     AuthResponse currentUser(CustomUserDetails currentUser);
 

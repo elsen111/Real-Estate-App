@@ -27,6 +27,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 
@@ -202,17 +203,32 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     @Override
     public RefreshTokenResponse refreshToken(
-            RefreshTokenRequest request,
+            String rawRefreshToken,
             HttpServletRequest servletRequest
     ) {
+        if (!StringUtils.hasText(rawRefreshToken)) {
+            throw new UnauthorizedException("Refresh token is missing");
+        }
+
         RefreshTokenServiceImpl.CreatedRefreshToken rotatedToken =
                 refreshTokenService.rotateRefreshToken(
-                        request.getRefreshToken(),
+                        rawRefreshToken,
                         extractIpAddress(servletRequest),
                         servletRequest.getHeader("User-Agent")
                 );
 
         UserEntity user = rotatedToken.entity().getUser();
+
+        // CHANGED: same agency-approval rule as login (rolls back the rotation if it fails)
+        AgencyMemberEntity membership = agencyMemberRepository
+                .findByUserAndActiveTrue(user)
+                .orElse(null);
+
+        if (membership != null && membership.getAgency().getStatus() != AgencyStatus.APPROVED) {
+            throw new ForbiddenException(
+                    "Your agency is not approved yet. Please try again after approval."
+            );
+        }
 
         log.atInfo()
                 .setMessage("Refresh token rotated.")
@@ -230,8 +246,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional
     @Override
-    public void logout(LogoutRequest request) {
-        refreshTokenService.revokeRefreshToken(request.getRefreshToken());
+    public void logout(String rawRefreshToken) {
+        if (StringUtils.hasText(rawRefreshToken)) {
+            refreshTokenService.revokeRefreshToken(rawRefreshToken);
+        }
 
         log.atInfo()
                 .setMessage("Log out successful.")

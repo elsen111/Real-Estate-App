@@ -103,7 +103,10 @@ public class RefreshTokenServiceImpl {
             throw new UnauthorizedException("Refresh token is expired or revoked");
         }
 
-        if (!token.getUser().getEnabled()) {
+        UserEntity user = token.getUser();
+
+        // CHANGED: deleted users can no longer refresh
+        if (!Boolean.TRUE.equals(user.getEnabled()) || Boolean.TRUE.equals(user.getDeleted())) {
             throw new UnauthorizedException("User account is disabled");
         }
 

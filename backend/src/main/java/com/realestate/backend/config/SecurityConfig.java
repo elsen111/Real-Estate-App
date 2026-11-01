@@ -81,7 +81,8 @@ public class SecurityConfig {
                                 "/auth/register",
                                 "/auth/register/**",
                                 "/auth/login",
-                                "/auth/refresh-token",
+                                "/auth/refresh",
+                                "/auth/logout",
                                 "/auth/forgot-password",
                                 "/auth/reset-password"
                         ).permitAll()
