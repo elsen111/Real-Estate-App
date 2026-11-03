@@ -6,6 +6,7 @@ import { ClipLoader } from "react-spinners";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+import AuthSwitch from "./AuthSwitch";
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -94,7 +95,7 @@ const LoginForm = () => {
             aria-label="Email"
             aria-invalid={!!error}
             onChange={handleEmailChange}
-            className="focus:border-secondary w-full rounded-2xl border border-gray-300 bg-transparent py-4 pr-4 pl-26 text-[1.6rem] transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-300"
+            className="focus:border-secondary w-full rounded-2xl border border-gray-500 bg-transparent py-4 pr-4 pl-26 text-[1.6rem] transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-300 md:border-gray-400"
           />
         </div>
 
@@ -116,7 +117,7 @@ const LoginForm = () => {
             aria-label="Password"
             aria-invalid={!!error}
             onChange={handlePasswordChange}
-            className="focus:border-secondary w-full rounded-2xl border border-gray-300 bg-transparent py-4 pr-16 pl-26 text-[1.6rem] transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-300"
+            className="focus:border-secondary w-full rounded-2xl border border-gray-500 bg-transparent py-4 pr-16 pl-26 text-[1.6rem] transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-300 md:border-gray-400"
           />
 
           <button
@@ -137,12 +138,15 @@ const LoginForm = () => {
         <p
           id="login-error"
           role="alert"
+          aria-live="polite"
           className={clsx(
-            "min-h-5 text-[1.4rem] font-medium text-red-500 transition-opacity duration-200",
-            error ? "opacity-100" : "opacity-0",
+            "overflow-hidden text-[1.4rem] font-medium text-red-500 transition-all duration-300 ease-in-out",
+            error
+              ? "mt-2 max-h-10 translate-y-0 opacity-100"
+              : "mt-0 max-h-0 -translate-y-1 opacity-0",
           )}
         >
-          {error || "\u00A0"}
+          {error}
         </p>
 
         <button
@@ -163,6 +167,8 @@ const LoginForm = () => {
           )}
         </button>
       </form>
+
+      <AuthSwitch switchTo="toRegister" className="mt-6 justify-center" />
     </section>
   );
 };

@@ -2,7 +2,7 @@ import clsx from "clsx";
 
 type TooltipProps = {
   title: string;
-  placement: "bottom" | "top";
+  placement: "bottom" | "top" | "right";
   visible: boolean;
 };
 
@@ -10,6 +10,7 @@ const Tooltip = ({ title, placement, visible }: TooltipProps) => {
   const positions = {
     bottom: "top-[105%] top-1/2 -translate-y-1/2",
     top: "bottom-[100%] top-1/2 -translate-y-1/2",
+    right: "left-[110%]",
   };
 
   return (
