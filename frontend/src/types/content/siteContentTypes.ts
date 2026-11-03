@@ -48,3 +48,8 @@ export interface FooterNavGroup {
   heading: string;
   links: FooterNavLink[];
 }
+
+export interface AuthHeaderContent {
+  heading: string;
+  description: string;
+}

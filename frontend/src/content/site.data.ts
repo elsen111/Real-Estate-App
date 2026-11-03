@@ -1,5 +1,6 @@
 import { BadgeCheck, ChartNoAxesCombined, MessageCircle, Search } from "lucide-react";
 import type {
+  AuthHeaderContent,
   CtaSectionContent,
   FeaturesSectionContent,
   FooterContent,
@@ -116,4 +117,9 @@ export const footerContent: FooterContent = {
     },
   ],
   copyright: `\u00A9 ${new Date().getFullYear()} ${siteMetaData.name}. All rights reserved.`,
+};
+
+export const loginPageHeaderContent: AuthHeaderContent = {
+  heading: "Welcome Back!",
+  description: `Sign in to your ${siteMetaData.name} account to unlock more features.`,
 };

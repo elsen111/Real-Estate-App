@@ -1,4 +1,4 @@
-import { apiClient } from "../config/api";
+import { apiClient } from "../config/api/api";
 import type { TopAgencyResponse } from "../types/api/agency";
 import type { PageResponse } from "../types/api/api";
 
