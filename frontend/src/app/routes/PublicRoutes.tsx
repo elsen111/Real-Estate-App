@@ -10,8 +10,9 @@ import PropertyDetailsPage from "../../pages/public/PropertyDetailsPage";
 import AgencyDetailsPage from "../../pages/public/AgencyDetailsPage";
 import AuthLayout from "../layouts/AuthLayout";
 import ClientRegistrationPage from "../../pages/auth/register/ClientRegistrationPage";
-import AgencyRegistrationPage from "../../pages/auth/register/AgencyRegistrationPage";
 import RegisterSelectionPage from "../../pages/auth/register/RegisterSelectionPage";
+import AgencyOnwerRegistrationPage from "../../pages/auth/register/AgencyOwnerRegistrationPage";
+import AgencyRegistrationSubmissionPage from "../../pages/public/AgencyRegistrationSubmissionPage";
 
 export const PublicRoutes = [
   {
@@ -36,7 +37,11 @@ export const PublicRoutes = [
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <RegisterSelectionPage /> },
       { path: "register/client", element: <ClientRegistrationPage /> },
-      { path: "register/agency", element: <AgencyRegistrationPage /> },
+      { path: "register/agency-owner", element: <AgencyOnwerRegistrationPage /> },
+      {
+        path: "/auth/agency-registration/submitted",
+        element: <AgencyRegistrationSubmissionPage />,
+      },
     ],
   },
 ];

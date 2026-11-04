@@ -145,7 +145,7 @@ const HeaderNav = () => {
                 Login
               </Button>
 
-              <Button path="/auth/register/agency" variant="blue" isLink={true}>
+              <Button path="/auth/register/agency-owner" variant="blue" isLink={true}>
                 List your agency
               </Button>
             </>

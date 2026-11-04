@@ -156,7 +156,7 @@ export const registrationOptionsContent: RegistrationOptionsSection = {
     description: "Manage your agency, agents and property listings",
     optionLink: {
       label: "Continue as an Agency",
-      path: "/auth/register/agency",
+      path: "/auth/register/agency-owner",
     },
   },
 };
@@ -172,4 +172,9 @@ export const registrationSelectionPageFooter: RegistrationSelectionPageFooter = 
 export const clientRegistrationPageHeaderContent: AuthHeaderContent = {
   heading: "Client Registration",
   description: "Create your account to start exploring properties",
+};
+
+export const ownerRegistrationPageHeaderContent: AuthHeaderContent = {
+  heading: "Agency Registration",
+  description: `Join ${siteMetaData.name} as an agency owner`,
 };

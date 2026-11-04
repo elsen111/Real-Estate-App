@@ -44,3 +44,18 @@ export interface UserRegisterRequest {
   password: string;
   phoneNumber: string;
 }
+
+export interface AgencyRegisterRequest {
+  agencyName: string;
+  agencyDescription: string;
+  agencyBusinessEmail: string;
+  agencyBusinessPhone: string;
+  agencyWebsiteUrl: string;
+  agencyCity: string;
+  agencyAddress: string;
+}
+
+export interface AgencyOwnerRegisterRequest {
+  owner: UserRegisterRequest;
+  agency: AgencyRegisterRequest;
+}

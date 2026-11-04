@@ -1,6 +1,7 @@
 import { apiClient } from "../config/api/api";
 import type { ApiResponse } from "../types/api/api";
 import type {
+  AgencyOwnerRegisterRequest,
   AuthResponse,
   LoginRequest,
   UserRegisterRequest,
@@ -14,6 +15,9 @@ export const authService = {
 
   registerClient: (payload: UserRegisterRequest) =>
     apiClient.post<AuthResponse>("/auth/register/user", payload),
+
+  registerAgencyOwner: (payload: AgencyOwnerRegisterRequest) =>
+    apiClient.post<AuthResponse>("/auth/register/agency-owner", payload),
 
   refresh: () => {
     if (!refreshPromise) {
