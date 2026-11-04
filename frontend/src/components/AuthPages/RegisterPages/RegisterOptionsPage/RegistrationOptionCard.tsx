@@ -1,7 +1,7 @@
 import clsx from "clsx";
-import { registrationOptionsContent } from "../../content/site.data";
-import Button from "../common/UI/Button";
 import { ArrowRight } from "lucide-react";
+import { registrationOptionsContent } from "../../../../content/site.data";
+import Button from "../../../common/UI/Button";
 
 type RegistrationOptionCardProps = {
   variant: "clientRegistration" | "agencyRegistration";
@@ -22,12 +22,10 @@ const RegistrationOptionCard = ({ variant, className }: RegistrationOptionCardPr
         <Icon size={32} />
       </div>
       <h6 className="text-secondaryText text-[2.2rem] font-bold">
-        {" "}
-        {registrationOptionsContent[variant].heading}{" "}
+        {registrationOptionsContent[variant].heading}
       </h6>
       <p className="max-w-84 text-center text-[1.6rem] font-medium text-gray-600">
-        {" "}
-        {registrationOptionsContent[variant].description}{" "}
+        {registrationOptionsContent[variant].description}
       </p>
 
       <Button

@@ -1,4 +1,4 @@
-import { registrationSelectionPageFooter } from "../../content/site.data";
+import { registrationSelectionPageFooter } from "../../../../content/site.data";
 
 const RegisterSelectionPageFooter = () => {
   const Icon = registrationSelectionPageFooter.securityNote.icon;

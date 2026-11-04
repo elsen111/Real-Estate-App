@@ -1,14 +1,40 @@
-import clsx from "clsx";
-import { Eye, EyeClosed, Lock, Mail } from "lucide-react";
 import { useState, type ChangeEvent, type FormEvent } from "react";
+import { Eye, EyeClosed, Lock, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
-import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
-import { getErrorMessage } from "../../utils/getErrorMessage";
-import AuthSwitch from "./AuthSwitch";
+import clsx from "clsx";
+
+import AuthSwitch from "../common/AuthSwitch";
+import { useAuth } from "../../../context/AuthContext";
+import { getErrorMessage } from "../../../utils/getErrorMessage";
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+const ERROR_ID = "login-error";
+
+const INPUT_BASE_CLASS =
+  "focus:border-secondary w-full rounded-2xl border border-gray-500 bg-transparent py-4 pl-26 text-[1.6rem] transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-300 md:border-gray-400";
+
+const INPUT_ICON_CLASS = "absolute top-1/2 left-10 -translate-y-1/2 text-gray-400";
+
+const TOGGLE_BUTTON_CLASS =
+  "absolute top-1/2 right-10 -translate-y-1/2 cursor-pointer text-gray-400";
+
+const SUCCESS_TOAST_OPTIONS = {
+  duration: 1000,
+  position: "top-center",
+  iconTheme: {
+    primary: "#000066",
+    secondary: "#eee",
+  },
+  style: {
+    background: "#eee",
+    color: "#100a55",
+    fontSize: "1.6rem",
+    fontWeight: "medium",
+  },
+} as const;
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -20,51 +46,37 @@ const LoginForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const formValid = EMAIL_REGEX.test(email.trim()) && password.length > 0;
+  const isFormValid = EMAIL_REGEX.test(email.trim()) && password.length > 0;
 
   const clearError = () => {
     if (error) setError("");
   };
 
-  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
+  const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
     clearError();
+    setEmail(event.target.value);
   };
 
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
+  const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
     clearError();
+    setPassword(event.target.value);
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-    if (!formValid || isSubmitting) return;
+    if (!isFormValid || isSubmitting) return;
 
     setError("");
     setIsSubmitting(true);
 
     try {
       await login({
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         password,
       });
 
-      toast.success("Logged into account successfully!", {
-        duration: 1000,
-        position: "top-center",
-
-        iconTheme: {
-          primary: "#000066",
-          secondary: "#eee",
-        },
-        style: {
-          background: "#eee",
-          color: "#100a55",
-          fontSize: "1.6rem",
-          fontWeight: "medium",
-        },
-      });
+      toast.success("Logged into account successfully!", SUCCESS_TOAST_OPTIONS);
 
       navigate("/dashboard", { replace: true });
     } catch (err) {
@@ -76,35 +88,32 @@ const LoginForm = () => {
 
   return (
     <section className="w-full max-w-200">
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+        {/* Email */}
         <div className="relative">
-          <Mail
-            size={20}
-            aria-hidden="true"
-            className="absolute top-1/2 left-10 -translate-y-1/2 text-gray-400"
-          />
+          <Mail size={20} aria-hidden="true" className={INPUT_ICON_CLASS} />
 
           <input
             type="email"
             name="email"
             id="email"
             autoComplete="email"
+            autoCapitalize="none"
+            spellCheck={false}
             value={email}
             placeholder="Email"
             required
             aria-label="Email"
             aria-invalid={!!error}
+            aria-describedby={ERROR_ID}
             onChange={handleEmailChange}
-            className="focus:border-secondary w-full rounded-2xl border border-gray-500 bg-transparent py-4 pr-4 pl-26 text-[1.6rem] transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-300 md:border-gray-400"
+            className={clsx(INPUT_BASE_CLASS, "pr-4")}
           />
         </div>
 
+        {/* Password */}
         <div className="relative">
-          <Lock
-            size={20}
-            aria-hidden="true"
-            className="absolute top-1/2 left-10 -translate-y-1/2 text-gray-400"
-          />
+          <Lock size={20} aria-hidden="true" className={INPUT_ICON_CLASS} />
 
           <input
             type={passwordVisible ? "text" : "password"}
@@ -116,8 +125,9 @@ const LoginForm = () => {
             required
             aria-label="Password"
             aria-invalid={!!error}
+            aria-describedby={ERROR_ID}
             onChange={handlePasswordChange}
-            className="focus:border-secondary w-full rounded-2xl border border-gray-500 bg-transparent py-4 pr-16 pl-26 text-[1.6rem] transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-300 md:border-gray-400"
+            className={clsx(INPUT_BASE_CLASS, "pr-16")}
           />
 
           <button
@@ -125,7 +135,7 @@ const LoginForm = () => {
             onClick={() => setPasswordVisible((prev) => !prev)}
             aria-label={passwordVisible ? "Hide password" : "Show password"}
             aria-pressed={passwordVisible}
-            className="absolute top-1/2 right-10 -translate-y-1/2 cursor-pointer text-gray-400"
+            className={TOGGLE_BUTTON_CLASS}
           >
             {passwordVisible ? (
               <Eye size={20} aria-hidden="true" />
@@ -135,8 +145,9 @@ const LoginForm = () => {
           </button>
         </div>
 
+        {/* Error message */}
         <p
-          id="login-error"
+          id={ERROR_ID}
           role="alert"
           aria-live="polite"
           className={clsx(
@@ -149,9 +160,10 @@ const LoginForm = () => {
           {error}
         </p>
 
+        {/* Submit */}
         <button
           type="submit"
-          disabled={!formValid || isSubmitting}
+          disabled={!isFormValid || isSubmitting}
           className="bg-secondary hover:bg-secondary/90 flex w-full cursor-pointer items-center justify-center rounded-xl py-3 text-[1.6rem] font-semibold text-white transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-80"
         >
           {isSubmitting ? (

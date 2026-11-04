@@ -2,11 +2,11 @@ import { LogOut, Menu, UserRound, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
-import Brand from "../Brand";
 import Button from "../UI/Button";
 import { MdOutlineFavorite } from "react-icons/md";
 import Tooltip from "../UI/Tooltip";
 import toast from "react-hot-toast";
+import Brand from "../UI/Brand";
 
 type TopNavLink = {
   label: string;

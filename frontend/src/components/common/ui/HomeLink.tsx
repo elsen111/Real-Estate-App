@@ -1,8 +1,9 @@
 import { Home } from "lucide-react";
 import { Link } from "react-router-dom";
-import Tooltip from "./UI/Tooltip";
+import Tooltip from "./Tooltip";
 import { useState } from "react";
 import clsx from "clsx";
+import { siteMetaData } from "../../../content/site.data";
 
 const HomeLink = ({ className = "" }: { className?: string }) => {
   const [homeHovered, setHomeHovered] = useState(false);
@@ -18,8 +19,8 @@ const HomeLink = ({ className = "" }: { className?: string }) => {
         onMouseEnter={() => setHomeHovered(true)}
         onMouseLeave={() => setHomeHovered(false)}
       >
-        <Home size={24} />
-
+        <Home size={24} className="mr-3" />
+        {siteMetaData.name}
         <Tooltip title="Go Home Page" placement="right" visible={homeHovered} />
       </Link>
     </div>

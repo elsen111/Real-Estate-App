@@ -39,3 +39,37 @@ body {
   font-weight: 600;
   font-style: normal;
 }
+
+/* Phone input in regsitration */
+.estate-phone-input {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.estate-phone-input .PhoneInputCountry {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.estate-phone-input .PhoneInputCountrySelect,
+.estate-phone-input .PhoneInputCountryIcon {
+  display: none;
+}
+
+.estate-phone-input .PhoneInputInput {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font-size: 1.6rem;
+  line-height: inherit;
+}
+
+.estate-phone-input .PhoneInputInput::placeholder {
+  color: #9ca3af;
+}

@@ -1,4 +1,4 @@
-import SectionContainer from "../../../app/layouts/SectionContainer";
+import SectionContainer from "../../common/Section/SectionContainer";
 import CategoryFilter from "./CategoryFilter";
 import FeaturedProperties from "./FeaturedProperties";
 import RecentProperties from "./RecentProperties";

@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
 import authBgImg from "../../assets/images/auth-bg.jpg";
-import HomeLink from "../../components/common/HomeLink";
+import HomeLink from "../../components/common/UI/HomeLink";
 
 const AuthLayout = () => {
   const { pathname } = useLocation();

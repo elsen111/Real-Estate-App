@@ -1,6 +1,6 @@
 import HomePage from "../../pages/public/HomePage";
 import PublicLayout from "../layouts/PublicLayout";
-import LoginPage from "../../pages/auth/LoginPage";
+import LoginPage from "../../pages/auth/login/LoginPage";
 import RentPage from "../../pages/public/RentPage";
 import BuyPage from "../../pages/public/BuyPage";
 import PricingPage from "../../pages/public/PricingPage";
@@ -9,9 +9,9 @@ import PropertySearchPage from "../../pages/public/PropertySearchPage";
 import PropertyDetailsPage from "../../pages/public/PropertyDetailsPage";
 import AgencyDetailsPage from "../../pages/public/AgencyDetailsPage";
 import AuthLayout from "../layouts/AuthLayout";
-import ClientRegisterPage from "../../pages/auth/ClientRegisterPage";
-import AgencyRegisterPage from "../../pages/auth/AgencyRegisterPage";
-import RegisterSelectionPage from "../../pages/auth/RegisterSelectionPage";
+import ClientRegistrationPage from "../../pages/auth/register/ClientRegistrationPage";
+import AgencyRegistrationPage from "../../pages/auth/register/AgencyRegistrationPage";
+import RegisterSelectionPage from "../../pages/auth/register/RegisterSelectionPage";
 
 export const PublicRoutes = [
   {
@@ -35,8 +35,8 @@ export const PublicRoutes = [
     children: [
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <RegisterSelectionPage /> },
-      { path: "register/client", element: <ClientRegisterPage /> },
-      { path: "register/agency", element: <AgencyRegisterPage /> },
+      { path: "register/client", element: <ClientRegistrationPage /> },
+      { path: "register/agency", element: <AgencyRegistrationPage /> },
     ],
   },
 ];

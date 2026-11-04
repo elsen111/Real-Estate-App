@@ -1,6 +1,11 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
-import type { LoginRequest, AuthResponse, UserResponse } from "../types/api/auth";
+import type {
+  LoginRequest,
+  AuthResponse,
+  UserResponse,
+  UserRegisterRequest,
+} from "../types/api/auth";
 
 import { authService } from "../services/authService";
 import { tokenStore } from "../config/api/tokenStore";
@@ -10,6 +15,7 @@ interface AuthContextValue {
   isLoading: boolean;
 
   login: (credentials: LoginRequest) => Promise<void>;
+  registerClient: (payload: UserRegisterRequest) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -55,6 +61,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     startSession(response.data);
   };
 
+  const registerClient = async (payload: UserRegisterRequest) => {
+    const response = await authService.registerClient(payload);
+
+    startSession(response.data);
+  };
+
   const logout = async () => {
     try {
       await authService.logout();
@@ -65,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout, registerClient }}>
       {children}
     </AuthContext.Provider>
   );

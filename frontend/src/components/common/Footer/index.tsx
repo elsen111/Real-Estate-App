@@ -1,4 +1,4 @@
-import SectionContainer from "../../../app/layouts/SectionContainer";
+import SectionContainer from "../Section/SectionContainer";
 import { footerContent } from "../../../content/site.data";
 import NavGroup from "./FooterNavGroup";
 

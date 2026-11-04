@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import SectionContainer from "../../../app/layouts/SectionContainer";
+import SectionContainer from "../../common/Section/SectionContainer";
 import type { PopularCityResponse } from "../../../types/api/property";
 import { Carousel } from "../../common/UI/Carousel";
-import SubsectionHeader from "../../common/SubsectionHeader";
+import SubsectionHeader from "../../common/UI/SubsectionHeader";
 import { useNavigate } from "react-router-dom";
 import propertyService from "../../../services/propertyService";
 import axios from "axios";

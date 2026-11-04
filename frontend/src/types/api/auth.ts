@@ -37,3 +37,10 @@ export interface TokenResponse {
   tokenType: string;
   expiresInSeconds: number;
 }
+
+export interface UserRegisterRequest {
+  fullName: string;
+  email: string;
+  password: string;
+  phoneNumber: string;
+}

@@ -1,11 +1,19 @@
 import { apiClient } from "../config/api/api";
 import type { ApiResponse } from "../types/api/api";
-import type { AuthResponse, LoginRequest, UserResponse } from "../types/api/auth";
+import type {
+  AuthResponse,
+  LoginRequest,
+  UserRegisterRequest,
+  UserResponse,
+} from "../types/api/auth";
 
 let refreshPromise: Promise<ApiResponse<AuthResponse>> | null = null;
 
 export const authService = {
   login: (payload: LoginRequest) => apiClient.post<AuthResponse>("/auth/login", payload),
+
+  registerClient: (payload: UserRegisterRequest) =>
+    apiClient.post<AuthResponse>("/auth/register/user", payload),
 
   refresh: () => {
     if (!refreshPromise) {

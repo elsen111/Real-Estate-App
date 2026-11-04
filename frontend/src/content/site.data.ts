@@ -168,3 +168,8 @@ export const registrationSelectionPageFooter: RegistrationSelectionPageFooter = 
     text: "Your information is safe with us",
   },
 };
+
+export const clientRegistrationPageHeaderContent: AuthHeaderContent = {
+  heading: "Client Registration",
+  description: "Create your account to start exploring properties",
+};
