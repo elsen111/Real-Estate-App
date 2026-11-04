@@ -2,7 +2,7 @@ import { Carousel } from "../../common/UI/Carousel";
 import useCategories from "../../../hooks/useCategories";
 import type { CategoryResponse } from "../../../types/api/category";
 import { useNavigate } from "react-router-dom";
-import SubsectionHeader from "../../common/SubsectionHeader";
+import SubsectionHeader from "../../common/UI/SubsectionHeader";
 import { propertyShowcaseSubsectionContents } from "../../../content/site.data";
 import categoryDefaultImage from "../../../assets/images/category-default-bg.jpg";
 import CategoryCard from "../../common/Cards/CategoryCard";

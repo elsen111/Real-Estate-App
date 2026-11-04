@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import SectionContainer from "../../../app/layouts/SectionContainer";
+import SectionContainer from "../../common/Section/SectionContainer";
 import { Carousel } from "../../common/UI/Carousel";
-import SubsectionHeader from "../../common/SubsectionHeader";
+import SubsectionHeader from "../../common/UI/SubsectionHeader";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { propertyShowcaseSubsectionContents } from "../../../content/site.data";

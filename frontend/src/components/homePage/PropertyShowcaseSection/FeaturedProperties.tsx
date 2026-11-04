@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { PropertyResponse } from "../../../types/api/property";
 import propertyService from "../../../services/propertyService";
 import axios from "axios";
-import SubsectionHeader from "../../common/SubsectionHeader";
+import SubsectionHeader from "../../common/UI/SubsectionHeader";
 import { propertyShowcaseSubsectionContents } from "../../../content/site.data";
 import { Carousel } from "../../common/UI/Carousel";
 import PropertyCard from "../../common/Cards/PropertyCard";

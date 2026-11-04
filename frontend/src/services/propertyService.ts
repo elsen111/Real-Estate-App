@@ -1,4 +1,4 @@
-import { apiClient } from "../config/api";
+import { apiClient } from "../config/api/api";
 import type { PageResponse } from "../types/api/api";
 import type { PropertyResponse, PopularCityResponse } from "../types/api/property";
 

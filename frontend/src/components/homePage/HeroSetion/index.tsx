@@ -1,4 +1,4 @@
-import SectionContainer from "../../../app/layouts/SectionContainer";
+import SectionContainer from "../../common/Section/SectionContainer";
 import heroImage from "../../../assets/images/home-hero.jpg";
 import { heroSectionContent } from "../../../content/site.data";
 import HeroForm from "./HeroForm";

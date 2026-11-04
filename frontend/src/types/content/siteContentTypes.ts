@@ -48,3 +48,31 @@ export interface FooterNavGroup {
   heading: string;
   links: FooterNavLink[];
 }
+
+export interface AuthHeaderContent {
+  heading: string;
+  description: string;
+}
+
+export interface RegistrationOptionCard {
+  icon: LucideIcon;
+  heading: string;
+  description: string;
+  optionLink: {
+    label: string;
+    path: string;
+  };
+}
+
+export interface RegistrationOptionsSection {
+  clientRegistration: RegistrationOptionCard;
+  agencyRegistration: RegistrationOptionCard;
+}
+
+export interface RegistrationSelectionPageFooter {
+  dividerText: string;
+  securityNote: {
+    icon: LucideIcon;
+    text: string;
+  };
+}

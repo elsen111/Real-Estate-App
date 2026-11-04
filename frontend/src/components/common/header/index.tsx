@@ -1,4 +1,4 @@
-import Brand from "../Brand";
+import Brand from "../UI/Brand";
 import HeaderNav from "./HeaderNav";
 
 const Header = () => {

@@ -1,4 +1,4 @@
-import { apiClient } from "../config/api";
+import { apiClient } from "../config/api/api";
 import type { ApiResponse } from "../types/api/api";
 import type { CategoryResponse } from "../types/api/category";
 

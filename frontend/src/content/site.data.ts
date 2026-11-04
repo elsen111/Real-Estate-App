@@ -1,10 +1,21 @@
-import { BadgeCheck, ChartNoAxesCombined, MessageCircle, Search } from "lucide-react";
+import {
+  BadgeCheck,
+  BuildingComplex,
+  ChartNoAxesCombined,
+  MessageCircle,
+  Search,
+  ShieldCheck,
+  User,
+} from "lucide-react";
 import type {
+  AuthHeaderContent,
   CtaSectionContent,
   FeaturesSectionContent,
   FooterContent,
   HeroSectionContent,
   PropertyShowcaseSubsectionContent,
+  RegistrationOptionsSection,
+  RegistrationSelectionPageFooter,
   SiteMetaData,
 } from "../types/content/siteContentTypes";
 
@@ -116,4 +127,54 @@ export const footerContent: FooterContent = {
     },
   ],
   copyright: `\u00A9 ${new Date().getFullYear()} ${siteMetaData.name}. All rights reserved.`,
+};
+
+export const loginPageHeaderContent: AuthHeaderContent = {
+  heading: "Welcome Back!",
+  description: `Sign in to your ${siteMetaData.name} account to unlock more features.`,
+};
+
+export const registerSelectionPageHeaderContent: AuthHeaderContent = {
+  heading: `Choose how you want to use ${siteMetaData.name}`,
+  description: "Join our platform as a client or an agency owner.",
+};
+
+export const registrationOptionsContent: RegistrationOptionsSection = {
+  clientRegistration: {
+    icon: User,
+    heading: "I'm a Client",
+    description: "Discover properties, save favorites and contact agencies",
+    optionLink: {
+      label: "Continue as a Client",
+      path: "/auth/register/client",
+    },
+  },
+
+  agencyRegistration: {
+    icon: BuildingComplex,
+    heading: "I have an Agency",
+    description: "Manage your agency, agents and property listings",
+    optionLink: {
+      label: "Continue as an Agency",
+      path: "/auth/register/agency-owner",
+    },
+  },
+};
+
+export const registrationSelectionPageFooter: RegistrationSelectionPageFooter = {
+  dividerText: "It is quick and easy",
+  securityNote: {
+    icon: ShieldCheck,
+    text: "Your information is safe with us",
+  },
+};
+
+export const clientRegistrationPageHeaderContent: AuthHeaderContent = {
+  heading: "Client Registration",
+  description: "Create your account to start exploring properties",
+};
+
+export const ownerRegistrationPageHeaderContent: AuthHeaderContent = {
+  heading: "Agency Registration",
+  description: `Join ${siteMetaData.name} as an agency owner`,
 };

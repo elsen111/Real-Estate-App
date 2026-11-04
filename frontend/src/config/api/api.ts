@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { AxiosRequestConfig } from "axios";
-import type { ApiResponse } from "../types/api/api";
+import type { ApiResponse } from "../../types/api/api";
+import { tokenStore } from "./tokenStore";
 
 const API_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:8080/api").replace(/\/+$/, "");
 
@@ -13,9 +14,8 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
+  const token = tokenStore.getAccessToken();
   const isPublic = PUBLIC_ENDPOINTS.some((path) => config.url?.startsWith(path));
-
   if (token && !isPublic) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -24,10 +24,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const isPublic = PUBLIC_ENDPOINTS.some((path) => error.config?.url?.startsWith(path));
-
     if (error.response?.status === 401 && !isPublic) {
-      localStorage.removeItem("accessToken");
-      window.location.href = "/login";
+      tokenStore.clear();
     }
     return Promise.reject(error);
   },

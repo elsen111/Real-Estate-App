@@ -1,11 +1,12 @@
-import { Menu, UserRound, X } from "lucide-react";
+import { LogOut, Menu, UserRound, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
-import Brand from "../Brand";
 import Button from "../UI/Button";
 import { MdOutlineFavorite } from "react-icons/md";
 import Tooltip from "../UI/Tooltip";
+import toast from "react-hot-toast";
+import Brand from "../UI/Brand";
 
 type TopNavLink = {
   label: string;
@@ -24,7 +25,7 @@ const HeaderNav = () => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [favHovered, setFavHovered] = useState<boolean>(false);
 
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -32,6 +33,31 @@ const HeaderNav = () => {
       document.body.style.overflow = "";
     };
   }, [menuOpen]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setMenuOpen(false);
+
+      toast.success("Logged out from account successfully!", {
+        duration: 1000,
+        position: "top-center",
+        iconTheme: {
+          primary: "#000066",
+          secondary: "#eee",
+        },
+        style: {
+          background: "#eee",
+          color: "#100a55",
+          fontSize: "1.6rem",
+          fontWeight: "medium",
+          padding: "1rem 2rem",
+        },
+      });
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
     <>
@@ -94,9 +120,9 @@ const HeaderNav = () => {
                 hasFixedDimensions={true}
                 isLink={true}
               >
-                {user.image ? (
+                {user.user?.avatarUrl ? (
                   <img
-                    src={user.image}
+                    src={user.user.avatarUrl}
                     className="block h-full! w-full! rounded-full object-cover"
                     alt="Profile avatar"
                   />
@@ -104,15 +130,22 @@ const HeaderNav = () => {
                   <UserRound size="24" />
                 )}
               </Button>
+
+              <div
+                onClick={handleLogout}
+                className="hover:bg-purple/10 cursor-pointer rounded-full p-2 transition-all duration-300 active:scale-95"
+              >
+                <LogOut />
+              </div>
               <span className="text-primaryText font-medium lg:hidden"> Account </span>
             </div>
           ) : (
             <>
-              <Button path="/login" variant="white" isLink={true}>
+              <Button path="/auth/login" variant="white" isLink={true}>
                 Login
               </Button>
 
-              <Button path="/register" variant="blue" isLink={true}>
+              <Button path="/auth/register/agency-owner" variant="blue" isLink={true}>
                 List your agency
               </Button>
             </>

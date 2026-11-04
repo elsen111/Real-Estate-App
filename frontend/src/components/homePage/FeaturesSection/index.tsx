@@ -1,4 +1,4 @@
-import SectionContainer from "../../../app/layouts/SectionContainer";
+import SectionContainer from "../../common/Section/SectionContainer";
 import featuresImg from "../../../assets/images/features.jpg";
 import { featuresSectionContent } from "../../../content/site.data";
 import Button from "../../common/UI/Button";

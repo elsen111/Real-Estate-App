@@ -1,7 +1,7 @@
-import { siteMetaData } from "../../content/site.data";
-import logo from "../../assets/images/logo.png";
+import logo from "../../../assets/images/logo.png";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
+import { siteMetaData } from "../../../content/site.data";
 
 const Brand = ({ styles }: { styles?: string }) => {
   return (

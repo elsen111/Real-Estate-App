@@ -1,4 +1,4 @@
-import type { PropertyShowcaseSubsectionContent } from "../../types/content/siteContentTypes";
+import type { PropertyShowcaseSubsectionContent } from "../../../types/content/siteContentTypes";
 
 const SubsectionHeader = ({ title, tagline = "" }: PropertyShowcaseSubsectionContent) => {
   return (
