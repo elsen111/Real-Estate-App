@@ -79,6 +79,14 @@ app:
     allow-credentials: true
     max-age: 36000
 
+  password-reset:
+    otp-expiration-minutes: 10
+    otp-resend-cooldown-seconds: 60
+    token-expiration-minutes: 10
+    otp-max-attempts: 5
+    otp-length: 6
+    otp-hmac-secret: ${PASSWORD_RESET_OTP_SECRET}
+
   cookie:
     secure: ${COOKIE_SECURE:true}
     same-site: ${COOKIE_SAME_SITE:Strict}

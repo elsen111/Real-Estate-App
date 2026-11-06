@@ -21,6 +21,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
                 BootstrapAdminProperties.class,
                 CorsProperties.class,
                 CookieProperties.class,
+                PasswordResetProperties.class
         }
 )
 public class BackendApplication {

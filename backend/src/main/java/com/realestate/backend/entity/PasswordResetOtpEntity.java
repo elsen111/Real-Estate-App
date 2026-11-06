@@ -8,9 +8,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(
-        name = "password_reset_otp"
-)
+@Table(name = "password_reset_otp")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,21 +21,22 @@ public class PasswordResetOtpEntity {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @Column(nullable = false, length = 6)
-    private String otp;
+    @Column(nullable = false, length = 64)
+    private String otpHash;
 
     @Column(nullable = false)
     private LocalDateTime expiresAt;
 
     @Column(nullable = false)
-    private Boolean used = false;
+    private Integer attempts;
+
+    @Column(nullable = false)
+    private Boolean used;
 
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
-
 }
