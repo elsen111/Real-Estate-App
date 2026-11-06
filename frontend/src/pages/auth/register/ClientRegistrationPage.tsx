@@ -1,4 +1,5 @@
 import AuthHeaderSection from "../../../components/AuthPages/common/AuthHeaderSection";
+import ClientRegisterForm from "../../../components/AuthPages/RegisterPages/ClientRegistration/ClientRegisterForm";
 import BackToRegisterSelection from "../../../components/AuthPages/RegisterPages/common/BackToRegisterSelection";
 import { clientRegistrationPageHeaderContent } from "../../../content/site.data";
 
@@ -11,6 +12,7 @@ const ClientRegistrationPage = () => {
         heading={clientRegistrationPageHeaderContent.heading}
         description={clientRegistrationPageHeaderContent.description}
       />
+      <ClientRegisterForm />
     </div>
   );
 };
