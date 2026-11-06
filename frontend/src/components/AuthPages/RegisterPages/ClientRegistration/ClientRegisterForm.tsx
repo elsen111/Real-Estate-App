@@ -62,8 +62,6 @@ const ClientRegisterForm = () => {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  /* ------------------------------- Validation ------------------------------ */
-
   const fullNameLength = formData.fullName.trim().length;
   const isFullNameValid =
     fullNameLength >= FULL_NAME_MIN_LENGTH && fullNameLength <= FULL_NAME_MAX_LENGTH;
