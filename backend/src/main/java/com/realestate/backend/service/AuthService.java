@@ -3,6 +3,7 @@ package com.realestate.backend.service;
 import com.realestate.backend.dto.request.*;
 import com.realestate.backend.dto.response.AuthResponse;
 import com.realestate.backend.dto.response.RefreshTokenResponse;
+import com.realestate.backend.dto.response.VerifyResetOtpResponse;
 import com.realestate.backend.security.principal.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -36,14 +37,6 @@ public interface AuthService {
     void changePassword(
             ChangePasswordRequest request,
             CustomUserDetails currentUser
-    );
-
-    void forgotPassword(
-            ForgotPasswordRequest request
-    );
-
-    void resetPassword(
-            ResetPasswordRequest request
     );
 
     AuthResponse reactivateAccount(

@@ -15,7 +15,6 @@ import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.security.jwt.JwtService;
 import com.realestate.backend.security.core.SecurityConstants;
 import com.realestate.backend.service.AuthService;
-import com.realestate.backend.service.OtpService;
 import com.realestate.backend.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +27,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -55,10 +52,6 @@ public class AuthServiceImpl implements AuthService {
     private final AgencyMemberRepository agencyMemberRepository;
 
     private final AuthMapper authMapper;
-
-    private final OtpService otpService;
-
-    private final PasswordResetOtpRepository passwordResetOtpRepository;
 
     @Transactional
     @Override
@@ -219,7 +212,6 @@ public class AuthServiceImpl implements AuthService {
 
         UserEntity user = rotatedToken.entity().getUser();
 
-        // CHANGED: same agency-approval rule as login (rolls back the rotation if it fails)
         AgencyMemberEntity membership = agencyMemberRepository
                 .findByUserAndActiveTrue(user)
                 .orElse(null);
@@ -306,64 +298,6 @@ public class AuthServiceImpl implements AuthService {
 
         log.atInfo()
                 .setMessage("Password changed")
-                .addKeyValue("userId", user.getId())
-                .addKeyValue("userEmail", user.getEmail())
-                .log();
-
-    }
-
-    @Override
-    @Transactional
-    public void forgotPassword(ForgotPasswordRequest request) {
-
-        userRepository.findByEmailIgnoreCase(request.getEmail())
-                .ifPresent(otpService::generateAndSendOtp);
-
-        log.atInfo()
-                .setMessage("Password reset requested")
-                .addKeyValue("email", request.getEmail())
-                .log();
-
-    }
-
-    @Override
-    @Transactional
-    public void resetPassword(ResetPasswordRequest request) {
-
-        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            throw new BadRequestException("Passwords do not match.");
-        }
-
-        UserEntity user = userRepository.findByEmailIgnoreCase(request.getEmail())
-                .orElseThrow(() -> new BadRequestException("Invalid email or OTP."));
-
-        PasswordResetOtpEntity otpEntity =
-                passwordResetOtpRepository
-                        .findTopByUserAndUsedFalseOrderByCreatedAtDesc(user)
-                        .orElseThrow(() -> new BadRequestException("Invalid email or OTP."));
-
-        if (!otpEntity.getOtp().equals(request.getOtp())) {
-            throw new BadRequestException("Invalid email or OTP.");
-        }
-
-        if (otpEntity.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new BadRequestException("OTP has expired.");
-        }
-
-        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
-
-        userRepository.save(user);
-
-        otpEntity.setUsed(true);
-
-        passwordResetOtpRepository.save(otpEntity);
-
-        passwordResetOtpRepository.deleteByUser(user);
-
-        refreshTokenRepository.deleteAllByUser(user);
-
-        log.atInfo()
-                .setMessage("Password reset completed")
                 .addKeyValue("userId", user.getId())
                 .addKeyValue("userEmail", user.getEmail())
                 .log();

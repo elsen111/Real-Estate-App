@@ -84,7 +84,8 @@ public class SecurityConfig {
                                 "/auth/refresh",
                                 "/auth/logout",
                                 "/auth/forgot-password",
-                                "/auth/reset-password"
+                                "/auth/reset-password",
+                                "/auth/verify-reset-otp"
                         ).permitAll()
 
                         .requestMatchers(

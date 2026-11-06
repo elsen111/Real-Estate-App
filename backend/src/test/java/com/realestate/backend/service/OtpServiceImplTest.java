@@ -4,7 +4,6 @@ import com.realestate.backend.entity.PasswordResetOtpEntity;
 import com.realestate.backend.entity.UserEntity;
 import com.realestate.backend.exception.InvalidOtpException;
 import com.realestate.backend.repository.PasswordResetOtpRepository;
-import com.realestate.backend.service.impl.OtpServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
