@@ -32,7 +32,7 @@ A real estate platform backend for agencies, agents, landlords, and clients. It 
 ## ✨ Features
 
 * 🔐 JWT-based authentication (access + refresh tokens), login/logout, "me" endpoint
-* 🛡️ Role-based access control (`SUPER_ADMIN`, `ADMIN`, `AGENCY_OWNER`, `AGENT`, `LANDLORD`, `CLIENT`)
+* 🛡️ Role-based access control (`SUPER_ADMIN`, `ADMIN`, `AGENCY_OWNER`, `AGENT`, `CLIENT`)
 * 📝 Separate registration flows for regular users and agency owners
 * 📧 Password reset via email OTP
 * 🏢 Agency management (profile, members, status, admin moderation)
