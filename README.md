@@ -60,7 +60,6 @@ Seeded via Liquibase (`db/changelog/2.0`):
 - **ADMIN** — assistant to the platform administrator
 - **AGENCY_OWNER** — head of an agency, manages agents/properties/inquiries for that agency
 - **AGENT** — manages assigned properties, inquiries, and appointments
-- **LANDLORD** — private owner listing their own property directly
 - **CLIENT** — searches properties, saves favorites, sends inquiries, requests viewings
 
 ⬆️ [Back to top](#estateflow--real-estate-crm--marketplace-backend)
