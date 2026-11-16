@@ -5,6 +5,7 @@ import com.realestate.backend.dto.response.AgencyMemberResponse;
 import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.AgencyMemberService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +18,26 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/agencies/{agencyId}/members")
 @RequiredArgsConstructor
+@Tag(
+        name = "Agency Member Management",
+        description = """
+                Endpoints for managing agency membership, including assigning agents to agencies.
+                """
+)
 public class AgencyMemberController {
 
     private final AgencyMemberService agencyMemberService;
 
     @PostMapping("/agents/{userId}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'AGENCY_OWNER')")
-    @Operation(summary = "Assign agent to agency.")
+    @Operation(
+            summary = "Assign an agent to an agency",
+            description = """
+                    Assigns an existing user to the specified agency as an agent.
+                    Accessible to super administrators and agency owners.
+                    Returns the created agency membership details.
+                    """
+    )
     public ResponseEntity<ApiResponse<AgencyMemberResponse>> assignAgent(
             @PathVariable UUID agencyId,
             @PathVariable UUID userId,

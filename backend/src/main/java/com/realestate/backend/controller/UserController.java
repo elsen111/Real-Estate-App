@@ -8,6 +8,7 @@ import com.realestate.backend.dto.response.UserProfilePhotoResponse;
 import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +23,28 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@Tag(
+        name = "Users",
+        description = """
+                Endpoints for managing authenticated user accounts and profile information.
+                Supports profile updates, account deletion, and profile photo management.
+                """
+)
 public class UserController {
 
     private final UserService userService;
 
     @PreAuthorize("isAuthenticated()")
     @PatchMapping("/me/profile")
-    @Operation(summary = "Update own profile")
+    @Operation(
+            summary = "Update own profile",
+            description = """
+                    Updates the profile information of the currently authenticated user.
+                    Accepts the profile fields provided in UpdateProfileRequest.
+                    Returns the updated user information.
+                    Requires authentication.
+                    """
+    )
     public ResponseEntity<ApiResponse<AuthUserResponse>> updateProfile(
             @Valid @RequestBody UpdateProfileRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUser
@@ -45,7 +61,15 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     @Transactional
     @DeleteMapping("/account")
-    @Operation(summary = "Delete own profile")
+    @Operation(
+            summary = "Delete own account",
+            description = """
+                    Deletes or deactivates the account of the currently authenticated user,
+                    according to the account deletion workflow implemented by the service.
+                    Requires the user's password for confirmation.
+                    Requires authentication.
+                    """
+    )
     public ResponseEntity<ApiResponse<Void>> deleteAccount(
             @Valid @RequestBody AccountPasswordRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUser
@@ -68,7 +92,16 @@ public class UserController {
             value = "/me/photo",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    @Operation(summary = "Upload/edit profile photo")
+    @Operation(
+            summary = "Upload or update profile photo",
+            description = """
+                    Uploads a profile photo for the currently authenticated user.
+                    If a profile photo already exists, it can be replaced with the uploaded file.
+                    Accepts multipart/form-data with a file parameter named 'file'.
+                    Returns the uploaded profile photo information.
+                    Requires authentication.
+                    """
+    )
     public ResponseEntity<ApiResponse<UserProfilePhotoResponse>> uploadProfilePhoto(
             @RequestPart("file") MultipartFile file,
             @AuthenticationPrincipal CustomUserDetails currentUser
@@ -85,7 +118,13 @@ public class UserController {
 
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/me/photo")
-    @Operation(summary = "Remove profile photo")
+    @Operation(
+            summary = "Remove profile photo",
+            description = """
+                    Removes the profile photo associated with the currently authenticated user.
+                    Requires authentication.
+                    """
+    )
     public ResponseEntity<ApiResponse<Void>> removeProfilePhoto(
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {

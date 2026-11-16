@@ -8,6 +8,7 @@ import com.realestate.backend.service.AppointmentService;
 import com.realestate.backend.service.InquiryService;
 import com.realestate.backend.service.PropertyService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,15 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/properties")
 @RequiredArgsConstructor
+@Tag(
+        name = "Properties",
+        description = """
+                APIs for property management and discovery, including creating and updating
+                property listings, browsing and searching public properties, map-based property
+                discovery, featured and popular listings, property media management,
+                inquiry and appointment creation, and agent assignment.
+                """
+)
 public class PropertyController {
 
     private final PropertyService propertyService;
@@ -33,8 +43,16 @@ public class PropertyController {
     private final AppointmentService appointmentService;
 
     @PostMapping
-    @Operation(summary = "Create a new property.")
     @PreAuthorize("hasRole('AGENCY_OWNER')")
+    @Operation(
+            summary = "Create a new property listing",
+            description = """
+                    Creates a new property listing using the provided property details.
+                    The property is associated with the authenticated agency owner's account
+                    and agency.
+                    Requires the AGENCY_OWNER role.
+                    """
+    )
     public ResponseEntity<ApiResponse<PropertyResponse>> createProperty(
             @Valid @RequestBody PropertyRequest request,
             @AuthenticationPrincipal CustomUserDetails currentUser
@@ -49,7 +67,14 @@ public class PropertyController {
     }
 
     @GetMapping
-    @Operation(summary = "Get all available public properties.")
+    @Operation(
+            summary = "Get all public property listings",
+            description = """
+                    Retrieves a paginated list of publicly available property listings.
+                    Supports filtering by property attributes and other search criteria.
+                    Supports pagination and sorting.
+                    """
+    )
     public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getAllPublicProperties(
             @ModelAttribute PropertyPublicFilterRequest filter,
             @PageableDefault(sort = "createdAt")
@@ -65,7 +90,14 @@ public class PropertyController {
     }
 
     @GetMapping("/{propertyId}")
-    @Operation(summary = "Get detailed information for the specific property.")
+    @Operation(
+            summary = "Get property details by ID",
+            description = """
+                    Retrieves detailed information about a specific property using its unique identifier.
+                    The returned information may depend on the property's visibility and
+                    the authenticated user's permissions.
+                    """
+    )
     public ResponseEntity<ApiResponse<PropertyDetailResponse>> getPropertyById(
             @PathVariable UUID propertyId,
             @AuthenticationPrincipal CustomUserDetails currentUser
@@ -80,8 +112,15 @@ public class PropertyController {
     }
 
     @PutMapping("/{propertyId}")
-    @Operation(summary = "Update an existing property")
     @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT')")
+    @Operation(
+            summary = "Update an existing property listing",
+            description = """
+                    Updates the details of an existing property listing using the provided request data.
+                    Requires the AGENCY_OWNER or AGENT role.
+                    The authenticated user must have permission to manage the specified property.
+                    """
+    )
     public ResponseEntity<ApiResponse<PropertyResponse>> updateProperty(
             @Valid @RequestBody PropertyRequest request,
             @PathVariable UUID propertyId,
@@ -97,7 +136,14 @@ public class PropertyController {
     }
 
     @PatchMapping("/{propertyId}")
-    @Operation(summary = "Update the status of an existing property")
+    @Operation(
+            summary = "Update property listing status",
+            description = """
+                    Changes the status of an existing property listing using the requested status.
+                    Supports authorized agency personnel and administrative users.
+                    Requires the AGENCY_OWNER, AGENT, SUPER_ADMIN, or ADMIN role.
+                    """
+    )
     @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<ApiResponse<Void>> updatePropertyStatus(
             @Valid @RequestBody PropertyStatusRequest request,
@@ -114,8 +160,16 @@ public class PropertyController {
     }
 
     @PatchMapping("/{propertyId}/featured")
-    @Operation(summary = "Update the featured property of an existing property")
     @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'SUPER_ADMIN', 'ADMIN')")
+    @Operation(
+            summary = "Toggle a property's featured status",
+            description = """
+                    Toggles the featured status of an existing property listing.
+                    The operation is subject to the user's authorization and applicable
+                    agency subscription limits.
+                    Requires the AGENCY_OWNER, AGENT, SUPER_ADMIN, or ADMIN role.
+                    """
+    )
     public ResponseEntity<ApiResponse<PropertyResponse>> toggleFeatured(
             @PathVariable UUID propertyId,
             @AuthenticationPrincipal CustomUserDetails currentUser
@@ -130,8 +184,16 @@ public class PropertyController {
     }
 
     @DeleteMapping("/{propertyId}")
-    @Operation(summary = "Soft delete the existing property")
     @PreAuthorize("hasAnyRole('AGENCY_OWNER', 'SUPER_ADMIN', 'ADMIN')")
+    @Operation(
+            summary = "Soft delete a property listing",
+            description = """
+                    Soft deletes an existing property listing without permanently removing
+                    its database record.
+                    Requires the AGENCY_OWNER, SUPER_ADMIN, or ADMIN role.
+                    The authenticated user must be authorized to manage the specified property.
+                    """
+    )
     public ResponseEntity<ApiResponse<Void>> softDeleteProperty(
             @PathVariable UUID propertyId,
             @AuthenticationPrincipal CustomUserDetails currentUser
@@ -146,7 +208,14 @@ public class PropertyController {
     }
 
     @GetMapping("/featured")
-    @Operation(summary = "Get featured properties.")
+    @Operation(
+            summary = "Get featured property listings",
+            description = """
+                    Retrieves a paginated list of currently featured public property listings.
+                    Supports filtering by property attributes and other search criteria.
+                    Supports pagination and sorting.
+                    """
+    )
     public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getFeaturedProperties(
             @ModelAttribute PropertyPublicFilterRequest filter,
             @PageableDefault(sort = "createdAt")
@@ -162,7 +231,14 @@ public class PropertyController {
     }
 
     @GetMapping("/recent")
-    @Operation(summary = "Get recent properties.")
+    @Operation(
+            summary = "Get recently added properties",
+            description = """
+                    Retrieves recently created public property listings.
+                    Supports filtering by property attributes and allows the client to specify
+                    the maximum number of results through the size query parameter.
+                    """
+    )
     public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getRecentProperties(
             @ModelAttribute PropertyPublicFilterRequest filter,
             @RequestParam(defaultValue = "8") int size
@@ -177,7 +253,14 @@ public class PropertyController {
     }
 
     @GetMapping("/popular")
-    @Operation(summary = "Get popular (most viewed) properties.")
+    @Operation(
+            summary = "Get the most viewed properties",
+            description = """
+                    Retrieves a paginated list of popular property listings based on their
+                    view counts.
+                    Supports pagination and sorting.
+                    """
+    )
     public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getPopularProperties(
             @PageableDefault(size = 3) Pageable pageable
     ) {
@@ -192,7 +275,14 @@ public class PropertyController {
 
 
     @GetMapping("/{propertyId}/similar")
-    @Operation(summary = "Get similar properties.")
+    @Operation(
+            summary = "Get properties similar to a specified property",
+            description = """
+                    Retrieves a paginated list of property listings similar to the specified property.
+                    Uses the reference property's attributes to identify relevant listings.
+                    Supports pagination and sorting.
+                    """
+    )
     public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getSimilarProperties(
             @PathVariable UUID propertyId,
             @PageableDefault(sort = "featured")
@@ -208,7 +298,13 @@ public class PropertyController {
     }
 
     @GetMapping("/search/suggestions")
-    @Operation(summary = "Get search suggestion according to the typed keyword.")
+    @Operation(
+            summary = "Get property search suggestions",
+            description = """
+                    Retrieves property search suggestions based on the supplied keyword.
+                    Intended to provide relevant suggestions while users enter search terms.
+                    """
+    )
     public ResponseEntity<ApiResponse<PropertySearchSuggestionResponse>> getSuggestedProperties(
             @Valid @RequestParam String keyword
     ) {
@@ -222,7 +318,14 @@ public class PropertyController {
     }
 
     @GetMapping("/map")
-    @Operation(summary = "Get properties with map details.")
+    @Operation(
+            summary = "Get properties for map-based discovery",
+            description = """
+                    Retrieves a paginated list of properties with location information
+                    required for displaying property markers on a map.
+                    Supports filtering through map-specific search criteria.
+                    """
+    )
     public ResponseEntity<ApiResponse<Page<PropertyMapResponse>>> getMapProperties(
             @ModelAttribute PropertyMapFilterRequest request,
             @PageableDefault(size = 100)
@@ -242,7 +345,15 @@ public class PropertyController {
             value = "/{propertyId}/media",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    @Operation(summary = "Upload property media files.")
+    @Operation(
+            summary = "Upload media files for a property",
+            description = """
+                    Uploads multiple image or media files associated with the specified property.
+                    Files are submitted using multipart/form-data.
+                    Requires the AGENCY_OWNER or AGENT role.
+                    The authenticated user must have permission to manage the property.
+                    """
+    )
     public ResponseEntity<ApiResponse<List<PropertyMediaResponse>>> uploadPropertyMedia(
             @PathVariable UUID propertyId,
             @AuthenticationPrincipal CustomUserDetails currentUser,
@@ -258,7 +369,13 @@ public class PropertyController {
     }
 
     @GetMapping("/{propertyId}/images")
-    @Operation(summary = "Get property images.")
+    @Operation(
+            summary = "Get property media files",
+            description = """
+                    Retrieves the media files associated with the specified property,
+                    including their metadata and primary-image information.
+                    """
+    )
     public ResponseEntity<ApiResponse<List<PropertyMediaResponse>>> getPropertyMedia(
             @PathVariable UUID propertyId
     ) {
@@ -272,8 +389,15 @@ public class PropertyController {
     }
 
     @PatchMapping("/{propertyId}/media/{mediaId}")
-    @Operation(summary = "Set the primary image for property")
     @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT')")
+    @Operation(
+            summary = "Set the primary image of a property",
+            description = """
+                    Sets the specified property media file as the primary image of the property.
+                    Updates the primary-image designation among the property's associated media files.
+                    Requires the AGENCY_OWNER or AGENT role.
+                    """
+    )
     public ResponseEntity<ApiResponse<List<SetPropertyMediaResponse>>> setPrimaryImage(
             @PathVariable UUID propertyId,
             @PathVariable UUID mediaId,
@@ -289,8 +413,15 @@ public class PropertyController {
     }
 
     @DeleteMapping("/media/{mediaId}")
-    @Operation(summary = "Delete the media image.")
     @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT')")
+    @Operation(
+            summary = "Delete a property media file",
+            description = """
+                    Removes the specified media file from its associated property.
+                    Requires the AGENCY_OWNER or AGENT role.
+                    The authenticated user must have permission to manage the associated property.
+                    """
+    )
     public ResponseEntity<ApiResponse<Void>> deleteImage(
             @PathVariable UUID mediaId,
             @AuthenticationPrincipal CustomUserDetails currentUser
@@ -304,9 +435,17 @@ public class PropertyController {
 
     }
 
-//    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'LANDLORD')")
+    //    @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'LANDLORD')")
     @PostMapping("/{propertyId}/inquiries")
-    @Operation(summary = "Create a new inquiry for the specific property")
+    @Operation(
+            summary = "Create an inquiry for a property",
+            description = """
+                    Creates a new inquiry associated with the specified property using
+                    the provided inquiry details.
+                    The inquiry is processed according to the property's availability
+                    and applicable business rules.
+                    """
+    )
     public ResponseEntity<ApiResponse<InquiryResponse>> createInquiry(
             @PathVariable UUID propertyId,
             @Valid @RequestBody CreateInquiryRequest request,
@@ -323,7 +462,15 @@ public class PropertyController {
 
     @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'LANDLORD')")
     @PostMapping("/{propertyId}/appointments")
-    @Operation(summary = "Create a new appointment for the specific property.")
+    @Operation(
+            summary = "Create an appointment for a property",
+            description = """
+                    Creates a new appointment request for the specified property using
+                    the provided appointment details.
+                    Requires the AGENCY_OWNER, AGENT, or LANDLORD role.
+                    The appointment is subject to the applicable scheduling and authorization rules.
+                    """
+    )
     public ResponseEntity<ApiResponse<AppointmentResponse>> createAppointment(
             @PathVariable UUID propertyId,
             @Valid @RequestBody CreateAppointmentRequest request,
@@ -341,7 +488,14 @@ public class PropertyController {
 
     @PreAuthorize("hasRole('AGENCY_OWNER')")
     @PutMapping("/{propertyId}/agent")
-    @Operation(summary = "Assign agent to a property")
+    @Operation(
+            summary = "Assign an agent to a property",
+            description = """
+                    Assigns an existing agency agent to the specified property.
+                    The assignment is performed within the authenticated agency owner's agency.
+                    Requires the AGENCY_OWNER role.
+                    """
+    )
     public ResponseEntity<ApiResponse<Void>> assignAgentToProperty(
             @PathVariable UUID propertyId,
             @Valid @RequestBody AssignAgentToPropertyRequest request,
@@ -357,7 +511,15 @@ public class PropertyController {
     }
 
     @GetMapping("/cities/popular")
-    @Operation(summary = "Get trending cities by property.")
+    @Operation(
+            summary = "Get popular cities by property listings",
+            description = """
+                    Retrieves a paginated list of popular cities based on property listing
+                    statistics.
+                    Intended to support location-based property discovery.
+                    Supports pagination and sorting.
+                    """
+    )
     public ResponseEntity<ApiResponse<Page<PopularCityResponse>>> getTrendingCities(
             @PageableDefault(size = 8)
             Pageable pageable
