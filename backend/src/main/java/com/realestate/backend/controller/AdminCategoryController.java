@@ -7,6 +7,7 @@ import com.realestate.backend.dto.response.CategoryLogoUploadResponse;
 import com.realestate.backend.dto.response.CategoryResponse;
 import com.realestate.backend.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -21,13 +22,23 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/admin/categories")
 @RequiredArgsConstructor
+@Tag(
+        name = "Admin - Category Management",
+        description = """
+                Administrative endpoints for managing property categories, including category creation,
+                retrieval, updates, activation, deactivation, deletion, and image uploads.
+                """
+)
 public class AdminCategoryController {
 
     private final CategoryService categoryService;
 
     @GetMapping
-    @Operation(summary = "Get all categories")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
+    @Operation(
+            summary = "Get all categories",
+            description = "Retrieves a list of all categories, including their details and current status."
+    )
     public ResponseEntity<ApiResponse<List<CategoryResponse>>> getActiveCategories() {
 
         List<CategoryResponse> response = categoryService.getAllCategories();
@@ -39,8 +50,11 @@ public class AdminCategoryController {
     }
 
     @GetMapping("/{categoryId}")
-    @Operation(summary = "Get category by id")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
+    @Operation(
+            summary = "Get category by ID",
+            description = "Retrieves detailed information about a specific category using its unique identifier."
+    )
     public ResponseEntity<ApiResponse<CategoryResponse>> getCategoryById(
             @PathVariable UUID categoryId
     ) {
@@ -54,8 +68,14 @@ public class AdminCategoryController {
     }
 
     @PostMapping
-    @Operation(summary = "Create a new category")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
+    @Operation(
+            summary = "Create a category",
+            description = """
+                    Creates a new property category using the provided category information.
+                    The request must satisfy the defined validation constraints.
+                    """
+    )
     public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(
             @Valid @RequestBody CreateCategoryRequest request
     ) {
@@ -69,8 +89,11 @@ public class AdminCategoryController {
     }
 
     @PutMapping("/{categoryId}")
-    @Operation(summary = "Update an existing category")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
+    @Operation(
+            summary = "Update category",
+            description = "Updates the information of an existing category using the provided request data."
+    )
     public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
             @PathVariable UUID categoryId,
             @Valid @RequestBody UpdateCategoryRequest request
@@ -85,8 +108,14 @@ public class AdminCategoryController {
     }
 
     @PatchMapping("/{categoryId}/status")
-    @Operation(summary = "Change the status (activity) of an existing category")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
+    @Operation(
+            summary = "Toggle category status",
+            description = """
+                    Toggles the active status of an existing category.
+                    Changes an active category to inactive or an inactive category to active.
+                    """
+    )
     public ResponseEntity<ApiResponse<CategoryResponse>> toggleCategoryStatus(
             @PathVariable UUID categoryId
     ) {
@@ -100,8 +129,14 @@ public class AdminCategoryController {
     }
 
     @DeleteMapping("/{categoryId}")
-    @Operation(summary = "Delete an existing category")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
+    @Operation(
+            summary = "Delete category",
+            description = """
+                    Soft-deletes an existing category using its unique identifier.
+                    The category is marked as deleted without permanently removing its database record.
+                    """
+    )
     public ResponseEntity<ApiResponse<Void>> softDeleteCategory(
             @PathVariable UUID categoryId
     ) {
@@ -118,7 +153,14 @@ public class AdminCategoryController {
             value = "/{categoryId}/image",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    @Operation(summary = "Upload image for category")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
+    @Operation(
+            summary = "Upload category image",
+            description = """
+                    Uploads an image for a specific category using multipart/form-data.
+                    The uploaded image is associated with the specified category and its storage information is returned.
+                    """
+    )
     public ResponseEntity<ApiResponse<CategoryLogoUploadResponse>> uploadCategoryImage(
             @PathVariable UUID categoryId,
             @RequestPart("file") MultipartFile file

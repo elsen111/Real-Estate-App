@@ -15,6 +15,7 @@ import com.realestate.backend.service.AppointmentService;
 import com.realestate.backend.service.InquiryService;
 import com.realestate.backend.service.PropertyService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,6 +34,14 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/agencies")
 @RequiredArgsConstructor
+@Tag(
+        name = "Agency Management",
+        description = """
+                Endpoints for agency profile management, public agency discovery, subscription information,
+                property listings, agency members, inquiries, and appointments.
+                Includes both authenticated agency operations and publicly accessible agency information.
+                """
+)
 public class AgencyController {
 
     private final AgencyService agencyService;
@@ -42,7 +51,13 @@ public class AgencyController {
 
     @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT')")
     @GetMapping("/me")
-    @Operation(summary = "Get current agency information.")
+    @Operation(
+            summary = "Get current agency information",
+            description = """
+                    Retrieves the agency profile associated with the authenticated agency owner or agent,
+                    including its details and current information.
+                    """
+    )
     public ResponseEntity<ApiResponse<AgencyResponse>> getCurrentAgency(
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
@@ -57,7 +72,13 @@ public class AgencyController {
 
     @PutMapping("/me")
     @PreAuthorize("hasRole('AGENCY_OWNER')")
-    @Operation(summary = "Update agency profile")
+    @Operation(
+            summary = "Update agency profile",
+            description = """
+                    Updates the authenticated agency owner's agency profile using the provided request data.
+                    Only agency owners can modify their agency information.
+                    """
+    )
     public ResponseEntity<ApiResponse<AgencyResponse>> updateOwnAgency(
             @AuthenticationPrincipal CustomUserDetails currentUser,
             @Valid @RequestBody UpdateAgencyRequest request
@@ -76,7 +97,13 @@ public class AgencyController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     @PreAuthorize("hasRole('AGENCY_OWNER')")
-    @Operation(summary = "Update agency profile logo")
+    @Operation(
+            summary = "Upload agency logo",
+            description = """
+                    Uploads a new logo for the authenticated agency using multipart/form-data.
+                    The uploaded image is associated with the agency profile, and its storage information is returned.
+                    """
+    )
     public ResponseEntity<ApiResponse<AgencyLogoUploadResponse>> uploadAgencyLogo(
             @AuthenticationPrincipal CustomUserDetails currentUser,
             @RequestPart("file") MultipartFile file
@@ -91,8 +118,14 @@ public class AgencyController {
     }
 
     @GetMapping("/me/subscription")
-    @Operation(summary = "Get current agency's subscription.")
     @PreAuthorize("hasAnyRole('AGENCY_OWNER', 'AGENT', 'LANDLORD')")
+    @Operation(
+            summary = "Get current agency subscription",
+            description = """
+                    Retrieves the subscription information associated with the authenticated user's agency,
+                    including the assigned subscription plan and subscription details.
+                    """
+    )
     public ResponseEntity<ApiResponse<AgencySubscriptionResponse>> getMySubscription(
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
@@ -106,8 +139,14 @@ public class AgencyController {
     }
 
     @GetMapping("/me/properties")
-    @Operation(summary = "Get all properties belonging to the current agency")
     @PreAuthorize("hasAnyRole('AGENCY_OWNER', 'AGENT')")
+    @Operation(
+            summary = "Get current agency properties",
+            description = """
+                    Retrieves a paginated list of properties belonging to the authenticated user's agency.
+                    Supports filtering by property attributes and status, as well as sorting and pagination.
+                    """
+    )
     public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getAllProperties(
             @AuthenticationPrincipal CustomUserDetails currentUser,
             @ModelAttribute AgencyPropertyFilterRequest filter,
@@ -125,7 +164,13 @@ public class AgencyController {
     }
 
     @GetMapping("/public")
-    @Operation(summary = "Get all public agencies")
+    @Operation(
+            summary = "Get all public agencies",
+            description = """
+                    Retrieves a paginated list of publicly available agencies on the platform.
+                    Supports filtering by agency attributes and sorting and pagination.
+                    """
+    )
     public ResponseEntity<ApiResponse<Page<AgencyResponse>>> getAllAgencies(
             @ModelAttribute AgencyFilterRequest filter,
             @PageableDefault(sort = "createdAt")
@@ -143,7 +188,12 @@ public class AgencyController {
 
 
     @GetMapping("/public/{agencyId}")
-    @Operation(summary = "Get specific agency's public information.")
+    @Operation(
+            summary = "Get public agency information",
+            description = """
+                    Retrieves publicly accessible profile information for a specific agency using its unique identifier.
+                    """
+    )
     public ResponseEntity<ApiResponse<AgencyResponse>> getAgencyPublicInfo(
             @PathVariable UUID agencyId
     ) {
@@ -157,7 +207,13 @@ public class AgencyController {
     }
 
     @GetMapping("/public/{agencyId}/properties")
-    @Operation(summary = "Get agency's public properties list")
+    @Operation(
+            summary = "Get agency public properties",
+            description = """
+                    Retrieves a paginated list of publicly available property listings belonging to a specific agency.
+                    Supports filtering by property attributes, sorting, and pagination.
+                    """
+    )
     public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getAllAgencies(
             @PathVariable UUID agencyId,
             @ModelAttribute PropertyFilterRequest filter,
@@ -176,7 +232,13 @@ public class AgencyController {
 
     @PreAuthorize("hasAnyRole('AGENCY_OWNER','ADMIN', 'SUPER_ADMIN')")
     @GetMapping("/{agencyId}/agents")
-    @Operation(summary = "Get all agents belonging to the specific agency")
+    @Operation(
+            summary = "Get agency members",
+            description = """
+                    Retrieves a paginated list of agents and members associated with a specific agency.
+                    Supports filtering by member attributes and membership status, along with sorting and pagination.
+                    """
+    )
     public ResponseEntity<ApiResponse<Page<AgencyMemberResponse>>> getAgencyAgents(
             @PathVariable UUID agencyId,
             @ModelAttribute AgencyAgentFilterRequest filter,
@@ -194,8 +256,14 @@ public class AgencyController {
     }
 
     @DeleteMapping("/me/logo")
-    @Operation(summary = "Remove agency logo")
     @PreAuthorize("hasRole('AGENCY_OWNER')")
+    @Operation(
+            summary = "Remove agency logo",
+            description = """
+                    Removes the currently configured logo from the authenticated agency's profile.
+                    Only agency owners can perform this operation.
+                    """
+    )
     public ResponseEntity<ApiResponse<Void>> removeAgencyLogo(
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
@@ -212,8 +280,15 @@ public class AgencyController {
     }
 
     @GetMapping("/me/inquiries")
-    @Operation(summary = "Get current user's agency's inquiries")
     @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT')")
+    @Operation(
+            summary = "Get current agency inquiries",
+            description = """
+                    Retrieves a paginated list of inquiries associated with the authenticated user's agency.
+                    Supports optional filtering by inquiry status and property identifier.
+                    Results are sorted by creation date in descending order by default.
+                    """
+    )
     public ResponseEntity<ApiResponse<Page<InquiryResponse>>> getMyAgencyInquiries(
             @RequestParam(required = false) InquiryStatus status,
             @RequestParam(required = false) UUID propertyId,
@@ -236,7 +311,14 @@ public class AgencyController {
 
     @PreAuthorize("hasAnyRole('AGENCY_OWNER','AGENT', 'LANDLORD')")
     @GetMapping("/agencies/me/appointments")
-    @Operation(summary = "Get agency's appointments")
+    @Operation(
+            summary = "Get current agency appointments",
+            description = """
+                    Retrieves a paginated list of appointments associated with the authenticated user's agency.
+                    Supports optional filtering by appointment status and property identifier.
+                    Results are sorted by creation date in descending order by default.
+                    """
+    )
     public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getMyAgencyAppointments(
             @RequestParam(required = false) AppointmentStatus status,
             @RequestParam(required = false) UUID propertyId,
@@ -261,7 +343,13 @@ public class AgencyController {
     }
 
     @GetMapping("/public/top")
-    @Operation(summary = "Get top agencies by performance.")
+    @Operation(
+            summary = "Get top-performing agencies",
+            description = """
+                    Retrieves a paginated list of top-performing agencies based on the platform's agency
+                    performance ranking criteria. The default page size is 8.
+                    """
+    )
     public ResponseEntity<ApiResponse<Page<TopAgencyResponse>>> getTopAgencies(
             @PageableDefault(size = 8)
             Pageable pageable

@@ -5,6 +5,7 @@ import com.realestate.backend.dto.response.CategoryLogoUploadResponse;
 import com.realestate.backend.dto.response.CategoryResponse;
 import com.realestate.backend.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +18,25 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/categories")
 @RequiredArgsConstructor
+@Tag(
+        name = "Categories",
+        description = """
+                Public APIs for retrieving active property categories and their associated
+                information, including category details and display metadata.
+                """
+)
 public class CategoryController {
 
     private final CategoryService categoryService;
 
     @GetMapping
-    @Operation(summary = "Get all active categories")
+    @Operation(
+            summary = "Get all active categories",
+            description = """
+                    Retrieves a list of all currently active property categories.
+                    Inactive categories are excluded from the response.
+                    """
+    )
     public ResponseEntity<ApiResponse<List<CategoryResponse>>> getActiveCategories() {
 
         List<CategoryResponse> response = categoryService.getActiveCategories();
@@ -34,7 +48,13 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
-    @Operation(summary = "Get active category by id")
+    @Operation(
+            summary = "Get an active category by ID",
+            description = """
+                    Retrieves the details of a specific active property category using its unique identifier.
+                    Returns category information only if the category is active.
+                    """
+    )
     public ResponseEntity<ApiResponse<CategoryResponse>> getActiveCategoryById(
             @PathVariable UUID categoryId
     ) {

@@ -7,6 +7,7 @@ import com.realestate.backend.dto.response.ReviewResponse;
 import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,13 +23,28 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(
+        name = "Reviews",
+        description = """
+                Endpoints for creating, retrieving, updating, and deleting property and agency reviews.
+                Supports paginated review listings with filtering and authenticated review management.
+                """
+)
 public class ReviewController {
 
     private final ReviewService reviewService;
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/properties/{propertyId}/reviews")
-    @Operation(summary = "Create a new review for property.")
+    @Operation(
+            summary = "Create a property review",
+            description = """
+                    Creates a review for the specified property.
+                    Requires an authenticated user.
+                    The review details are provided in the request body.
+                    The authenticated user's information is used to associate the review with its author.
+                    """
+    )
     public ResponseEntity<ApiResponse<ReviewResponse>> createPropertyReview(
             @PathVariable UUID propertyId,
             @Valid @RequestBody ReviewRequest request,
@@ -44,7 +60,14 @@ public class ReviewController {
     }
 
     @GetMapping("/properties/{propertyId}/reviews")
-    @Operation(summary = "Get property reviews.")
+    @Operation(
+            summary = "Get property reviews",
+            description = """
+                    Retrieves a paginated list of reviews for the specified property.
+                    Supports filtering through PublicReviewFilterRequest.
+                    Results are sorted by creation date in descending order by default.
+                    """
+    )
     public ResponseEntity<ApiResponse<Page<ReviewResponse>>> getPropertyReviews(
             @PathVariable UUID propertyId,
             @ModelAttribute PublicReviewFilterRequest filter,
@@ -62,7 +85,15 @@ public class ReviewController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/agencies/{agencyId}/reviews")
-    @Operation(summary = "Create a new review for agency.")
+    @Operation(
+            summary = "Create an agency review",
+            description = """
+                    Creates a review for the specified agency.
+                    Requires an authenticated user.
+                    The review details are provided in the request body.
+                    The authenticated user's information is used to associate the review with its author.
+                    """
+    )
     public ResponseEntity<ApiResponse<ReviewResponse>> createAgencyReview(
             @PathVariable UUID agencyId,
             @Valid @RequestBody ReviewRequest request,
@@ -78,7 +109,14 @@ public class ReviewController {
     }
 
     @GetMapping("/agencies/{agencyId}/reviews")
-    @Operation(summary = "Get agency reviews.")
+    @Operation(
+            summary = "Get agency reviews",
+            description = """
+                    Retrieves a paginated list of reviews for the specified agency.
+                    Supports filtering through PublicReviewFilterRequest.
+                    Results are sorted by creation date in descending order by default.
+                    """
+    )
     public ResponseEntity<ApiResponse<Page<ReviewResponse>>> getAgencyReviews(
             @PathVariable UUID agencyId,
             @ModelAttribute PublicReviewFilterRequest filter,
@@ -96,7 +134,15 @@ public class ReviewController {
 
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/reviews/{reviewId}")
-    @Operation(summary = "Update own review.")
+    @Operation(
+            summary = "Update own review",
+            description = """
+                    Updates an existing review identified by its ID.
+                    Requires an authenticated user.
+                    The updated review details are provided in the request body.
+                    The authenticated user's information is used to verify review ownership.
+                    """
+    )
     public ResponseEntity<ApiResponse<ReviewResponse>> updateOwnReview(
             @PathVariable UUID reviewId,
             @Valid @RequestBody ReviewRequest request,
@@ -113,7 +159,14 @@ public class ReviewController {
 
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/reviews/{reviewId}")
-    @Operation(summary = "Delete own review.")
+    @Operation(
+            summary = "Delete own review",
+            description = """
+                    Deletes an existing review identified by its ID.
+                    Requires an authenticated user.
+                    The authenticated user's information is used to verify review ownership.
+                    """
+    )
     public ResponseEntity<ApiResponse<Void>> deleteOwnReview(
             @PathVariable UUID reviewId,
             @AuthenticationPrincipal CustomUserDetails currentUser

@@ -11,6 +11,7 @@ import com.realestate.backend.dto.response.InquiryResponse;
 import com.realestate.backend.service.AdminAgencyService;
 import com.realestate.backend.service.InquiryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -27,6 +28,10 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/admin/agencies")
 @RequiredArgsConstructor
+@Tag(
+        name = "Admin - Agency Management",
+        description = "Administrative endpoints for managing agencies, including agency information, approval workflows, subscriptions, and inquiries."
+)
 public class AdminAgencyController {
 
     private final AdminAgencyService adminAgencyService;
@@ -34,7 +39,10 @@ public class AdminAgencyController {
 
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
     @GetMapping
-    @Operation(summary = "Get all agencies")
+    @Operation(
+            summary = "Get all agencies",
+            description = "Retrieves a paginated list of agencies with optional filtering by agency attributes and status. Supports sorting and pagination."
+    )
     public ResponseEntity<ApiResponse<Page<AdminAgencyResponse>>> getAllAgencies(
             @ModelAttribute AdminAgencyFilterRequest filter,
             @PageableDefault(sort = "createdAt")
@@ -52,7 +60,10 @@ public class AdminAgencyController {
 
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
     @GetMapping("/{agencyId}")
-    @Operation(summary = "Get agency by id")
+    @Operation(
+            summary = "Get agency by ID",
+            description = "Retrieves detailed information about a specific agency using its unique identifier."
+    )
     public ResponseEntity<ApiResponse<AdminAgencyResponse>> getAgencyById(
             @PathVariable UUID agencyId
     ) {
@@ -67,7 +78,10 @@ public class AdminAgencyController {
 
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
     @PutMapping("/{agencyId}/status")
-    @Operation(summary = "Change agency status")
+    @Operation(
+            summary = "Change agency status",
+            description = "Updates the status of a specific agency. Allows administrators to change the agency's current status according to the provided request."
+    )
     public ResponseEntity<ApiResponse<Void>> changeAgencyStatus(
             @PathVariable UUID agencyId,
             @Valid @RequestBody AgencyStatusRequest request
@@ -84,7 +98,10 @@ public class AdminAgencyController {
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Transactional
     @DeleteMapping("/{agencyId}")
-    @Operation(summary = "Delete a specific agency")
+    @Operation(
+            summary = "Delete an agency",
+            description = "Soft-deletes a specific agency using its unique identifier. This operation is restricted to super administrators."
+    )
     public ResponseEntity<ApiResponse<Void>> deleteAccount(
             @PathVariable @NotNull UUID agencyId
     ) {
@@ -101,7 +118,10 @@ public class AdminAgencyController {
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Transactional
     @PostMapping("/{agencyId}/subscription-plans/{subscriptionId}")
-    @Operation(summary = "Assign subscription plan to an agency")
+    @Operation(
+            summary = "Assign subscription plan to agency",
+            description = "Assigns a subscription plan to a specific agency by creating an agency subscription using the provided agency and subscription plan identifiers."
+    )
     public ResponseEntity<ApiResponse<AgencySubscriptionResponse>> assignSubscriptionPlan(
             @PathVariable UUID agencyId,
             @PathVariable UUID subscriptionId
@@ -117,7 +137,10 @@ public class AdminAgencyController {
 
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
     @GetMapping("/{agencyId}/subscription-plan")
-    @Operation(summary = "Get agency subscription")
+    @Operation(
+            summary = "Get agency subscription",
+            description = "Retrieves the current subscription information associated with a specific agency, including its assigned subscription plan and subscription details."
+    )
     public ResponseEntity<ApiResponse<AgencySubscriptionResponse>> getAgencySubscription(
             @PathVariable UUID agencyId
     ) {
@@ -132,7 +155,10 @@ public class AdminAgencyController {
 
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     @PutMapping("/{agencyId}")
-    @Operation(summary = "Update agency information")
+    @Operation(
+            summary = "Approve agency",
+            description = "Approves a pending agency registration request, allowing the agency to become eligible to operate on the platform."
+    )
     public ResponseEntity<ApiResponse<AdminAgencyResponse>> updateAgency(
             @PathVariable UUID agencyId,
             @Valid @RequestBody UpdateAgencyRequest request
@@ -148,7 +174,10 @@ public class AdminAgencyController {
 
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     @PutMapping("/{agencyId}/approve")
-    @Operation(summary = "Approve an agency")
+    @Operation(
+            summary = "Approve agency",
+            description = "Approves a pending agency registration request, allowing the agency to become eligible to operate on the platform."
+    )
     public ResponseEntity<ApiResponse<Void>> approveAgency(
             @PathVariable UUID agencyId
     ) {
@@ -163,7 +192,10 @@ public class AdminAgencyController {
 
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     @PutMapping("/{agencyId}/reject")
-    @Operation(summary = "Reject an agency")
+    @Operation(
+            summary = "Reject agency",
+            description = "Rejects a pending agency registration request and updates the agency's status accordingly."
+    )
     public ResponseEntity<ApiResponse<Void>> rejectAgency(
             @PathVariable UUID agencyId
     ) {
@@ -178,7 +210,10 @@ public class AdminAgencyController {
 
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     @GetMapping("/{agencyId}/inquiries")
-    @Operation(summary = "Get agency's inquiries using its id")
+    @Operation(
+            summary = "Get agency inquiries",
+            description = "Retrieves a paginated list of inquiries associated with a specific agency. Supports optional filtering, sorting, and pagination."
+    )
     public ResponseEntity<ApiResponse<Page<InquiryResponse>>> getAgencyInquiries(
             @PathVariable UUID agencyId,
             @ModelAttribute InquiryFilterRequest filter,
