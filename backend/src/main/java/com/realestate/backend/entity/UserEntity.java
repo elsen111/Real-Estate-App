@@ -74,6 +74,17 @@ public class UserEntity {
     @JoinColumn(name = "agency_id")
     private AgencyEntity agency;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "deleted_by",
+            foreignKey = @ForeignKey(name = "fk_users_deleted_by")
+    )
+    private UserEntity deletedBy;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

@@ -156,8 +156,8 @@ public class AdminAgencyController {
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     @PutMapping("/{agencyId}")
     @Operation(
-            summary = "Approve agency",
-            description = "Approves a pending agency registration request, allowing the agency to become eligible to operate on the platform."
+            summary = "Update agency",
+            description = "Updates the agency details."
     )
     public ResponseEntity<ApiResponse<AdminAgencyResponse>> updateAgency(
             @PathVariable UUID agencyId,

@@ -388,7 +388,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private void ensureAgencyEmailIsFree(String email) {
-        if (agencyRepository.existsByEmail(email)) {
+        if (agencyRepository.existsByEmailAndIsDeletedFalse(email)) {
             throw new ConflictException("Agency already exists with email: " + email);
         }
     }

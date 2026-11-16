@@ -3,10 +3,7 @@ package com.realestate.backend.service.impl;
 import com.realestate.backend.dto.request.AdminUserFilterRequest;
 import com.realestate.backend.dto.request.UserStatusRequest;
 import com.realestate.backend.dto.response.UserResponse;
-import com.realestate.backend.entity.AgencyEntity;
-import com.realestate.backend.entity.AgencyMemberEntity;
-import com.realestate.backend.entity.RoleEntity;
-import com.realestate.backend.entity.UserEntity;
+import com.realestate.backend.entity.*;
 import com.realestate.backend.enums.PropertyStatus;
 import com.realestate.backend.enums.Role;
 import com.realestate.backend.exception.BusinessException;
@@ -17,14 +14,17 @@ import com.realestate.backend.repository.*;
 import com.realestate.backend.repository.specification.UserSpecification;
 import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.AdminUserService;
+import com.realestate.backend.service.MediaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Slf4j
@@ -39,6 +39,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     private final PropertyRepository propertyRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final AgencyMemberRepository agencyMemberRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final MediaService mediaService;
+    private final UserMediaRepository userMediaRepository;
 
 
     @Override
@@ -156,11 +159,17 @@ public class AdminUserServiceImpl implements AdminUserService {
                 .map(RoleEntity::getRoleName)
                 .anyMatch(role -> role == Role.AGENCY_OWNER);
 
+        boolean isUserAgent = user.getRoles()
+                .stream()
+                .map(RoleEntity::getRoleName)
+                .anyMatch(role -> role == Role.AGENT);
+
+
         if (isUserSuperAdmin) {
             throw new ForbiddenException("Cannot delete super admin.");
         }
 
-        if (isUserAgencyOwner) {
+        if (isUserAgencyOwner || isUserAgent) {
 
             AgencyEntity agency = agencyRepository.findById(user.getAgency().getId())
                     .orElseThrow(
@@ -182,19 +191,38 @@ public class AdminUserServiceImpl implements AdminUserService {
             membership.setActive(false);
             membership.setRemovedBy(assigner);
 
-            agency.setIsDeleted(true);
+            if(isUserAgencyOwner) {
+                agency.setIsDeleted(true);
+            }
 
         }
 
         refreshTokenRepository.deleteAllByUser(user);
 
-        user.setEnabled(false);
+        userMediaRepository.findByUserId(userId).ifPresent(userMedia -> {
+            userMediaRepository.delete(userMedia);
+            mediaService.delete(userMedia.getMedia());
+        });
+
         user.setDeleted(true);
-        user.setFullName("Deleted user");
+        user.setEnabled(false);
+
+        user.setDeletedBy(assigner);
+        user.setDeletedAt(LocalDateTime.now());
+        user.setEmailVerified(false);
+
+        user.setFullName("Deleted User");
+        user.setEmail("deleted+" + user.getId() + "@example.com");
         user.setPhoneNumber(null);
         user.setProfilePhotoUrl(null);
+        user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
 
-        log.info("User deleted");
+        log.atInfo()
+                .setMessage("User account deleted")
+                .addKeyValue("userId", user.getId())
+                .addKeyValue("deletedBy", assigner.getId())
+                .addKeyValue("deleted at", LocalDateTime.now())
+                .log();
     }
 
 }
