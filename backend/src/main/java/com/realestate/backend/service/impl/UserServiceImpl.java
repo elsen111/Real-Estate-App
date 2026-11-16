@@ -5,17 +5,12 @@ import com.realestate.backend.dto.response.AuthUserResponse;
 import com.realestate.backend.dto.request.AccountPasswordRequest;
 import com.realestate.backend.dto.request.UpdateProfileRequest;
 import com.realestate.backend.dto.response.UserProfilePhotoResponse;
-import com.realestate.backend.entity.MediaFileEntity;
-import com.realestate.backend.entity.UserEntity;
-import com.realestate.backend.entity.UserMediaEntity;
-import com.realestate.backend.exception.AccountStateException;
-import com.realestate.backend.exception.ConflictException;
-import com.realestate.backend.exception.ResourceNotFoundException;
-import com.realestate.backend.exception.UnauthorizedException;
+import com.realestate.backend.entity.*;
+import com.realestate.backend.enums.PropertyStatus;
+import com.realestate.backend.enums.Role;
+import com.realestate.backend.exception.*;
 import com.realestate.backend.mapper.UserMapper;
-import com.realestate.backend.repository.RefreshTokenRepository;
-import com.realestate.backend.repository.UserMediaRepository;
-import com.realestate.backend.repository.UserRepository;
+import com.realestate.backend.repository.*;
 import com.realestate.backend.security.principal.CustomUserDetails;
 import com.realestate.backend.service.MediaService;
 import com.realestate.backend.service.UserService;
@@ -27,7 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -44,6 +41,10 @@ public class UserServiceImpl implements UserService {
     private final UserMediaRepository userMediaRepository;
 
     private final MediaService mediaService;
+
+    private final AgencyRepository agencyRepository;
+    private final AgencyMemberRepository agencyMemberRepository;
+    private final PropertyRepository propertyRepository;
 
     @Override
     @Transactional
@@ -87,8 +88,72 @@ public class UserServiceImpl implements UserService {
             );
         }
 
+        UUID assignerId = currentUser.getId();
+
+        boolean isUserSuperAdmin = user.getRoles()
+                .stream()
+                .map(RoleEntity::getRoleName)
+                .anyMatch(role -> role == Role.SUPER_ADMIN);
+
+        boolean isUserAgent = user.getRoles()
+                .stream()
+                .map(RoleEntity::getRoleName)
+                .anyMatch(role -> role == Role.AGENT);
+
+        boolean isUserAgencyOwner = user.getRoles()
+                .stream()
+                .map(RoleEntity::getRoleName)
+                .anyMatch(role -> role == Role.AGENCY_OWNER);
+
+        if (isUserSuperAdmin) {
+            throw new ForbiddenException("Cannot delete super admin.");
+        }
+
+        if (isUserAgencyOwner || isUserAgent) {
+
+            AgencyEntity agency = agencyRepository.findById(user.getAgency().getId())
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException("Agency not found with id: " + user.getAgency().getId() + "!")
+                    );
+
+            boolean hasActiveListings = propertyRepository.existsByAgencyIdAndStatus(
+                    agency.getId(), PropertyStatus.ACTIVE);
+
+            if (hasActiveListings) {
+                throw new BusinessException("Cannot delete the user (agency owner) whose agency has active listings!");
+            }
+
+            AgencyMemberEntity membership = agencyMemberRepository.findByUserAndActiveTrue(user)
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException("Agency member not found with id: " + user.getId())
+                    );
+
+            membership.setActive(false);
+            membership.setRemovedBy(user);
+
+            if(isUserAgencyOwner) {
+                agency.setIsDeleted(true);
+            }
+
+        }
+
+        userMediaRepository.findByUserId(user.getId()).ifPresent(userMedia -> {
+            userMediaRepository.delete(userMedia);
+            mediaService.delete(userMedia.getMedia());
+        });
+
         user.setEnabled(false);
         user.setDeleted(true);
+
+        user.setEmailVerified(false);
+        user.setDeletedBy(user);
+        user.setDeletedAt(LocalDateTime.now());
+
+        user.setFullName("Deleted User");
+        user.setEmail("deleted+" + user.getId() + "@example.com");
+        user.setPhoneNumber(null);
+        user.setProfilePhotoUrl(null);
+        user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
 
         refreshTokenRepository.deleteAllByUser(user);
 

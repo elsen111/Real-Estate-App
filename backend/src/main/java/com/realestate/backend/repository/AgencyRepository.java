@@ -10,7 +10,7 @@ import java.util.UUID;
 @Repository
 public interface AgencyRepository extends JpaRepository<AgencyEntity, UUID>, JpaSpecificationExecutor<AgencyEntity> {
 
-    boolean existsByEmail(
+    boolean existsByEmailAndIsDeletedFalse(
             String email
     );
 

@@ -349,7 +349,7 @@ public class AgencyServiceImpl implements AgencyService {
                         () -> new ResourceNotFoundException("Agency not found with id: " + agencyId)
                 );
 
-        if (agencyRepository.existsByEmail(request.getEmail()) && !agency.getEmail().equals(request.getEmail())) {
+        if (agencyRepository.existsByEmailAndIsDeletedFalse(request.getEmail()) && !agency.getEmail().equals(request.getEmail())) {
             throw new ConflictException("Email already exists for another agency.");
         }
 
